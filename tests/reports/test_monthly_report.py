@@ -70,23 +70,43 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
                 returned_on=date(2026, 2, 16),
             ),
             Loan(
+                id='report-d-start',
+                member='member-d',
+                isbn='9',
+                lent_on=date(2026, 2, 5),
+            ),
+            Loan(
+                id='report-d-return-on-first',
+                member='member-d',
+                isbn='10',
+                lent_on=date(2025, 12, 1),
+                returned_on=date(2026, 2, 1),
+            ),
+            Loan(
+                id='report-e-late-two-days',
+                member='member-e',
+                isbn='11',
+                lent_on=date(2026, 2, 1),
+                returned_on=date(2026, 2, 17),
+            ),
+            Loan(
                 id='report-no-start',
                 member='member-without-starts',
-                isbn='9',
+                isbn='12',
                 lent_on=date(2026, 1, 1),
                 returned_on=date(2026, 2, 20),
             ),
             Loan(
                 id='report-a-after-window',
                 member='member-a',
-                isbn='10',
+                isbn='13',
                 lent_on=date(2025, 12, 1),
                 returned_on=date(2026, 3, 1),
             ),
             Loan(
                 id='report-start-after-window',
                 member='member-outside-window',
-                isbn='11',
+                isbn='14',
                 lent_on=date(2026, 3, 1),
             ),
         ]
@@ -98,7 +118,9 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
     assert output.getvalue() == (
         'member_id,loans_started,late_returns,late_fees_cents\n'
         'member-z,2,2,2000\n'
+        'member-d,1,1,1000\n'
         'member-a,2,1,75\n'
         'member-b,1,1,75\n'
         'member-c,1,1,0\n'
+        'member-e,1,1,0\n'
     )
