@@ -20,6 +20,21 @@ GATEWAY_GOLDENS = json.loads(
 )
 
 
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L3'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L3/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_fee_endpoint_matches_characterized_html(client):
     expected = HTTP_GOLDENS['GET /fees/{id}']['response']
