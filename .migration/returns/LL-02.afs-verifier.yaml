@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/268
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.993
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: minor
+    where: src/loans/repository.py:17
+    what: "Mutant #2 removes @transaction.atomic and remains in the survivor report. The change matters: PostgreSQL autocommit rejects the unwrapped select_for_update; the added transaction test exercises the decorated path, but the mutation runner did not kill this import-time decorator mutant."
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_loan_form_exposes_required_member_and_isbn_fields
+  - tests/loans/test_catalog.py::test_browser_catalog_page_lists_loans
+  - tests/loans/test_catalog.py::test_browser_get_with_htmx_header_returns_full_lending_page
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_return_repository_uses_a_transaction_for_row_locking
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
