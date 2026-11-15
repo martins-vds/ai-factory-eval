@@ -22,8 +22,7 @@ def late_fee(request, loan_id):
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
     body = format_html(
-        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-        '<p class="fee">Fee: {}</p>',
+        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: {}</p>',
         quote.loan.id,
         quote.loan.due_on.isoformat(),
         quote.days_late,
@@ -70,9 +69,7 @@ def payment_page(request, loan_id):
         'loan_id': loan_id,
         'success': success,
         'message': (
-            f'Payment complete for {loan_id}.'
-            if success
-            else 'Payment could not be completed.'
+            f'Payment complete for {loan_id}.' if success else 'Payment could not be completed.'
         ),
         'gateway_body': result.body,
     }

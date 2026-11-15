@@ -172,9 +172,7 @@ def test_payment_io_failure_maps_to_gateway_unavailable(client, monkeypatch):
 
 
 @pytest.mark.django_db
-def test_interrupted_payment_returns_502_and_logs_original_exception(
-    client, monkeypatch, caplog
-):
+def test_interrupted_payment_returns_502_and_logs_original_exception(client, monkeypatch, caplog):
     interruption = InterruptedError('gateway call interrupted')
 
     def interrupt(*args, **kwargs):
