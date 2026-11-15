@@ -1,5 +1,5 @@
 ## Handoff — afs-verifier · 2026-11-15T02:08:00Z
-**State:** blocked  ·  **Branch / PR:** `copilot/eval-2026-11-15-baseline-r1-again` / https://github.com/martins-vds/ai-factory-eval/pull/8  ·  **Last commit:** `96e09fe914819272ebcf8c246ba8db1db21a8ec1`
+**State:** blocked  ·  **Branch / PR:** `copilot/eval-2026-11-15-baseline-r1-again` / PR number unavailable  ·  **Last commit:** `96e09fe914819272ebcf8c246ba8db1db21a8ec1`
 ### Done
 - Source checkout is read-only and ignored, and matches pinned SHA `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`.
 - Completed target HEAD ancestry with `git fetch --unshallow origin`; checkout is no longer shallow.
