@@ -2,14 +2,14 @@ role: afs-specialist-migrator
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
 specialty: ui
-pr: null
+pr: https://github.com/martins-vds/ai-factory-eval/pull/346
 gates:
-  build: null
-  behavior: null
-  idiom: null
-  crap: null
-  mutation_changed: null
-  regression: null
+  build: "n/a: blocked; required dialog endpoints and templates are absent from approved scope"
+  behavior: "n/a: blocked; required dialog endpoints and templates are absent from approved scope"
+  idiom: "n/a: blocked; required dialog endpoints and templates are absent from approved scope"
+  crap: "n/a: blocked; required dialog endpoints and templates are absent from approved scope"
+  mutation_changed: "n/a: blocked; required dialog endpoints and templates are absent from approved scope"
+  regression: "n/a: blocked; required dialog endpoints and templates are absent from approved scope"
 specialty_evidence: []
 ledger_updated: []
 quirk_tickets: []
