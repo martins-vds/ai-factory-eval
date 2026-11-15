@@ -8,15 +8,10 @@ from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import PaymentGatewayFailure
 
 HTTP_GOLDENS = json.loads(
-    (
-        Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
-    ).read_text(encoding='utf-8')
+    (Path(__file__).parent / 'fixtures/http.json').read_text(encoding='utf-8')
 )
 GATEWAY_GOLDENS = json.loads(
-    (
-        Path(__file__).resolve().parents[2]
-        / '.migration/characterization/source/goldens/gateway.json'
-    ).read_text(encoding='utf-8')
+    (Path(__file__).parent / 'fixtures/gateway.json').read_text(encoding='utf-8')
 )
 
 
