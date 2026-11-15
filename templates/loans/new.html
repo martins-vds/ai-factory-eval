@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <h1 class="mb-4 mt-6 text-5xl">A new book finds its reader.</h1>
+  <p class="mb-8 text-[#66705b]">Add a reader and the book's ISBN to the lending ledger.</p>
+  <form id="loan-form" class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm" method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="#loan-form" hx-select="#loan-form" hx-swap="outerHTML">
+    {% csrf_token %}
+    <div class="card-body">
+      {% if errors %}
+        {% if errors.member %}<p class="text-sm text-[#a94e37]" id="member-error" role="alert">Member is required.</p>{% endif %}
+      {% endif %}
+      <label class="form-control">
+        <span class="label-text mb-2">Member</span>
+        <input class="input input-bordered" name="member" value="{{ member }}" required{% if errors.member %} aria-invalid="true" aria-describedby="member-error"{% endif %}>
+      </label>
+      <label class="form-control mt-4">
+        <span class="label-text mb-2">ISBN</span>
+        {% if errors.isbn %}<p class="text-sm text-[#a94e37]" id="isbn-error" role="alert">ISBN is required.</p>{% endif %}
+        <input class="input input-bordered" name="isbn" value="{{ isbn }}" required{% if errors.isbn %} aria-invalid="true" aria-describedby="isbn-error"{% endif %}>
+      </label>
+      <button class="btn btn-primary mt-6 self-start" type="submit">Add to collection</button>
+    </div>
+  </form>
+</section>
+{% endblock %}
