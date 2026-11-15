@@ -4,12 +4,12 @@ issue: martins-vds/ai-factory-pilot-target#293
 specialty: ui
 pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
 gates:
-  build: 0
-  behavior: 0
-  idiom: 0
-  crap: 26.0
-  mutation_changed: 0.790
-  regression: 0
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
@@ -27,3 +27,8 @@ ledger_updated:
   - booking.routing-assign
 quirk_tickets: []
 handoff: .migration/handoffs/BK-05F.md
+equivalent_mutants:
+  - "views.py:22 #1 diff: 'booking.route_selection' -> 'XXbooking.route_selectionXX'; both signing and verification use the same salt, so this label change does not alter the route-selection flow."
+  - 'views.py:39 #14 diff: quote(..., safe="") -> quote(..., safe="XXXX"); X is unreserved and quote leaves it unescaped in either case.'
+  - "views.py:95 #40 diff: missing candidate default '' -> 'XXXX'; both malformed tokens reach the same invalid-candidate 404."
+  - "views.py:97 #44 diff: BadSignature detail changed; the exception is caught and replaced by the same user-facing Http404."
