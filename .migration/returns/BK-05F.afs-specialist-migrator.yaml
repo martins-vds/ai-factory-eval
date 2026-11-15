@@ -8,7 +8,7 @@ gates:
   behavior: null
   idiom: null
   crap: null
-  mutation_changed: 0.933
+  mutation_changed: null
   regression: null
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
@@ -29,3 +29,8 @@ evidence_logs:
   - .migration/evidence/runs/BK-05F.md
 quirk_tickets: []
 handoff: .migration/handoffs/BK-05F.md
+notes: >-
+  This session's absolute-path mutation invocation reported 0.933, but the
+  validator does not recognize it as the profile's exact mutation command.
+  mutation_changed remains null because the profile gate was not recorded with
+  its required command; the latest recognized profile score is 0.790.
