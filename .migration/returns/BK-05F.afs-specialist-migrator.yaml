@@ -8,7 +8,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: 0.790
+  mutation_changed: 'n/a: no mutable code changed'
   regression: 0
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
@@ -20,6 +20,7 @@ specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
+  - .migration/runs/BK-05F/20261115T201456077966Z-route-selection-tests-current.log
 ledger_updated:
   - booking.routing-chain
   - booking.screen-route
