@@ -1,7 +1,7 @@
 {
   "harness_version": "0.2.0",
-  "harness_commit": "77252ce58f5e551b638cff212fa64aa939cabf1f",
-  "installed_at": "2026-11-14T20:42:55Z",
+  "harness_commit": "7f53b906f5205dd3e9049156381bc77c252fd9da",
+  "installed_at": "2026-11-15T17:28:53Z",
   "entries": [
     {
       "path": ".github/agents/afs-analyst.agent.md",
@@ -21,7 +21,7 @@
       "path": ".github/agents/afs-bootstrapper.agent.md",
       "kind": "agent",
       "files": {
-        ".github/agents/afs-bootstrapper.agent.md": "6b9ce11fa246c38967b9f7f63d156c73cc05e23eb1829023c4462dfccbdf6d61"
+        ".github/agents/afs-bootstrapper.agent.md": "508e8a4b5049222b6164d28b202cea6b9c0f57778cb560b7a285fa520d24cf12"
       }
     },
     {
@@ -35,7 +35,7 @@
       "path": ".github/agents/afs-migrator.agent.md",
       "kind": "agent",
       "files": {
-        ".github/agents/afs-migrator.agent.md": "f493a8e3ab1cc866b1b8c93572baaa0e6ee5b340bde83a0c7cf6261e9fdb4f37"
+        ".github/agents/afs-migrator.agent.md": "3d0c4ad3c774eec0facc57edb1f5241189fc3351893ef322ed9cd88cf9501dfd"
       }
     },
     {
@@ -1114,11 +1114,11 @@
       "kind": "tools",
       "files": {
         ".migration/harness/tools/afs-acceptance": "0aaaebaab137f54132b4e744c66f43a4cc92a12bf0c652b3d478300226388acd",
-        ".migration/harness/tools/afs-cost-hook": "20af3da92b540af8115d501999a2277dad489cfeb80f5f976b126ffaf800c1f0",
+        ".migration/harness/tools/afs-cost-hook": "11d03088b545d9ad08f9236bd4fa078ef431f9d0754e1e5df84da79c44117edd",
         ".migration/harness/tools/afs-costs": "f3cc1d4b9de512fd18c8e35f6f9690070ba5060ca0284271e842257df786a9ab",
         ".migration/harness/tools/afs-drill": "ed8ba2f25075cf2644facf21a73fdb14bd5c8cb2df8b0df4d2d65e5f6b12186b",
-        ".migration/harness/tools/afs-finish-check": "bec3e8a07cf0a9ca5256a8087204210c6cab0723aa548b6a0935172006d6deee",
-        ".migration/harness/tools/afs-mutation": "a22388825b66b01c8733ab2710f1b1dfaf92ec3512abfab028b95c4ab386a2ab",
+        ".migration/harness/tools/afs-finish-check": "f92a23321460ea292ced1a23e44fc1fea75ea9a41d60db8143634dd7abbf382e",
+        ".migration/harness/tools/afs-mutation": "bae80b93fc4de320cfe685d592469e3b705e6a3564e268153f3b8e5e0319e50f",
         ".migration/harness/tools/afs-run": "71b8fa2e46cbff8098becb7567577dcbf41983e0c408de59e69c9f10b039179a",
         ".migration/harness/tools/afs-services": "9ba61468eef1d55329963d02ae05bee14d8ad3ed2afcb620208ca3e9c16f2669",
         ".migration/harness/tools/afs_trace.py": "68e27fa4ffc01cd1f423f0120935c342d91479db3ccfd7b6f0cc4da4276110bf",
@@ -1160,7 +1160,7 @@
         ".migration/harness/schemas/capabilities.schema.json": "d95c267a234e1ae68325e0fd613e99c4efae3f40ec6c1191ca03f7896b1cdec1",
         ".migration/harness/schemas/ledger-entry.schema.json": "494d09f8ddf4c713aa95e45b3c10833eefb57097efa3f427deb146a1a7d60ab0",
         ".migration/harness/schemas/plan-tickets.schema.json": "ea92395e7c6edc23fe18975337e935c70be41431b13119c02a144e88b693f48d",
-        ".migration/harness/schemas/profile.schema.json": "e95245a7d9327f186fd59ca0e91750704dc6d21ec6c4357d8f3809e4d39c9985",
+        ".migration/harness/schemas/profile.schema.json": "a0a2aa64b0ddc65445ccdc28f915094af0aa384d5f64e574fbf7e8e9a404d262",
         ".migration/harness/schemas/return.schema.json": "29a870b0eef1eafd7a31460282c81d8bc838f597d3a2168dcef7dee434db310a",
         ".migration/harness/schemas/slice.schema.json": "4697d465a8e85177184f1699af4d7a290e15922e9e92e799cc68ba96da2db706"
       }
