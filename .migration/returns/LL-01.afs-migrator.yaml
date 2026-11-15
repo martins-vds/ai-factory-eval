@@ -22,4 +22,4 @@ ledger_updated:
   - loan.text-export
 quirk_tickets: []
 new_tickets: []
-handoff: none
+handoff: .migration/handoffs/LL-01.md
