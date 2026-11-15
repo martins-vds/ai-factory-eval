@@ -32,7 +32,7 @@ def get_loan_text(loan_id):
 
 
 def lend_loan(member, isbn):
-    if not member or not member.strip() or not isbn or not isbn.strip():
+    if loan_field_errors(member, isbn):
         return None
 
     return LoanRepository().lend(
@@ -40,3 +40,16 @@ def lend_loan(member, isbn):
         isbn=isbn,
         lent_on=timezone.localdate(),
     )
+
+
+def loan_field_errors(member, isbn):
+    errors = {}
+    if not member or not member.strip():
+        errors['member'] = 'Member is required.'
+    if not isbn or not isbn.strip():
+        errors['isbn'] = 'ISBN is required.'
+    return errors
+
+
+def return_loan(loan_id):
+    return LoanRepository().mark_returned(loan_id, timezone.localdate())
