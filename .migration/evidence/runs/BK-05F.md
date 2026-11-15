@@ -79,3 +79,19 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T07:22:46+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:24:20+00:00 | verify-build-compile | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:24:21+00:00 | verify-build-django-check | 0 | 1.55 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T07:24:21+00:00 | verify-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T07:24:21+00:00 | verify-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T07:25:51+00:00 | verifier-route-http-404 | 0 | 3.28 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_http_404_for_unknown_and_stale_cargo` | `856d0c92bfd158ae` |  |  |
+| 2026-11-15T07:26:08+00:00 | verify-build-compile-final | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:26:09+00:00 | verify-build-django-final | 0 | 0.26 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T07:26:09+00:00 | verify-idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T07:26:09+00:00 | verify-idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T07:26:43+00:00 | verify-behavior-final | 0 | 33.92 | `pytest -q` | `14ac32a5cf63963e` |  |  |
+| 2026-11-15T07:27:24+00:00 | verify-regression-final | 0 | 41.46 | `pytest -q` | `2d8e26ce52eea83b` |  |  |
+| 2026-11-15T07:27:59+00:00 | verify-crap-coverage-final | 0 | 34.65 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `16e11b3ccaadfd67` |  |  |
+| 2026-11-15T07:27:59+00:00 | verify-crap-lizard-final | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:27:59+00:00 | verify-crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-15T08:10:24+00:00 | verify-mutation-changed | 0 | 2544.64 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `02076552ddefa22f` |  | gate=mutation score=0.934 threshold=0.8 killed=1994 survived=141 files=81 base=origin/main |

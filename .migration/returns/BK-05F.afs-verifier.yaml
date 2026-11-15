@@ -1,0 +1,42 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/158
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.934
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_http_404_for_unknown_and_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+mutation_scope_note: >-
+  The profile command compared this evaluation checkout with origin/main and mutated 81 files;
+  the BK-05F route-selection survivors below are the ones relevant to the screens under review.
+mutation_survivors:
+  - ids: [123, 124]
+    matters: false
+    assessment: >-
+      Both mutations change the candidate signing salt. Signing and verification still use the
+      same salt, and this is the only signing use in the application; tokens are opaque.
+  - ids: [132, 135, 149, 168]
+    matters: false
+    assessment: >-
+      These mutate Http404 message text. The HTTP 404 boundary is unchanged; the cargo-not-found
+      phrase remains identifiable, and the exact message is not a screen requirement.
+  - ids: [136]
+    matters: false
+    assessment: X is unreserved in URLs, so the redirect path is unchanged.
+  - ids: [162]
+    matters: false
+    assessment: Both missing-token defaults fail signature validation and produce the same 404.
+  - ids: [166]
+    matters: false
+    assessment: The changed BadSignature text is caught and translated to the same Http404 response.
