@@ -66,7 +66,7 @@ def payment_page(request, loan_id):
             {'succeeded': status == 200},
         )
     if status == 200:
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect('ui-fee-page', loan_id=loan_id)
     loan = get_object_or_404(Loan, pk=loan_id)
     return render(
         request,

@@ -23,6 +23,6 @@ urlpatterns = [
     path('', include('src.loans.urls')),
     path('fees/<str:loan_id>', fee_views.fee_api),
     path('payments/<str:loan_id>', fee_views.payment_api),
-    path('ui/fees/<str:loan_id>/', fee_views.fee_page),
+    path('ui/fees/<str:loan_id>/', fee_views.fee_page, name='ui-fee-page'),
     path('ui/payments/<str:loan_id>/', fee_views.payment_page),
 ]
