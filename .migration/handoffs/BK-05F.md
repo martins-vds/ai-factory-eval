@@ -25,3 +25,15 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-specialist-migrator · 2026-11-15T06:37:51Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05f-update-changed-code-mutation  ·  **Last commit:** 8b76544
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05F.afs-specialist-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it.
+- [ ] Your return reports a handoff (`.migration/handoffs/BK-05F.md`) but this branch didn't commit it. Write the `## Handoff` section with afs-handoff and commit `.migration/handoffs/BK-05F.md`.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 2 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
