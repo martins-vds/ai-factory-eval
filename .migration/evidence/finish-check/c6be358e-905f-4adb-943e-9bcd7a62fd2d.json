@@ -57,5 +57,35 @@
     "blocks_before": 1,
     "decision": "allow",
     "why": "same failure twice; wrote .migration/handoffs/BK-05F.md"
+  },
+  {
+    "at": "2026-11-15T06:38:05Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 44233,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/costs/c6be358e-905f-4adb-943e-9bcd7a62fd2d.json",
+      ".migration/evidence/mutants/BK-05F.md",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/handoffs/BK-05F.md"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05F.afs-specialist-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 1,
+    "decision": "block",
+    "why": "block 2 of 2"
   }
 ]
