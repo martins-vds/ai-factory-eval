@@ -1,0 +1,29 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/75
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.941
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "Lending and return use cases directly depend on Django's clock and instantiate the concrete ORM repository instead of using application-owned ports wired by an outer composition root."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:5-101
+    what: "Survivors #1/#2/#20 cover the prior catalog, #44 only changes GET+HX rendering, #68-70 alter an unspecified missing-ID UI response, and #13 is a known module-level mutation-runner selection false negative; none affect required API or successful UI flows, and repeat-return mutant #79 is now killed."
+tests_added:
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43

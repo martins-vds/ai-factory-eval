@@ -424,6 +424,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
