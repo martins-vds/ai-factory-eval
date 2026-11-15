@@ -123,6 +123,12 @@ def test_lending_form_shows_field_errors_for_blank_values(client):
     assert form_page.context['form'].fields['member'].max_length == 255
     assert form_page.context['form'].fields['isbn'].max_length == 255
 
+    missing = client.post('/ui/loans/new/', {'member': 'dee'})
+
+    assert missing.status_code == 200
+    assert missing.context['form'].errors.keys() == {'isbn'}
+    assert missing.context['form'].errors['isbn'] == ['This field is required.']
+
     response = client.post('/ui/loans/new/', {'member': ' ', 'isbn': ''})
 
     assert response.status_code == 200
