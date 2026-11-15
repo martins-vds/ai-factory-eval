@@ -14,3 +14,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T13:46:53+00:00 | idiom | 0 | 0.18 | `bash -lc 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
 | 2026-11-15T13:47:30+00:00 | regression | 0 | 37.19 | `pytest -q` | `846b55d3d7687175` |  |  |
 | 2026-11-15T13:48:06+00:00 | crap | 0 | 36.02 | `bash -lc 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `35d1fe98b04fd873` |  | gate=crap max=26.0 threshold=30 over=0 methods=181 |
+| 2026-11-15T13:48:49+00:00 | roundtrip-reconcile | 0 | 1.45 | `pytest -q tests/data_migration/test_export.py::test_export_data_snapshot_round_trips_fixture_rows` | `7ed2738ac3dcd8f9` |  |  |

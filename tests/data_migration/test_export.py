@@ -1,4 +1,6 @@
 import csv
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -38,6 +40,26 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
     assert cargo[0]['eta'] == '2026-12-29'
     assert cargo[0]['last_known_location_id'] == r'\N'
     assert cargo[0]['calculated_at'] == '2026-11-07T10:11:12Z'
+    reconciliation = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / '.migration' / 'harness' / 'tools' / 'data_reconcile.py'),
+            'reconcile',
+            '--snapshot',
+            str(FIXTURE_SNAPSHOT),
+            '--target',
+            str(output),
+            '--mapping',
+            str(MAPPING),
+            '--report',
+            str(tmp_path / 'reconciliation.md'),
+        ],
+        capture_output=True,
+        check=False,
+        cwd=ROOT,
+        text=True,
+    )
+    assert reconciliation.returncode == 0, reconciliation.stdout + reconciliation.stderr
 
 
 @pytest.mark.django_db
