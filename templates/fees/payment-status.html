@@ -1,0 +1,7 @@
+<div id="payment-status">
+  {% if succeeded %}
+  <p role="status">Payment received. Thank you.</p>
+  {% else %}
+  <p role="alert">The payment gateway is unavailable. Please try again.</p>
+  {% endif %}
+</div>
