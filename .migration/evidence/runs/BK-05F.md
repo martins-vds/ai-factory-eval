@@ -79,3 +79,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T04:10:03+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T04:13:27+00:00 | verifier-404-focused | 0 | 3.06 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo` | `19d002248bff382d` |  |  |
+| 2026-11-15T04:13:45+00:00 | build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T04:13:45+00:00 | build-django-check | 0 | 0.34 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T04:14:39+00:00 | behavior | 0 | 53.7 | `pytest -q` | `944e9fb8057050fe` |  |  |
+| 2026-11-15T04:14:39+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T04:14:39+00:00 | idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `c2a52aa225452bd4` |  |  |
+| 2026-11-15T04:15:35+00:00 | crap-coverage | 0 | 55.46 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f421ffbf7d81a5c0` |  |  |
+| 2026-11-15T04:15:35+00:00 | crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T04:15:35+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-15T04:39:17+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T04:40:08+00:00 | regression | 0 | 50.5 | `pytest -q` | `b618d77ac1f94c7b` |  |  |
