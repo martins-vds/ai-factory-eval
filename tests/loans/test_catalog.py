@@ -490,9 +490,11 @@ def test_repository_write_rolls_back_failed_transaction():
 @pytest.mark.django_db(transaction=True)
 def test_return_repository_uses_a_transaction_for_its_row_lock():
     returned_on = date(2026, 1, 25)
+    Loan.objects.create(id='LT', member='reader', isbn='123', lent_on=date(2026, 1, 1))
 
-    loan, updated = LoanRepository().mark_returned('L1', returned_on)
+    loan, updated = LoanRepository().mark_returned('LT', returned_on)
 
     assert updated
+    assert loan.id == 'LT'
     assert loan.returned_on == returned_on
-    assert Loan.objects.get(pk='L1').returned_on == returned_on
+    assert Loan.objects.get(pk='LT').returned_on == returned_on
