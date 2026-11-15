@@ -16,5 +16,5 @@ gap_tickets:
   - "new: source crap (best-effort)"
   - "new: source mutation-testing"
   - "new: source lint-format"
-validation: "Pending: pinned harness validator is installed by step 5; YAML and required profile/capability fields reviewed against harness 0.2.0 schemas."
+validation: "pass: profile, capabilities, and return YAML validate against the pinned harness schemas; Compose semantic validation skipped because Docker CLI is unavailable."
 handoff: .migration/handoffs/SY-01.md
