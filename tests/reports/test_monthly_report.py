@@ -11,6 +11,7 @@ from src.loans.models import Loan
 
 @pytest.mark.django_db
 def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
+    Loan.objects.all().delete()
     Loan.objects.bulk_create(
         [
             Loan(
@@ -35,11 +36,25 @@ def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
                 returned_on=date(2025, 12, 26),
             ),
             Loan(
+                id='REPORT-7',
+                member='ALPHA',
+                isbn='7',
+                lent_on=date(2025, 12, 1),
+                returned_on=date(2026, 1, 1),
+            ),
+            Loan(
                 id='REPORT-4',
                 member='GAMMA',
                 isbn='4',
                 lent_on=date(2025, 12, 11),
                 returned_on=date(2025, 12, 28),
+            ),
+            Loan(
+                id='REPORT-8',
+                member='WAIVED',
+                isbn='8',
+                lent_on=date(2025, 12, 13),
+                returned_on=date(2025, 12, 29),
             ),
             Loan(
                 id='REPORT-5',
@@ -59,6 +74,7 @@ def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
     assert list(csv.reader(StringIO(output.getvalue()))) == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
         ['BETA', '1', '1', '150'],
-        ['ALPHA', '2', '1', '75'],
+        ['ALPHA', '3', '1', '75'],
         ['GAMMA', '1', '1', '75'],
+        ['WAIVED', '1', '1', '0'],
     ]
