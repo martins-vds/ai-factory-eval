@@ -1,0 +1,33 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/182
+verdict: blocked
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 6.0
+  mutation_changed: "n/a: mutmut failed on 12 of 15 files during isolated test collection"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: blocker
+    where: tests/loans/test_catalog.py::test_real_browser_can_lend_and_return_a_book
+    what: "The full suite repeatedly times out waiting for /ui/loans/L4/ (68 passed, 1 failed), blocking behavior and regression acceptance."
+  - severity: blocker
+    where: .migration/evidence/runs/LL-03.md:39
+    what: "Changed-code mutation could not score: mutmut failed on 12 of 15 files because isolated runs cannot collect the selected tests."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:12
+    what: "Known module-level survivors cover route literals, HTTP method guards, and LoanForm.Meta.model; LL-03 route behavior tests now exercise each API/UI route with both GET and POST."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_wrong_http_methods
+  - tests/fees/test_fee_calculation.py::test_pay_uses_in_memory_loan_repository_and_gateway
+  - tests/fees/test_fee_calculation.py::test_pay_unknown_loan_does_not_call_gateway
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+  - martins-vds/ai-factory-synthetic-target#41
+handoff: .migration/handoffs/LL-03.md
