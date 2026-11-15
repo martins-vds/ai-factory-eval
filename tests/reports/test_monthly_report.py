@@ -34,7 +34,8 @@ def test_monthly_report_groups_monthly_loans_and_sorts_by_fees_then_member():
 
     output = io.StringIO()
 
-    call_command('monthly_report', '--month', '2026-03', stdout=output)
+    with patch('django.utils.timezone.localdate', return_value=date(2026, 4, 1)):
+        call_command('monthly_report', stdout=output)
 
     rows = list(csv.reader(io.StringIO(output.getvalue(), newline='')))
     assert rows == [

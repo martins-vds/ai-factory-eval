@@ -1,4 +1,3 @@
-import argparse
 import csv
 from datetime import date, timedelta
 
@@ -8,16 +7,6 @@ from django.utils import timezone
 from src.loans.models import Loan
 
 
-def _parse_month(value):
-    try:
-        month = date.fromisoformat(f'{value}-01')
-    except ValueError as error:
-        raise argparse.ArgumentTypeError('month must be in YYYY-MM format') from error
-    if month.strftime('%Y-%m') != value:
-        raise argparse.ArgumentTypeError('month must be in YYYY-MM format')
-    return month
-
-
 def _next_month(month):
     return (month.replace(day=28) + timedelta(days=4)).replace(day=1)
 
@@ -25,27 +14,20 @@ def _next_month(month):
 class Command(BaseCommand):
     help = 'Write the monthly lending report as CSV.'
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--month',
-            type=_parse_month,
-            help='Report month in YYYY-MM format; defaults to the previous month.',
-        )
-
     def handle(self, *args, **options):
         today = timezone.localdate()
-        month = options['month'] or (today.replace(day=1) - timedelta(days=1)).replace(day=1)
+        month = (today.replace(day=1) - timedelta(days=1)).replace(day=1)
         report_date = _next_month(month)
         loans = Loan.objects.filter(
             lent_on__gte=month,
             lent_on__lt=report_date,
-        ).values('member', 'lent_on', 'returned_on')
+        ).only('member', 'lent_on', 'returned_on')
         totals = {}
 
         for loan in loans:
-            member = loan['member']
-            due_on = loan['lent_on'] + timedelta(days=14)
-            returned_on = loan['returned_on']
+            member = loan.member
+            due_on = loan.due_on
+            returned_on = loan.returned_on
             returned_by_report_date = returned_on is not None and returned_on <= report_date
             fee_end = returned_on if returned_by_report_date else report_date
             days_late = max(0, (fee_end - due_on).days)

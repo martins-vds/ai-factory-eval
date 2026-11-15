@@ -19,4 +19,4 @@ evidence:
   - .migration/evidence/runs/LL-05.md
   - tests/reports/test_monthly_report.py::test_monthly_report_groups_monthly_loans_and_sorts_by_fees_then_member
   - tests/reports/test_monthly_report.py::test_monthly_report_defaults_to_previous_month_in_server_timezone
-notes: "The report groups loans started in the selected month and evaluates late returns and fees through the first day after that month. Only the specification remains; the separate reporting module and runtime are unavailable."
+notes: "The report groups loans started in the previous calendar month and evaluates late returns and fees through the first day of this month. Only the specification remains; the separate reporting module and runtime are unavailable."
