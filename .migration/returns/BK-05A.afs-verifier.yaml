@@ -1,0 +1,21 @@
+role: afs-verifier
+ticket: BK-05A
+issue: martins-vds/ai-factory-pilot-target#288
+pr: https://github.com/martins-vds/ai-factory-eval/pull/8
+verdict: blocked
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs: null
+findings:
+  - severity: blocker
+    where: .migration/plan/
+    what: "Setup validation fails because admin-live-map.tickets.yaml, booking.tickets.yaml, data-migration.tickets.yaml, handling-registration.tickets.yaml, and track-cargo.tickets.yaml are missing; verification gates were not run."
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+handoff: .migration/handoffs/BK-05A.md
