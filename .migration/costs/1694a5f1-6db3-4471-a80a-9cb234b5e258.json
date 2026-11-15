@@ -1,0 +1,287 @@
+{
+  "agent": "afs-migrator",
+  "branch": "copilot/fix-41807230-1458293352-d748f338-3006-4423-bc62-c3d759587420",
+  "diagnostics": {
+    "data_keys": {
+      "assistant.message": [
+        "apiCallId",
+        "chunkCount",
+        "chunkIndex",
+        "clientRequestId",
+        "content",
+        "encryptedContent",
+        "interactionId",
+        "messageId",
+        "model",
+        "outputTokens",
+        "parentToolCallId",
+        "phase",
+        "reasoningOpaque",
+        "requestId",
+        "rte",
+        "serviceRequestId",
+        "toolRequests",
+        "turnId"
+      ],
+      "assistant.turn_end": [
+        "turnId"
+      ],
+      "assistant.turn_start": [
+        "interactionId",
+        "turnId"
+      ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
+      "hook.end": [
+        "hookInvocationId",
+        "hookType",
+        "success"
+      ],
+      "hook.start": [
+        "hookInvocationId",
+        "hookType",
+        "input"
+      ],
+      "permission.completed": [
+        "requestId",
+        "result",
+        "toolCallId"
+      ],
+      "permission.requested": [
+        "permissionRequest",
+        "promptRequest",
+        "requestId"
+      ],
+      "session.start": [
+        "alreadyInUse",
+        "context",
+        "contextTier",
+        "copilotVersion",
+        "producer",
+        "reasoningEffort",
+        "remoteSteerable",
+        "selectedModel",
+        "sessionId",
+        "startTime",
+        "version"
+      ],
+      "skill.invoked": [
+        "content",
+        "description",
+        "model",
+        "name",
+        "path",
+        "source",
+        "trigger"
+      ],
+      "subagent.completed": [
+        "agentDisplayName",
+        "agentName",
+        "durationMs",
+        "model",
+        "toolCallId",
+        "totalTokens",
+        "totalToolCalls"
+      ],
+      "subagent.selected": [
+        "agentDisplayName",
+        "agentName",
+        "tools"
+      ],
+      "subagent.started": [
+        "agentDescription",
+        "agentDisplayName",
+        "agentName",
+        "model",
+        "toolCallId"
+      ],
+      "system.message": [
+        "content",
+        "interactionId",
+        "role"
+      ],
+      "tool.execution_complete": [
+        "error",
+        "interactionId",
+        "model",
+        "parentToolCallId",
+        "result",
+        "rte",
+        "success",
+        "toolCallId",
+        "toolTelemetry",
+        "turnId"
+      ],
+      "tool.execution_start": [
+        "arguments",
+        "mcpServerName",
+        "mcpToolName",
+        "model",
+        "parentToolCallId",
+        "rte",
+        "shellToolInfo",
+        "toolCallId",
+        "toolName",
+        "turnId"
+      ],
+      "user.message": [
+        "attachments",
+        "content",
+        "delivery",
+        "interactionId",
+        "parentAgentTaskId",
+        "source",
+        "supportedNativeDocumentMimeTypes",
+        "transformedContent"
+      ]
+    },
+    "event_types": {
+      "assistant.message": 277,
+      "assistant.turn_end": 120,
+      "assistant.turn_start": 120,
+      "external_tool.completed": 3,
+      "external_tool.requested": 3,
+      "hook.end": 509,
+      "hook.start": 510,
+      "permission.completed": 273,
+      "permission.requested": 273,
+      "session.start": 1,
+      "skill.invoked": 17,
+      "subagent.completed": 6,
+      "subagent.selected": 1,
+      "subagent.started": 6,
+      "system.message": 7,
+      "tool.execution_complete": 289,
+      "tool.execution_start": 289,
+      "user.message": 16
+    },
+    "events": 2720,
+    "usage_fields": []
+  },
+  "ended_at": "2026-11-15T18:55:04.518Z",
+  "event": "sessionEnd",
+  "harness_tools": [
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 90,
+      "exit": 0,
+      "tool": "afs-run"
+    },
+    {
+      "count": 2,
+      "exit": 1,
+      "tool": "afs-run"
+    },
+    {
+      "count": 2,
+      "exit": 2,
+      "tool": "afs-run"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-services"
+    },
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "check_inputs.py"
+    },
+    {
+      "count": 2,
+      "exit": 1,
+      "tool": "check_inputs.py"
+    },
+    {
+      "count": 8,
+      "exit": 0,
+      "tool": "check_plan.py"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "check_runtime.py"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "understand.py"
+    },
+    {
+      "count": 8,
+      "exit": 0,
+      "tool": "validate.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-cost-hook"
+    }
+  ],
+  "log": "/home/runner/.copilot/session-state/1694a5f1-6db3-4471-a80a-9cb234b5e258/events.jsonl",
+  "models": {
+    "gpt-6-luna": {
+      "output": 103906,
+      "requests": 277
+    }
+  },
+  "prompt_head": null,
+  "recorded_at": "2026-11-15T18:55:10+00:00",
+  "schema": "afs-cost/1",
+  "session_id": "1694a5f1-6db3-4471-a80a-9cb234b5e258",
+  "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
+  "skills_invoked": [
+    {
+      "count": 1,
+      "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-implement"
+    },
+    {
+      "count": 1,
+      "skill": "afs-ledger"
+    },
+    {
+      "count": 2,
+      "skill": "afs-migration-contract"
+    },
+    {
+      "count": 2,
+      "skill": "afs-setup-check"
+    },
+    {
+      "count": 7,
+      "skill": "code-review"
+    },
+    {
+      "count": 1,
+      "skill": "django-tdd"
+    },
+    {
+      "count": 1,
+      "skill": "tdd"
+    },
+    {
+      "count": 1,
+      "skill": "verification-before-completion"
+    }
+  ],
+  "started_at": "2026-11-15T18:15:53.405Z",
+  "surface": "coding-agent",
+  "usage_source": "assistant.message (output only, partial)"
+}
