@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+from django.db import connection
 
 from src.loans.models import Loan
 
@@ -51,3 +52,19 @@ def test_export_quotes_field_and_record_delimiters(client):
     assert response.content.decode() == (
         'L4;"Member; One";"123\n456";2026-03-01;2026-03-15;\n'
     )
+
+
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
+def test_loan_is_available_after_database_connection_reopens(client):
+    Loan.objects.create(
+        id='L4',
+        member='dee',
+        isbn='123',
+        lent_on=date(2026, 11, 8),
+    )
+    connection.close()
+
+    response = client.get('/loans/L4')
+
+    assert response.status_code == 200
+    assert response.content.decode() == 'L4;dee;123;2026-11-08;2026-11-22;\n'
