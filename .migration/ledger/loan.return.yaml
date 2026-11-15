@@ -25,7 +25,7 @@ evidence:
   - tests/loans/test_circulation.py::test_return_updates_the_loan_and_records_the_date
   - tests/loans/test_circulation.py::test_repeat_return_rejects_request_and_preserves_existing_date
   - tests/loans/test_circulation.py::test_return_reports_unknown_loan
-  - tests/loans/test_circulation.py::test_browser_return_uses_htmx_and_updates_the_detail_page
+  - tests/loans/test_circulation.py::test_ui_return_uses_htmx_and_updates_the_detail_page
   - tests/test_ui_smoke.py::test_loan_catalog_renders_in_browser_and_admin_is_removed
 notes: "Approved ruling martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the original date; approval is recorded on decision map #38."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
