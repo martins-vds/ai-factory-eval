@@ -1,4 +1,5 @@
 from datetime import date
+from typing import ClassVar
 
 from django.db import migrations, models
 
@@ -26,9 +27,9 @@ def seed_loans(apps, schema_editor):
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies: ClassVar[list] = []
 
-    operations = [
+    operations: ClassVar[list] = [
         migrations.CreateModel(
             name='Loan',
             fields=[
@@ -38,7 +39,6 @@ class Migration(migrations.Migration):
                 ('lent_on', models.DateField()),
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],
-            options={'ordering': ('id',)},
         ),
         migrations.RunPython(seed_loans, migrations.RunPython.noop),
     ]
