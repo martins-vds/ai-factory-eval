@@ -9,3 +9,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T04:12:26+00:00 | export-red | 1 | 3.12 | `pytest -q tests/data_migration/test_export.py` | `0ac8be75739d31e1` | E               KeyError: 'export_data_snapshot' |  |
 | 2026-11-15T04:12:52+00:00 | export-test | 1 | 1.25 | `pytest -q tests/data_migration/test_export.py` | `bbea4f3d70b781db` | assert {path.stem for path in output.glob('*.csv')} == { |  |
 | 2026-11-15T04:13:03+00:00 | export-test | 0 | 1.24 | `pytest -q tests/data_migration/test_export.py` | `2082fa6110502427` |  |  |
+| 2026-11-15T04:13:31+00:00 | export-test-order | 0 | 1.33 | `pytest -q tests/data_migration/test_export.py` | `f34bbeaad9b69d77` |  |  |

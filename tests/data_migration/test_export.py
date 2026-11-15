@@ -5,6 +5,8 @@ import pytest
 import yaml
 from django.core.management import call_command
 
+from cargotracker.location.infrastructure.models import LocationRecord
+
 
 ROOT = Path(__file__).parents[2]
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
@@ -18,6 +20,7 @@ def test_export_snapshot_round_trips_fixture_and_preserves_nulls(tmp_path):
         snapshot=str(FIXTURE_SNAPSHOT),
         mapping=str(MAPPING),
     )
+    LocationRecord.objects.create(id=100, unlocode='TST00', name='First by key')
     output = tmp_path / 'export'
 
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
@@ -30,6 +33,7 @@ def test_export_snapshot_round_trips_fixture_and_preserves_nulls(tmp_path):
     with (output / 'location.csv').open(newline='', encoding='utf-8') as stream:
         locations = list(csv.DictReader(stream))
     assert locations == [
+        {'id': '100', 'unlocode': 'TST00', 'name': 'First by key'},
         {'id': '101', 'unlocode': 'USNYC', 'name': 'New York'},
         {'id': '102', 'unlocode': 'NLRTM', 'name': 'Rotterdam'},
     ]
