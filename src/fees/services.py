@@ -9,7 +9,6 @@ from urllib.request import Request, urlopen
 
 from django.utils import timezone
 
-
 logger = logging.getLogger(__name__)
 
 

@@ -36,7 +36,7 @@ def payment_gateway(monkeypatch):
 
 @pytest.mark.django_db
 def test_payment_api_posts_to_gateway_and_forwards_success_response(client, payment_gateway):
-    gateway_response, requests = payment_gateway
+    _, requests = payment_gateway
     Loan.objects.get(pk='L3')
 
     response = client.post('/payments/L3')
@@ -48,9 +48,7 @@ def test_payment_api_posts_to_gateway_and_forwards_success_response(client, paym
 
 
 @pytest.mark.django_db
-def test_payment_api_maps_non_success_gateway_response_to_bad_gateway(
-    client, payment_gateway
-):
+def test_payment_api_maps_non_success_gateway_response_to_bad_gateway(client, payment_gateway):
     gateway_response, requests = payment_gateway
     gateway_response.update(status=503, body=b'declined\n')
     Loan.objects.get(pk='L3')
@@ -140,9 +138,7 @@ def test_htmx_payment_action_swaps_gateway_failure_message(client, payment_gatew
         ('/ui/payments/L3/', 'get'),
     ],
 )
-def test_fee_and_payment_routes_reject_unsupported_methods(
-    client, payment_gateway, path, method
-):
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, path, method):
     response = getattr(client, method)(path)
 
     assert response.status_code == 405
