@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+<div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+  <section aria-labelledby="catalog-heading">
+    <p class="text-xs uppercase tracking-[.2em] text-[#626858]">The collection · {{ loans|length }} loans in view</p>
+    <h1 id="catalog-heading" class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+    <p class="mb-8 text-[#626858]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    <div aria-label="Loan records">
+      {% for loan in loans %}
+      <article class="grid gap-4 border-b border-[#d8cdbb] py-5 sm:grid-cols-[1fr_auto]">
+        <div>
+          <h2 class="text-xl font-semibold">
+            <a class="hover:text-[#a94e37]" href="{% url 'loan-catalog-detail' loan.id %}">Loan {{ loan.id }}</a>
+          </h2>
+          <p class="text-[#626858]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+        </div>
+        <div class="sm:text-right">
+          <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+          {% if loan.returned_on %}
+          <p class="text-sm text-[#626858]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+          {% endif %}
+        </div>
+      </article>
+      {% empty %}
+      <p class="border-b border-[#d8cdbb] py-5 text-[#626858]">No loans are in the collection yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="h-fit border border-[#d8cdbb] bg-[#fffdf7] p-6">
+    <p class="text-xs uppercase tracking-widest text-[#626858]">At the desk</p>
+    <h2 class="mb-5 mt-2 text-2xl">A shared collection</h2>
+    <p class="mb-5 leading-relaxed">Each book is lent for fourteen days. Browse the current record or take the list with you.</p>
+    <a class="btn w-full bg-[#a94e37] text-white hover:bg-[#8f3f2c]" href="/loans">Download loan list</a>
+  </aside>
+</div>
+{% endblock %}
