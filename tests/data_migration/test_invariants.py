@@ -1,5 +1,6 @@
 import csv
 import hashlib
+import itertools
 import json
 import shutil
 from datetime import UTC, datetime
@@ -106,9 +107,7 @@ def _load_fixture(tmp_path):
 def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
     _load_fixture(tmp_path)
     cargo = DjangoCargoRepository().find(TrackingId('ABC123'))
-    history = DjangoHandlingEventRepository().lookup_handling_history_of_cargo(
-        TrackingId('ABC123')
-    )
+    history = DjangoHandlingEventRepository().lookup_handling_history_of_cargo(TrackingId('ABC123'))
 
     assert history.most_recent_event is not None
     expected = Delivery.derived_from(
@@ -141,7 +140,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
         assert legs
         assert all(
             previous.unload_location_id == following.load_location_id
-            for previous, following in zip(legs, legs[1:], strict=False)
+            for previous, following in itertools.pairwise(legs)
         )
     assert any(LegRecord.objects.filter(cargo_id=cargo_id).count() > 1 for cargo_id in cargo_ids)
 
@@ -179,5 +178,5 @@ def test_loaded_carrier_movement_schedules_are_in_order(tmp_path):
         assert all(movement.departure_time < movement.arrival_time for movement in schedule)
         assert all(
             previous.arrival_time <= following.departure_time
-            for previous, following in zip(schedule, schedule[1:], strict=False)
+            for previous, following in itertools.pairwise(schedule)
         )
