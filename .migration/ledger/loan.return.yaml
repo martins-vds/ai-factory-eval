@@ -9,9 +9,23 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.loans.views.loan_return
+    - src.loans.views.loan_catalog_return
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_updates_the_loan_and_records_the_date
+  - tests/loans/test_circulation.py::test_repeat_return_rejects_request_and_preserves_existing_date
+  - tests/loans/test_circulation.py::test_return_reports_unknown_loan
+  - tests/loans/test_circulation.py::test_ui_return_uses_htmx_and_updates_the_detail_page
+  - tests/test_ui_smoke.py::test_loan_catalog_renders_in_browser_and_admin_is_removed
+notes: "Approved ruling martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the original date; approval is recorded on decision map #38."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
