@@ -28,5 +28,35 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-15T17:51:42Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 58747,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05G",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/costs/97f309e6-70a1-4ff3-85b6-64ff573d9865.json",
+      ".migration/evidence/runs/BK-05G.md",
+      ".migration/handoffs/BK-05G.md",
+      ".migration/returns/BK-05G.afs-specialist-migrator.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
   }
 ]
