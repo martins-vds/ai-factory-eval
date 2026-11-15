@@ -26,6 +26,7 @@ evidence:
   - tests/fees/test_fees.py::test_payment_api_posts_to_gateway_and_forwards_success
   - tests/fees/test_fees.py::test_payment_api_maps_gateway_failure_to_bad_gateway
   - tests/fees/test_fees.py::test_payment_gateway_keeps_interrupted_error_as_cause
+  - tests/fees/test_fees.py::test_payment_views_log_interruption_when_mapping_to_failure
   - .migration/evidence/runs/LL-03.md
-notes: "The gateway maps interruption to 502 and retains InterruptedError as the chained cause, per the approved fix in martins-vds/ai-factory-synthetic-target#40."
+notes: "The gateway maps interruption to 502, logs the chained InterruptedError and retains it as the cause, per the approved fix in martins-vds/ai-factory-synthetic-target#40."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
