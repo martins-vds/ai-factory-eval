@@ -35,7 +35,7 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
 
     with (output / 'cargo.csv').open(newline='', encoding='utf-8') as stream:
         cargo = list(csv.DictReader(stream))
-    assert cargo[0]['eta'] == r'\N'
+    assert cargo[0]['eta'] == '2026-12-29'
     assert cargo[0]['last_known_location_id'] == r'\N'
     assert cargo[0]['calculated_at'] == '2026-11-07T10:11:12Z'
 
