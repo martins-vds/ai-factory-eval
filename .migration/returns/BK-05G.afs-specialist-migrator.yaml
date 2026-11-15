@@ -16,6 +16,10 @@ specialty_evidence:
   - tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open
   - tests/booking/interfaces/test_dialogs.py::test_destination_update_redirects_and_refreshes_not_routed_row
   - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_route_and_refreshes_not_routed_row
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_cargo_dialog_returns_cargo_not_found
+  - tests/booking/interfaces/test_dialogs.py::test_dialog_update_recalculates_route_state
+  - .migration/evidence/runs/BK-05G.md — dialogs-verifier-targeted (exit 0, 2026-11-15)
+  - .migration/evidence/runs/BK-05G.md — setup-probe (exit 0, 2026-11-15)
   - .migration/evidence/runs/BK-05G.md
   - .migration/evidence/mutants/BK-05G.md
 ledger_updated:
