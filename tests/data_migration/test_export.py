@@ -68,7 +68,7 @@ def test_export_snapshot_round_trips_fixture_rows_and_preserves_null_and_empty(t
     )
     assert 'AFS-RESULT gate=data-reconcile' in result.stdout
 
-    assert _records(output / 'cargo.csv')[0]['eta'] == r'\N'
+    assert _records(output / 'cargo.csv')[0]['last_known_location_id'] == r'\N'
     assert _records(output / 'voyage.csv')[0]['voyage_number'] == ''
     assert _records(output / 'cargo.csv')[0]['calculated_at'] == '2026-11-07T10:11:12Z'
 
