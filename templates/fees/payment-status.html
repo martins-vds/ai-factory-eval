@@ -1,0 +1,9 @@
+<div id="payment-status" class="mt-4">
+  {% if payment_result %}
+    {% if payment_result.success %}
+    <p role="status" class="text-[#66705b]">Payment successful.</p>
+    {% else %}
+    <p role="alert" class="text-[#a94e37]">Payment could not be processed.</p>
+    {% endif %}
+  {% endif %}
+</div>
