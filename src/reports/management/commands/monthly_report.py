@@ -36,7 +36,7 @@ class Command(BaseCommand):
         for loan in late_loans:
             due_on = loan.lent_on + timedelta(days=14)
             days_late = (loan.returned_on - due_on).days
-            if days_late <= 0 or loan.member not in rows:
+            if days_late <= 0:
                 continue
 
             rows[loan.member]['late_returns'] += 1
@@ -45,7 +45,9 @@ class Command(BaseCommand):
 
         writer = csv.writer(self.stdout, lineterminator='\n')
         writer.writerow(['member_id', 'loans_started', 'late_returns', 'late_fees_cents'])
-        for row in sorted(rows.values(), key=lambda item: (-item['late_fees_cents'], item['member_id'])):
+        for row in sorted(
+            rows.values(), key=lambda item: (-item['late_fees_cents'], item['member_id'])
+        ):
             writer.writerow(
                 [
                     row['member_id'],
