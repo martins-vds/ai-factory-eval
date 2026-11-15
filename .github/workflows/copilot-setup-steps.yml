@@ -58,6 +58,14 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           "$HOME/.local/bin/rtk" --version
 
+      # Eval only (ADR-0041): this repo's main is unrelated to each case, so "changed code" must be measured from
+      # the case's prepared base commit, not origin/main (baseline r1/r2 mutated the whole tree). afs-mutation
+      # reads AFS_BASE before origin/main; live targets don't set it.
+      - name: Measure changed code from the eval case's base commit
+        run: |
+          base=$(git log --grep='^Eval case .*: base at ' -1 --format=%H)
+          if [ -n "$base" ]; then echo "AFS_BASE=$base" >> "$GITHUB_ENV"; echo "AFS_BASE=$base"; else echo "::warning::no eval case base commit"; fi
+
       - uses: actions/setup-python@v5
         with: { python-version: "3.13" }
 
