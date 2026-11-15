@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -122,6 +123,17 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.django_db
+def test_lending_form_requires_member_and_isbn_values():
+    invalid_form = LoanForm(data={'member': ' ', 'isbn': ''})
+    valid_form = LoanForm(data={'member': 'reader', 'isbn': '123'})
+
+    assert not invalid_form.is_valid()
+    assert set(invalid_form.errors) == {'member', 'isbn'}
+    assert valid_form.is_valid()
+    assert valid_form.cleaned_data == {'member': 'reader', 'isbn': '123'}
 
 
 @pytest.mark.django_db
@@ -329,6 +341,15 @@ def test_browser_can_create_a_loan_from_the_new_loan_page(client):
     loan = Loan.objects.get(pk='L4')
     assert loan.lent_on == lent_on
     assert loan.due_on == due_on
+
+
+@pytest.mark.django_db
+def test_browser_lending_page_uses_full_template_for_htmx_get(client):
+    response = client.get('/ui/loans/new/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert response.content.startswith(b'<!doctype html>')
+    assert b'id="loan-form"' in response.content
 
 
 @pytest.mark.django_db
