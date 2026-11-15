@@ -1,0 +1,19 @@
+role: afs-specialist-migrator
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#345
+specialty: data
+pr: martins-vds/ai-factory-eval#351
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+specialty_evidence:
+  - .migration/evidence/runs/DM-05F.md
+  - tests/data_migration/test_invariants.py
+  - tests/data_migration/fixtures/DM-05C/manifest.json
+ledger_updated: []
+quirk_tickets: []
+handoff: none
