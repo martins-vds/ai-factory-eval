@@ -82,6 +82,7 @@ def test_destination_dialog_shows_current_values_and_filters_without_mutating_lo
     assert response.status_code == 200
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
+    assert 'type="button" onclick="this.closest(\'dialog\').close()"' in content
     assert options is not None
     assert f'value="{cargo.route_specification.origin.unlocode.value}"' not in options.group(1)
     assert f'value="{cargo.route_specification.destination.unlocode.value}"' not in options.group(1)
@@ -137,7 +138,7 @@ def test_destination_update_preserves_other_route_fields_and_refreshes_table(cli
         HTTP_HX_REQUEST='true',
     )
 
-    assert response.status_code == 204
+    assert response.status_code == 200
     assert response.headers['HX-Redirect'] == '/admin/dashboard/'
 
     updated = _cargo()
@@ -164,7 +165,7 @@ def test_deadline_update_preserves_other_route_fields_and_refreshes_table(client
         HTTP_HX_REQUEST='true',
     )
 
-    assert response.status_code == 204
+    assert response.status_code == 200
     assert response.headers['HX-Redirect'] == '/admin/dashboard/'
 
     updated = _cargo()

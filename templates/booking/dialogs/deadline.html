@@ -1,0 +1,41 @@
+<dialog aria-labelledby="deadline-dialog-title" class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+  <h2 id="deadline-dialog-title" class="mb-4 text-xl font-semibold text-gray-900">Change arrival deadline</h2>
+  <dl class="mb-4 grid grid-cols-2 gap-2">
+    <dt class="font-medium">Origin</dt>
+    <dd>{{ cargo.route_specification.origin.name }}</dd>
+    <dt class="font-medium">Destination</dt>
+    <dd>{{ cargo.route_specification.destination.name }}</dd>
+  </dl>
+  {% if error %}
+    <p id="deadline-error" class="mb-3 text-red-700" role="alert">{{ error }}</p>
+  {% endif %}
+  <form
+    method="post"
+    action="{{ action_url }}"
+    hx-post="{{ action_url }}"
+    hx-target="#booking-dialog"
+    hx-swap="innerHTML"
+  >
+    {% csrf_token %}
+    <label for="deadline-choice" class="mb-1 block font-medium">Arrival deadline</label>
+    <input
+      id="deadline-choice"
+      name="deadline"
+      type="date"
+      value="{{ deadline_value }}"
+      required
+      autofocus
+      aria-invalid="{% if error %}true{% else %}false{% endif %}"
+      {% if error %}aria-describedby="deadline-error"{% endif %}
+      class="w-full rounded border border-gray-400 p-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+    >
+    <div class="mt-6 flex justify-end gap-3">
+      <button type="button" onclick="this.closest('dialog').close()" class="rounded border border-gray-400 px-4 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600">
+        Cancel
+      </button>
+      <button type="submit" class="rounded bg-blue-700 px-4 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600">
+        Update
+      </button>
+    </div>
+  </form>
+</dialog>
