@@ -53,7 +53,7 @@ def _write_rows(snapshot, table, rows):
     manifest_path.write_text(json.dumps(manifest), encoding='utf-8')
 
 
-def _domain_references():
+def _domain_reference_maps():
     locations = {
         record.pk: Location(UnLocode(record.unlocode), record.name)
         for record in LocationRecord.objects.all()
@@ -86,7 +86,7 @@ def _derive_delivery(cargo_record, locations, voyages):
         )
         for record in LegRecord.objects.filter(cargo_id=cargo_record.pk).order_by('load_time', 'pk')
     ]
-    itinerary = Itinerary(legs)
+    itinerary = Itinerary(legs) if legs else Itinerary.EMPTY
     cargo = Cargo(
         tracking_id=TrackingId(cargo_record.tracking_id),
         route_specification=route_specification,
@@ -145,6 +145,28 @@ def loaded_snapshot(tmp_path):
         SPEC_DESTINATION_ID='103',
         ROUTING_STATUS='ROUTED',
     )
+    cargo_rows.append(
+        {
+            'ID': '14',
+            'TRACKING_ID': 'FIDELITY-0002',
+            'ORIGIN_ID': '101',
+            'SPEC_ORIGIN_ID': '101',
+            'SPEC_DESTINATION_ID': '103',
+            'SPEC_ARRIVAL_DEADLINE': '2026-12-30',
+            'TRANSPORT_STATUS': 'IN_PORT',
+            'LAST_KNOWN_LOCATION_ID': '103',
+            'CURRENT_VOYAGE_ID': '\\N',
+            'MISDIRECTED': 'false',
+            'ETA': '\\N',
+            'NEXT_EXPECTED_HANDLING_EVENT_TYPE': '\\N',
+            'NEXT_EXPECTED_LOCATION_ID': '\\N',
+            'NEXT_EXPECTED_VOYAGE_ID': '\\N',
+            'UNLOADED_AT_DEST': 'false',
+            'ROUTING_STATUS': 'NOT_ROUTED',
+            'CALCULATED_AT': '2026-11-07T10:11:12Z',
+            'LAST_EVENT_ID': '72',
+        }
+    )
     _write_rows(snapshot, 'CARGO', cargo_rows)
 
     locations = _read_rows(snapshot, 'LOCATION')
@@ -153,6 +175,17 @@ def loaded_snapshot(tmp_path):
 
     events = _read_rows(snapshot, 'HANDLINGEVENT')
     events[0].update(TYPE='LOAD', LOCATION_ID='101')
+    events.append(
+        {
+            'ID': '72',
+            'TYPE': 'RECEIVE',
+            'VOYAGE_ID': '\\N',
+            'LOCATION_ID': '103',
+            'COMPLETIONTIME': '2026-11-07T09:00:00Z',
+            'REGISTRATION': '2026-11-07T09:01:00Z',
+            'CARGO_ID': '14',
+        }
+    )
     _write_rows(snapshot, 'HANDLINGEVENT', events)
 
     legs = _read_rows(snapshot, 'LEG')
@@ -197,7 +230,7 @@ def loaded_snapshot(tmp_path):
 @pytest.mark.django_db(transaction=True)
 def test_loaded_cargo_delivery_state_matches_its_handling_history(loaded_snapshot):
     assert CargoRecord.objects.exists()
-    locations, voyages, location_ids, voyage_ids = _domain_references()
+    locations, voyages, location_ids, voyage_ids = _domain_reference_maps()
 
     for cargo in CargoRecord.objects.order_by('pk'):
         delivery, history = _derive_delivery(cargo, locations, voyages)
@@ -235,8 +268,10 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_
     assert HandlingEventRecord.objects.exists()
 
     for event in HandlingEventRecord.objects.all():
-        assert event.voyage_id is not None
-        assert VoyageRecord.objects.filter(pk=event.voyage_id).exists()
+        if HandlingEventType(event.event_type).requires_voyage:
+            assert event.voyage_id is not None
+        if event.voyage_id is not None:
+            assert VoyageRecord.objects.filter(pk=event.voyage_id).exists()
         assert event.location_id is not None
         assert LocationRecord.objects.filter(pk=event.location_id).exists()
 
