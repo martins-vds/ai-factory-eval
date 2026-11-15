@@ -49,6 +49,12 @@ def test_monthly_report_summarizes_prior_month_started_loans_in_fee_order():
         isbn='6',
         lent_on=date(2026, 11, 1),
     )
+    Loan.objects.create(
+        id='R7',
+        member='delta',
+        isbn='7',
+        lent_on=date(2026, 10, 1),
+    )
     output = StringIO()
 
     with patch('django.utils.timezone.localdate', return_value=date(2026, 11, 1)):
@@ -56,7 +62,39 @@ def test_monthly_report_summarizes_prior_month_started_loans_in_fee_order():
 
     assert output.getvalue() == (
         'member_id,loans_started,loans_returned_late,late_fees_cents\n'
-        'beta,2,1,75\n'
+        'beta,2,1,475\n'
+        'delta,1,0,425\n'
         'alpha,1,1,0\n'
         'charlie,1,0,0\n'
+    )
+
+
+@pytest.mark.django_db
+def test_monthly_report_includes_previous_december_when_run_on_january_first():
+    Loan.objects.create(
+        id='R8',
+        member='reader',
+        isbn='8',
+        lent_on=date(2026, 12, 10),
+        returned_on=date(2026, 12, 28),
+    )
+    Loan.objects.create(
+        id='R9',
+        member='reader',
+        isbn='9',
+        lent_on=date(2026, 12, 31),
+    )
+    Loan.objects.create(
+        id='R10',
+        member='current',
+        isbn='10',
+        lent_on=date(2027, 1, 1),
+    )
+    output = StringIO()
+
+    with patch('django.utils.timezone.localdate', return_value=date(2027, 1, 1)):
+        call_command('monthly_report', stdout=output)
+
+    assert output.getvalue() == (
+        'member_id,loans_started,loans_returned_late,late_fees_cents\nreader,2,1,100\n'
     )
