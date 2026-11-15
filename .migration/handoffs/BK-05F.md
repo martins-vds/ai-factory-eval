@@ -25,3 +25,28 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-verifier · 2026-11-15T14:11:05Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-verify-route-selection-screens-again` / https://github.com/martins-vds/ai-factory-eval/pull/204 · **Last commit:** ceb2f9f
+
+### Done
+- Setup passed; source SHA is `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`. Exact ticket input check found all five named paths.
+- Build, idiom, behavior, regression, and CRAP gates passed in `.migration/evidence/runs/BK-05F.md`; behavior and regression each report 468 passed, CRAP max is 26.0 (threshold 30).
+- Independently checked the route-selection views call `CargoRouting.route_candidates`/`assign_route`; the routing use case calls `RoutingService` and filters by the route specification. Existing tests cover populated/empty screens, assignment and persisted route state, deadline filtering, and unknown/stale IDs. The four BK-05F ledger entries match their target components and evidence.
+- The committed `.migration/evidence/mutants/BK-05F.md` from the target PR run has nine survivors. None changes the required boundary behavior: #1/#2 alter only internal signing salt; #10/#13/#27/#44/#46 alter exception diagnostics that still resolve to the same 404; #14 preserves the same URL because `X` is unreserved; #40 still yields an invalid-token 404.
+
+### Remaining
+- [ ] Complete a fresh changed-code mutation run against the intended target-code baseline, record its result and classify its survivor diffs.
+- [ ] Replace the blocked mutation value in this return, rerun migration validation, and finish the verifier return.
+
+### Decisions made
+- No new tests were needed: the existing screen and BK-05C application tests already cover the requested route flow and state transitions.
+
+### Blockers / questions
+- The configured command `python .migration/harness/tools/afs-mutation --changed-since origin/main` selected 128 Python source files in this eval checkout, rather than the single route-selection source file under review. After 18 minutes it was still running across the first files; the run was stopped as a real execution limit. It produced no exit status, score, or journal row, so no mutation pass is claimed. PR #406's Actions gate checks were skipped and do not provide substitute evidence. A human/next session must establish a mutation base that represents the target repository's main branch before rerunning the required gate.
+
+### Failing commands
+- None completed with a failure. The mutation command above was interrupted and is recorded as incomplete, not as a failed or passing run.
+
+### Next step for the next session
+Use a checkout whose `origin/main` is the target repository's main baseline, rerun the profile mutation command through `afs-run`, assess its survivor diffs, then update and validate `.migration/returns/BK-05F.afs-verifier.yaml`.
