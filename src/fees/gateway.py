@@ -4,7 +4,6 @@ from http.client import HTTPException
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
@@ -33,7 +32,7 @@ class HttpPaymentGateway:
             try:
                 body = response.read().decode('utf-8', errors='replace')
             except (OSError, HTTPException) as error:
-                raise PaymentGatewayUnavailable('payment gateway unavailable') from error
+                raise PaymentGatewayUnavailable from error
             return PaymentResponse(502, body)
         except (OSError, HTTPException) as error:
-            raise PaymentGatewayUnavailable('payment gateway unavailable') from error
+            raise PaymentGatewayUnavailable from error

@@ -5,7 +5,9 @@ from threading import Thread
 import pytest
 
 from src.fees.gateway import HttpPaymentGateway, PaymentGatewayUnavailable
+from src.fees.services import FeeApplication
 from src.loans.models import Loan
+from src.loans.repository import DjangoLoanRepository
 
 
 @pytest.fixture
@@ -14,8 +16,20 @@ def local_gateway(monkeypatch):
 
     class GatewayHandler(BaseHTTPRequestHandler):
         def do_POST(self):
-            requests.append((self.command, self.path, self.rfile.read(int(self.headers.get('Content-Length', 0)))))
-            status, body = (503, b'declined\n') if self.path.endswith('loan=L2') else (200, b'charged\n')
+            requests.append(
+                (
+                    self.command,
+                    self.path,
+                    self.rfile.read(int(self.headers.get('Content-Length', 0))),
+                )
+            )
+            status, body = (
+                (503, b'declined\n')
+                if self.path.endswith('loan=L2')
+                else (201, b'review\n')
+                if self.path.endswith('loan=L3')
+                else (200, b'charged\n')
+            )
             self.send_response(status)
             self.send_header('Content-Length', str(len(body)))
             self.end_headers()
@@ -129,8 +143,28 @@ def test_payment_for_unknown_loan_does_not_call_gateway(client, local_gateway):
     response = client.post('/payments/unknown')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'no such loan\n'
     assert local_gateway == []
+
+
+@pytest.mark.django_db
+def test_ui_payment_for_unknown_loan_does_not_call_gateway(client, local_gateway):
+    response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert local_gateway == []
+
+
+@pytest.mark.django_db
+def test_payment_api_maps_non_200_success_status_to_bad_gateway(client, local_gateway):
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'review\n'
+    assert local_gateway == [('POST', '/charge?loan=L3', b'')]
 
 
 @pytest.mark.django_db
@@ -166,6 +200,20 @@ def test_htmx_payment_surfaces_gateway_failure(client, local_gateway):
     assert b'Payment could not be completed. declined' in response.content
 
 
+@pytest.mark.django_db
+def test_htmx_payment_surfaces_connection_failure(client, monkeypatch):
+    unavailable_server = ThreadingHTTPServer(('127.0.0.1', 0), BaseHTTPRequestHandler)
+    gateway_url = f'http://127.0.0.1:{unavailable_server.server_port}'
+    unavailable_server.server_close()
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'Payment gateway unavailable.</p>' in response.content
+
+
 def test_payment_gateway_keeps_interrupted_error_as_cause(monkeypatch):
     def interrupt(request):
         raise InterruptedError('request interrupted')
@@ -177,3 +225,62 @@ def test_payment_gateway_keeps_interrupted_error_as_cause(monkeypatch):
         gateway.charge('L1')
 
     assert isinstance(failure.value.__cause__, InterruptedError)
+
+
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/ui/fees/L3/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+@pytest.mark.django_db
+def test_fee_and_payment_routes_reject_unsupported_methods(client, local_gateway, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert local_gateway == []
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('today', 'expected_days', 'expected_cents'),
+    [
+        (date(2026, 1, 15), 0, 0),
+        (date(2026, 1, 19), 3, 75),
+    ],
+)
+def test_unreturned_loan_quote_uses_today_and_clamps_early_dates(
+    today, expected_days, expected_cents
+):
+    class FixedClock:
+        def today(self):
+            return today
+
+    quote = FeeApplication(DjangoLoanRepository(), FixedClock()).quote('L1')
+
+    assert (quote.days_late, quote.amount_cents) == (expected_days, expected_cents)
+
+
+@pytest.mark.parametrize(
+    ('base_url', 'expected_url'),
+    [
+        (None, 'https://payments.lending-library.invalid/charge?loan=L1'),
+        ('http://gateway.test', 'http://gateway.test/charge?loan=L1'),
+    ],
+)
+def test_gateway_uses_configured_or_source_default_url(monkeypatch, base_url, expected_url):
+    requested_urls = []
+
+    def unavailable(request):
+        requested_urls.append(request.full_url)
+        raise OSError('offline')
+
+    monkeypatch.setattr('src.fees.gateway.urlopen', unavailable)
+
+    with pytest.raises(PaymentGatewayUnavailable):
+        HttpPaymentGateway(base_url).charge('L1')
+
+    assert requested_urls == [expected_url]
