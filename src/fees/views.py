@@ -60,7 +60,7 @@ def payment_page(request, loan_id):
         template = 'fees/payment-status.html'
         context = {'succeeded': result.status_code == 200, 'body': body}
     elif result.status_code == 200:
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect('fee-page', loan_id=loan.id)
     else:
         template = 'fees/detail.html'
         context = {

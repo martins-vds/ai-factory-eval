@@ -139,6 +139,16 @@ def test_htmx_payment_action_renders_success_status(client, payment_gateway):
 
 
 @pytest.mark.django_db
+def test_regular_payment_action_redirects_to_fee_page(client, payment_gateway):
+    Loan.objects.get(pk='L3')
+
+    response = client.post('/ui/payments/L3/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L3/'
+
+
+@pytest.mark.django_db
 def test_htmx_payment_action_swaps_gateway_failure_message(client, payment_gateway):
     gateway_response, _ = payment_gateway
     gateway_response.update(status=503, body=b'declined\n')

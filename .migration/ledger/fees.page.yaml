@@ -13,5 +13,5 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_fee_endpoint_returns_characterized_not_found_response, tests/fees/test_fees.py::test_reading_room_fee_page_has_htmx_payment_action]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_fee_endpoint_returns_characterized_not_found_response, tests/fees/test_fees.py::test_reading_room_fee_page_has_htmx_payment_action, tests/fees/test_payments.py::test_regular_payment_action_redirects_to_fee_page]
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
