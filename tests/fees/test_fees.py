@@ -1,6 +1,6 @@
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from datetime import date, timedelta
 from decimal import Decimal
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
@@ -16,13 +16,15 @@ def payment_gateway():
     class GatewayHandler(BaseHTTPRequestHandler):
         response_status = 200
         response_body = b'charged\n'
-        response_headers = {}
+        response_headers = None
 
         def do_POST(self):
-            requests.append((self.command, self.path, self.rfile.read(int(self.headers['Content-Length'] or 0))))
+            requests.append(
+                (self.command, self.path, self.rfile.read(int(self.headers['Content-Length'] or 0)))
+            )
             self.send_response(self.response_status)
             self.send_header('Content-Type', 'text/plain')
-            for name, value in self.response_headers.items():
+            for name, value in (self.response_headers or {}).items():
                 self.send_header(name, value)
             self.end_headers()
             self.wfile.write(self.response_body)
@@ -103,7 +105,9 @@ def test_fee_api_returns_characterized_not_found_response_for_unknown_loan(clien
 
 
 @pytest.mark.django_db
-def test_payment_api_posts_to_the_gateway_and_forwards_success(client, monkeypatch, payment_gateway):
+def test_payment_api_posts_to_the_gateway_and_forwards_success(
+    client, monkeypatch, payment_gateway
+):
     gateway_url, requests, _ = payment_gateway
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
 
@@ -161,9 +165,7 @@ def test_payment_api_does_not_call_gateway_for_an_unknown_loan(
 
 
 @pytest.mark.django_db
-def test_interrupted_payment_is_a_gateway_failure_without_losing_cause(
-    client, caplog, monkeypatch
-):
+def test_interrupted_payment_is_a_gateway_failure_without_losing_cause(client, caplog, monkeypatch):
     def interrupt(request):
         raise InterruptedError('gateway request interrupted')
 
@@ -173,7 +175,9 @@ def test_interrupted_payment_is_a_gateway_failure_without_losing_cause(
 
     assert response.status_code == 502
     assert response.content == b'payment gateway unavailable\n'
-    failure = next(record for record in caplog.records if record.message == 'Payment gateway call interrupted')
+    failure = next(
+        record for record in caplog.records if record.message == 'Payment gateway call interrupted'
+    )
     assert isinstance(failure.exc_info[1].__cause__, InterruptedError)
 
 
@@ -202,9 +206,7 @@ def test_htmx_payment_action_reports_gateway_success(client, monkeypatch, paymen
 
 
 @pytest.mark.django_db
-def test_htmx_payment_action_keeps_gateway_failures_visible(
-    client, monkeypatch, payment_gateway
-):
+def test_htmx_payment_action_keeps_gateway_failures_visible(client, monkeypatch, payment_gateway):
     gateway_url, _, handler = payment_gateway
     handler.response_status = 503
     handler.response_body = b'declined\n'
