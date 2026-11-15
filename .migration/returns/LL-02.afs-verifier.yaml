@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/75
+verdict: blocked
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: blocker
+    where: src/loans/services.py:4-20
+    what: "Local checkout 011a103 uses Django's clock and concrete repository directly and lacks composition.py; PR #75 head cfc717a uses application-owned ports and adapter composition. Local gate results are not valid for the PR head."
+tests_added:
+  - tests/loans/test_catalog.py::test_list_export_quotes_delimiters_quotes_and_line_breaks
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_browser_return_for_unknown_loan_returns_not_found
+  - tests/loans/test_catalog.py::test_return_repository_uses_a_transaction_for_its_row_lock
+  - tests/loans/test_catalog.py::test_lending_form_requires_member_and_isbn_values
+  - tests/loans/test_catalog.py::test_browser_lending_page_uses_full_template_for_htmx_get
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+handoff: .migration/handoffs/LL-02.md
