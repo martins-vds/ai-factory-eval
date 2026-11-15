@@ -20,6 +20,33 @@ GATEWAY_GOLDENS = json.loads(
 )
 
 
+def _assert_method_not_allowed(client, payment_gateway, method, path):
+    response = client.generic(method, path)
+
+    assert response.status_code == 405
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_fee_endpoint_rejects_post(client, payment_gateway):
+    _assert_method_not_allowed(client, payment_gateway, 'POST', '/fees/L3')
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_rejects_get(client, payment_gateway):
+    _assert_method_not_allowed(client, payment_gateway, 'GET', '/payments/L1')
+
+
+@pytest.mark.django_db
+def test_fee_page_rejects_post(client, payment_gateway):
+    _assert_method_not_allowed(client, payment_gateway, 'POST', '/ui/fees/L3/')
+
+
+@pytest.mark.django_db
+def test_payment_page_rejects_get(client, payment_gateway):
+    _assert_method_not_allowed(client, payment_gateway, 'GET', '/ui/payments/L1/')
+
+
 @pytest.mark.django_db
 def test_fee_endpoint_matches_characterized_html(client):
     expected = HTTP_GOLDENS['GET /fees/{id}']['response']

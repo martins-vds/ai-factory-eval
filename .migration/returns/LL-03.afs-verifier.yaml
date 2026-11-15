@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/131
+verdict: blocked
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 7.0
+  mutation_changed: "n/a: mutmut failed to collect selected tests before scoring"
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: blocker
+    where: .migration/evidence/runs/LL-03.md:41
+    what: "Changed-code mutation failed before scoring on 12 of 15 files with no collectors for selected tests on both attempts; the two-attempt stop rule fired."
+  - severity: major
+    where: .migration/evidence/runs/LL-03.md:29
+    what: "The full suite has one recurring out-of-scope loan-browser navigation timeout; the other 62 tests passed, and the full regression gate was not separately completed."
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_pay_existing_loan_uses_injected_gateway
+  - tests/fees/test_fee_calculation.py::test_pay_unknown_loan_does_not_call_injected_gateway
+  - tests/fees/test_endpoints.py::test_fee_endpoint_rejects_post
+  - tests/fees/test_endpoints.py::test_payment_endpoint_rejects_get
+  - tests/fees/test_endpoints.py::test_fee_page_rejects_post
+  - tests/fees/test_endpoints.py::test_payment_page_rejects_get
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+handoff: .migration/handoffs/LL-03.md
