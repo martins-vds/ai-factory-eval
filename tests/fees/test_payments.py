@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+from urllib.error import URLError
 
 import pytest
 
@@ -99,6 +100,28 @@ def test_payment_api_maps_interrupted_gateway_call_and_retains_interruption(
     assert response.content == b'payment gateway unavailable\n'
     assert any(
         record.exc_info and isinstance(record.exc_info[1], InterruptedError)
+        for record in caplog.records
+    )
+
+
+@pytest.mark.django_db
+def test_payment_api_retains_interruption_wrapped_by_url_error(
+    client, payment_gateway, monkeypatch, caplog
+):
+    Loan.objects.get(pk='L3')
+
+    def interrupted_request(*args, **kwargs):
+        raise URLError(InterruptedError('request interrupted'))
+
+    monkeypatch.setattr('src.fees.services.urlopen', interrupted_request)
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+    assert any(
+        record.exc_info
+        and isinstance(record.exc_info[1], URLError)
+        and isinstance(record.exc_info[1].reason, InterruptedError)
         for record in caplog.records
     )
 

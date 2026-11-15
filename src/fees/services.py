@@ -48,7 +48,11 @@ def charge_late_fee(loan_id: str) -> PaymentResult:
     except InterruptedError:
         logger.warning('Payment gateway request was interrupted', exc_info=True)
         return PaymentResult(502, b'payment gateway unavailable\n')
-    except (URLError, OSError):
+    except URLError as error:
+        if isinstance(error.reason, InterruptedError):
+            logger.warning('Payment gateway request was interrupted', exc_info=True)
+        return PaymentResult(502, b'payment gateway unavailable\n')
+    except OSError:
         return PaymentResult(502, b'payment gateway unavailable\n')
 
     return PaymentResult(status_code if status_code == 200 else 502, body)
