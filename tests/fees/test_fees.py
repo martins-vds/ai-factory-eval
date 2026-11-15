@@ -1,8 +1,39 @@
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from datetime import date
+from threading import Thread
 
 import pytest
 
 from src.loans.models import Loan
+
+
+@pytest.fixture
+def payment_gateway(monkeypatch):
+    requests = []
+    response = {'status': 200, 'body': b'charged\n'}
+
+    class GatewayHandler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
+            requests.append((self.command, self.path, body))
+            self.send_response(response['status'])
+            self.send_header('Content-Length', str(len(response['body'])))
+            self.end_headers()
+            self.wfile.write(response['body'])
+
+        def log_message(self, format, *args):
+            return
+
+    server = ThreadingHTTPServer(('127.0.0.1', 0), GatewayHandler)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', f'http://127.0.0.1:{server.server_port}')
+    try:
+        yield response, requests
+    finally:
+        server.shutdown()
+        thread.join()
+        server.server_close()
 
 
 @pytest.mark.django_db
@@ -64,3 +95,13 @@ def test_fee_page_shows_the_amount_and_htmx_payment_action(client):
     assert b'19 day(s) late' in response.content
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_forwards_the_gateway_success(payment_gateway, client):
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'charged\n'
+    assert payment_gateway[1] == [('POST', '/charge?loan=L1', b'')]
