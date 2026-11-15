@@ -16,3 +16,22 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-specialist-migrator · 2026-11-15T02:10:39Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-continue-dialogs-from-not-routed-table` / PR pending  ·  **Last commit:** 16a221f
+### Done
+- AFS setup passed: source SHA `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d` is pinned and read-only; target history is complete; migration validation, required-input checks, services, and runtime checks passed.
+- Setup probe passed via `afs-run` (exit 0); journal: `.migration/evidence/runs/BK-05G.md`.
+- Inspected the in-scope not-routed template and confirmed this checkout has no booking dialog views, dialog templates, dialog tests, or booking URL registrations.
+### Remaining
+- [ ] Resolve the missing BK-05G dialog implementation or approve scope to add the required dialog endpoints and UI before wiring the table.
+- [ ] After the required dialog implementation is available and in scope, add table triggers and run every profile gate through `afs-run`.
+### Decisions made
+- Made no template change: trigger markup cannot open a dialog when this checkout has no dialog component or endpoint, and would leave the UI nonfunctional.
+### Blockers / questions
+- The operator extension limits changes to `templates/booking/dashboard/not_routed_table.html`, but the necessary dialog endpoints and templates are absent from this checkout. A template-only change cannot provide the requested behavior.
+- No feature tests or gates were run because the required implementation is missing and adding it is outside the authorized file scope.
+### Failing commands
+- None.
+### Next step for the next session
+Ask the operator to resolve the target-checkout mismatch or authorize/assign the missing dialog implementation and URL wiring; then resume the template integration within the resulting scope.
