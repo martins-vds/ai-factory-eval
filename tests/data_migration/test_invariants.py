@@ -74,6 +74,8 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(loaded_snapsho
         'CLAIM': 'CLAIMED',
     }
 
+    assert CargoRecord.objects.exists()
+
     for cargo in CargoRecord.objects.order_by('pk'):
         latest_event = (
             HandlingEventRecord.objects.filter(cargo_id=cargo.pk)
@@ -91,6 +93,8 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(loaded_snapsho
 
 @pytest.mark.django_db(transaction=True)
 def test_loaded_itinerary_legs_connect(loaded_snapshot):
+    assert LegRecord.objects.exists()
+
     for cargo in CargoRecord.objects.order_by('pk'):
         legs = list(LegRecord.objects.filter(cargo_id=cargo.pk).order_by('load_time', 'pk'))
         if not legs:
