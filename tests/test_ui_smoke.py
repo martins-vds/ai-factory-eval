@@ -1,9 +1,22 @@
+from datetime import date
+
 import pytest
 from playwright.sync_api import sync_playwright
+
+from src.loans.models import Loan
 
 
 @pytest.mark.django_db
 def test_loan_catalog_renders_in_browser(live_server):
+    Loan.objects.update_or_create(
+        pk='L1',
+        defaults={
+            'member': 'ana',
+            'isbn': '9780134685991',
+            'lent_on': date(2026, 1, 2),
+        },
+    )
+
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
         try:

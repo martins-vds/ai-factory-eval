@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_19rem]">
+  <section>
+    <p class="text-xs uppercase tracking-[0.2em] text-ink/70">The collection · {{ loans|length }} loans in view</p>
+    <h1 class="mt-3 text-5xl font-medium tracking-tight md:text-6xl">Books in good company.</h1>
+    <p class="mb-8 mt-4 max-w-2xl text-lg text-ink/70">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    <div class="divide-y divide-line">
+      {% for loan in loans %}
+      <article class="grid gap-4 py-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+        <div>
+          <p class="text-xs uppercase tracking-[0.16em] text-ink/60">Loan {{ loan.pk }}</p>
+          <h2 class="mt-1 text-2xl font-semibold">{{ loan.member }}</h2>
+          <p class="mt-1 text-sm text-ink/70">ISBN {{ loan.isbn }}</p>
+        </div>
+        <div class="flex items-center gap-5">
+          <p class="text-sm">Due <time datetime="{{ loan.due_on|date:'Y-m-d' }}">{{ loan.due_on|date:'M j, Y' }}</time></p>
+          <a class="btn btn-outline btn-sm" href="{% url 'loan-page' loan.pk %}">Read loan</a>
+        </div>
+      </article>
+      {% empty %}
+      <p class="py-8 text-ink/70">No loans are currently in the catalog.</p>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="card h-fit border border-line bg-surface shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[0.18em] text-accent">A lending note</p>
+      <h2 class="card-title font-serif text-2xl">Good books take their time.</h2>
+      <p class="text-ink/70">Each loan is due fourteen days after it begins. Browse the catalog to see who is reading what.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

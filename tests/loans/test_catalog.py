@@ -1,5 +1,9 @@
-import pytest
 from datetime import date
+from importlib import import_module
+
+import pytest
+from django.apps import apps
+from django.db import connection
 
 from src.loans.models import Loan
 
@@ -28,7 +32,7 @@ def test_loan_list_orders_records_by_id(client):
 
     response = client.get('/loans')
 
-    assert response.content.decode().splitlines()[3].startswith('L10;')
+    assert response.content.decode().splitlines()[1].startswith('L10;')
 
 
 @pytest.mark.django_db
@@ -55,14 +59,49 @@ def test_due_date_is_fourteen_calendar_days_after_lending():
 def test_export_quotes_delimiter_characters(client):
     Loan.objects.create(
         id='L4',
-        member='a;b',
-        isbn='123;456',
+        member='a;"b',
+        isbn='123\n456',
         lent_on=date(2026, 11, 8),
     )
 
     response = client.get('/loans/L4')
 
-    assert response.content.decode() == 'L4;"a;b";"123;456";2026-11-08;2026-11-22;\n'
+    assert response.content.decode() == 'L4;"a;""b";"123\n456";2026-11-08;2026-11-22;\n'
+
+
+@pytest.mark.django_db
+def test_catalog_detail_page_shows_loan_information(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'9780134685991' in response.content
+
+
+@pytest.mark.django_db
+def test_seed_migration_fills_missing_records_without_overwriting_existing_ones():
+    Loan.objects.filter(pk='L1').update(member='existing record')
+    Loan.objects.filter(pk='L2').delete()
+    migration = import_module('src.loans.migrations.0002_seed_loans')
+
+    migration.seed_loans(apps, None)
+
+    assert Loan.objects.get(pk='L1').member == 'existing record'
+    assert Loan.objects.filter(pk='L2').exists()
+
+
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
+def test_loan_record_survives_database_connection_reopen(client):
+    Loan.objects.create(
+        id='L4',
+        member='dee',
+        isbn='123',
+        lent_on=date(2026, 11, 8),
+    )
+    connection.close()
+
+    response = client.get('/loans/L4')
+
+    assert response.content.decode() == 'L4;dee;123;2026-11-08;2026-11-22;\n'
 
 
 def test_admin_is_not_installed(client):

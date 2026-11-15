@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}The Lending Library{% endblock %}</title>
+  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5.0.35/daisyui.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" defer></script>
+</head>
+<body class="min-h-screen bg-paper text-ink">
+  <header class="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-5 px-6 py-6">
+    <a class="font-serif text-2xl font-semibold tracking-tight" href="{% url 'loan-catalog' %}">
+      The Lending Library
+      <span class="ml-2 text-sm font-normal text-ink/70">/ a neighborhood collection</span>
+    </a>
+    <nav aria-label="Library pages" class="flex gap-2">
+      <a class="btn btn-ghost btn-sm" href="{% url 'loan-catalog' %}">Loans</a>
+    </nav>
+  </header>
+  <main class="mx-auto max-w-7xl px-6 pb-16">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
