@@ -16,3 +16,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T13:47:00+00:00 | invariants-focused-rerun | 0 | 2.15 | `pytest -q tests/data_migration/test_invariants.py` | `578cebb7a3c297c1` |  |  |
 | 2026-11-15T13:47:57+00:00 | behavior | 0 | 52.91 | `pytest -q` | `80c0581233dd534f` |  |  |
 | 2026-11-15T13:48:52+00:00 | crap | 0 | 49.78 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `9b1e6684674e5a53` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
+| 2026-11-15T14:24:59+00:00 | regression | 0 | 57.99 | `pytest -q` | `0d124f3922bde1cb` |  |  |
