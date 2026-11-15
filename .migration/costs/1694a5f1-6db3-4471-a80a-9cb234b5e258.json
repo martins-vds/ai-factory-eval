@@ -145,29 +145,29 @@
       ]
     },
     "event_types": {
-      "assistant.message": 205,
-      "assistant.turn_end": 91,
-      "assistant.turn_start": 92,
-      "external_tool.completed": 2,
-      "external_tool.requested": 2,
-      "hook.end": 389,
-      "hook.start": 390,
-      "permission.completed": 212,
-      "permission.requested": 212,
+      "assistant.message": 262,
+      "assistant.turn_end": 111,
+      "assistant.turn_start": 112,
+      "external_tool.completed": 3,
+      "external_tool.requested": 3,
+      "hook.end": 481,
+      "hook.start": 483,
+      "permission.completed": 262,
+      "permission.requested": 262,
       "session.start": 1,
-      "skill.invoked": 15,
-      "subagent.completed": 3,
+      "skill.invoked": 17,
+      "subagent.completed": 4,
       "subagent.selected": 1,
-      "subagent.started": 4,
-      "system.message": 5,
-      "tool.execution_complete": 225,
-      "tool.execution_start": 227,
-      "user.message": 14
+      "subagent.started": 6,
+      "system.message": 7,
+      "tool.execution_complete": 275,
+      "tool.execution_start": 278,
+      "user.message": 16
     },
-    "events": 2090,
+    "events": 2584,
     "usage_fields": []
   },
-  "ended_at": "2026-11-15T18:41:48.873Z",
+  "ended_at": "2026-11-15T18:53:29.060Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -176,7 +176,7 @@
       "tool": "afs-mutation"
     },
     {
-      "count": 66,
+      "count": 90,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -234,12 +234,12 @@
   "log": "/home/runner/.copilot/session-state/1694a5f1-6db3-4471-a80a-9cb234b5e258/events.jsonl",
   "models": {
     "gpt-6-luna": {
-      "output": 77015,
-      "requests": 205
+      "output": 97543,
+      "requests": 262
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-15T18:41:54+00:00",
+  "recorded_at": "2026-11-15T18:53:35+00:00",
   "schema": "afs-cost/1",
   "session_id": "1694a5f1-6db3-4471-a80a-9cb234b5e258",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -265,7 +265,7 @@
       "skill": "afs-setup-check"
     },
     {
-      "count": 5,
+      "count": 7,
       "skill": "code-review"
     },
     {
@@ -283,6 +283,6 @@
   ],
   "started_at": "2026-11-15T18:15:53.405Z",
   "surface": "coding-agent",
-  "trigger_id": "call_USBlj8yUTAJNnrfiLMaTGt85",
+  "trigger_id": "call_IkWPebehjuLfFX8xpA6K89jL",
   "usage_source": "assistant.message (output only, partial)"
 }
