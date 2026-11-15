@@ -16,3 +16,24 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-specialist-migrator · 2026-11-15T15:02:48Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-continue-dialogs-not-routed-table-another-one` / originating PR https://github.com/martins-vds/ai-factory-pilot-target/pull/395  ·  **Last commit:** 3c87903
+### Done
+- Setup checks passed; pinned source SHA is `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`.
+- Setup probe completed with exit 0; journal: `.migration/evidence/runs/BK-05G.md`.
+- Read the ticket and operator scope extension: `templates/booking/dashboard/not_routed_table.html` is now the only permitted product-code change.
+- Confirmed the required dialog implementation is absent: no `src/cargotracker/booking/interfaces/dialogs/`, no `templates/booking/dialogs/`, and no destination/deadline dialog routes in `src/cargotracker/urls.py`. Existing use cases are `CargoSpecification.change_destination` and `CargoSpecification.change_deadline` in `src/cargotracker/booking/application/specification.py`.
+- Did not add template triggers pointing at nonexistent routes; that would leave the requested dialogs unusable.
+### Remaining
+- [ ] Obtain approval to include the dialog views, dialog templates, dialog tests, and URL registration in this ticket, or assign those implementation files to the responsible tickets.
+- [ ] Implement the dialogs through the existing application use cases, then add not-routed-table triggers within the approved template scope; run required gates through `afs-run` and update the dialog ledger entries.
+### Decisions made
+- No product code was changed because the template-only scope cannot provide working dialogs without the missing view, template, test, and URL integration files.
+### Blockers / questions
+- The operator scope extension authorizes only `templates/booking/dashboard/not_routed_table.html`, while the dialog views, templates, and routes do not exist in this checkout. BK-05G's planned files include dialog views/templates/tests, but the live instruction disallows changing them.
+- A human must approve the additional files or identify the ticket that will supply working dialog endpoints. The prior handoff's template-scope blocker is resolved; this is a distinct implementation dependency.
+### Failing commands
+- None.
+### Next step for the next session
+Resume after an operator approves scope for the missing dialog endpoints and tests (or assigns them elsewhere); then implement test-first, wire the not-routed table, and run every required gate through `afs-run`.
