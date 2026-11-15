@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/87
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.933
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: minor
+    where: src/loans/services.py:12
+    what: lend_loan() calls repository.all().count(), exposing ORM query mechanics outside the repository boundary.
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:78
+    what: Mutant #2 removes @transaction.atomic around select_for_update and survives; this PostgreSQL transaction guarantee remains a meaningful unresolved survivor.
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:5
+    what: Other survivors are prior-slice catalog template/context/route mutants (#1, #2, #20), a GET+HX-only template branch (#44), UI unknown-loan responses (#68-70), and LoanForm metadata (#13); regular lending/return flows are covered, but these survivors remain visible.
+tests_added:
+  - tests/loans/test_catalog.py::test_repository_return_runs_row_lock_inside_atomic_transaction
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
