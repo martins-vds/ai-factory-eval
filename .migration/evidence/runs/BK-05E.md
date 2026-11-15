@@ -19,3 +19,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
 | 2026-11-15T17:47:36+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:52:43+00:00 | verifier-detail-tests | 1 | 4.51 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `0c8c9e2543a9b215` | assert unknown_response.status_code == 404 |  |
+| 2026-11-15T17:53:16+00:00 | verifier-detail-variants | 0 | 2.82 | `pytest -q tests/booking/interfaces/test_cargo_details.py -k 'not unknown_and_stale'` | `2a96b3f0c0697d3b` |  |  |
