@@ -62,6 +62,15 @@ def test_repeating_a_return_is_rejected_without_changing_its_original_date(clien
 
 
 @pytest.mark.django_db
+def test_returning_an_unknown_loan_keeps_the_characterized_not_found_response(client):
+    response = client.post('/loans/unknown/return')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
 def test_loan_browser_offers_lending_and_first_return_actions(client):
     response = client.get('/ui/loans/')
     page = response.content.decode()
@@ -86,3 +95,42 @@ def test_browser_lending_shows_field_errors_for_blank_values(client):
     assert 'Enter an ISBN; blank values are not accepted.' in page
     assert 'aria-invalid="true"' in page
     assert Loan.objects.count() == existing_loans
+
+
+@pytest.mark.django_db
+def test_browser_lending_creates_a_loan_and_shows_feedback(client):
+    response = client.post('/ui/loans/new/', {'member': ' reader ', 'isbn': '123'})
+    page = response.content.decode()
+
+    loan = Loan.objects.get(pk='L4')
+    assert response.status_code == 200
+    assert 'Loan L4 added to the collection.' in page
+    assert loan.member == 'reader'
+    assert loan.isbn == '123'
+
+
+@pytest.mark.django_db
+def test_browser_return_marks_loan_and_shows_status(client):
+    today = timezone.localdate()
+
+    response = client.post('/ui/loans/L1/return/')
+    page = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'L1 marked returned today.' in page
+    assert f'Returned {today.strftime("%b")} {today.day}, {today.year}' in page
+    assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
+def test_browser_repeated_return_is_rejected_and_preserves_original_date(client):
+    original_date = Loan.objects.get(pk='L2').returned_on
+
+    response = client.post('/ui/loans/L2/return/')
+
+    assert response.status_code == 200
+    assert (
+        f'L2 was already returned on {original_date}; repeat return rejected '
+        'and original date retained.'
+    ) in response.content.decode()
+    assert Loan.objects.get(pk='L2').returned_on == original_date
