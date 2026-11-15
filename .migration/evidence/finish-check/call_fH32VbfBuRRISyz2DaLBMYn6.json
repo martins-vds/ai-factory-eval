@@ -1,0 +1,31 @@
+[
+  {
+    "at": "2026-11-15T18:13:36Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 0,
+    "prompt_from": "none",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05G",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/costs/bb3f89ff-4d6f-4453-84f7-bad07c7bd623.json",
+      ".migration/evidence/mutants/BK-05G.md",
+      ".migration/evidence/runs/BK-05G.md",
+      ".migration/returns/BK-05G.afs-specialist-migrator.yaml",
+      "tests/booking/interfaces/test_dialogs.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
