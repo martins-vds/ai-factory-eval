@@ -8,10 +8,29 @@ source:
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#270
+target:
+  components:
+    - fees.gateway.PaymentGateway
+    - fees.views.payment_api
+    - fees.views.payment_page
+    - templates/fees/payment-result.html
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - tests/fees/test_fees.py::test_payment_endpoint_forwards_the_gateway_success
+  - tests/fees/test_fees.py::test_payment_endpoint_maps_non_200_gateway_responses_to_502
+  - tests/fees/test_fees.py::test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_fees.py::test_payment_endpoint_maps_gateway_connection_failures_to_502
+  - tests/fees/test_fees.py::test_payment_endpoint_logs_an_interrupted_gateway_call
+  - tests/fees/test_fees.py::test_fee_page_htmx_action_shows_gateway_success
+  - .migration/evidence/runs/LL-03.md
+notes: "The approved #40 fix logs the interruption's cause and still returns the characterized HTTP 502 response."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#40
+  reason: "Fix ruling: do not swallow an interrupted gateway call; retain its cause while surfacing a gateway failure."
