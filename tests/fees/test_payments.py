@@ -75,6 +75,37 @@ def test_payment_api_does_not_call_gateway_for_unknown_loan(client, payment_gate
 
 
 @pytest.mark.django_db
+def test_payment_api_maps_gateway_io_failure_to_unavailable(client, monkeypatch):
+    Loan.objects.get(pk='L3')
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
+def test_payment_api_maps_interrupted_gateway_call_and_retains_interruption(
+    client, payment_gateway, monkeypatch, caplog
+):
+    Loan.objects.get(pk='L3')
+
+    def interrupted_request(*args, **kwargs):
+        raise InterruptedError('request interrupted')
+
+    monkeypatch.setattr('src.fees.services.urlopen', interrupted_request)
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+    assert any(
+        record.exc_info and isinstance(record.exc_info[1], InterruptedError)
+        for record in caplog.records
+    )
+
+
+@pytest.mark.django_db
 def test_htmx_payment_action_renders_success_status(client, payment_gateway):
     Loan.objects.get(pk='L3')
 
@@ -84,3 +115,35 @@ def test_htmx_payment_action_renders_success_status(client, payment_gateway):
     assert b'role="status"' in response.content
     assert b'Payment complete' in response.content
     assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_swaps_gateway_failure_message(client, payment_gateway):
+    gateway_response, _ = payment_gateway
+    gateway_response.update(status=503, body=b'declined\n')
+    Loan.objects.get(pk='L3')
+
+    response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/payments/L3', 'get'),
+        ('/ui/fees/L3/', 'post'),
+        ('/ui/payments/L3/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(
+    client, payment_gateway, path, method
+):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway[1] == []

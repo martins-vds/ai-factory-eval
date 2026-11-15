@@ -1,0 +1,7 @@
+<div id="payment-status" class="mt-6" aria-live="polite">
+  {% if succeeded %}
+  <p role="status">Payment complete: {{ body }}</p>
+  {% else %}
+  <p role="alert">Payment could not be completed: {{ body }}</p>
+  {% endif %}
+</div>
