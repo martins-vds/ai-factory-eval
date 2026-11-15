@@ -7,11 +7,13 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "A first return assigns today's date and persists it; a repeated return is rejected and preserves the original return date."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#354]
+target:
+  components: [src.loans.repository.LoanRepository.mark_returned, src.loans.services.return_loan]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_updates_a_loan_and_rejects_repeated_returns, tests/loans/test_circulation.py::test_reading_room_can_lend_and_return_with_htmx]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

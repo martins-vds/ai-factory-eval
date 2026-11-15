@@ -7,11 +7,13 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after the first return, HTTP 409 when already returned, or HTTP 404 with `no such loan` and a newline when the id is absent; the /ui/ path updates the reading-room row."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#354]
+target:
+  components: [src.loans.views.loan_return, src.loans.views.loan_return_page, src.loans.services.return_loan]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_updates_a_loan_and_rejects_repeated_returns, tests/loans/test_circulation.py::test_return_unknown_loan_returns_not_found, tests/loans/test_circulation.py::test_reading_room_returns_useful_responses_for_repeats_and_unknown_loans, tests/loans/test_circulation.py::test_reading_room_return_redirects_after_first_return]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
