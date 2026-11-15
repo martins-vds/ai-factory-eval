@@ -35,44 +35,58 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
                 returned_on=date(2026, 2, 20),
             ),
             Loan(
+                id='report-z-late-2',
+                member='member-z',
+                isbn='4',
+                lent_on=date(2025, 11, 1),
+                returned_on=date(2026, 2, 21),
+            ),
+            Loan(
                 id='report-a-late',
                 member='member-a',
-                isbn='4',
+                isbn='5',
                 lent_on=date(2026, 2, 1),
                 returned_on=date(2026, 2, 18),
             ),
             Loan(
+                id='report-a-early',
+                member='member-a',
+                isbn='6',
+                lent_on=date(2026, 2, 1),
+                returned_on=date(2026, 2, 14),
+            ),
+            Loan(
                 id='report-b-late',
                 member='member-b',
-                isbn='5',
+                isbn='7',
                 lent_on=date(2026, 2, 3),
                 returned_on=date(2026, 2, 20),
             ),
             Loan(
                 id='report-c-late-within-grace',
                 member='member-c',
-                isbn='6',
+                isbn='8',
                 lent_on=date(2026, 2, 1),
                 returned_on=date(2026, 2, 16),
             ),
             Loan(
                 id='report-no-start',
                 member='member-without-starts',
-                isbn='7',
+                isbn='9',
                 lent_on=date(2026, 1, 1),
                 returned_on=date(2026, 2, 20),
             ),
             Loan(
                 id='report-a-after-window',
                 member='member-a',
-                isbn='8',
+                isbn='10',
                 lent_on=date(2025, 12, 1),
                 returned_on=date(2026, 3, 1),
             ),
             Loan(
                 id='report-start-after-window',
                 member='member-outside-window',
-                isbn='9',
+                isbn='11',
                 lent_on=date(2026, 3, 1),
             ),
         ]
@@ -83,8 +97,8 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
 
     assert output.getvalue() == (
         'member_id,loans_started,late_returns,late_fees_cents\n'
-        'member-z,2,1,1000\n'
-        'member-a,1,1,75\n'
+        'member-z,2,2,2000\n'
+        'member-a,2,1,75\n'
         'member-b,1,1,75\n'
         'member-c,1,1,0\n'
     )
