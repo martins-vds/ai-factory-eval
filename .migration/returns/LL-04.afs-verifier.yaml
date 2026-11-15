@@ -1,0 +1,28 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-synthetic-target#65
+pr: https://github.com/martins-vds/ai-factory-eval/pull/144
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.976
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+  - .migration/evidence/mutants/LL-04.md
+findings:
+  - severity: major
+    where: templates/base.html:8
+    what: Tailwind CSS returns 404 and the container max-width is none, so the approved reading-room layout is not applied.
+  - severity: major
+    where: tests/loans/test_catalog.py:395
+    what: Regression remains red on the unrelated loans browser test; Actions also failed it with L1 observed instead of L4.
+tests_added:
+  - tests/library_info/test_about_page.py::test_about_pages_reject_non_get_requests
+  - tests/library_info/test_about_page.py::test_modern_about_page_shows_library_information_in_browser (Tailwind max-width assertion)
+ledger_issues:
+  - about.page remains marked migrated although the approved Tailwind layout is not applied.
+quirk_tickets: []
