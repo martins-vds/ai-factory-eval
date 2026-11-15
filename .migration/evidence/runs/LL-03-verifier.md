@@ -10,3 +10,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T14:01:19+00:00 | build-check | 0 | 0.44 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-15T14:01:19+00:00 | idiom-lint | 0 | 0.01 | `ruff check src config manage.py tests` | `82b3e6a6c090a576` |  |  |
 | 2026-11-15T14:01:19+00:00 | idiom-format | 0 | 0.01 | `ruff format --check src config manage.py tests` | `3e8c2dbca935b383` |  |  |
+| 2026-11-15T14:02:13+00:00 | behavior | 1 | 37.87 | `pytest -q` | `186a8b362fbd0898` | assert page.get_by_role('status').inner_text() == 'Loan L4 is ready.' |  |
+| 2026-11-15T14:02:51+00:00 | regression | 1 | 37.61 | `pytest -q` | `d2ed3d23657f9de5` | assert page.get_by_role('status').inner_text() == 'Loan L4 is ready.' |  |
