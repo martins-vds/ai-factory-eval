@@ -7,11 +7,17 @@ source:
   flow: Pay Late Fee
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
-boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
+boundary: "POST /payments/{id} first requires an existing loan, then POSTs an empty-body request to /charge?loan={id} at PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.fees.gateway.PaymentGateway.charge, src.fees.views.payment_api, src.fees.views.payment_page, src.fees.urls, templates/fees/payment-result.html]
+status: in-progress
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_payment_endpoint_forwards_the_characterized_gateway_request, tests/fees/test_fees.py::test_payment_endpoint_maps_gateway_failure_to_502_and_preserves_body, tests/fees/test_fees.py::test_payment_endpoint_does_not_call_gateway_for_unknown_loan, tests/fees/test_fees.py::test_interrupted_gateway_request_is_preserved_as_the_gateway_error_cause, tests/fees/test_fees.py::test_interrupted_payment_endpoint_returns_gateway_failure, tests/fees/test_fees.py::test_htmx_payment_displays_success_and_forwards_the_gateway_request, tests/fees/test_fees.py::test_htmx_payment_displays_gateway_failure, tests/fees/test_fees.py::test_browser_can_pay_a_late_fee]
 notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#40
+  reason: "Approved fix: surface the interrupted call as a gateway failure while retaining the interruption as the exception cause."

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Late fees · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-4xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+  <h1 class="mb-8 mt-3 text-5xl md:text-6xl">Late fees</h1>
+  <div class="grid gap-8 md:grid-cols-[1.4fr_1fr]">
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-[#66705b]">{{ fee.loan.member }} · {{ fee.loan.id }}</p>
+        <h2 class="card-title mt-2 text-3xl">Loan {{ fee.loan.id }}</h2>
+        <p class="mt-5">
+          Due {{ fee.loan.due_on|date:"M j, Y" }}
+          {% if fee.loan.returned_on %} · returned {{ fee.loan.returned_on|date:"M j, Y" }}{% endif %}
+        </p>
+        <p class="mt-2">{{ fee.days_late }} late days · first two days waived</p>
+        <p class="mt-7 text-6xl font-bold">${{ fee.amount|floatformat:2 }}</p>
+        <p class="mt-2 text-[#66705b]">25¢ per day after the grace period, capped at $10.00.</p>
+        <div id="payment-status" class="mt-6">
+          {% if payment_result %}
+          {% include "fees/payment-result.html" with result=payment_result %}
+          {% endif %}
+        </div>
+        <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
+              hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="innerHTML">
+          {% csrf_token %}
+          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">
+            Pay late fee
+          </button>
+        </form>
+      </div>
+    </article>
+    <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-widest text-[#66705b]">At the desk</p>
+        <h2 class="card-title text-2xl">A clear account</h2>
+        <p>The first two late days are waived. After that, the fee is 25¢ per day, up to $10.00.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
