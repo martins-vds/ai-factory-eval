@@ -3,11 +3,9 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-
 HTTP_GOLDENS = json.loads(
     (
-        Path(__file__).resolve().parents[2]
-        / '.migration/characterization/source/goldens/http.json'
+        Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
     ).read_text(encoding='utf-8')
 )
 
