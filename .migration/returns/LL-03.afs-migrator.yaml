@@ -1,7 +1,7 @@
 role: afs-migrator
 ticket: LL-03
 issue: martins-vds/ai-factory-eval#270
-pr: null
+pr: https://github.com/martins-vds/ai-factory-eval/pull/277
 gates:
   build: 0
   behavior: 1
