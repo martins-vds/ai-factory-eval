@@ -448,10 +448,12 @@ def test_browser_regular_repeat_return_shows_an_error(client):
 
 @pytest.mark.django_db(transaction=True)
 def test_return_endpoint_uses_a_transaction_for_row_locking(client):
-    response = client.post('/loans/L1/return')
+    Loan.objects.create(id='L99', member='reader', isbn='123', lent_on=date(2026, 3, 1))
+
+    response = client.post('/loans/L99/return')
 
     assert response.status_code == 200
-    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+    assert Loan.objects.get(pk='L99').returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db
