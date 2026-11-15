@@ -1,0 +1,36 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/356
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 'n/a: pytest failed before lizard/CRAP calculation'
+  mutation_changed: 'n/a: mutmut aborted after baseline tests failed'
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/views.py:35-38
+    what: Missing member or ISBN returns Django per-field text instead of the characterized `member and isbn are required\n`; ruling #39 approves rejecting blanks, not changing this missing-field response.
+  - severity: minor
+    where: src/loans/repository.py:18-21
+    what: The repeat-return lifecycle invariant is enforced in the Django repository rather than domain policy; confirm this layer choice against the DDD target decision.
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: Meaningful survivors #2 repository transaction, #79 repeat-return detail context, and #9 LoanForm model received focused tests; catalog mutants #1/#2 and URL #4 are covered by browser smoke, while #44 and #68-70 are outside the requested flows.
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_form_exposes_required_member_and_isbn_fields
+  - tests/loans/test_catalog.py::test_lend_endpoint_preserves_characterized_missing_field_response[POST /loans/missing-isbn]
+  - tests/loans/test_catalog.py::test_lend_endpoint_preserves_characterized_missing_field_response[POST /loans/missing-member]
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_keeps_loan_details
+  - tests/loans/test_catalog.py::test_return_endpoint_runs_with_a_transaction_for_row_locking
+ledger_issues:
+  - loan.lend evidence does not reconcile the target's missing-field response text with the source golden.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43

@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -20,6 +21,12 @@ HTTP_GOLDENS = json.loads(
         HTTP_GOLDEN_PATH
         if HTTP_GOLDEN_PATH.exists()
         else Path(__file__).parent / 'fixtures/http.json'
+    ).read_text(encoding='utf-8')
+)
+EDGE_CASE_GOLDENS = json.loads(
+    (
+        Path(__file__).resolve().parents[2]
+        / '.migration/characterization/source/goldens/edge-cases.json'
     ).read_text(encoding='utf-8')
 )
 
@@ -122,6 +129,29 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+def test_lend_form_exposes_required_member_and_isbn_fields():
+    form = LoanForm()
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert form.fields['member'].required
+    assert form.fields['isbn'].required
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'case',
+    ['POST /loans/missing-isbn', 'POST /loans/missing-member'],
+)
+def test_lend_endpoint_preserves_characterized_missing_field_response(client, case):
+    golden = EDGE_CASE_GOLDENS[case]
+
+    response = client.post(golden['request']['path'], golden['request']['form'])
+
+    assert response.status_code == golden['response']['status']
+    assert response['Content-Type'] == golden['response']['content_type']
+    assert response.content.decode() == golden['response']['body']
 
 
 @pytest.mark.django_db
@@ -425,6 +455,32 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_regular_repeat_return_keeps_loan_details(client):
+    response = client.post('/ui/loans/L2/return/')
+    content = response.content.decode()
+
+    assert response.status_code == 409
+    assert 'Loan record · L2' in content
+    assert 'Jan 20, 2026' in content
+    assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_endpoint_runs_with_a_transaction_for_row_locking(client):
+    Loan.objects.create(
+        id='L-test',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+
+    response = client.post('/loans/L-test/return')
+
+    assert response.status_code == 200
+    assert Loan.objects.get(pk='L-test').returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db
