@@ -23,3 +23,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T20:18:51+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
 | 2026-11-15T20:19:25+00:00 | regression | 0 | 29.88 | `pytest -q` | `ccd837a32ae326c8` |  |  |
 | 2026-11-15T20:19:29+00:00 | mutation-changed | 0 | 0.05 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-15T20:21:10+00:00 | regression-final | 0 | 26.98 | `pytest -q` | `b277b04b1ae9ed28` |  |  |
