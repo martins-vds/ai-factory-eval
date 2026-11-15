@@ -5,10 +5,11 @@ from pathlib import Path
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -101,6 +102,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -122,6 +125,14 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+def test_loan_form_exposes_required_member_and_isbn_fields():
+    form = LoanForm()
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert form.fields['member'].required
+    assert form.fields['isbn'].required
 
 
 @pytest.mark.django_db
@@ -281,6 +292,15 @@ def test_list_endpoint_orders_all_records_by_id(client):
 
 
 @pytest.mark.django_db
+def test_browser_catalog_page_lists_loans(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'ana \xc2\xb7 ISBN 9780134685991' in response.content
+
+
+@pytest.mark.django_db
 def test_browser_detail_page_shows_loan_dates(client):
     response = client.get('/ui/loans/L1/')
 
@@ -341,6 +361,15 @@ def test_browser_can_lend_a_book_with_htmx(client):
 
 
 @pytest.mark.django_db
+def test_browser_get_with_htmx_header_returns_full_lending_page(client):
+    response = client.get('/ui/loans/new/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert b'id="loan-form"' in response.content
+
+
+@pytest.mark.django_db
 def test_htmx_lending_errors_replace_only_the_form(client):
     response = client.post(
         '/ui/loans/new/',
@@ -376,6 +405,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L1/'
     assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
 
 
 @pytest.mark.django_db
@@ -424,6 +462,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
@@ -455,3 +495,22 @@ def test_repository_write_rolls_back_failed_transaction():
         )
 
     assert Loan.objects.get(pk='L1').member == 'ana'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_repository_uses_a_transaction_for_row_locking():
+    assert connection.vendor == 'postgresql'
+    assert connection.get_autocommit()
+    Loan.objects.create(
+        id='transaction-test',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+    returned_on = date(2026, 3, 10)
+
+    loan, updated = LoanRepository().mark_returned('transaction-test', returned_on)
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='transaction-test').returned_on == returned_on
