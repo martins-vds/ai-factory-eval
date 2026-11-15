@@ -2,6 +2,7 @@ import csv
 import hashlib
 import json
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -146,8 +147,10 @@ def loaded_snapshot(tmp_path):
 def test_loaded_cargo_delivery_matches_its_handling_history(loaded_snapshot):
     cargo_repository = DjangoCargoRepository()
     handling_repository = DjangoHandlingEventRepository()
+    cargos = cargo_repository.find_all()
 
-    for cargo in cargo_repository.find_all():
+    assert cargos
+    for cargo in cargos:
         history = handling_repository.lookup_handling_history_of_cargo(cargo.tracking_id)
         derived = Delivery.derived_from(
             cargo.route_specification,
@@ -166,12 +169,16 @@ def test_loaded_cargo_delivery_matches_its_handling_history(loaded_snapshot):
 
 @pytest.mark.django_db(transaction=True)
 def test_loaded_itinerary_legs_connect(loaded_snapshot):
-    for cargo in CargoRecord.objects.all():
+    cargos = list(CargoRecord.objects.all())
+
+    assert cargos
+    for cargo in cargos:
         legs = list(LegRecord.objects.filter(cargo=cargo).order_by('load_time', 'pk'))
 
+        assert len(legs) >= 2
         assert all(
             previous.unload_location_id == following.load_location_id
-            for previous, following in zip(legs, legs[1:])
+            for previous, following in pairwise(legs)
         )
 
 
@@ -179,21 +186,27 @@ def test_loaded_itinerary_legs_connect(loaded_snapshot):
 def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
     location_ids = set(LocationRecord.objects.values_list('pk', flat=True))
     voyage_ids = set(VoyageRecord.objects.values_list('pk', flat=True))
+    events = list(HandlingEventRecord.objects.all())
 
-    for event in HandlingEventRecord.objects.all():
+    assert events
+    for event in events:
         assert event.location_id in location_ids
         assert event.voyage_id is None or event.voyage_id in voyage_ids
 
 
 @pytest.mark.django_db(transaction=True)
 def test_loaded_voyage_carrier_movements_form_ordered_schedules(loaded_snapshot):
-    for voyage in VoyageRecord.objects.all():
+    voyages = list(VoyageRecord.objects.all())
+
+    assert voyages
+    for voyage in voyages:
         movements = list(
             CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
 
+        assert len(movements) >= 2
         assert all(
             previous.arrival_time <= following.departure_time
             and previous.arrival_location_id == following.departure_location_id
-            for previous, following in zip(movements, movements[1:])
+            for previous, following in pairwise(movements)
         )
