@@ -134,28 +134,28 @@
       ]
     },
     "event_types": {
-      "assistant.message": 154,
-      "assistant.turn_end": 82,
-      "assistant.turn_start": 83,
-      "hook.end": 286,
-      "hook.start": 287,
-      "permission.completed": 133,
-      "permission.requested": 133,
+      "assistant.message": 166,
+      "assistant.turn_end": 93,
+      "assistant.turn_start": 93,
+      "hook.end": 311,
+      "hook.start": 312,
+      "permission.completed": 138,
+      "permission.requested": 138,
       "session.start": 1,
       "skill.invoked": 11,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.selected": 1,
       "subagent.started": 2,
-      "system.message": 3,
-      "tool.execution_complete": 162,
-      "tool.execution_start": 164,
-      "user.message": 11
+      "system.message": 4,
+      "tool.execution_complete": 172,
+      "tool.execution_start": 172,
+      "user.message": 14
     },
-    "events": 1514,
+    "events": 1630,
     "usage_fields": []
   },
-  "ended_at": "2026-11-15T06:44:13.462Z",
-  "event": "agentStop",
+  "ended_at": "2026-11-15T07:00:46.101Z",
+  "event": "sessionEnd",
   "harness_tools": [
     {
       "count": 34,
@@ -173,7 +173,7 @@
       "tool": "afs-services"
     },
     {
-      "count": 12,
+      "count": 14,
       "exit": 0,
       "tool": "check_inputs.py"
     },
@@ -211,12 +211,12 @@
   "log": "/home/runner/.copilot/session-state/83411815-7f10-4ab8-83f8-3164afa403cb/events.jsonl",
   "models": {
     "gpt-6-luna": {
-      "output": 60503,
-      "requests": 154
+      "output": 63973,
+      "requests": 166
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-15T06:44:21+00:00",
+  "recorded_at": "2026-11-15T07:00:53+00:00",
   "schema": "afs-cost/1",
   "session_id": "83411815-7f10-4ab8-83f8-3164afa403cb",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -256,6 +256,5 @@
   ],
   "started_at": "2026-11-15T06:08:30.464Z",
   "surface": "coding-agent",
-  "trigger_id": "call_nQkgqD75NtA42ZnNXk8b1XH2",
   "usage_source": "assistant.message (output only, partial)"
 }
