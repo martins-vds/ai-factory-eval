@@ -17,9 +17,9 @@
       {% if loan.returned_on %}
       <p>Returned {{ loan.returned_on|date:"M j, Y" }}</p>
       {% endif %}
-      <p class="mt-2">{{ fee.days_late }} late days · first two days waived</p>
+      <p class="mt-2">{{ fee.days_late }} late days · two-day grace period</p>
       <p class="fee mt-7 text-6xl font-bold">${{ fee.amount|floatformat:2 }}</p>
-      <p class="mt-2 text-[#66705b]">25¢ per day after the grace period, capped at $10.00.</p>
+      <p class="mt-2 text-[#66705b]">25¢ per late day once the grace threshold is crossed, capped at $10.00.</p>
       {% if payment_success %}
       <p class="mt-5" role="status">Payment received.</p>
       {% elif payment_error %}

@@ -4,6 +4,7 @@ from decimal import Decimal
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.fees.services import calculate_late_fee
 
@@ -15,11 +16,14 @@ def payment_gateway():
     class GatewayHandler(BaseHTTPRequestHandler):
         response_status = 200
         response_body = b'charged\n'
+        response_headers = {}
 
         def do_POST(self):
             requests.append((self.command, self.path, self.rfile.read(int(self.headers['Content-Length'] or 0))))
             self.send_response(self.response_status)
             self.send_header('Content-Type', 'text/plain')
+            for name, value in self.response_headers.items():
+                self.send_header(name, value)
             self.end_headers()
             self.wfile.write(self.response_body)
 
@@ -128,6 +132,21 @@ def test_payment_api_maps_gateway_failures_to_bad_gateway_and_keeps_body(
 
 
 @pytest.mark.django_db
+def test_payment_api_does_not_follow_gateway_redirects(client, monkeypatch, payment_gateway):
+    gateway_url, requests, handler = payment_gateway
+    handler.response_status = 302
+    handler.response_body = b'redirected\n'
+    handler.response_headers = {'Location': 'http://127.0.0.1:9/charge'}
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'redirected\n'
+    assert requests == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
 def test_payment_api_does_not_call_gateway_for_an_unknown_loan(
     client, monkeypatch, payment_gateway
 ):
@@ -148,7 +167,7 @@ def test_interrupted_payment_is_a_gateway_failure_without_losing_cause(
     def interrupt(request):
         raise InterruptedError('gateway request interrupted')
 
-    monkeypatch.setattr('src.fees.gateway.urlopen', interrupt)
+    monkeypatch.setattr('src.fees.gateway.open_url', interrupt)
 
     response = client.post('/payments/L3')
 
@@ -183,9 +202,52 @@ def test_htmx_payment_action_reports_gateway_success(client, monkeypatch, paymen
 
 
 @pytest.mark.django_db
+def test_htmx_payment_action_keeps_gateway_failures_visible(
+    client, monkeypatch, payment_gateway
+):
+    gateway_url, _, handler = payment_gateway
+    handler.response_status = 503
+    handler.response_body = b'declined\n'
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+    response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
+
+
+@pytest.mark.django_db
 def test_unknown_fee_page_returns_characterized_not_found_fragment(client):
     response = client.get('/ui/fees/unknown/')
 
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/html'
     assert response.content == b'<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_browser_can_pay_a_late_fee_from_the_reading_room_page(
+    live_server, monkeypatch, payment_gateway
+):
+    gateway_url, requests, _ = payment_gateway
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            assert page.get_by_role('heading', name='Late fees').is_visible()
+
+            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
+            page.get_by_role('button', name='Pay fee').click()
+            if htmx_available:
+                page.get_by_role('status').wait_for()
+            else:
+                page.wait_for_url('**/ui/fees/L3/?payment=success')
+
+            assert page.get_by_role('status').inner_text() == 'Payment received.'
+            assert requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()

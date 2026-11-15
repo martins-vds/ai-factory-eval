@@ -9,9 +9,22 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.fees.gateway.charge_loan, src.fees.views.payment_detail, src.fees.views.payment_page]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_fees.py::test_payment_api_posts_to_the_gateway_and_forwards_success
+  - tests/fees/test_fees.py::test_payment_api_maps_gateway_failures_to_bad_gateway_and_keeps_body
+  - tests/fees/test_fees.py::test_payment_api_does_not_follow_gateway_redirects
+  - tests/fees/test_fees.py::test_payment_api_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_fees.py::test_interrupted_payment_is_a_gateway_failure_without_losing_cause
+  - tests/fees/test_fees.py::test_htmx_payment_action_keeps_gateway_failures_visible
+notes: "The human ruling #40 fixes the swallowed interruption: the target returns 502 and retains the InterruptedError as the logged exception cause."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
