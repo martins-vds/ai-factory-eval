@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = [
     path('fees/<str:loan_id>', views.late_fee),
+    path('ui/fees/<str:loan_id>/', views.late_fee_page),
 ]

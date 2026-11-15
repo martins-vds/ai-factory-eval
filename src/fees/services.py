@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import date
 
 from src.loans.services import Clock, LoanRecord, LoanRepository
 
@@ -9,6 +8,10 @@ class FeeQuote:
     loan: LoanRecord
     days_late: int
     amount_cents: int
+
+    @property
+    def formatted_amount(self) -> str:
+        return f'${self.amount_cents // 100}.{self.amount_cents % 100:02d}'
 
 
 class FeeApplication:
