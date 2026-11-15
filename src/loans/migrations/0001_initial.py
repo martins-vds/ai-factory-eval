@@ -10,9 +10,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Loan',
             fields=[
-                ('id', models.CharField(max_length=32, primary_key=True, serialize=False)),
-                ('member', models.CharField(max_length=200)),
-                ('isbn', models.CharField(max_length=32)),
+                ('id', models.TextField(primary_key=True, serialize=False)),
+                ('member', models.TextField()),
+                ('isbn', models.TextField()),
                 ('lent_on', models.DateField()),
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],
