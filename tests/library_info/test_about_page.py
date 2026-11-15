@@ -19,6 +19,7 @@ def test_about_endpoint_matches_characterized_response(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures('restore_seed_loans_after_about_browser_test')
 def test_reading_room_about_page_is_available_in_a_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
