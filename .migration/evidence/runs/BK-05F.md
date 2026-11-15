@@ -79,3 +79,26 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T17:49:03+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:53:44+00:00 | build-compile-review | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:53:48+00:00 | build-django-check-review | 0 | 1.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T17:54:16+00:00 | build-compile-review | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:54:16+00:00 | build-django-review | 0 | 0.37 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T17:54:43+00:00 | behavior-review | 0 | 52.4 | `pytest -q` | `c8a5f34d42d0da06` |  |  |
+| 2026-11-15T17:54:46+00:00 | idiom-ruff-check-review | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T17:54:49+00:00 | idiom-ruff-format-review | 0 | 0.03 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T17:55:39+00:00 | crap-coverage-review | 0 | 47.33 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `4066daa6c0771d5e` |  |  |
+| 2026-11-15T17:55:41+00:00 | behavior-review | 1 | 85.33 | `pytest -q` | `e9f86f48f6ccc900` | _ ERROR at setup of test_registration_persists_new_cargo_with_generated_id_and_empty_itinerary _ |  |
+| 2026-11-15T17:55:42+00:00 | crap-lizard-review | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:55:46+00:00 | crap-score-review | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-15T17:56:05+00:00 | idiom-ruff-review | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T17:56:05+00:00 | idiom-format-review | 0 | 0.01 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T18:33:13+00:00 | verifier-build-compile | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T18:33:13+00:00 | verifier-build-django-check | 0 | 0.3 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T18:33:18+00:00 | verifier-idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T18:33:18+00:00 | verifier-idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T18:34:05+00:00 | verifier-behavior | 0 | 43.97 | `pytest -q` | `037b856effe944e7` |  |  |
+| 2026-11-15T18:34:52+00:00 | verifier-regression | 0 | 43.01 | `pytest -q` | `1c93acac350de43c` |  |  |
+| 2026-11-15T18:35:41+00:00 | verifier-crap-coverage | 0 | 43.45 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `55caa8893ff04638` |  |  |
+| 2026-11-15T18:35:41+00:00 | verifier-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T18:35:41+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |

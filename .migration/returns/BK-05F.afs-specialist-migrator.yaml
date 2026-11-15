@@ -52,6 +52,7 @@ specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
+  - "2026-11-15 PR #406 recheck: build and idiom passed; a full-suite run passed, while a later concurrent run failed because the PostgreSQL test database was already in use; CRAP max was 26.0. Mutation and regression values remain from the prior journaled gate runs."
 ledger_updated:
   - booking.routing-chain
   - booking.screen-route
