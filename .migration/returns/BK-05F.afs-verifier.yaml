@@ -1,0 +1,23 @@
+role: afs-verifier
+ticket: BK-05F
+issue: "martins-vds/ai-factory-pilot-target#293"
+pr: "https://github.com/martins-vds/ai-factory-eval/pull/70"
+verdict: blocked
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: null
+  regression: 0
+evidence_logs:
+  - ".migration/evidence/runs/BK-05F.md"
+findings:
+  - severity: blocker
+    where: ".migration/profile.yaml:56"
+    what: "The changed-code mutation run compares 805 files in this checkout and was interrupted before producing a score; BK-05F mutation remains unverified."
+tests_added:
+  - "tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo"
+ledger_issues: []
+quirk_tickets: []
+handoff: ".migration/handoffs/BK-05F.md"
