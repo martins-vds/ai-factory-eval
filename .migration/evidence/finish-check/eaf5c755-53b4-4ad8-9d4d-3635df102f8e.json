@@ -1,0 +1,30 @@
+[
+  {
+    "at": "2026-11-15T05:02:13Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 48670,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05F",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/evidence/runs/DM-05F.md",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/DM-05F.afs-specialist-migrator.yaml` with `role: afs-specialist-migrator`, `ticket: DM-05F`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/DM-05F.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "self_heal.enabled is off; would have blocked"
+  }
+]
