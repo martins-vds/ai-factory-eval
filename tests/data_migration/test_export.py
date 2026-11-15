@@ -1,8 +1,10 @@
 import csv
+from io import StringIO
 from pathlib import Path
 
 import pytest
 from django.core.management import call_command
+from django.core.management.base import CommandError
 
 from cargotracker.location.infrastructure.models import LocationRecord
 
@@ -13,7 +15,11 @@ MAPPING = Path(__file__).parents[2] / '.migration' / 'data' / 'mapping.yaml'
 @pytest.mark.django_db(transaction=True)
 def test_export_round_trips_snapshot_fixture(tmp_path):
     call_command('load_data_snapshot', snapshot=str(FIXTURE_SNAPSHOT), mapping=str(MAPPING))
-    exported = tmp_path / 'target'
+    exported = tmp_path / 'nested' / 'target'
+    output = StringIO()
+
+    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(exported), stdout=output)
+    assert output.getvalue() == 'Exported 7 rows across 6 mapped tables.\n'
 
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(exported))
 
@@ -64,6 +70,17 @@ def test_export_round_trips_snapshot_fixture(tmp_path):
     for table, expected in expected_rows.items():
         with (exported / f'{table}.csv').open(encoding='utf-8', newline='') as stream:
             assert list(csv.reader(stream))[1:] == expected
+
+
+@pytest.mark.parametrize('provided', ['mapping', 'out'])
+def test_export_requires_mapping_and_output_arguments(tmp_path, provided):
+    options = (
+        {'out': str(tmp_path)}
+        if provided == 'mapping'
+        else {'mapping': str(MAPPING)}
+    )
+    with pytest.raises(CommandError, match='required'):
+        call_command('export_data_snapshot', **options)
 
 
 @pytest.mark.django_db(transaction=True)
