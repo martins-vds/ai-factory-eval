@@ -80,3 +80,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-15T13:42:38+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T13:45:00+00:00 | verifier-build-compile | 0 | 0.08 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T13:45:01+00:00 | verifier-build-django-check | 0 | 1.43 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T13:45:01+00:00 | verifier-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T13:45:01+00:00 | verifier-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T13:46:05+00:00 | verifier-behavior | 0 | 57.84 | `pytest -q` | `c6399a326a1c3485` |  |  |
+| 2026-11-15T13:46:56+00:00 | verifier-regression | 0 | 51.05 | `pytest -q` | `57b14d441f5b77da` |  |  |
+| 2026-11-15T13:47:54+00:00 | verifier-crap-coverage | 0 | 52.15 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `87e7e43d9646c5fd` |  |  |
+| 2026-11-15T13:47:54+00:00 | verifier-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T13:47:54+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
