@@ -80,3 +80,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-15T23:44:54+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T23:46:20+00:00 | verifier-route-404-test | 0 | 3.56 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_unknown_or_stale_cargo_returns_not_found_for_route_pages` | `30e055f15a5602f4` |  |  |
