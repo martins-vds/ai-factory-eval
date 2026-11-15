@@ -6,7 +6,9 @@ import shutil
 from pathlib import Path
 
 import pytest
+import yaml
 from django.core.management import call_command
+from test_load import MAPPING
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.infrastructure.models import CargoRecord
@@ -17,7 +19,6 @@ from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
 
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
-MAPPING = Path(__file__).resolve().parents[2] / '.migration' / 'data' / 'mapping.yaml'
 
 
 def _rewrite_table(snapshot, table, updates=None, additions=()):
@@ -123,7 +124,9 @@ def _load_snapshot(tmp_path):
         ],
     )
 
-    call_command('load_data_snapshot', snapshot=str(snapshot), mapping=str(MAPPING))
+    mapping = tmp_path / 'mapping.yaml'
+    mapping.write_text(yaml.safe_dump(MAPPING), encoding='utf-8')
+    call_command('load_data_snapshot', snapshot=str(snapshot), mapping=str(mapping))
 
 
 @pytest.fixture
