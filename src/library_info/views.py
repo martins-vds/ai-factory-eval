@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 ABOUT_PAGE = """<!doctype html>
@@ -16,3 +17,8 @@ ABOUT_PAGE = """<!doctype html>
 @require_GET
 def about_endpoint(request):
     return HttpResponse(ABOUT_PAGE, content_type='text/html')
+
+
+@require_GET
+def about_page(request):
+    return render(request, 'library_info/about.html')
