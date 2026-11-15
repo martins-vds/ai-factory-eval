@@ -1,0 +1,10 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Change Destination | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <section aria-labelledby="destination-dialog-heading" class="mx-auto max-w-xl rounded-lg border border-slate-300 bg-white p-6 shadow-sm">
+    <h1 id="destination-dialog-heading" class="mb-5 text-2xl font-semibold">Change destination for {{ cargo.tracking_id.value }}</h1>
+    {% include "booking/dialogs/_destination_form.html" %}
+  </section>
+{% endblock %}

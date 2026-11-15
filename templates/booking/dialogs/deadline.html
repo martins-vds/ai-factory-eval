@@ -1,0 +1,10 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Change Arrival Deadline | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <section aria-labelledby="deadline-dialog-heading" class="mx-auto max-w-xl rounded-lg border border-slate-300 bg-white p-6 shadow-sm">
+    <h1 id="deadline-dialog-heading" class="mb-5 text-2xl font-semibold">Change arrival deadline for {{ cargo.tracking_id.value }}</h1>
+    {% include "booking/dialogs/_deadline_form.html" %}
+  </section>
+{% endblock %}

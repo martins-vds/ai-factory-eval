@@ -1,0 +1,35 @@
+<form
+  method="post"
+  action="{{ form_action }}"
+  hx-post="{{ form_action }}"
+  hx-target="#booking-dialog-content"
+  hx-swap="innerHTML"
+  class="flex flex-col gap-5"
+>
+  {% csrf_token %}
+  <div>
+    <p class="font-medium">Origin: {{ cargo.route_specification.origin.name }}</p>
+    <p>Current destination: {{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})</p>
+  </div>
+  <div>
+    <label class="mb-1 block font-medium" for="destination">Destination</label>
+    {% if destination_error %}
+      <p class="mb-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <select
+      class="w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+      id="destination"
+      name="destination"
+      required
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    >
+      {% for location in locations %}
+        <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="flex justify-end gap-3">
+    <a class="rounded-md px-4 py-2 hover:bg-slate-100" href="/admin/dashboard/">Cancel</a>
+    <button class="rounded-md bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update</button>
+  </div>
+</form>
