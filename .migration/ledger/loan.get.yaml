@@ -8,7 +8,9 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans/{id} returns the formatted loan line and newline with HTTP 200, or HTTP 404 with `no such loan` and a newline when the id is absent."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.views.loan_detail, src.loans.repository.get_loan, src.loans.export.format_loan]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [tests/loans/test_catalog.py::test_loan_lookup_returns_a_formatted_record_or_characterized_not_found, .migration/evidence/runs/LL-01.md, .migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]

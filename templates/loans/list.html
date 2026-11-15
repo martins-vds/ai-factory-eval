@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Loans · The Lending Library{% endblock %}
+{% block content %}
+  <section class="mb-10 max-w-3xl">
+    <p class="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#a94e37]">A neighborhood collection</p>
+    <h1 class="font-serif text-5xl font-bold leading-tight md:text-6xl">Loans in circulation</h1>
+    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-[#626658]">
+      Browse the books shared by our readers. Each loan is due 14 days after it begins.
+    </p>
+  </section>
+  <section aria-label="Loan catalog" class="divide-y divide-[#d8cdbb] border-y border-[#d8cdbb]">
+    {% for loan in loans %}
+      <article class="grid gap-5 py-6 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <p class="font-serif text-2xl font-semibold">ISBN {{ loan.isbn }}</p>
+          <p class="mt-2 text-sm text-[#626658]">
+            Loan {{ loan.id }} <span aria-hidden="true">·</span> {{ loan.member }}
+          </p>
+          <p class="mt-2 text-sm">
+            Due {{ loan.due_on|date:"M j, Y" }}
+            {% if loan.returned_on %}<span class="text-[#626658]">· Returned {{ loan.returned_on|date:"M j, Y" }}</span>{% endif %}
+          </p>
+        </div>
+        <div class="flex items-center gap-4">
+          {% if loan.returned_on %}
+            <span class="badge badge-outline">Returned</span>
+          {% else %}
+            <span class="badge border-[#a94e37] bg-[#a94e37] text-white">On loan</span>
+          {% endif %}
+          <a href="{% url 'loan_page' loan.id %}" aria-label="View loan {{ loan.id }}" class="link link-hover text-[#a94e37]">
+            Details
+          </a>
+        </div>
+      </article>
+    {% empty %}
+      <p class="py-8 text-[#626658]">There are no loans in the catalog.</p>
+    {% endfor %}
+  </section>
+{% endblock %}
