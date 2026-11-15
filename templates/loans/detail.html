@@ -5,6 +5,9 @@
 {% block content %}
 <section class="mx-auto max-w-3xl">
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  {% for message in messages %}
+  <p class="mt-6 border-l-4 border-[#66705b] bg-[#fffdf7] px-4 py-3" role="status">{{ message }}</p>
+  {% endfor %}
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan record · {{ loan.id }}</p>
@@ -15,6 +18,14 @@
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
       </dl>
+      {% if not loan.returned_on %}
+      <div class="mt-8 border-t border-[#d8cdbb] pt-6" id="return-status">
+        <form method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/">
+          {% csrf_token %}
+          <button class="btn btn-primary bg-[#a94e37] text-white hover:bg-[#873d2b]" type="submit">Mark returned</button>
+        </form>
+      </div>
+      {% endif %}
     </div>
   </article>
 </section>
