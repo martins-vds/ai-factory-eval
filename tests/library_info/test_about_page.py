@@ -19,6 +19,13 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.content.decode() == expected['body']
 
 
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_reject_non_get_requests(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_modern_about_page_shows_library_information_in_browser(live_server):
     with sync_playwright() as playwright:
@@ -29,6 +36,10 @@ def test_modern_about_page_shows_library_information_in_browser(live_server):
 
             assert response is not None
             assert response.status == 200
+            assert (
+                page.locator('section').evaluate('element => getComputedStyle(element).maxWidth')
+                == '768px'
+            )
             assert page.get_by_role('heading', name='About the Lending Library').is_visible()
             assert page.get_by_text(
                 'A neighborhood collection, kept in motion by the people who read it.'
