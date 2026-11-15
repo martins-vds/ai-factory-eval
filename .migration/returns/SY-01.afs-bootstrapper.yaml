@@ -1,0 +1,27 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#45
+setup_pr: null
+characterization_tier: C
+tier_evidence: "Ran ./legacy/run.sh; Maven dependency resolution did not complete in 5m28s and no server started. All seven HTTP endpoint probes returned curl exit 7. Tier-B javac of Loan.java exited 1 because jakarta.persistence was unavailable."
+tier_b_attempt: "ran: javac -d /tmp/sy01-javac -sourcepath legacy/src/main/java -implicit:class legacy/src/main/java/lib/Loan.java -> exit 1: jakarta.persistence is unavailable (12 compile errors)"
+capabilities:
+  met: 6
+  gap: 12
+  waived: 0
+  not_applicable: 0
+gap_tickets:
+  - "new: build-run (source)"
+  - "new: build-run (target)"
+  - "new: characterization-harness (source)"
+  - "new: unit-integration-tests (target)"
+  - "new: coverage (source, best effort)"
+  - "new: coverage (target)"
+  - "new: crap (target)"
+  - "new: mutation-testing (target)"
+  - "new: lint-format (target)"
+  - "new: stack-idioms (source)"
+  - "new: data-migration (source and target)"
+  - "new: ui-end-to-end (source and target)"
+handoff: .migration/handoffs/SY-01.md
+validation: "Pass: YAML parsing, profile/capability/return invariants, and Docker Compose config; harness validate.py is unavailable before step 5."
