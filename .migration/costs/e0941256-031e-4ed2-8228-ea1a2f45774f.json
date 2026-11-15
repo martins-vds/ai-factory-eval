@@ -1,0 +1,283 @@
+{
+  "agent": "afs-verifier",
+  "branch": "copilot/martins-vdsai-factory-pilot-target402",
+  "diagnostics": {
+    "data_keys": {
+      "assistant.message": [
+        "apiCallId",
+        "chunkCount",
+        "chunkIndex",
+        "clientRequestId",
+        "content",
+        "encryptedContent",
+        "interactionId",
+        "messageId",
+        "model",
+        "outputTokens",
+        "parentToolCallId",
+        "phase",
+        "reasoningOpaque",
+        "requestId",
+        "rte",
+        "serviceRequestId",
+        "toolRequests",
+        "turnId"
+      ],
+      "assistant.turn_end": [
+        "turnId"
+      ],
+      "assistant.turn_start": [
+        "interactionId",
+        "turnId"
+      ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
+      "hook.end": [
+        "hookInvocationId",
+        "hookType",
+        "output",
+        "success"
+      ],
+      "hook.start": [
+        "hookInvocationId",
+        "hookType",
+        "input"
+      ],
+      "permission.completed": [
+        "requestId",
+        "result",
+        "toolCallId"
+      ],
+      "permission.requested": [
+        "permissionRequest",
+        "promptRequest",
+        "requestId"
+      ],
+      "session.start": [
+        "alreadyInUse",
+        "context",
+        "contextTier",
+        "copilotVersion",
+        "producer",
+        "reasoningEffort",
+        "remoteSteerable",
+        "selectedModel",
+        "sessionId",
+        "startTime",
+        "version"
+      ],
+      "skill.invoked": [
+        "allowedTools",
+        "content",
+        "description",
+        "model",
+        "name",
+        "path",
+        "source",
+        "trigger"
+      ],
+      "subagent.completed": [
+        "agentDisplayName",
+        "agentName",
+        "durationMs",
+        "model",
+        "toolCallId",
+        "totalTokens",
+        "totalToolCalls"
+      ],
+      "subagent.selected": [
+        "agentDisplayName",
+        "agentName",
+        "tools"
+      ],
+      "subagent.started": [
+        "agentDescription",
+        "agentDisplayName",
+        "agentName",
+        "model",
+        "toolCallId"
+      ],
+      "system.message": [
+        "content",
+        "interactionId",
+        "role"
+      ],
+      "system.notification": [
+        "content",
+        "kind"
+      ],
+      "tool.execution_complete": [
+        "error",
+        "interactionId",
+        "model",
+        "parentToolCallId",
+        "result",
+        "rte",
+        "success",
+        "toolCallId",
+        "toolTelemetry",
+        "turnId"
+      ],
+      "tool.execution_start": [
+        "arguments",
+        "mcpServerName",
+        "mcpToolName",
+        "model",
+        "parentToolCallId",
+        "rte",
+        "shellToolInfo",
+        "toolCallId",
+        "toolName",
+        "turnId"
+      ],
+      "user.message": [
+        "attachments",
+        "content",
+        "delivery",
+        "interactionId",
+        "parentAgentTaskId",
+        "source",
+        "supportedNativeDocumentMimeTypes",
+        "transformedContent"
+      ]
+    },
+    "event_types": {
+      "assistant.message": 301,
+      "assistant.turn_end": 96,
+      "assistant.turn_start": 96,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 582,
+      "hook.start": 583,
+      "permission.completed": 283,
+      "permission.requested": 283,
+      "session.start": 1,
+      "skill.invoked": 19,
+      "subagent.completed": 4,
+      "subagent.selected": 1,
+      "subagent.started": 4,
+      "system.message": 7,
+      "system.notification": 1,
+      "tool.execution_complete": 347,
+      "tool.execution_start": 347,
+      "user.message": 18
+    },
+    "events": 2975,
+    "usage_fields": []
+  },
+  "ended_at": "2026-11-15T07:51:56.321Z",
+  "event": "sessionEnd",
+  "harness_tools": [
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "afs-finish-check"
+    },
+    {
+      "count": 68,
+      "exit": 0,
+      "tool": "afs-run"
+    },
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "afs-services"
+    },
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "check_inputs.py"
+    },
+    {
+      "count": 10,
+      "exit": 0,
+      "tool": "check_plan.py"
+    },
+    {
+      "count": 2,
+      "exit": 1,
+      "tool": "check_return_contract.py"
+    },
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "check_runtime.py"
+    },
+    {
+      "count": 10,
+      "exit": 0,
+      "tool": "validate.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-cost-hook"
+    }
+  ],
+  "log": "/home/runner/.copilot/session-state/e0941256-031e-4ed2-8228-ea1a2f45774f/events.jsonl",
+  "models": {
+    "gpt-6-luna": {
+      "output": 125561,
+      "requests": 301
+    }
+  },
+  "prompt_head": null,
+  "recorded_at": "2026-11-15T07:52:08+00:00",
+  "schema": "afs-cost/1",
+  "session_id": "e0941256-031e-4ed2-8228-ea1a2f45774f",
+  "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
+  "skills_invoked": [
+    {
+      "count": 2,
+      "skill": "afs-evidence"
+    },
+    {
+      "count": 3,
+      "skill": "afs-migration-contract"
+    },
+    {
+      "count": 3,
+      "skill": "afs-setup-check"
+    },
+    {
+      "count": 1,
+      "skill": "agent-browser"
+    },
+    {
+      "count": 1,
+      "skill": "clean-architecture"
+    },
+    {
+      "count": 1,
+      "skill": "clean-code"
+    },
+    {
+      "count": 5,
+      "skill": "code-review"
+    },
+    {
+      "count": 1,
+      "skill": "domain-driven-design"
+    },
+    {
+      "count": 1,
+      "skill": "patterns-of-enterprise-application-architecture"
+    },
+    {
+      "count": 1,
+      "skill": "ui-ux-pro-max"
+    }
+  ],
+  "started_at": "2026-11-15T06:59:04.728Z",
+  "surface": "coding-agent",
+  "usage_source": "assistant.message (output only, partial)"
+}

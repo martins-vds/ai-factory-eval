@@ -48,3 +48,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:54+00:00 | mutation-changed | 0 | 139.12 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `c97ad74d6bf2528b` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
+| 2026-11-15T06:59:22+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:04:23+00:00 | dialogs-verifier-targeted | 0 | 13.11 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py tests/booking/application/test_specification.py` | `fee6677fe8752cd9` |  |  |
+| 2026-11-15T07:08:39+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:13:29+00:00 | verifier-build-compileall | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:13:30+00:00 | verifier-build-django-check | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T07:14:46+00:00 | verifier-behavior | 0 | 75.65 | `pytest -q` | `1a17de8e043e00a9` |  |  |
+| 2026-11-15T07:14:46+00:00 | verifier-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T07:14:46+00:00 | verifier-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T07:16:00+00:00 | verifier-crap-coverage | 0 | 74.58 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `e862e8a888d4c44f` |  |  |
+| 2026-11-15T07:16:00+00:00 | verifier-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:16:01+00:00 | verifier-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-15T07:17:15+00:00 | verifier-regression | 0 | 74.62 | `pytest -q` | `b0a104b9f54bc093` |  |  |
