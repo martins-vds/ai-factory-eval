@@ -1,0 +1,34 @@
+[
+  {
+    "at": "2026-11-15T14:35:09Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 50239,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05E",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/afeb16e5-3bfa-4b38-902e-5776229930e0.json",
+      ".migration/evidence/mutants/BK-05E.md",
+      ".migration/evidence/runs/BK-05E.md",
+      ".migration/returns/BK-05E.afs-specialist-migrator.yaml",
+      "tests/booking/interfaces/test_cargo_details.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05E.afs-verifier.yaml` with `role: afs-verifier`, `ticket: BK-05E`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05E.md`). See afs-migration-contract \u2192 Return files.",
+      "[mechanical] You changed another role's or ticket's return file: `.migration/returns/BK-05E.afs-specialist-migrator.yaml`. A session writes only its own return (`.migration/returns/BK-05E.afs-verifier.yaml`). Restore each one exactly as it was on your base branch (`git checkout <base> -- <file>`) and commit."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
