@@ -39,6 +39,5 @@ class FeeApplication:
 
         end_date = loan.returned_on or self.clock.today()
         days_late = max(0, (end_date - loan.due_on).days)
-        chargeable_days = max(0, days_late - 2)
-        amount_cents = min(chargeable_days * 25, 1000)
+        amount_cents = 0 if days_late <= 2 else min(days_late * 25, 1000)
         return LateFeeQuote(loan, days_late, amount_cents)
