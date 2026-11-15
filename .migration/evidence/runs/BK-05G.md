@@ -59,3 +59,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T02:16:54+00:00 | verifier-unknown-404 | 0 | 2.77 | `pytest -q tests/booking/interfaces/test_dialogs.py -k unknown_cargo_dialog_returns_not_found` | `2498400f07c20953` |  |  |
 | 2026-11-15T02:17:55+00:00 | behavior-final | 0 | 48.15 | `pytest -q` | `403eba35681016ba` |  |  |
 | 2026-11-15T02:18:54+00:00 | crap-final | 0 | 48.18 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `2aeaa068a23c851a` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-15T02:40:29+00:00 | regression-final | 0 | 99.38 | `pytest -q` | `88f8c72285e41043` |  |  |
