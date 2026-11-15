@@ -7,8 +7,18 @@ source:
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.reports.services.MonthlyReport.for_period
+    - src.reports.repository.DjangoMonthlyReportRepository.started_between
+    - src.reports.repository.DjangoMonthlyReportRepository.returned_between
+    - src.reports.management.commands.monthly_report.Command.handle
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_lists_previous_month_activity_in_fee_order
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."

@@ -26,7 +26,9 @@ class Command(BaseCommand):
         output = StringIO()
         writer = csv.writer(output, lineterminator='\n')
         writer.writerow(['member_id', 'loans_started', 'late_returns', 'late_fees_cents'])
-        for report in MonthlyReport(DjangoMonthlyReportRepository(), fee_application).for_period(start, end):
+        for report in MonthlyReport(DjangoMonthlyReportRepository(), fee_application).for_period(
+            start, end
+        ):
             writer.writerow(
                 [
                     report.member_id,

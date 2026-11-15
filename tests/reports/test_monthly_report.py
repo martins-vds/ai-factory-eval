@@ -29,6 +29,13 @@ def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
                 returned_on=date(2025, 12, 30),
             ),
             Loan(
+                id='REPORT-9',
+                member='BETA',
+                isbn='9',
+                lent_on=date(2025, 11, 20),
+                returned_on=date(2025, 12, 30),
+            ),
+            Loan(
                 id='REPORT-3',
                 member='ALPHA',
                 isbn='3',
@@ -73,7 +80,7 @@ def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
 
     assert list(csv.reader(StringIO(output.getvalue()))) == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
-        ['BETA', '1', '1', '150'],
+        ['BETA', '1', '2', '800'],
         ['ALPHA', '3', '1', '75'],
         ['GAMMA', '1', '1', '75'],
         ['WAIVED', '1', '1', '0'],

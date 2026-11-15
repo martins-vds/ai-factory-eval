@@ -19,9 +19,11 @@ class MonthlyReport:
         for loan in self.loans.started_between(start, end):
             report = members.setdefault(loan.member, MemberReport(loan.member))
             report.loans_started += 1
-            if loan.returned_on is None or not start <= loan.returned_on < end:
-                continue
 
+        for loan in self.loans.returned_between(start, end):
+            report = members.get(loan.member)
+            if report is None:
+                continue
             fee = self.fees.fee_for(loan.id)
             if fee is None:
                 continue
