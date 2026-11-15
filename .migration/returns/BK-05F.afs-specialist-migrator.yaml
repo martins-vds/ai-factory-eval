@@ -20,6 +20,28 @@ specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
+  - >-
+    Equivalent mutant #10: changing the missing-cargo POST Http404 detail does not change the 404
+    page or status.
+  - >-
+    Equivalent mutant #13: changing the stale-route Http404 detail does not change the 404 page or
+    status.
+  - >-
+    Equivalent mutant #14: `quote(..., safe="")` to `quote(..., safe="XXXX")` is equivalent because
+    `X` is unreserved and always left unescaped.
+  - >-
+    Equivalent mutant #27: changing the missing-cargo GET Http404 detail does not change the 404
+    page or status.
+  - >-
+    Equivalent mutant #40: absent candidate defaults `''` and `'XXXX'` both fail signature
+    validation and produce the same 404 response.
+  - >-
+    Equivalent mutant #44: the changed BadSignature detail is caught and normalized to the same
+    Http404 response.
+  - >-
+    Equivalent mutant #46: changing the invalid-candidate Http404 detail does not change the 404
+    page or status.
+  - .migration/handoffs/BK-05F.md
 ledger_updated:
   - booking.routing-chain
   - booking.screen-route
