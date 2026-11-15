@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -80,6 +81,22 @@ def test_lend_endpoint_creates_a_loan_with_fourteen_day_due_date(client):
 
 
 @pytest.mark.django_db
+def test_lend_endpoint_preserves_surrounding_whitespace_in_nonblank_values(client):
+    lent_on = timezone.localdate()
+    due_on = lent_on + timedelta(days=14)
+
+    response = client.post(
+        '/loans',
+        {'member': ' reader ', 'isbn': ' 123 '},
+    )
+
+    assert response.status_code == 201
+    assert response.content.decode() == (
+        f'L4; reader ; 123 ;{lent_on.isoformat()};{due_on.isoformat()};\n'
+    )
+
+
+@pytest.mark.django_db
 def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     lent_on = timezone.localdate()
     due_on = lent_on + timedelta(days=14)
@@ -101,6 +118,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -122,6 +141,23 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.parametrize(
+    ('payload', 'expected_fields'),
+    [
+        ({}, {'member', 'isbn'}),
+        ({'member': 'reader'}, {'isbn'}),
+        ({'isbn': '123'}, {'member'}),
+        ({'member': ' ', 'isbn': '123'}, {'member'}),
+        ({'member': 'reader', 'isbn': ' '}, {'isbn'}),
+    ],
+)
+def test_loan_form_requires_nonblank_member_and_isbn(payload, expected_fields):
+    form = LoanForm(data=payload)
+
+    assert not form.is_valid()
+    assert set(form.errors) == expected_fields
 
 
 @pytest.mark.django_db
@@ -379,6 +415,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
 
 
 @pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
 def test_real_browser_can_lend_and_return_a_book(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -424,6 +469,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
