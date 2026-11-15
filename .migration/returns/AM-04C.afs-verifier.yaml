@@ -1,0 +1,20 @@
+role: afs-verifier
+ticket: AM-04C
+issue: martins-vds/ai-factory-pilot-target#282
+pr: null
+verdict: blocked
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/AM-04C.md
+  - .migration/runs/AM-04C/20261115T020829905095Z-setup-probe.log
+findings: null
+tests_added: null
+ledger_issues: null
+quirk_tickets: null
+handoff: .migration/handoffs/AM-04C.md

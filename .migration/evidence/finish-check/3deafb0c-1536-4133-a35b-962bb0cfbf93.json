@@ -1,0 +1,29 @@
+[
+  {
+    "at": "2026-11-15T02:10:20Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 32334,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "AM-04C",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/evidence/runs/AM-04C.md",
+      ".migration/handoffs/AM-04C.md",
+      ".migration/returns/AM-04C.afs-verifier.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
