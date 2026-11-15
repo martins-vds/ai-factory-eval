@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.http import require_http_methods
 
 from .models import Loan
-from .services import get_loan_text, list_loans_text
+from .services import get_loan_text, lend_book, list_loans_text
 
 
 def loan_catalog(request):
@@ -14,7 +15,22 @@ def loan_catalog_detail(request, loan_id):
     return render(request, 'loans/detail.html', {'loan': loan})
 
 
+@require_http_methods(['GET', 'POST'])
 def loan_list(request):
+    if request.method == 'POST':
+        member = request.POST.get('member')
+        isbn = request.POST.get('isbn')
+        if not member or not isbn:
+            return HttpResponse(
+                'member and isbn are required\n',
+                status=400,
+                content_type='text/plain',
+            )
+        return HttpResponse(
+            lend_book(member, isbn),
+            status=201,
+            content_type='text/plain',
+        )
     return HttpResponse(list_loans_text(), content_type='text/plain')
 
 
