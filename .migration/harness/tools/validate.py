@@ -9,16 +9,20 @@ Usage: validate.py <folder> [--schemas <dir>]
   slices/*.yaml      → schemas/slice.schema.json (unknown keys are errors)
   ledger/*.yaml      → schemas/ledger-entry.schema.json, plus: file name == `<id>.yaml`, ids unique, and
                        (ADR-0018) every evidence item exists, is committed (never .migration/runs/),
-                       and a test id's symbol is still defined
+                       and a test id's symbol is still defined; a migrated entry's target components exist
   returns/*.yaml     → schemas/return.schema.json, plus: file name == `<ticket>.<role>.yaml`; and (ADR-0017)
                        a finished return has no null gates, each score equals the last mutation
                        gate run's AFS-RESULT, and PR-bearing roles have a meaningful PR reference
                        (legacy returns and unchanged null-PR history from before this rule are exempt)
   handoffs/*.md      → every `## Handoff — <role> · <UTC>` section has its required subsections
   quirks/*.md        → quirk drafts have Question, Evidence, Impact and Options sections
+  plan/*.md          → each has `<slice>.tickets.yaml` (schemas/plan-tickets.schema.json), checked by
+                       check_plan.py: new ids, files named, no shared file without a blocking edge,
+                       cross_slice listed, test-name clashes, capability ledger entries (harness #98)
 Exits 1 if anything is invalid. Requires: jsonschema, pyyaml.
 """
 import argparse
+import ast
 import json
 import os
 import pathlib
@@ -28,6 +32,7 @@ import subprocess
 import sys
 import tempfile
 
+import check_plan
 import yaml
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -232,6 +237,19 @@ def check_return_evidence(folder, path, doc, profile, pr_roles, errors):
                               f"'n/a: <reason>' if the gate does not apply (null only with a handoff)")
     trusted = gate_commands(profile or {})
     runs = [r for r in rows if r["command"] in trusted and r["result"].get("gate") == "mutation"]
+    # A ticket's journal is shared by its sessions (migrator, Verifier, fixes, re-verification); each session's
+    # afs-setup-check writes a `setup-probe` row first. A return's score is the last mutation run of one
+    # session. When a squash merge lands a migrator's return and a later Verifier session's rows in one
+    # commit (synthetic LL-03, #88), the file's last run is the Verifier's, not the migrator's.
+    finals, session_last = [], None
+    for r in rows:
+        if r["gate"] == "setup-probe" and session_last is not None:
+            finals.append(session_last)
+            session_last = None
+        if r in runs:
+            session_last = r
+    if session_last is not None:
+        finals.append(session_last)
     for key, value in scores_in(doc):
         if not isinstance(value, (int, float)) or isinstance(value, bool):
             continue
@@ -239,14 +257,34 @@ def check_return_evidence(folder, path, doc, profile, pr_roles, errors):
             errors.append(f"{path}: {key}={value} but {journal} has no mutation gate run with a result; run the "
                           f"profile's mutation gate through afs-run")
             continue
-        last = runs[-1]["result"].get("score", "")
-        try:
-            ok = abs(float(last) - float(value)) < 0.0005
-        except ValueError:
-            ok = False
-        if not ok:
-            errors.append(f"{path}: {key}={value} does not match the last mutation gate run in {journal} "
-                          f"when this return was last committed (score={last}); report the score afs-mutation printed")
+
+        def same(run):
+            try:
+                return abs(float(run["result"].get("score", "")) - float(value)) < 0.0005
+            except ValueError:
+                return False
+        if not any(same(run) for run in finals):
+            last = runs[-1]["result"].get("score", "")
+            errors.append(f"{path}: {key}={value} does not match the last mutation gate run of any session in "
+                          f"{journal} when this return was last committed (latest score={last}); report the score "
+                          f"afs-mutation printed")
+
+
+TIER_B_ATTEMPT = re.compile(r"^(ran|no code): \S")
+
+
+def check_tier_attempt(path, doc, errors):
+    """ADR-0005: tier C only after the tier-B recipe was tried. A build that fails on a private dependency is
+    exactly the case tier B exists for, so `tier_b_attempt` must show the compile-only run and its result,
+    or say there is no code to compile."""
+    if doc.get("role") != "afs-bootstrapper" or doc.get("characterization_tier") != "C":
+        return
+    attempt = doc.get("tier_b_attempt")
+    if not isinstance(attempt, str) or not TIER_B_ATTEMPT.match(attempt.strip()):
+        errors.append(f"{path}: characterization_tier C needs `tier_b_attempt: \"ran: <compile-only command> -> "
+                      f"<result>\"` (the tier-B recipe: compile only what the source's tests reach) or "
+                      f"`\"no code: <what the source contains>\"`. A failed full build is not enough "
+                      f"(afs-migration-contract -> references/characterization.md)")
 
 
 UNCOMMITTED = (".migration/runs/",)   # gitignored: raw logs vanish with the session (ADR-0018)
@@ -282,6 +320,63 @@ def check_evidence(root, path, doc, errors):
             # Language-neutral: `name(` (def/method), or `class/def/function name`.
             if not re.search(rf"\b{re.escape(name)}\s*\(|\b(class|def|function)\s+{re.escape(name)}\b", text):
                 errors.append(f"{path}: evidence '{item}': no '{name}' defined in {file} (stale symbol)")
+
+
+def resolve_component(root, ref):
+    """None when a ledger `target.components` entry names something that exists, else why it doesn't.
+
+    Forms: a repo path (`templates/booking/wizard/`, a file or folder); a dotted Python name, with or
+    without the `src.` source folder (`src.loans.services.LoanApplication.lend`); a dotted template name
+    (`templates.tracking.result` for `templates/tracking/result.html`)."""
+    if any(c.isspace() for c in ref.strip()):
+        return None                                               # prose (a library, a service), not a reference
+    if "/" in ref:
+        file, _, symbol = re.split(r"::?", ref, maxsplit=1)[0], None, (re.split(r"::?", ref, maxsplit=1)[1:] or [""])[0]
+        target = root / file
+        if not target.exists():
+            return f"{file} does not exist"
+        if symbol and target.is_file() and not re.search(
+                rf"\b{re.escape(symbol)}\s*\(|\b(class|def|function)\s+{re.escape(symbol)}\b",
+                target.read_text(encoding="utf-8", errors="ignore")):
+            return f"no '{symbol}' defined in {file}"
+        return None
+    parts = ref.split(".")
+    for base in ("", "src/"):
+        for k in range(len(parts), 0, -1):
+            stem = root / (base + "/".join(parts[:k]))
+            rest = parts[k:]
+            module = next((f for f in (stem.with_suffix(".py"), stem / "__init__.py") if f.is_file()), None)
+            if module is None and rest and stem.is_file():               # a file's target: `Makefile.run`
+                text = stem.read_text(encoding="utf-8", errors="ignore")
+                return None if re.search(rf"^{re.escape(rest[-1])}\s*:", text, re.M) or \
+                    re.search(rf"\b{re.escape(rest[-1])}\b", text) else f"no '{rest[-1]}' in {stem.relative_to(root)}"
+            if module is None and not rest and stem.parent.is_dir():
+                if stem.is_dir() or any(f.stem == stem.name for f in stem.parent.iterdir() if f.is_file()):
+                    return None                                   # a package folder, or a template by stem
+            if module is None:
+                continue
+            body = ast.parse(module.read_text(encoding="utf-8", errors="ignore")).body
+            for name in rest:
+                found = next((n for n in body if getattr(n, "name", None) == name or any(
+                    getattr(t, "id", None) == name for t in getattr(n, "targets", [getattr(n, "target", None)]))),
+                    None)
+                if found is None:
+                    return f"no '{name}' in {module.relative_to(root)}"
+                body = getattr(found, "body", [])
+            return None
+    return f"no module, package or file for '{ref}'"
+
+
+def check_components(root, path, doc, errors):
+    """ADR-0018 amendment: a migrated entry's `target.components` name code that exists. A refactor that
+    moves code (synthetic LL-02 put its use cases behind ports) fails here, on its own PR, instead of at the
+    slice audit (LC-AUDIT found two stale references)."""
+    if doc.get("status") != "migrated":
+        return
+    for ref in (doc.get("target") or {}).get("components") or []:
+        problem = resolve_component(root, ref)
+        if problem:
+            errors.append(f"{path}: target component '{ref}': {problem} (stale reference)")
 
 
 def check_thresholds(path, profile, errors):
@@ -334,6 +429,7 @@ def main():
                 seen[doc["id"]] = path.name
             if isinstance(doc, dict) and not a.sample:
                 check_evidence(folder.resolve().parent, path, doc, errors)
+                check_components(folder.resolve().parent, path, doc, errors)
 
     returns = folder / "returns"
     if returns.is_dir():
@@ -348,12 +444,17 @@ def main():
             checked += 1
             if isinstance(doc, dict) and doc.get("ticket") and path.name not in legacy:
                 check_return_evidence(folder, path, doc, profile, pr_roles, errors)
+                check_tier_attempt(path, doc, errors)
             if isinstance(doc, dict) and "ticket" in doc and "role" in doc:
                 want = f"{doc['ticket']}.{doc['role']}"
                 if path.stem != want:
                     errors.append(f"{path}: file name must be '{want}.yaml'")
 
     checked += check_markdown(folder, errors)
+    before = len(errors)
+    checked += check_plan.check(folder, schemas, errors, a.sample)
+    # check_plan runs inside validate.py, so announce its own verdict for harness coverage (ADR-0027)
+    print(f"AFS-TOOL check_plan.py exit={1 if len(errors) > before else 0}", file=sys.stderr)
 
     if checked == 0:
         errors.append(f"{folder}: nothing to validate (no profile.yaml, capabilities.yaml or ledger/)")
