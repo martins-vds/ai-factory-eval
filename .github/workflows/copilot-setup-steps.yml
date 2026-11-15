@@ -63,6 +63,9 @@ jobs:
       # reads AFS_BASE before origin/main; live targets don't set it.
       - name: Measure changed code from the eval case's base commit
         run: |
+          # Copilot forces fetch-depth 2 on the checkout above, so the case's base commit isn't in the clone
+          # yet (afs-setup-check unshallows later, too late for this step). This repo is public: no token needed.
+          git fetch -q --unshallow origin 2>/dev/null || git fetch -q --deepen=500 origin
           base=$(git log --grep='^Eval case .*: base at ' -1 --format=%H)
           if [ -n "$base" ]; then echo "AFS_BASE=$base" >> "$GITHUB_ENV"; echo "AFS_BASE=$base"; else echo "::warning::no eval case base commit"; fi
 
