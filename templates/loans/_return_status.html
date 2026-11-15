@@ -1,0 +1,14 @@
+<div id="return-status" class="mt-6 border-t border-[#d8cdbb] pt-5">
+  {% if loan.returned_on %}
+  {% if already_returned %}
+  <p class="text-sm text-[#66705b]" role="alert">This loan was already returned on {{ loan.returned_on|date:"M j, Y" }}.</p>
+  {% else %}
+  <p class="text-sm text-[#66705b]" role="status">This loan was returned on {{ loan.returned_on|date:"M j, Y" }}.</p>
+  {% endif %}
+  {% else %}
+  <form method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="outerHTML">
+    {% csrf_token %}
+    <button class="btn btn-secondary btn-sm" type="submit">Mark as returned</button>
+  </form>
+  {% endif %}
+</div>

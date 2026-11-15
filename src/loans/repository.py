@@ -3,9 +3,16 @@ from django.db import transaction
 from .models import Loan
 
 
+class AlreadyReturnedError(Exception):
+    pass
+
+
 class LoanRepository:
     def all(self):
         return Loan.objects.all()
+
+    def count(self):
+        return Loan.objects.count()
 
     def find(self, loan_id):
         return Loan.objects.filter(pk=loan_id).first()
@@ -13,3 +20,14 @@ class LoanRepository:
     @transaction.atomic
     def create(self, **fields):
         return Loan.objects.create(**fields)
+
+    @transaction.atomic
+    def mark_returned(self, loan_id, returned_on):
+        loan = Loan.objects.select_for_update().filter(pk=loan_id).first()
+        if loan is None:
+            return None
+        if loan.returned_on is not None:
+            raise AlreadyReturnedError
+        loan.returned_on = returned_on
+        loan.save(update_fields=['returned_on'])
+        return loan

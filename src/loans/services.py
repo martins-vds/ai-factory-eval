@@ -1,7 +1,23 @@
 import csv
 from io import StringIO
 
-from .repository import LoanRepository
+from django.utils import timezone
+
+from .repository import AlreadyReturnedError, LoanRepository
+
+
+def lend_book(member, isbn):
+    repository = LoanRepository()
+    return repository.create(
+        id=f'L{repository.count() + 1}',
+        member=member,
+        isbn=isbn,
+        lent_on=timezone.localdate(),
+    )
+
+
+def return_book(loan_id):
+    return LoanRepository().mark_returned(loan_id, timezone.localdate())
 
 
 def loan_line(loan):
