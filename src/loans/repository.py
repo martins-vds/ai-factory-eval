@@ -13,3 +13,8 @@ class LoanRepository:
     @transaction.atomic
     def create(self, **fields):
         return Loan.objects.create(**fields)
+
+    @transaction.atomic
+    def lend(self, **fields):
+        fields['id'] = f'L{Loan.objects.count() + 1}'
+        return Loan.objects.create(**fields)
