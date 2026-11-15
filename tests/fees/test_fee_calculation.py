@@ -34,6 +34,16 @@ class PaymentGateway:
         raise AssertionError('fee calculation must not charge the gateway')
 
 
+class RecordingPaymentGateway:
+    def __init__(self, response):
+        self.response = response
+        self.loan_ids = []
+
+    def charge(self, loan_id):
+        self.loan_ids.append(loan_id)
+        return self.response
+
+
 @pytest.mark.parametrize(
     ('days_late', 'expected_cents'),
     [(0, 0), (1, 0), (2, 0), (3, 75), (11, 275), (100, 1000)],
@@ -70,3 +80,24 @@ def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_pay_delegates_to_gateway_for_an_existing_loan():
+    response = object()
+    gateway = RecordingPaymentGateway(response)
+    application = FeeApplication(
+        LoanRepository(Loan('L1', date(2026, 1, 10))),
+        Clock(date(2026, 1, 1)),
+        gateway,
+    )
+
+    assert application.pay('L1') is response
+    assert gateway.loan_ids == ['L1']
+
+
+def test_pay_does_not_call_gateway_for_an_unknown_loan():
+    gateway = RecordingPaymentGateway(object())
+    application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), gateway)
+
+    assert application.pay('missing') is None
+    assert gateway.loan_ids == []
