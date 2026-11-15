@@ -1,9 +1,13 @@
+import logging
+
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application, payment_application
 from .gateway import PaymentGatewayUnavailable
+
+logger = logging.getLogger(__name__)
 
 
 @require_GET
@@ -37,6 +41,7 @@ def pay_fee(request, loan_id):
     try:
         payment = payment_application.pay(loan_id)
     except PaymentGatewayUnavailable:
+        logger.exception('Payment gateway unavailable')
         return HttpResponse(
             'payment gateway unavailable\n',
             status=502,
@@ -52,6 +57,7 @@ def pay_fee_page(request, loan_id):
     try:
         payment = payment_application.pay(loan_id)
     except PaymentGatewayUnavailable:
+        logger.exception('Payment gateway unavailable')
         return render(
             request,
             'fees/payment-status.html',

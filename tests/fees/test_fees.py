@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
@@ -265,6 +266,29 @@ def test_payment_gateway_keeps_interrupted_error_as_cause(monkeypatch):
         gateway.charge('L1')
 
     assert isinstance(failure.value.__cause__, InterruptedError)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'headers', 'expected_status'),
+    [
+        ('/payments/L1', {}, 502),
+        ('/ui/payments/L1/', {'HTTP_HX_REQUEST': 'true'}, 200),
+    ],
+)
+def test_payment_views_log_interruption_when_mapping_to_failure(
+    client, monkeypatch, caplog, path, headers, expected_status
+):
+    def interrupt(request):
+        raise InterruptedError('request interrupted')
+
+    install_gateway_opener(monkeypatch, interrupt)
+
+    with caplog.at_level(logging.ERROR, logger='src.fees.views'):
+        response = client.post(path, **headers)
+
+    assert response.status_code == expected_status
+    assert 'InterruptedError: request interrupted' in caplog.text
 
 
 @pytest.mark.parametrize(
