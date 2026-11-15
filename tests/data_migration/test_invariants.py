@@ -71,8 +71,7 @@ def test_loaded_voyage_carrier_movements_are_in_schedule_order(loaded_snapshot):
 
     for voyage in voyages:
         movements = list(
-            CarrierMovementRecord.objects.filter(voyage=voyage)
-            .order_by('departure_time', 'pk')
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
         for movement in movements:
             assert movement.departure_time <= movement.arrival_time
