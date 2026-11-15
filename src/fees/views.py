@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 from .composition import fees_application
@@ -16,3 +17,11 @@ def fee_api(request, loan_id):
         f'<p class="fee">Fee: ${fee.amount:.2f}</p>'
     )
     return HttpResponse(body, content_type='text/html')
+
+
+@require_GET
+def fee_page(request, loan_id):
+    fee = fees_application.fee_for(loan_id)
+    if fee is None:
+        return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
+    return render(request, 'fees/page.html', {'fee': fee})
