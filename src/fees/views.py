@@ -76,7 +76,7 @@ def payment_page(request, loan_id):
     if is_htmx:
         return render(request, 'fees/payment-status.html', {'feedback': feedback})
     if success:
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect('late-fee-page', loan_id=loan_id)
     return _render_fee_page(request, loan_id, feedback, status=502)
 
 
