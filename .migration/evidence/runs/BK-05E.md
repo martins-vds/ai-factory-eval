@@ -18,3 +18,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
+| 2026-11-15T07:27:59+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:31:10+00:00 | behavior | 0 | 5.46 | `pytest -q tests/characterization/test_booking.py tests/booking/interfaces/test_dashboard.py tests/booking/interfaces/test_cargo_details.py` | `52f47fd5288ce6c9` |  |  |
+| 2026-11-15T07:31:10+00:00 | build-compileall | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:31:10+00:00 | build-django-check | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T07:31:10+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T07:31:10+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `df313bb2dd82ede5` |  |  |
+| 2026-11-15T07:32:09+00:00 | regression | 0 | 58.21 | `pytest -q` | `f86b6d8387690831` |  |  |
+| 2026-11-15T07:33:06+00:00 | crap-coverage | 0 | 57.28 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `8cb98da7ce8b4cfe` |  |  |
+| 2026-11-15T07:33:06+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:33:06+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-15T08:13:33+00:00 | behavior-details | 0 | 7.98 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `5e8a08a4f15a5285` |  |  |
+| 2026-11-15T08:13:47+00:00 | idiom-test-ruff-check | 0 | 0.01 | `ruff check tests/booking/interfaces/test_cargo_details.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T08:13:47+00:00 | idiom-test-ruff-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_cargo_details.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-15T08:16:24+00:00 | regression-after-tests | 0 | 157.17 | `pytest -q` | `370988ed145b1f36` |  |  |

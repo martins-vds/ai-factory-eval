@@ -1,6 +1,7 @@
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
@@ -50,6 +51,36 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
     assert 'Arrival deadline:' in content
     assert 'Itinerary' in content
     assert '0200T' in content
+    assert 'Misrouted cargo!' not in content
+    assert 'Reroute' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unrouted_cargo_details_link_to_route_selection(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/DEF789/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert '<strong>Not routed</strong>' in content
+    assert 'href="/admin/cargo/DEF789/route/"' in content
+    assert 'Itinerary' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_misrouted_cargo_details_offer_reroute_action(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/JKL567/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Misrouted cargo!' in content
+    assert 'href="/admin/cargo/JKL567/itineraries/"' in content
+    assert 'Reroute' in content
 
 
 @pytest.mark.django_db
@@ -63,3 +94,13 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+
+
+def test_unknown_cargo_details_raise_not_found_error():
+    repository.missing_tracking_ids.add('UNKNOWN')
+
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        cargo_details_view(
+            RequestFactory().get('/admin/cargo/UNKNOWN/'),
+            'UNKNOWN',
+        )
