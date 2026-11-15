@@ -1,0 +1,16 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#236
+setup_pr: null
+characterization_tier: A
+tier_evidence: "PORT=18080 ./legacy/run.sh built and started; curl probes returned 200 for /loans, /fees/L3 and /about, 502 for POST /payments/L3, 201 for POST /loans, and 404 for /loans/unknown."
+capabilities:
+  met: 16
+  gap: 2
+  waived: 1
+  not_applicable: 4
+gap_tickets:
+  - "new: coverage (source)"
+  - "new: crap (source)"
+validation: "Migration YAML parsed successfully; harness validate.py is not installed until step 5. Docker Compose CLI was unavailable, so compose was YAML-parsed but not started."
+handoff: .migration/handoffs/SY-01.md
