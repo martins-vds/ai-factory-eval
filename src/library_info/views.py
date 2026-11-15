@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 ABOUT_HTML = (
@@ -17,3 +18,8 @@ ABOUT_HTML = (
 @require_GET
 def about(request):
     return HttpResponse(ABOUT_HTML, content_type='text/html')
+
+
+@require_GET
+def about_page(request):
+    return render(request, 'library_info/about.html')
