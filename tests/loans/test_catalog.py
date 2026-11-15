@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -122,6 +123,19 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.django_db
+def test_loan_form_validates_required_member_and_isbn_fields():
+    form = LoanForm(data={'member': 'reader', 'isbn': '123'})
+
+    assert form.is_valid()
+    assert form.cleaned_data == {'member': 'reader', 'isbn': '123'}
+
+    invalid_form = LoanForm(data={'member': '', 'isbn': ''})
+
+    assert not invalid_form.is_valid()
+    assert set(invalid_form.errors) == {'member', 'isbn'}
 
 
 @pytest.mark.django_db
@@ -424,6 +438,9 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    body = response.content.decode()
+    assert 'Loan record · L2' in body
+    assert 'Jan 20, 2026' in body
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
