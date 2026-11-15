@@ -48,3 +48,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:54+00:00 | mutation-changed | 0 | 139.12 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `c97ad74d6bf2528b` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
+| 2026-11-15T02:08:39+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T02:10:35+00:00 | build | 0 | 1.31 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T02:11:09+00:00 | idiom | 0 | 0.05 | `bash -c 'ruff check && ruff format --check'` | `07a2e0ea53bd64f2` |  |  |
+| 2026-11-15T02:11:45+00:00 | behavior | 0 | 52.16 | `pytest -q` | `46abb377262ebdfb` |  |  |
+| 2026-11-15T02:14:52+00:00 | regression | 0 | 56.51 | `pytest -q` | `29ffbda3b97c9ae6` |  |  |
+| 2026-11-15T02:16:06+00:00 | crap | 0 | 49.44 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `fbeaa6c6cdc07289` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-15T02:16:52+00:00 | idiom-final | 0 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `07a2e0ea53bd64f2` |  |  |
+| 2026-11-15T02:16:52+00:00 | build-final | 0 | 0.34 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T02:16:54+00:00 | verifier-unknown-404 | 0 | 2.77 | `pytest -q tests/booking/interfaces/test_dialogs.py -k unknown_cargo_dialog_returns_not_found` | `2498400f07c20953` |  |  |
+| 2026-11-15T02:17:55+00:00 | behavior-final | 0 | 48.15 | `pytest -q` | `403eba35681016ba` |  |  |
+| 2026-11-15T02:18:54+00:00 | crap-final | 0 | 48.18 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `2aeaa068a23c851a` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-15T02:40:29+00:00 | regression-final | 0 | 99.38 | `pytest -q` | `88f8c72285e41043` |  |  |
