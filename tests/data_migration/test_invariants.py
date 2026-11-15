@@ -1,5 +1,6 @@
 import csv
 import hashlib
+import itertools
 import json
 import shutil
 from dataclasses import replace
@@ -172,7 +173,7 @@ def test_loaded_itinerary_legs_connect(loaded_snapshot):
         legs = list(LegRecord.objects.filter(cargo=cargo).order_by('load_time', 'pk'))
         assert all(
             previous.unload_location_id == following.load_location_id
-            for previous, following in zip(legs, legs[1:])
+            for previous, following in itertools.pairwise(legs)
         )
 
 
@@ -192,5 +193,5 @@ def test_loaded_voyage_movements_form_ordered_schedules(loaded_snapshot):
         assert all(movement.departure_time <= movement.arrival_time for movement in movements)
         assert all(
             previous.arrival_time <= following.departure_time
-            for previous, following in zip(movements, movements[1:])
+            for previous, following in itertools.pairwise(movements)
         )
