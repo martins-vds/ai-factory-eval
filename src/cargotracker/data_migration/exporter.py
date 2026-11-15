@@ -57,9 +57,8 @@ def export_snapshot(mapping_path, output_path):
             columns = entry['columns']
             fields = [entry['fields'][target] for target, _, _ in columns]
             primary_key = getattr(model._meta.pk, 'fields', (model._meta.pk,))
-            rows = (
-                model._base_manager.order_by(*(field.name for field in primary_key))
-                .values_list(*(field.attname for field in fields))
+            rows = model._base_manager.order_by(*(field.name for field in primary_key)).values_list(
+                *(field.attname for field in fields)
             )
             path = output / f'{spec["target"]}.csv'
             with path.open('w', newline='', encoding='utf-8') as stream:
@@ -67,9 +66,7 @@ def export_snapshot(mapping_path, output_path):
                 writer.writerow([target for target, _, _ in columns])
                 row_count = 0
                 for row in rows.iterator():
-                    writer.writerow(
-                        [_format_value(value, timestamp_timezone) for value in row]
-                    )
+                    writer.writerow([_format_value(value, timestamp_timezone) for value in row])
                     row_count += 1
             exported.append((spec['target'], row_count))
     except OSError as error:
