@@ -36,9 +36,6 @@ def monthly_report(month_start: date, month_end: date, as_of: date) -> list[Memb
         total[2] += 0 if days_late <= 2 else min(1000, days_late * 25)
 
     return sorted(
-        (
-            MemberMonthlyReport(member_id, *values)
-            for member_id, values in totals.items()
-        ),
+        (MemberMonthlyReport(member_id, *values) for member_id, values in totals.items()),
         key=lambda report: (-report.late_fees_cents, report.member_id),
     )

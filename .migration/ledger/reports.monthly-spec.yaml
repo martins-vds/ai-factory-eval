@@ -5,10 +5,20 @@ title: Produce the specified monthly lending report
 source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
-boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
+boundary: "The monthly_report management command writes one CSV row per member with loans started in the previous calendar month, including starts, late returns, and late fees in cents, sorted by fees descending then member id; members without a start in that month are omitted."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.reports.management.commands.monthly_report
+    - src.reports.services.monthly_report
+    - src.reports.services.previous_month_window
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_loans
+  - tests/reports/test_monthly_report.py::test_monthly_report_uses_december_when_run_on_january_first
+  - .migration/evidence/runs/LL-05.md
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
