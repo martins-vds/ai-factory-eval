@@ -447,7 +447,7 @@ def test_browser_regular_repeat_return_shows_an_error(client):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_return_endpoint_uses_a_transaction_for_row_locking(client):
+def test_return_endpoint_succeeds_in_autocommit_mode(client):
     Loan.objects.create(id='L99', member='reader', isbn='123', lent_on=date(2026, 3, 1))
 
     response = client.post('/loans/L99/return')
