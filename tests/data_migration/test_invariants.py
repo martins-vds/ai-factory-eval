@@ -1,10 +1,10 @@
 import csv
-from dataclasses import replace
 import hashlib
-from itertools import pairwise
 import json
-from pathlib import Path
 import shutil
+from dataclasses import replace
+from itertools import pairwise
+from pathlib import Path
 
 import pytest
 from django.core.management import call_command
@@ -153,11 +153,14 @@ def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
             if derived.eta is not None
             else None
         )
-        assert replace(
-            derived,
-            eta=expected_eta,
-            last_event_id=history.most_recent_event_id,
-        ) == cargo.delivery
+        assert (
+            replace(
+                derived,
+                eta=expected_eta,
+                last_event_id=history.most_recent_event_id,
+            )
+            == cargo.delivery
+        )
 
 
 @pytest.mark.django_db(transaction=True)
@@ -190,9 +193,7 @@ def test_loaded_handling_events_reference_known_voyages_and_locations(tmp_path):
 
     for event in HandlingEventRecord.objects.all():
         assert event.location_id in location_ids
-        if event.event_type in ('LOAD', 'UNLOAD'):
-            assert event.voyage_id in voyage_ids
-        elif event.voyage_id is not None:
+        if event.event_type in ('LOAD', 'UNLOAD') or event.voyage_id is not None:
             assert event.voyage_id in voyage_ids
 
 
@@ -206,9 +207,7 @@ def test_loaded_voyage_schedules_are_in_order(tmp_path):
     )
 
     for voyage in VoyageRecord.objects.all():
-        movements = list(
-            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('pk')
-        )
+        movements = list(CarrierMovementRecord.objects.filter(voyage=voyage).order_by('pk'))
         assert movements
         assert all(movement.departure_time < movement.arrival_time for movement in movements)
         assert all(

@@ -14,3 +14,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T05:53:55+00:00 | handling-references | 0 | 1.98 | `pytest -q tests/data_migration/test_invariants.py -k 'cargo_delivery or itinerary_legs or handling_events'` | `d135fa9edad3e0d7` |  |  |
 | 2026-11-15T05:54:25+00:00 | invariants | 0 | 2.08 | `pytest -q tests/data_migration/test_invariants.py` | `9d5fd7842fa81bb4` |  |  |
 | 2026-11-15T05:55:30+00:00 | invariants | 0 | 2.1 | `pytest -q tests/data_migration/test_invariants.py` | `10e96b85b3bd96cf` |  |  |
+| 2026-11-15T05:56:23+00:00 | build | 0 | 0.43 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T05:56:27+00:00 | idiom | 1 | 0.03 | `bash -c 'ruff check && ruff format --check'` | `ba613fc901734db9` | 192 \|           assert event.location_id in location_ids |  |
+| 2026-11-15T05:56:43+00:00 | idiom | 1 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `c1e549823a431e9b` | -         assert replace( |  |
+| 2026-11-15T05:56:55+00:00 | idiom | 0 | 0.03 | `bash -c 'ruff check && ruff format --check'` | `03298b321feb6bc6` |  |  |
+| 2026-11-15T05:57:52+00:00 | behavior | 0 | 51.24 | `pytest -q` | `2773da4d4cc80cb0` |  |  |
+| 2026-11-15T05:58:44+00:00 | crap | 0 | 47.38 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `851c501c5aba971e` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
