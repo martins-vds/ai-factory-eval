@@ -25,16 +25,13 @@ def _read_mapping(mapping_path):
     if not isinstance(specs, list) or not specs:
         raise DataExportError('mapping has no tables')
     targets = [spec.get('target') if isinstance(spec, dict) else None for spec in specs]
-    if (
-        any(
-            not isinstance(target, str)
-            or target in ('.', '..')
-            or '\\' in target
-            or Path(target).name != target
-            for target in targets
-        )
-        or len(targets) != len(set(targets))
-    ):
+    if any(
+        not isinstance(target, str)
+        or target in ('.', '..')
+        or '\\' in target
+        or Path(target).name != target
+        for target in targets
+    ) or len(targets) != len(set(targets)):
         raise DataExportError('mapping targets must be unique table names')
     return mapping, specs
 
@@ -62,8 +59,7 @@ def _prepare_tables(specs):
                 (
                     candidate
                     for candidate in model._meta.concrete_fields
-                    if name
-                    in (candidate.column, candidate.name, candidate.attname)
+                    if name in (candidate.column, candidate.name, candidate.attname)
                 ),
                 None,
             )
@@ -90,6 +86,8 @@ def _mapping_timezone(mapping):
 def _serialize(value, timezone):
     if value is None:
         return NULL_MARKER
+    if value == NULL_MARKER:
+        raise DataExportError(r'literal value \N cannot be represented separately from SQL NULL')
     if isinstance(value, datetime.datetime):
         if value.tzinfo is None:
             value = value.replace(tzinfo=timezone)
