@@ -1,8 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 
+from .forms import LoanLendForm
 from .models import Loan
-from .services import get_loan_text, list_loans_text
+from .repository import LoanRepository
+from .services import get_loan_text, list_loans_text, loan_line
 
 
 def loan_catalog(request):
@@ -15,6 +18,22 @@ def loan_catalog_detail(request, loan_id):
 
 
 def loan_list(request):
+    if request.method == 'POST':
+        form = LoanLendForm(request.POST)
+        if not form.is_valid():
+            return HttpResponse(
+                'member and isbn are required\n',
+                status=400,
+                content_type='text/plain',
+            )
+        loan = LoanRepository().create(
+            id=f'L{Loan.objects.count() + 1}',
+            **form.cleaned_data,
+            lent_on=timezone.localdate(),
+        )
+        return HttpResponse(loan_line(loan), status=201, content_type='text/plain')
+    if request.method != 'GET':
+        return HttpResponse(status=405)
     return HttpResponse(list_loans_text(), content_type='text/plain')
 
 
