@@ -13,3 +13,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T06:13:58+00:00 | idiom | 0 | 0.03 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
 | 2026-11-15T06:14:28+00:00 | crap | 0 | 25.59 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `dc505b13cbf4ecfd` |  | gate=crap max=26.0 threshold=30 over=0 methods=185 |
 | 2026-11-15T06:45:35+00:00 | mutation-changed | 2 | 1862.94 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `09af2464c42c8092` | afs-mutation: mutmut failed on src/cargotracker/data_migration/loader.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=2 files=75 base=origin/main |
+| 2026-11-15T06:47:56+00:00 | export-tests-retry | 1 | 1.27 | `pytest -q tests/data_migration/test_export.py` | `325734177f04db04` | >           assert rows[0] == list(spec['columns']) |  |
+| 2026-11-15T06:48:10+00:00 | export-tests-retry | 0 | 1.22 | `pytest -q tests/data_migration/test_export.py` | `1c6ff8209026f216` |  |  |
+| 2026-11-15T06:48:18+00:00 | idiom-retry | 1 | 0.01 | `bash -c 'ruff check && ruff format --check'` | `34a02566d264d826` | Found 1 error. |  |
+| 2026-11-15T06:48:44+00:00 | tests-retry | 0 | 26.09 | `pytest -q` | `e43d2401ea54114c` |  |  |
+| 2026-11-15T06:48:55+00:00 | idiom-retry | 1 | 0.01 | `bash -c 'ruff check && ruff format --check'` | `0834a8223dc4e24f` | Found 1 error. |  |
+| 2026-11-15T06:49:13+00:00 | idiom-retry | 1 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `f6962e27eac9de93` |  |  |
+| 2026-11-15T06:49:24+00:00 | idiom-final | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
+| 2026-11-15T06:49:25+00:00 | export-tests-final | 0 | 1.33 | `pytest -q tests/data_migration/test_export.py` | `62f575628765ad31` |  |  |
+| 2026-11-15T06:50:18+00:00 | tests-final | 0 | 31.0 | `pytest -q` | `4f1a4de66d34e8c2` |  |  |
