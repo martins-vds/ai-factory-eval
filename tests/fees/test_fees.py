@@ -10,6 +10,17 @@ from src.loans.models import Loan
 from src.loans.repository import DjangoLoanRepository
 
 
+def install_gateway_opener(monkeypatch, open_request):
+    class GatewayOpener:
+        def open(self, request):
+            return open_request(request)
+
+    monkeypatch.setattr(
+        'src.fees.gateway.build_opener',
+        lambda *handlers: GatewayOpener(),
+    )
+
+
 @pytest.fixture
 def local_gateway(monkeypatch):
     requests = []
@@ -28,9 +39,27 @@ def local_gateway(monkeypatch):
                 if self.path.endswith('loan=L2')
                 else (201, b'review\n')
                 if self.path.endswith('loan=L3')
+                else (302, b'redirected\n')
+                if self.path.endswith('loan=L4')
                 else (200, b'charged\n')
             )
             self.send_response(status)
+            if status == 302:
+                self.send_header('Location', '/charge?loan=L1')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            requests.append(
+                (
+                    self.command,
+                    self.path,
+                    self.rfile.read(int(self.headers.get('Content-Length', 0))),
+                )
+            )
+            body = b'charged\n'
+            self.send_response(200)
             self.send_header('Content-Length', str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -168,6 +197,17 @@ def test_payment_api_maps_non_200_success_status_to_bad_gateway(client, local_ga
 
 
 @pytest.mark.django_db
+def test_payment_api_does_not_follow_gateway_redirects(client, local_gateway):
+    Loan.objects.create(id='L4', member='reader', isbn='123', lent_on=date(2026, 1, 2))
+
+    response = client.post('/payments/L4')
+
+    assert response.status_code == 502
+    assert response.content == b'redirected\n'
+    assert local_gateway == [('POST', '/charge?loan=L4', b'')]
+
+
+@pytest.mark.django_db
 def test_payment_api_maps_connection_failure_to_unavailable(client, monkeypatch):
     unavailable_server = ThreadingHTTPServer(('127.0.0.1', 0), BaseHTTPRequestHandler)
     gateway_url = f'http://127.0.0.1:{unavailable_server.server_port}'
@@ -218,7 +258,7 @@ def test_payment_gateway_keeps_interrupted_error_as_cause(monkeypatch):
     def interrupt(request):
         raise InterruptedError('request interrupted')
 
-    monkeypatch.setattr('src.fees.gateway.urlopen', interrupt)
+    install_gateway_opener(monkeypatch, interrupt)
     gateway = HttpPaymentGateway('http://127.0.0.1:1')
 
     with pytest.raises(PaymentGatewayUnavailable) as failure:
@@ -278,7 +318,7 @@ def test_gateway_uses_configured_or_source_default_url(monkeypatch, base_url, ex
         requested_urls.append(request.full_url)
         raise OSError('offline')
 
-    monkeypatch.setattr('src.fees.gateway.urlopen', unavailable)
+    install_gateway_opener(monkeypatch, unavailable)
 
     with pytest.raises(PaymentGatewayUnavailable):
         HttpPaymentGateway(base_url).charge('L1')
