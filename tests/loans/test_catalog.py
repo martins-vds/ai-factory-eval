@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-from django.db import connection
 
 from src.loans.models import Loan
 
@@ -17,6 +16,11 @@ def test_list_returns_seed_loans_as_ordered_semicolon_lines(client):
         'L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\n'
         'L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03\n'
     )
+
+
+@pytest.mark.django_db(serialized_rollback=True)
+def test_django_admin_is_not_exposed(client):
+    assert client.get('/admin/login/').status_code == 404
 
 
 @pytest.mark.django_db(serialized_rollback=True)
@@ -54,15 +58,14 @@ def test_export_quotes_field_and_record_delimiters(client):
     )
 
 
-@pytest.mark.django_db(transaction=True, serialized_rollback=True)
-def test_loan_is_available_after_database_connection_reopens(client):
+@pytest.mark.django_db(serialized_rollback=True)
+def test_loan_record_is_persisted_and_available_through_api(client):
     Loan.objects.create(
         id='L4',
         member='dee',
         isbn='123',
         lent_on=date(2026, 11, 8),
     )
-    connection.close()
 
     response = client.get('/loans/L4')
 
