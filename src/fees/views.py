@@ -4,7 +4,7 @@ from django.views.decorators.http import require_GET
 from django.views.decorators.http import require_POST
 
 from .composition import fees_application, payment_gateway
-from .gateway import PaymentGatewayError
+from .gateway import GatewayResponse, PaymentGatewayError
 
 
 @require_GET
@@ -31,16 +31,38 @@ def fee_page(request, loan_id):
 
 @require_POST
 def payment_api(request, loan_id):
-    if fees_application.fee_for(loan_id) is None:
+    response = _payment_result(loan_id)
+    if response is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+
+    return HttpResponse(
+        response.body,
+        status=response.status,
+        content_type='text/plain',
+    )
+
+
+@require_POST
+def payment_page(request, loan_id):
+    response = _payment_result(loan_id)
+    if response is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+
+    context = {'result': response}
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, 'fees/payment-result.html', context)
+
+    fee = fees_application.fee_for(loan_id)
+    return render(request, 'fees/page.html', {'fee': fee, 'payment_result': response})
+
+
+def _payment_result(loan_id):
+    if fees_application.fee_for(loan_id) is None:
+        return None
 
     try:
         response = payment_gateway.charge(loan_id)
     except PaymentGatewayError:
-        return HttpResponse('payment gateway unavailable\n', status=502, content_type='text/plain')
+        return GatewayResponse(502, 'payment gateway unavailable\n')
 
-    return HttpResponse(
-        response.body,
-        status=200 if response.status == 200 else 502,
-        content_type='text/plain',
-    )
+    return GatewayResponse(200 if response.status == 200 else 502, response.body)

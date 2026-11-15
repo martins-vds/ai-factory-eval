@@ -4,6 +4,7 @@ from decimal import Decimal
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.fees.gateway import PaymentGateway, PaymentGatewayError
 from src.fees.services import calculate_late_fee
@@ -129,6 +130,19 @@ def test_payment_endpoint_does_not_call_gateway_for_unknown_loan(client, payment
     assert payment_gateway.requests == []
 
 
+@pytest.mark.django_db
+def test_interrupted_payment_endpoint_returns_gateway_failure(client, monkeypatch):
+    def interrupted(_request):
+        raise InterruptedError('request interrupted')
+
+    monkeypatch.setattr('src.fees.gateway.urlopen', interrupted)
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
 def test_interrupted_gateway_request_is_preserved_as_the_gateway_error_cause(monkeypatch):
     def interrupted(_request):
         raise InterruptedError('request interrupted')
@@ -165,3 +179,29 @@ def test_htmx_payment_displays_gateway_failure(client, payment_gateway):
     assert b'role="alert"' in response.content
     assert b'Payment could not be completed' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_regular_payment_form_displays_gateway_result(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert b'Payment complete' in response.content
+    assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_can_pay_a_late_fee(live_server, payment_gateway):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.get_by_role('button', name='Pay late fee').click()
+            page.get_by_text('Payment complete', exact=False).wait_for()
+
+            assert page.get_by_text('charged', exact=False).is_visible()
+            assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()

@@ -19,7 +19,11 @@
         <p class="mt-2">{{ fee.days_late }} late days · first two days waived</p>
         <p class="mt-7 text-6xl font-bold">${{ fee.amount|floatformat:2 }}</p>
         <p class="mt-2 text-[#66705b]">25¢ per day after the grace period, capped at $10.00.</p>
-        <div id="payment-status" class="mt-6"></div>
+        <div id="payment-status" class="mt-6">
+          {% if payment_result %}
+          {% include "fees/payment-result.html" with result=payment_result %}
+          {% endif %}
+        </div>
         <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
               hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="innerHTML">
           {% csrf_token %}
