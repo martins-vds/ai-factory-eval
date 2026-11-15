@@ -8,6 +8,7 @@
     <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The collection · {{ loans|length }} loans in view</p>
     <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
     <p class="mb-8 text-[#66705b]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    <a class="btn btn-primary mb-4" href="/ui/loans/new/">Lend a book</a>
     <div class="divide-y divide-[#d8cdbb]">
       {% for loan in loans %}
       <article class="grid gap-4 py-5 sm:grid-cols-[1fr_auto]">

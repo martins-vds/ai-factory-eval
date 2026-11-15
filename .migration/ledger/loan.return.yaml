@@ -7,11 +7,30 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan on its first return, HTTP 404 with `no such loan` and a newline when absent, and HTTP 409 with `loan already returned` on a repeat without replacing the original date. The reading-room return action uses `/ui/loans/{id}/return/`."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_ui
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_returning_a_loan_sets_and_persists_return_date
+  - tests/loans/test_circulation.py::test_returning_an_unknown_loan_returns_the_characterized_not_found_response
+  - tests/loans/test_circulation.py::test_repeated_return_is_rejected_without_replacing_the_return_date
+  - tests/loans/test_circulation.py::test_reading_room_detail_offers_a_return_action
+  - tests/loans/test_circulation.py::test_reading_room_rejects_return_for_an_unknown_loan
+  - tests/loans/test_circulation.py::test_htmx_repeated_return_shows_no_change_feedback
+  - tests/loans/test_circulation.py::test_normal_repeated_return_is_rejected_with_the_loan_detail
+  - tests/loans/test_circulation.py::test_htmx_return_records_the_date_and_removes_the_action
+  - tests/loans/test_circulation.py::test_normal_lending_and_return_forms_redirect_to_the_reading_room
+  - tests/loans/test_circulation.py::test_api_return_requires_post
+notes: "Repeated returns are rejected per the human ruling in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

@@ -7,11 +7,34 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
+boundary: "POST /loans rejects missing or blank member and ISBN fields with HTTP 400; valid submissions create a loan dated today with id L<count+1> and return HTTP 201 with the formatted, escaped record. The reading-room form reports field errors."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.loans.views.loan_list
+    - src.loans.views.loan_lend
+    - src.loans.forms.LoanLendForm
+    - src.loans.services.lend_loan
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
-quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lending_creates_due_dated_loan_and_returns_formatted_record
+  - tests/loans/test_circulation.py::test_lending_rejects_missing_or_blank_required_fields
+  - tests/loans/test_circulation.py::test_lending_escapes_delimiters_in_export_fields
+  - tests/loans/test_circulation.py::test_lending_enforces_source_field_lengths
+  - tests/loans/test_circulation.py::test_lending_preserves_whitespace_around_nonblank_values
+  - tests/loans/test_circulation.py::test_reading_room_catalog_renders_existing_loans
+  - tests/loans/test_circulation.py::test_reading_room_has_a_loan_form
+  - tests/loans/test_circulation.py::test_htmx_lending_creates_a_loan_and_returns_form_feedback
+  - tests/loans/test_circulation.py::test_htmx_lending_shows_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_normal_lending_and_return_forms_redirect_to_the_reading_room
+quirks:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#43
+notes: "Approved fixes reject empty and whitespace-only values and escape export delimiters."
