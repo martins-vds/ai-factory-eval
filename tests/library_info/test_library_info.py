@@ -9,7 +9,7 @@ HTTP_GOLDEN_PATH = (
 ABOUT_GOLDEN = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))['GET /about']['response']
 
 
-def test_about_endpoint_matches_characterized_html(client):
+def test_about_http_endpoint_matches_characterized_html(client):
     response = client.get('/about')
 
     assert response.status_code == ABOUT_GOLDEN['status']
