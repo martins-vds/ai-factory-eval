@@ -144,6 +144,20 @@ def test_htmx_payment_action_displays_gateway_failure(client, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_regular_payment_failure_keeps_the_fee_page_and_retry_action(client, monkeypatch):
+    with payment_gateway(503, b'declined\n') as (url, requests):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', url)
+
+        response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 502
+    assert b'role="alert"' in response.content
+    assert b'Payment could not be completed.' in response.content
+    assert b'action="/ui/payments/L1/"' in response.content
+    assert requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
 def test_payment_io_failure_maps_to_gateway_unavailable(client, monkeypatch):
     def unavailable(*args, **kwargs):
         raise OSError('connection refused')
