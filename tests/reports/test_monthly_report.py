@@ -64,6 +64,13 @@ def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
                 returned_on=date(2025, 12, 29),
             ),
             Loan(
+                id='REPORT-10',
+                member='WAIVED',
+                isbn='10',
+                lent_on=date(2025, 12, 13),
+                returned_on=date(2025, 12, 28),
+            ),
+            Loan(
                 id='REPORT-5',
                 member='OUTSIDE',
                 isbn='5',
@@ -83,5 +90,25 @@ def test_monthly_report_lists_previous_month_activity_in_fee_order(monkeypatch):
         ['BETA', '1', '2', '800'],
         ['ALPHA', '3', '1', '75'],
         ['GAMMA', '1', '1', '75'],
-        ['WAIVED', '1', '1', '0'],
+        ['WAIVED', '2', '2', '0'],
+    ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_uses_exclusive_end_for_other_months(monkeypatch):
+    Loan.objects.all().delete()
+    Loan.objects.bulk_create(
+        [
+            Loan(id='REPORT-MARCH', member='MARCH', isbn='1', lent_on=date(2026, 3, 31)),
+            Loan(id='REPORT-APRIL', member='APRIL', isbn='2', lent_on=date(2026, 4, 1)),
+        ]
+    )
+    monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 4, 1))
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert list(csv.reader(StringIO(output.getvalue()))) == [
+        ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
+        ['MARCH', '1', '0', '0'],
     ]
