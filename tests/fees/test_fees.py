@@ -25,3 +25,15 @@ def test_late_fee_uses_two_day_grace_and_caps_at_ten_dollars(days_late, expected
 
     assert fee.days_late == max(0, days_late)
     assert fee.amount == expected_amount
+
+
+@pytest.mark.django_db
+def test_fee_endpoint_matches_the_characterized_html(client):
+    response = client.get('/fees/L3')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html'
+    assert response.content.decode() == (
+        '<h1>Late fee for L3</h1><p>Due 2025-12-15, 19 day(s) late.</p>'
+        '<p class="fee">Fee: $4.75</p>'
+    )
