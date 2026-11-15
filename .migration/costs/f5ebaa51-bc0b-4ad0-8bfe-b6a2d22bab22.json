@@ -1,0 +1,252 @@
+{
+  "agent": "afs-migrator",
+  "branch": "copilot/ll-03-view-and-pay-late-fees-again",
+  "diagnostics": {
+    "data_keys": {
+      "assistant.message": [
+        "apiCallId",
+        "chunkCount",
+        "chunkIndex",
+        "clientRequestId",
+        "content",
+        "encryptedContent",
+        "interactionId",
+        "messageId",
+        "model",
+        "outputTokens",
+        "phase",
+        "reasoningOpaque",
+        "requestId",
+        "rte",
+        "serviceRequestId",
+        "toolRequests",
+        "turnId"
+      ],
+      "assistant.turn_end": [
+        "turnId"
+      ],
+      "assistant.turn_start": [
+        "interactionId",
+        "turnId"
+      ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
+      "hook.end": [
+        "hookInvocationId",
+        "hookType",
+        "success"
+      ],
+      "hook.start": [
+        "hookInvocationId",
+        "hookType",
+        "input"
+      ],
+      "permission.completed": [
+        "requestId",
+        "result",
+        "toolCallId"
+      ],
+      "permission.requested": [
+        "permissionRequest",
+        "promptRequest",
+        "requestId"
+      ],
+      "session.start": [
+        "alreadyInUse",
+        "context",
+        "contextTier",
+        "copilotVersion",
+        "producer",
+        "reasoningEffort",
+        "remoteSteerable",
+        "selectedModel",
+        "sessionId",
+        "startTime",
+        "version"
+      ],
+      "skill.invoked": [
+        "content",
+        "description",
+        "model",
+        "name",
+        "path",
+        "source",
+        "trigger"
+      ],
+      "subagent.selected": [
+        "agentDisplayName",
+        "agentName",
+        "tools"
+      ],
+      "system.message": [
+        "content",
+        "interactionId",
+        "role"
+      ],
+      "system.notification": [
+        "content",
+        "kind"
+      ],
+      "tool.execution_complete": [
+        "error",
+        "interactionId",
+        "model",
+        "result",
+        "rte",
+        "success",
+        "toolCallId",
+        "toolTelemetry",
+        "turnId"
+      ],
+      "tool.execution_start": [
+        "arguments",
+        "mcpServerName",
+        "mcpToolName",
+        "model",
+        "rte",
+        "shellToolInfo",
+        "toolCallId",
+        "toolName",
+        "turnId"
+      ],
+      "user.message": [
+        "attachments",
+        "content",
+        "delivery",
+        "interactionId",
+        "parentAgentTaskId",
+        "source",
+        "supportedNativeDocumentMimeTypes",
+        "transformedContent"
+      ]
+    },
+    "event_types": {
+      "assistant.message": 134,
+      "assistant.turn_end": 87,
+      "assistant.turn_start": 87,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 282,
+      "hook.start": 283,
+      "permission.completed": 144,
+      "permission.requested": 144,
+      "session.start": 1,
+      "skill.invoked": 8,
+      "subagent.selected": 1,
+      "system.message": 1,
+      "system.notification": 2,
+      "tool.execution_complete": 152,
+      "tool.execution_start": 152,
+      "user.message": 9
+    },
+    "events": 1489,
+    "usage_fields": []
+  },
+  "ended_at": "2026-11-15T04:59:57.737Z",
+  "event": "sessionEnd",
+  "harness_tools": [
+    {
+      "count": 24,
+      "exit": 0,
+      "tool": "afs-run"
+    },
+    {
+      "count": 12,
+      "exit": 1,
+      "tool": "afs-run"
+    },
+    {
+      "count": 4,
+      "exit": 2,
+      "tool": "afs-run"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-services"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "check_inputs.py"
+    },
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "check_plan.py"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "check_runtime.py"
+    },
+    {
+      "count": 4,
+      "exit": 0,
+      "tool": "validate.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-cost-hook"
+    }
+  ],
+  "log": "/home/runner/.copilot/session-state/f5ebaa51-bc0b-4ad0-8bfe-b6a2d22bab22/events.jsonl",
+  "models": {
+    "gpt-6-luna": {
+      "output": 58514,
+      "requests": 134
+    }
+  },
+  "prompt_head": null,
+  "recorded_at": "2026-11-15T05:00:01+00:00",
+  "schema": "afs-cost/1",
+  "session_id": "f5ebaa51-bc0b-4ad0-8bfe-b6a2d22bab22",
+  "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
+  "skills_invoked": [
+    {
+      "count": 1,
+      "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-handoff"
+    },
+    {
+      "count": 1,
+      "skill": "afs-implement"
+    },
+    {
+      "count": 1,
+      "skill": "afs-ledger"
+    },
+    {
+      "count": 1,
+      "skill": "afs-migration-contract"
+    },
+    {
+      "count": 1,
+      "skill": "afs-setup-check"
+    },
+    {
+      "count": 1,
+      "skill": "code-review"
+    },
+    {
+      "count": 1,
+      "skill": "tdd"
+    }
+  ],
+  "started_at": "2026-11-15T04:45:17.101Z",
+  "surface": "coding-agent",
+  "usage_source": "assistant.message (output only, partial)"
+}
