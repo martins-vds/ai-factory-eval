@@ -1,7 +1,7 @@
 from datetime import date
 
 import pytest
-from django.db import connection
+from django.db import IntegrityError, connection
 
 from src.loans.models import Loan
 from src.loans.repositories import LoanRepository
@@ -26,8 +26,10 @@ def test_loan_lookup_returns_characterized_line_or_not_found(client):
     missing = client.get('/loans/unknown')
 
     assert found.status_code == 200
+    assert found['Content-Type'].startswith('text/plain')
     assert found.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
     assert missing.status_code == 404
+    assert missing['Content-Type'].startswith('text/plain')
     assert missing.content.decode() == 'no such loan\n'
 
 
@@ -56,6 +58,15 @@ def test_loan_detail_page_uses_separate_ui_path(client):
 
 
 @pytest.mark.django_db
+def test_missing_loan_detail_page_is_a_contextual_not_found(client):
+    response = client.get('/ui/loans/not-in-catalog/')
+
+    assert response.status_code == 404
+    assert b'No such loan' in response.content
+    assert b'not-in-catalog' in response.content
+
+
+@pytest.mark.django_db
 def test_catalog_page_lists_seeded_loans(client):
     response = client.get('/ui/loans/')
 
@@ -79,6 +90,38 @@ def test_repository_write_makes_a_loan_retrievable(client):
 
     assert response.status_code == 200
     assert response.content.decode() == 'L4;dee;123;2026-11-08;2026-11-22;\n'
+
+
+@pytest.mark.django_db
+def test_repository_rolls_back_a_failed_write_without_breaking_reads(client):
+    with pytest.raises(IntegrityError):
+        LoanRepository.save(
+            Loan(
+                id='L4',
+                member='duplicate',
+                isbn=None,
+                lent_on=date(2026, 11, 8),
+            )
+        )
+
+    response = client.get('/loans/L1')
+
+    assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
+
+
+@pytest.mark.django_db
+def test_unreturned_loan_is_valid_without_a_return_date():
+    loan = Loan(
+        id='L4',
+        member='dee',
+        isbn='123',
+        lent_on=date(2026, 11, 8),
+        returned_on=None,
+    )
+
+    loan.full_clean()
+
+    assert loan.returned_on is None
 
 
 @pytest.mark.django_db(transaction=True)

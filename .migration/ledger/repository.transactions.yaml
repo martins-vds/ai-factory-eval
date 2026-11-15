@@ -13,4 +13,4 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_repository_write_makes_a_loan_retrievable]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_repository_write_makes_a_loan_retrievable, tests/loans/test_catalog.py::test_repository_rolls_back_a_failed_write_without_breaking_reads]
