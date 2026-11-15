@@ -9,9 +9,20 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.services.return_book
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_updates_the_loan_and_records_the_date
+  - tests/loans/test_circulation.py::test_repeat_return_rejects_request_and_preserves_existing_date
+notes: "Approved ruling martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the original date; approval is recorded on decision map #38."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
