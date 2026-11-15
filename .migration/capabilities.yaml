@@ -1,0 +1,131 @@
+harness_version: 0.2.0
+checked_at: "2026-11-15T14:16:50Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: "legacy/run.sh built and started the application; live endpoint probes returned expected HTTP responses."
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: "JDK 17"}
+      - {kind: tool, name: Maven}
+  - id: build-run
+    applies_to: target
+    status: met
+    notes: "The target runtime and build gate are declared in the profile."
+    provided_by:
+      - {kind: tool, name: python-3.13}
+      - {kind: tool, name: Django 5}
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    notes: "The running legacy HTTP service was exercised directly with curl."
+    provided_by:
+      - {kind: tool, name: curl}
+  - id: characterization-harness
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest}
+      - {kind: skill, name: agent-browser}
+  - id: unit-integration-tests
+    applies_to: source
+    status: not-applicable
+    notes: "No legacy test sources exist; tier-A behavior was characterized through the live HTTP service."
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest}
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "Best effort only: no legacy test suite or Java coverage provider is configured; find-skills searches returned no provider."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: pytest-coverage}
+      - {kind: tool, name: coverage.py}
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard, version: "1.24.3"}
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "Best effort only: source CRAP scoring has no Java coverage data; no legacy tests exist."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard}
+      - {kind: tool, name: coverage.py}
+  - id: mutation-testing
+    applies_to: source
+    status: not-applicable
+    notes: "No legacy test suite exists to mutate; the source remains read-only."
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: mutmut, version: "3.8.1"}
+  - id: lint-format
+    applies_to: source
+    status: not-applicable
+    notes: "The Java source is read-only and has no lint or formatting gate."
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: ruff}
+  - id: stack-idioms
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: skill, name: java-docs}
+      - {kind: skill, name: java-junit}
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: django-patterns}
+      - {kind: skill, name: django-security}
+  - id: data-migration
+    applies_to: both
+    status: waived
+    waiver:
+      reason: "The synthetic legacy database contains only seed data; no planted scenario requires data migration, and the pilot exercises data migration end to end (operator decision recorded on source tracker issue #20)."
+      approved_by: martins-vds
+  - id: ui-end-to-end
+    applies_to: source
+    status: not-applicable
+    notes: "The legacy source has a static About page and HTTP API, but no interactive browser workflow."
+  - id: ui-end-to-end
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: agent-browser}
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: understand-anything, version: "2.9.8"}
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: "enrich_graph.py (java-ee, django)"}
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: rtk-oss, version: "1.1.0"}
