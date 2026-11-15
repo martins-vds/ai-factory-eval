@@ -18,3 +18,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T05:52:40+00:00 | data-load-rerun | 0 | 0.26 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
 | 2026-11-15T05:52:44+00:00 | data-export | 0 | 0.27 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export` | `ba754ea10ff616fb` |  |  |
 | 2026-11-15T05:52:49+00:00 | data-reconcile | 0 | 0.05 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target .migration/data/target-export --mapping .migration/data/mapping.yaml` | `0e5f155ede36068f` |  | gate=data-reconcile tables=6 rows=54 mismatched_tables=0 |
+| 2026-11-15T05:53:27+00:00 | regression | 0 | 26.37 | `pytest -q` | `6bb0fef48675162e` |  |  |
+| 2026-11-15T05:53:59+00:00 | crap | 0 | 26.04 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `792690e05110bcec` |  | gate=crap max=26.0 threshold=30 over=0 methods=184 |
+| 2026-11-15T06:25:50+00:00 | mutation-changed | 2 | 1906.96 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `f641f59e4606e236` | afs-mutation: mutmut failed on src/cargotracker/data_migration/loader.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=1 files=77 base=origin/main |
+| 2026-11-15T06:27:18+00:00 | export-tests-mutation-ready | 0 | 1.18 | `pytest -q tests/data_migration/test_export.py` | `791313e37fd7699e` |  |  |
+| 2026-11-15T06:27:30+00:00 | idiom-mutation-ready | 1 | 0.06 | `bash -c 'ruff check && ruff format --check'` | `9308660471df22e4` |  |  |
+| 2026-11-15T06:27:49+00:00 | idiom-mutation-ready-rerun | 1 | 0.01 | `bash -c 'ruff check && ruff format --check'` | `0dafb45777fd7c91` | Found 1 error. |  |
+| 2026-11-15T06:28:03+00:00 | idiom-mutation-ready-final | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
+| 2026-11-15T06:28:41+00:00 | behavior-mutation-ready | 0 | 26.08 | `pytest -q` | `424be322847c9138` |  |  |
