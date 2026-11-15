@@ -1,0 +1,20 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#100
+setup_pr: null
+characterization_tier: A
+tier_evidence: "legacy/run.sh packaged and started the app; HTTP endpoints returned live responses, recorded in .migration/references/characterization.md."
+capabilities:
+  met: 15
+  gap: 6
+  waived: 1
+  not_applicable: 0
+gap_tickets:
+  - "new: source characterization-harness"
+  - "new: source unit-integration-tests"
+  - "new: source coverage (best-effort)"
+  - "new: source crap (best-effort)"
+  - "new: source mutation-testing"
+  - "new: source lint-format"
+validation: "pass: profile, capabilities, and return YAML validate against the pinned harness schemas; Compose semantic validation skipped because Docker CLI is unavailable."
+handoff: .migration/handoffs/SY-01.md
