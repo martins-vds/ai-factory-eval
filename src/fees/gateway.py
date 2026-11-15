@@ -9,6 +9,11 @@ logger = logging.getLogger(__name__)
 DEFAULT_PAYMENT_GATEWAY_URL = 'http://localhost:8081'
 
 
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, response, code, message, headers, new_url):
+        return None
+
+
 @dataclass(frozen=True)
 class GatewayResponse:
     status: int
@@ -24,7 +29,8 @@ def charge_loan(loan_id: str) -> GatewayResponse:
     )
 
     try:
-        with urllib.request.urlopen(request, timeout=5) as response:
+        opener = urllib.request.build_opener(NoRedirectHandler())
+        with opener.open(request, timeout=5) as response:
             return GatewayResponse(response.status, response.read())
     except HTTPError as error:
         return GatewayResponse(error.code, error.read())

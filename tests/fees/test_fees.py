@@ -1,13 +1,26 @@
+import importlib
 import threading
 import urllib.request
 from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
+from django.apps import apps
+from django.db import connection
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
+
+
+@pytest.fixture
+def restore_seed_loans(django_db_blocker):
+    yield
+    with django_db_blocker.unblock():
+        Loan.objects.all().delete()
+        seed_loans = importlib.import_module('src.loans.migrations.0001_initial').seed_loans
+        with connection.schema_editor() as schema_editor:
+            seed_loans(apps, schema_editor)
 
 
 @pytest.fixture
@@ -17,6 +30,8 @@ def payment_gateway(monkeypatch):
             body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
             self.server.requests.append((self.command, self.path, body))
             self.send_response(self.server.response_status)
+            if self.server.response_status == 302:
+                self.send_header('Location', '/redirected')
             self.send_header('Content-Length', str(len(self.server.response_body)))
             self.end_headers()
             self.wfile.write(self.server.response_body)
@@ -128,6 +143,7 @@ def test_fee_page_uses_reading_room_layout_and_htmx_payment_action(client):
     [
         (200, b'charged\n', 200),
         (503, b'declined\n', 502),
+        (302, b'redirected\n', 502),
     ],
 )
 def test_payment_api_sends_the_characterized_request_and_maps_response(
@@ -179,7 +195,7 @@ def test_payment_api_turns_gateway_interruption_into_failure_without_losing_it(
     def interrupt(*args, **kwargs):
         raise InterruptedError('payment request interrupted')
 
-    monkeypatch.setattr(urllib.request, 'urlopen', interrupt)
+    monkeypatch.setattr(urllib.request.OpenerDirector, 'open', interrupt)
 
     response = client.post('/payments/L1')
 
@@ -215,6 +231,7 @@ def test_browser_can_pay_a_fee_with_htmx(client, payment_gateway):
 
 
 @pytest.mark.django_db
+@pytest.mark.usefixtures('restore_seed_loans')
 def test_real_browser_can_view_and_pay_a_fee(live_server, payment_gateway):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
