@@ -49,3 +49,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-15T02:08:39+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T02:10:35+00:00 | build | 0 | 1.31 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T02:11:09+00:00 | idiom | 0 | 0.05 | `bash -c 'ruff check && ruff format --check'` | `07a2e0ea53bd64f2` |  |  |
+| 2026-11-15T02:11:45+00:00 | behavior | 0 | 52.16 | `pytest -q` | `46abb377262ebdfb` |  |  |
