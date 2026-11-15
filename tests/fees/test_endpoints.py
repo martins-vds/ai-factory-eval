@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,7 @@ from playwright.sync_api import sync_playwright
 
 from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import PaymentGatewayFailure
+from src.loans.models import Loan
 
 HTTP_GOLDENS = json.loads(
     (
@@ -88,6 +90,22 @@ def test_payment_endpoint_rejects_unknown_loan_without_calling_gateway(client, p
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L1'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L1/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
     assert payment_gateway.requests == []
 
 
@@ -177,6 +195,38 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             status = page.get_by_role('status')
             status.wait_for()
             assert status.inner_text().strip() == 'charged'
+            assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_shows_payment_failure(live_server, payment_gateway):
+    payment_gateway.status = 503
+    payment_gateway.body = b'declined\n'
+    Loan.objects.update_or_create(
+        pk='L3',
+        defaults={
+            'member': 'reader',
+            'isbn': '123',
+            'lent_on': date(2025, 12, 1),
+            'returned_on': None,
+        },
+    )
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            with page.expect_response(
+                lambda response: (
+                    response.url.endswith('/ui/payments/L3/') and response.status == 502
+                )
+            ):
+                page.get_by_role('button', name='Pay late fee').click()
+
+            assert page.get_by_role('alert').inner_text().strip() == 'declined'
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
         finally:
             browser.close()
