@@ -34,3 +34,55 @@ def test_lending_rejects_blank_member_or_isbn(client, member, isbn):
     assert response.status_code == 400
     assert response.content.decode() == 'member and isbn are required\n'
     assert Loan.objects.count() == existing_loans
+
+
+@pytest.mark.django_db
+def test_returning_a_loan_records_today_and_returns_its_formatted_record(client):
+    today = timezone.localdate()
+
+    response = client.post('/loans/L1/return')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == (
+        f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today.isoformat()}\n'
+    )
+    assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
+def test_repeating_a_return_is_rejected_without_changing_its_original_date(client):
+    original_date = Loan.objects.get(pk='L2').returned_on
+
+    response = client.post('/loans/L2/return')
+
+    assert response.status_code == 409
+    assert response.content.decode() == 'loan already returned\n'
+    assert Loan.objects.get(pk='L2').returned_on == original_date
+
+
+@pytest.mark.django_db
+def test_loan_browser_offers_lending_and_first_return_actions(client):
+    response = client.get('/ui/loans/')
+    page = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Books in good company.' in page
+    assert 'action="/ui/loans/new/"' in page
+    assert 'action="/ui/loans/L1/return/"' in page
+    assert 'hx-boost="true"' in page
+    assert 'Return L1' in page
+
+
+@pytest.mark.django_db
+def test_browser_lending_shows_field_errors_for_blank_values(client):
+    existing_loans = Loan.objects.count()
+
+    response = client.post('/ui/loans/new/', {'member': '  ', 'isbn': ''})
+    page = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Enter a member name; blank values are not accepted.' in page
+    assert 'Enter an ISBN; blank values are not accepted.' in page
+    assert 'aria-invalid="true"' in page
+    assert Loan.objects.count() == existing_loans
