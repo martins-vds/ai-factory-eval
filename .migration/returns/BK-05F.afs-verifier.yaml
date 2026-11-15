@@ -1,0 +1,23 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/25
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.934
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: .migration/evidence/mutants/BK-05F.md:522
+    what: "Only the nine route-selection view survivors were classified; the broader run's other 132 survivors remain unassessed, including Delivery route-state mutants."
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_stale_tracking_id_returns_not_found_for_route_and_itinerary_screens
+ledger_issues: []
+quirk_tickets: []
+mutation_survivors: "The nine route-selection view survivors (#123, #124, #132, #135, #136, #149, #162, #166, #168) are behaviorally equivalent at the UI boundary: consistent signing salt changes preserve round trips, wrapped 404 diagnostics do not change the response, X is URL-unreserved, and malformed tokens still return 404. The other 132 of 141 survivors in the 81-file run were not classified."

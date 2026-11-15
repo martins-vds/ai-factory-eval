@@ -11,6 +11,7 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -220,3 +221,22 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_stale_tracking_id_returns_not_found_for_route_and_itinerary_screens(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    itinerary_url = f'/admin/cargo/{tracking_id.value}/itineraries/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+
+    assert client.get(route_url).status_code == 404
+    assert client.get(itinerary_url).status_code == 404
+    assert client.post(route_url, {'candidate': candidate_token}).status_code == 404
