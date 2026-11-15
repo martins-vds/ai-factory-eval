@@ -4,23 +4,26 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 from django.core.management import call_command
+from test_load import MAPPING as LOAD_MAPPING
 
 ROOT = Path(__file__).parents[2]
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
-MAPPING = ROOT / '.migration' / 'data' / 'mapping.yaml'
 
 
 @pytest.mark.django_db(transaction=True)
 def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
+    mapping = tmp_path / 'mapping.yaml'
+    mapping.write_text(yaml.safe_dump(LOAD_MAPPING), encoding='utf-8')
     call_command(
         'load_data_snapshot',
         snapshot=str(FIXTURE_SNAPSHOT),
-        mapping=str(MAPPING),
+        mapping=str(mapping),
     )
     output = tmp_path / 'target-export'
 
-    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+    call_command('export_data_snapshot', mapping=str(mapping), out=str(output))
 
     assert {path.name for path in output.glob('*.csv')} == {
         'location.csv',
@@ -50,7 +53,7 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
             '--target',
             str(output),
             '--mapping',
-            str(MAPPING),
+            str(mapping),
             '--report',
             str(tmp_path / 'reconciliation.md'),
         ],
