@@ -1,0 +1,30 @@
+[
+  {
+    "at": "2026-11-15T18:01:06Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 0,
+    "prompt_from": "none",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05F",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/costs/959538e2-d9a1-4f42-ae3a-72483ea5088c.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-specialist-migrator.yaml",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
