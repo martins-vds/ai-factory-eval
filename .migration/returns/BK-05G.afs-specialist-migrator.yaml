@@ -2,7 +2,7 @@ role: afs-specialist-migrator
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
 specialty: ui
-pr: null
+pr: martins-vds/ai-factory-eval#303
 gates:
   build: null
   behavior: null
