@@ -9,7 +9,19 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.library_info.views.about
+    - src.library_info.views.about_page
+    - templates/library_info/about.html
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - tests/library_info/test_about_page.py::test_about_endpoint_matches_characterized_response
+  - tests/library_info/test_about_page.py::test_about_page_presents_library_information_in_a_browser
+  - .migration/evidence/runs/LL-04.md
