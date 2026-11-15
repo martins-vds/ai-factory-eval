@@ -153,6 +153,23 @@ def test_interrupted_payment_request_returns_gateway_failure(monkeypatch, client
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L3'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L3/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_reject_wrong_http_methods(client, payment_gateway, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
 def test_io_failure_returns_gateway_failure(monkeypatch, client):
     def unavailable(_request):
         raise OSError('gateway unreachable')
