@@ -1,0 +1,38 @@
+<section class="space-y-4 p-6" aria-labelledby="deadline-dialog-heading">
+  <h2 id="deadline-dialog-heading" class="text-xl font-semibold">Change arrival deadline</h2>
+  <p>
+    Cargo from {{ cargo.route_specification.origin.name }}
+    ({{ cargo.route_specification.origin.unlocode.value }}) is bound for
+    {{ cargo.route_specification.destination.name }}
+    ({{ cargo.route_specification.destination.unlocode.value }}).
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-target="#cargo-edit-dialog-content"
+    hx-swap="innerHTML"
+    class="space-y-4"
+  >
+    {% csrf_token %}
+    <label class="label mb-1 block font-medium text-slate-800" for="deadline">Arrival deadline</label>
+    {% if deadline_error %}
+      <p class="text-red-700" id="deadline-error" role="alert">{{ deadline_error }}</p>
+    {% endif %}
+    <input
+      class="input input-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      id="deadline"
+      name="deadline"
+      type="date"
+      value="{{ deadline_value }}"
+      required
+      {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+    >
+    <div class="flex justify-end gap-3">
+      <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit">Update</button>
+    </div>
+  </form>
+  <form method="dialog" class="flex justify-end">
+    <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit">Cancel</button>
+  </form>
+</section>

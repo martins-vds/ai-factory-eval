@@ -16,3 +16,14 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-specialist-migrator · 2026-11-15T06:28:09Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs  ·  **Last commit:** a34d505
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] These files are outside ticket BK-05G's planned files: `src/cargotracker/booking/interfaces/dialogs/__init__.py`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.

@@ -1,0 +1,42 @@
+<section class="space-y-4 p-6" aria-labelledby="destination-dialog-heading">
+  <h2 id="destination-dialog-heading" class="text-xl font-semibold">Change destination</h2>
+  <p>
+    Cargo from {{ cargo.route_specification.origin.name }}
+    ({{ cargo.route_specification.origin.unlocode.value }}) is currently bound for
+    {{ cargo.route_specification.destination.name }}
+    ({{ cargo.route_specification.destination.unlocode.value }}).
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-target="#cargo-edit-dialog-content"
+    hx-swap="innerHTML"
+    class="space-y-4"
+  >
+    {% csrf_token %}
+    <label class="label mb-1 block font-medium text-slate-800" for="destination">Destination</label>
+    {% if destination_error %}
+      <p class="text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <select
+      class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      id="destination"
+      name="destination"
+      required
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    >
+      {% for location in locations %}
+        <option value="{{ location.unlocode.value }}">
+          {{ location.name }} ({{ location.unlocode.value }})
+        </option>
+      {% endfor %}
+    </select>
+    <div class="flex justify-end gap-3">
+      <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit">Update</button>
+    </div>
+  </form>
+  <form method="dialog" class="flex justify-end">
+    <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit">Cancel</button>
+  </form>
+</section>
