@@ -17,6 +17,28 @@ class Clock(Protocol):
 
 
 @dataclass(frozen=True)
+class GatewayResponse:
+    status_code: int
+    body: str
+
+
+class PaymentGatewayError(Exception):
+    pass
+
+
+class PaymentGatewayInterrupted(PaymentGatewayError):
+    pass
+
+
+class PaymentGatewayUnavailable(PaymentGatewayError):
+    pass
+
+
+class PaymentGateway(Protocol):
+    def charge(self, loan_id: str) -> GatewayResponse: ...
+
+
+@dataclass(frozen=True)
 class LateFeeQuote:
     loan: LoanRecord
     days_late: int
@@ -41,3 +63,14 @@ class FeeApplication:
         days_late = max(0, (end_date - loan.due_on).days)
         amount_cents = 0 if days_late <= 2 else min(days_late * 25, 1000)
         return LateFeeQuote(loan, days_late, amount_cents)
+
+
+class PaymentApplication:
+    def __init__(self, loan_repository: LoanRepository, gateway: PaymentGateway):
+        self.loan_repository = loan_repository
+        self.gateway = gateway
+
+    def pay(self, loan_id: str) -> GatewayResponse | None:
+        if self.loan_repository.find(loan_id) is None:
+            return None
+        return self.gateway.charge(loan_id)

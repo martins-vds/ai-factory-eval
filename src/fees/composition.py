@@ -1,6 +1,10 @@
 from src.loans.clock import SystemClock
 from src.loans.repository import DjangoLoanRepository
 
+from .gateway import HttpPaymentGateway
 from .services import FeeApplication
+from .services import PaymentApplication
 
-fee_application = FeeApplication(DjangoLoanRepository(), SystemClock())
+loan_repository = DjangoLoanRepository()
+fee_application = FeeApplication(loan_repository, SystemClock())
+payment_application = PaymentApplication(loan_repository, HttpPaymentGateway())

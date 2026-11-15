@@ -100,3 +100,28 @@ def test_payment_endpoint_does_not_call_gateway_for_missing_loan(client, monkeyp
     assert response['Content-Type'].split(';')[0] == expected['content_type']
     assert response.content.decode() == expected['body']
     assert requests == []
+
+
+@pytest.mark.django_db
+def test_fee_page_uses_reading_room_layout_and_htmx_payment_action(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    assert b'Late fee for L3' in response.content
+    assert b'Fee: $4.75' in response.content
+    assert b'class="card' in response.content
+    assert b'action="/ui/payments/L3/"' in response.content
+    assert b'hx-post="/ui/payments/L3/"' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_returns_visible_gateway_feedback(client, monkeypatch):
+    with payment_gateway(200, b'charged\n') as (url, requests):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', url)
+
+        response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="status"' in response.content
+    assert b'Payment complete' in response.content
+    assert requests == [('POST', '/charge?loan=L1', b'')]
