@@ -21,3 +21,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T17:47:36+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-15T17:52:43+00:00 | verifier-detail-tests | 1 | 4.51 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `0c8c9e2543a9b215` | assert unknown_response.status_code == 404 |  |
 | 2026-11-15T17:53:16+00:00 | verifier-detail-variants | 0 | 2.82 | `pytest -q tests/booking/interfaces/test_cargo_details.py -k 'not unknown_and_stale'` | `2a96b3f0c0697d3b` |  |  |
+| 2026-11-15T17:54:09+00:00 | build-compileall | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:54:10+00:00 | build-django-check | 0 | 0.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T17:54:10+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T17:54:10+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `df313bb2dd82ede5` |  |  |
+| 2026-11-15T17:55:06+00:00 | behavior | 1 | 56.6 | `pytest -q` | `656a31426ce07e4a` | assert unknown_response.status_code == 404 |  |
+| 2026-11-15T17:56:16+00:00 | crap-coverage | 1 | 56.51 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `5b868263df949328` | assert unknown_response.status_code == 404 |  |
+| 2026-11-15T17:56:16+00:00 | crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:56:16+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |

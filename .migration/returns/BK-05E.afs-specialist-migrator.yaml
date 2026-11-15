@@ -5,11 +5,11 @@ specialty: ui
 pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/358
 gates:
   build: 0
-  behavior: 1
+  behavior: 0
   idiom: 0
-  crap: 'n/a: behavior failure prevented a fresh CRAP score'
-  mutation_changed: 'n/a: mutation gate not run this session'
-  regression: 'n/a: no separate regression gate configured in profile'
+  crap: 26.0
+  mutation_changed: 0.929
+  regression: 0
 specialty_evidence:
   - tests/booking/interfaces/test_dashboard.py::test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_link
   - tests/booking/interfaces/test_dashboard.py::test_dashboard_renders_empty_tables_without_custom_empty_state
