@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl" aria-labelledby="loan-heading">
+  <a class="mb-6 inline-block text-sm text-[#626858] hover:text-[#a94e37]" href="{% url 'loan-catalog' %}">← Back to the collection</a>
+  <article class="border border-[#d8cdbb] bg-[#fffdf7] p-8">
+    <p class="text-xs uppercase tracking-[.2em] text-[#626858]">Loan record</p>
+    <h1 id="loan-heading" class="mb-8 mt-3 text-5xl">Loan {{ loan.id }}</h1>
+    <dl class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm text-[#626858]">Member</dt>
+        <dd class="mt-1 text-xl">{{ loan.member }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-[#626858]">ISBN</dt>
+        <dd class="mt-1 text-xl">{{ loan.isbn }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-[#626858]">Lent</dt>
+        <dd class="mt-1 text-xl">{{ loan.lent_on|date:"M j, Y" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-[#626858]">Due</dt>
+        <dd class="mt-1 text-xl">{{ loan.due_on|date:"M j, Y" }}</dd>
+      </div>
+      {% if loan.returned_on %}
+      <div>
+        <dt class="text-sm text-[#626858]">Returned</dt>
+        <dd class="mt-1 text-xl">{{ loan.returned_on|date:"M j, Y" }}</dd>
+      </div>
+      {% endif %}
+    </dl>
+  </article>
+</section>
+{% endblock %}

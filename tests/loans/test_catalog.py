@@ -88,6 +88,25 @@ def test_catalog_renders_the_seed_records(client):
     assert response.status_code == 200
     assert 'Books in good company.' in response.content.decode()
     assert response.content.decode().count('<article') == 3
+    assert 'href="/ui/loans/L1/"' in response.content.decode()
+
+
+@pytest.mark.django_db(serialized_rollback=True)
+def test_catalog_detail_renders_a_selected_loan(client):
+    detail_path = reverse('loan-catalog-detail', args=['L1'])
+    response = client.get(detail_path)
+    content = response.content.decode()
+
+    assert detail_path == '/ui/loans/L1/'
+    assert response.status_code == 200
+    assert 'Loan L1' in content
+    assert 'Member' in content
+    assert 'ana' in content
+    assert 'ISBN' in content
+    assert '9780134685991' in content
+    assert 'Due' in content
+    assert 'Jan 16, 2026' in content
+    assert client.get('/ui/loans/unknown/').status_code == 404
 
 
 @pytest.mark.django_db(serialized_rollback=True)

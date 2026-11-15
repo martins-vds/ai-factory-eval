@@ -12,7 +12,9 @@
       {% for loan in loans %}
       <article class="grid gap-4 border-b border-[#d8cdbb] py-5 sm:grid-cols-[1fr_auto]">
         <div>
-          <h2 class="text-xl font-semibold">Loan {{ loan.id }}</h2>
+          <h2 class="text-xl font-semibold">
+            <a class="hover:text-[#a94e37]" href="{% url 'loan-catalog-detail' loan.id %}">Loan {{ loan.id }}</a>
+          </h2>
           <p class="text-[#626858]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
         </div>
         <div class="sm:text-right">
