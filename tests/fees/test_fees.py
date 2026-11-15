@@ -139,3 +139,29 @@ def test_interrupted_gateway_request_is_preserved_as_the_gateway_error_cause(mon
         PaymentGateway().charge('L1')
 
     assert isinstance(error.value.__cause__, InterruptedError)
+
+
+@pytest.mark.django_db
+def test_htmx_payment_displays_success_and_forwards_the_gateway_request(
+    client, payment_gateway
+):
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="status"' in response.content
+    assert b'Payment complete' in response.content
+    assert b'charged' in response.content
+    assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_htmx_payment_displays_gateway_failure(client, payment_gateway):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    response = client.post('/ui/payments/L2/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'Payment could not be completed' in response.content
+    assert b'declined' in response.content
