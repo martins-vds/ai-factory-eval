@@ -16,8 +16,7 @@ def test_lending_creates_the_characterized_record(client):
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
-        f'L4;dee;123;{lent_on.isoformat()};'
-        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+        f'L4;dee;123;{lent_on.isoformat()};{(lent_on + timedelta(days=14)).isoformat()};\n'
     )
 
     persisted = client.get('/loans/L4')
@@ -117,7 +116,7 @@ def test_api_lending_rejects_missing_or_blank_fields(client, fields):
     assert Loan.objects.count() == 3
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
 def test_reader_can_lend_and_return_a_book_in_the_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -136,3 +135,13 @@ def test_reader_can_lend_and_return_a_book_in_the_browser(live_server):
             expect(loan.get_by_role('button', name='Return book')).to_have_count(0)
         finally:
             browser.close()
+
+
+@pytest.mark.django_db
+def test_browser_workflow_leaves_seed_records_available(client):
+    response = client.get('/loans')
+
+    assert response.status_code == 200
+    assert response.content.decode().startswith(
+        'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
+    )
