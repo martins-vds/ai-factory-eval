@@ -1,0 +1,59 @@
+[
+  {
+    "at": "2026-11-15T15:29:26Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 53613,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "LL-01",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/13c65b0f-f564-4342-8738-83a08babcc1f.json",
+      ".migration/evidence/runs/LL-01.md",
+      ".migration/ledger/application.build.yaml",
+      ".migration/ledger/application.startup.yaml",
+      ".migration/ledger/data.loan-storage.yaml",
+      ".migration/ledger/data.seed-records.yaml",
+      ".migration/ledger/loan.due-date.yaml",
+      ".migration/ledger/loan.get.yaml",
+      ".migration/ledger/loan.list.yaml",
+      ".migration/ledger/loan.text-export.yaml",
+      ".migration/ledger/repository.transactions.yaml",
+      "Makefile",
+      "config/settings.py",
+      "config/urls.py",
+      "src/loans/__init__.py",
+      "src/loans/apps.py",
+      "src/loans/formatting.py",
+      "src/loans/migrations/0001_initial.py",
+      "src/loans/migrations/__init__.py",
+      "src/loans/models.py",
+      "src/loans/repositories.py",
+      "src/loans/urls.py",
+      "src/loans/views.py",
+      "static/css/tailwind.css",
+      "templates/base.html",
+      "templates/loans/detail.html",
+      "templates/loans/list.html",
+      "templates/loans/not_found.html",
+      "tests/loans/test_catalog.py",
+      "tests/test_ui_smoke.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-01.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-01`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-01.md`). See afs-migration-contract \u2192 Return files.",
+      "[scope] These files are outside ticket LL-01's planned files: `tests/test_ui_smoke.py`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides."
+    ],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "self_heal.enabled is off; would have blocked"
+  }
+]
