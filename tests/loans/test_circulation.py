@@ -114,6 +114,29 @@ def test_new_loan_page_creates_a_loan_and_redirects_to_collection(client):
 
 
 @pytest.mark.django_db
+def test_new_loan_page_trims_member_and_isbn_values(client):
+    response = client.post('/ui/loans/new/', {'member': '  dee  ', 'isbn': ' 123 '})
+
+    assert response.status_code == 302
+    loan = Loan.objects.get(pk='L4')
+    assert loan.member == 'dee'
+    assert loan.isbn == '123'
+
+
+@pytest.mark.parametrize(
+    ('field', 'value'),
+    [('member', 'm' * 256), ('isbn', '1' * 256)],
+)
+@pytest.mark.django_db
+def test_new_loan_page_rejects_values_beyond_source_field_limit(client, field, value):
+    response = client.post('/ui/loans/new/', {'member': 'dee', 'isbn': '123', field: value})
+
+    assert response.status_code == 200
+    assert b'at most 255 characters' in response.content
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
 def test_loan_detail_page_uses_ui_path_for_htmx_return(client):
     response = client.get('/ui/loans/L1/')
 
