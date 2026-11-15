@@ -1,0 +1,18 @@
+role: afs-specialist-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#343
+specialty: data
+pr: https://github.com/martins-vds/ai-factory-eval/pull/349
+gates:
+  build: 0
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+specialty_evidence:
+  - .migration/evidence/runs/DM-05D.md
+  - tests/data_migration/test_export.py
+ledger_updated: []
+quirk_tickets: []
+handoff: .migration/handoffs/DM-05D.md
