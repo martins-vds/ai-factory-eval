@@ -10,6 +10,7 @@ from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -91,8 +92,17 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+@pytest.mark.parametrize('stale', [False, True])
+def test_unknown_or_stale_cargo_dialog_returns_not_found(client, dialog, stale):
+    tracking_id = 'DEF789' if stale else 'MISSING1'
+    if stale:
+        CargoRecord.objects.filter(tracking_id=tracking_id).delete()
+
+    response = client.get(
+        f'/admin/cargo/{tracking_id}/{dialog}/',
+        HTTP_HX_REQUEST='true',
+    )
 
     assert response.status_code == 404
 
