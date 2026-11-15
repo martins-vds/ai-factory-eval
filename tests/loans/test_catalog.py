@@ -63,7 +63,7 @@ def test_export_escapes_field_and_record_delimiters(client):
     ]
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
 def test_migration_and_new_connection_preserve_persisted_loans(client):
     loan = Loan.objects.get(pk='L1')
     loan.member = 'updated reader'
@@ -75,3 +75,17 @@ def test_migration_and_new_connection_preserve_persisted_loans(client):
 
     assert response.status_code == 200
     assert response.content.decode() == 'L1;updated reader;9780134685991;2026-01-02;2026-01-16;\n'
+
+
+@pytest.mark.django_db
+def test_browser_catalog_detail_uses_separate_ui_route(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'<title>Loan L1' in response.content
+    assert b'9780134685991' in response.content
+
+
+@pytest.mark.django_db
+def test_django_admin_route_is_removed(client):
+    assert client.get('/admin/').status_code == 404

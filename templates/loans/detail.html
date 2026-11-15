@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} · Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl space-y-8">
+  <a class="link link-primary" href="{% url 'loan-catalog' %}">← Back to the catalog</a>
+  <div class="space-y-3">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Loan {{ loan.id }}</p>
+    <h1 class="font-serif text-5xl font-medium tracking-tight">A book in the reading room</h1>
+  </div>
+  <dl class="card border border-base-300 bg-base-100 shadow-sm">
+    <div class="card-body grid gap-6 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm uppercase tracking-widest text-base-content/60">Reader</dt>
+        <dd class="mt-2 text-xl">{{ loan.member }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm uppercase tracking-widest text-base-content/60">ISBN</dt>
+        <dd class="mt-2 font-mono text-lg">{{ loan.isbn }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm uppercase tracking-widest text-base-content/60">Lent</dt>
+        <dd class="mt-2 text-lg">{{ loan.lent_on|date:"Y-m-d" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm uppercase tracking-widest text-base-content/60">Due</dt>
+        <dd class="mt-2 text-lg">{{ loan.due_on|date:"Y-m-d" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm uppercase tracking-widest text-base-content/60">Returned</dt>
+        <dd class="mt-2 text-lg">
+          {% if loan.returned_on %}{{ loan.returned_on|date:"Y-m-d" }}{% else %}Not yet returned{% endif %}
+        </dd>
+      </div>
+    </div>
+  </dl>
+</section>
+{% endblock %}
