@@ -35,6 +35,8 @@ def test_about_page_uses_the_reading_room_layout_in_a_browser(live_server):
             assert page.get_by_role('link', name='desk@lending-library.invalid').get_attribute(
                 'href'
             ) == 'mailto:desk@lending-library.invalid'
-            assert page.get_by_role('navigation', name='Library pages').is_visible()
+            about_link = page.get_by_role('link', name='About')
+            assert about_link.get_attribute('href') == '/ui/about/'
+            assert about_link.get_attribute('aria-current') == 'page'
         finally:
             browser.close()
