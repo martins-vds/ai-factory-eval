@@ -57,8 +57,21 @@ def loan_list(request):
     if request.method == 'POST':
         form = LoanForm(request.POST)
         if not form.is_valid():
+            has_blank_value = any(
+                field in request.POST and not request.POST[field].strip()
+                for field in ('member', 'isbn')
+            )
+            if has_blank_value:
+                errors = [
+                    f'{field}: {form.errors[field][0]}'
+                    for field in ('member', 'isbn')
+                    if field in form.errors
+                ]
+                body = '\n'.join(errors) + '\n'
+            else:
+                body = 'member and isbn are required\n'
             return HttpResponse(
-                'member and isbn are required\n',
+                body,
                 status=400,
                 content_type='text/plain',
             )

@@ -14,14 +14,13 @@ class LoanForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
     )
 
-    def clean_member(self):
-        member = self.cleaned_data['member']
-        if not member.strip():
-            raise forms.ValidationError('This field is required.', code='required')
-        return member
-
-    def clean_isbn(self):
-        isbn = self.cleaned_data['isbn']
-        if not isbn.strip():
-            raise forms.ValidationError('This field is required.', code='required')
-        return isbn
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in self.fields:
+            value = cleaned_data.get(field)
+            if value is not None and not value.strip():
+                self.add_error(
+                    field,
+                    forms.ValidationError('This field is required.', code='required'),
+                )
+        return cleaned_data

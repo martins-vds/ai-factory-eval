@@ -63,24 +63,51 @@ def test_lending_preserves_nonblank_surrounding_whitespace(client):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    'fields',
-    [
-        {'member': 'dee'},
-        {'isbn': '123'},
-        {'member': '', 'isbn': '123'},
-        {'member': 'dee', 'isbn': ''},
-        {'member': '  ', 'isbn': '123'},
-        {'member': 'dee', 'isbn': '\t'},
-        {'member': 'm' * 256, 'isbn': '123'},
-        {'member': 'dee', 'isbn': 'i' * 256},
-    ],
-)
-def test_lending_rejects_missing_or_blank_fields(client, fields):
+@pytest.mark.parametrize('fields', [{'member': 'dee'}, {'isbn': '123'}])
+def test_lending_preserves_characterized_missing_field_error(client, fields):
     response = client.post('/loans', fields)
 
     assert response.status_code == 400
     assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'member and isbn are required\n'
+    assert not Loan.objects.filter(pk='L4').exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('fields', 'expected'),
+    [
+        ({'member': '', 'isbn': '123'}, 'member: This field is required.\n'),
+        ({'member': '  ', 'isbn': '123'}, 'member: This field is required.\n'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn: This field is required.\n'),
+        ({'member': 'dee', 'isbn': '\t'}, 'isbn: This field is required.\n'),
+        (
+            {'member': '', 'isbn': ''},
+            'member: This field is required.\nisbn: This field is required.\n',
+        ),
+    ],
+)
+def test_lending_rejects_blank_fields_with_field_errors(client, fields, expected):
+    response = client.post('/loans', fields)
+
+    assert response.status_code == 400
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == expected
+    assert not Loan.objects.filter(pk='L4').exists()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'fields',
+    [
+        {'member': 'm' * 256, 'isbn': '123'},
+        {'member': 'dee', 'isbn': 'i' * 256},
+    ],
+)
+def test_lending_rejects_fields_that_exceed_storage_limits(client, fields):
+    response = client.post('/loans', fields)
+
+    assert response.status_code == 400
     assert response.content.decode() == 'member and isbn are required\n'
     assert not Loan.objects.filter(pk='L4').exists()
 
