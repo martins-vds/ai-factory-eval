@@ -18,8 +18,9 @@ class MonthlyReportTotals:
 
 
 class MonthlyReportService:
-    def __init__(self, repository):
+    def __init__(self, repository, fees):
         self.repository = repository
+        self.fees = fees
 
     def for_previous_month(self, today: date) -> list[MonthlyReportRow]:
         end_on = today.replace(day=1)
@@ -34,8 +35,9 @@ class MonthlyReportService:
                 days_late = max(0, (loan.returned_on - loan.due_on).days)
                 if days_late:
                     totals.late_returns += 1
-                    if days_late > 2:
-                        totals.late_fees_cents += min(1000, days_late * 25)
+                    fee = self.fees.fee_for(loan.id)
+                    if fee is not None:
+                        totals.late_fees_cents += fee.amount_cents
 
         rows = [
             MonthlyReportRow(

@@ -3,6 +3,7 @@ import csv
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from src.fees.composition import fee_application
 from src.reports.repository import DjangoMonthlyReportRepository
 from src.reports.services import MonthlyReportService
 
@@ -11,9 +12,9 @@ class Command(BaseCommand):
     help = 'Write the previous month lending report as CSV.'
 
     def handle(self, *args, **options):
-        rows = MonthlyReportService(DjangoMonthlyReportRepository()).for_previous_month(
-            timezone.localdate()
-        )
+        rows = MonthlyReportService(
+            DjangoMonthlyReportRepository(), fee_application
+        ).for_previous_month(timezone.localdate())
         writer = csv.writer(self.stdout)
         writer.writerow(['member_id', 'loans_started', 'late_returns', 'late_fees_cents'])
         writer.writerows(
