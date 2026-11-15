@@ -206,6 +206,17 @@ def test_htmx_payment_action_reports_gateway_success(client, monkeypatch, paymen
 
 
 @pytest.mark.django_db
+def test_regular_payment_action_redirects_to_the_fee_page(client, monkeypatch, payment_gateway):
+    gateway_url, _, _ = payment_gateway
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+    response = client.post('/ui/payments/L3/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L3/?payment=success'
+
+
+@pytest.mark.django_db
 def test_htmx_payment_action_keeps_gateway_failures_visible(client, monkeypatch, payment_gateway):
     gateway_url, _, handler = payment_gateway
     handler.response_status = 503

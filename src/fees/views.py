@@ -1,7 +1,9 @@
 import logging
+from urllib.parse import urlencode
 
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -82,4 +84,6 @@ def payment_page(request, loan_id):
             'fees/payment-result.html',
             {'success': succeeded, 'detail': body.decode('utf-8', errors='replace')},
         )
-    return redirect(f'/ui/fees/{loan_id}/?payment={"success" if succeeded else "failed"}')
+    fee_url = reverse('fee-page', kwargs={'loan_id': loan_id})
+    payment_status = 'success' if succeeded else 'failed'
+    return redirect(f'{fee_url}?{urlencode({"payment": payment_status})}')
