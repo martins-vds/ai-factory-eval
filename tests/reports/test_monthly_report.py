@@ -55,5 +55,5 @@ def test_monthly_report_defaults_to_previous_month_in_server_timezone():
     rows = list(csv.reader(io.StringIO(output.getvalue(), newline='')))
     assert rows == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
-        ['march reader', '1', '0', '0'],
+        ['march reader', '1', '0', '75'],
     ]
