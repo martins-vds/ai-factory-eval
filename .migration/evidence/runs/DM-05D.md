@@ -1,0 +1,30 @@
+# Run journal: DM-05D
+
+Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-256 identifies the exact log. Result is the gate tool's own `AFS-RESULT` line.
+
+| UTC | Gate | Exit | Seconds | Command | Log SHA-256 | First highlight | Result |
+|---|---|---|---|---|---|---|---|
+| 2026-11-15T05:46:10+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T05:47:53+00:00 | snapshot-check | 0 | 0.04 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-15T05:49:14+00:00 | export-tests-red | 1 | 3.57 | `pytest -q tests/data_migration/test_export.py` | `96274bc1eb7d29c5` | E               KeyError: 'export_data_snapshot' |  |
+| 2026-11-15T05:49:57+00:00 | export-tests-green | 1 | 1.24 | `pytest -q tests/data_migration/test_export.py` | `0a36ff088aaeb6af` | assert { |  |
+| 2026-11-15T05:50:07+00:00 | export-tests-green | 0 | 1.19 | `pytest -q tests/data_migration/test_export.py` | `62f575628765ad31` |  |  |
+| 2026-11-15T05:51:05+00:00 | build | 0 | 0.29 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T05:51:09+00:00 | idiom | 1 | 0.03 | `bash -c 'ruff check && ruff format --check'` | `f3e1bc5a39efa090` |  |  |
+| 2026-11-15T05:51:18+00:00 | idiom-rerun | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
+| 2026-11-15T05:51:49+00:00 | behavior | 0 | 27.25 | `pytest -q` | `b5f39350bedaf2df` |  |  |
+| 2026-11-15T05:52:23+00:00 | data-load | 1 | 0.28 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `39d84694036a43bc` | Traceback (most recent call last): |  |
+| 2026-11-15T05:52:35+00:00 | target-migrate | 0 | 0.29 | `python manage.py migrate --noinput` | `56d728c244009843` |  |  |
+| 2026-11-15T05:52:40+00:00 | data-load-rerun | 0 | 0.26 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
+| 2026-11-15T05:52:44+00:00 | data-export | 0 | 0.27 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export` | `ba754ea10ff616fb` |  |  |
+| 2026-11-15T05:52:49+00:00 | data-reconcile | 0 | 0.05 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target .migration/data/target-export --mapping .migration/data/mapping.yaml` | `0e5f155ede36068f` |  | gate=data-reconcile tables=6 rows=54 mismatched_tables=0 |
+| 2026-11-15T05:53:27+00:00 | regression | 0 | 26.37 | `pytest -q` | `6bb0fef48675162e` |  |  |
+| 2026-11-15T05:53:59+00:00 | crap | 0 | 26.04 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `792690e05110bcec` |  | gate=crap max=26.0 threshold=30 over=0 methods=184 |
+| 2026-11-15T06:25:50+00:00 | mutation-changed | 2 | 1906.96 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `f641f59e4606e236` | afs-mutation: mutmut failed on src/cargotracker/data_migration/loader.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=1 files=77 base=origin/main |
+| 2026-11-15T06:27:18+00:00 | export-tests-mutation-ready | 0 | 1.18 | `pytest -q tests/data_migration/test_export.py` | `791313e37fd7699e` |  |  |
+| 2026-11-15T06:27:30+00:00 | idiom-mutation-ready | 1 | 0.06 | `bash -c 'ruff check && ruff format --check'` | `9308660471df22e4` |  |  |
+| 2026-11-15T06:27:49+00:00 | idiom-mutation-ready-rerun | 1 | 0.01 | `bash -c 'ruff check && ruff format --check'` | `0dafb45777fd7c91` | Found 1 error. |  |
+| 2026-11-15T06:28:03+00:00 | idiom-mutation-ready-final | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
+| 2026-11-15T06:28:41+00:00 | behavior-mutation-ready | 0 | 26.08 | `pytest -q` | `424be322847c9138` |  |  |
+| 2026-11-15T06:29:36+00:00 | regression-final | 0 | 27.4 | `pytest -q` | `ec18a82124a47894` |  |  |
+| 2026-11-15T06:30:08+00:00 | crap-final | 0 | 27.58 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `79f864784a7c1b52` |  | gate=crap max=26.0 threshold=30 over=0 methods=184 |
