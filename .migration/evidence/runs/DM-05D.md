@@ -19,3 +19,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T17:53:49+00:00 | mutation-changed | 1 | 54.04 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `3d31d74fbde7b014` | afs-mutation: FAILED score=0.745 threshold=0.8 killed=38 survived=13 skipped=0 files=2 jobs=2 base=origin/main | gate=mutation score=0.745 threshold=0.8 killed=38 survived=13 files=2 base=origin/main |
 | 2026-11-15T17:54:31+00:00 | export-tests-hardening | 1 | 1.57 | `pytest -q tests/data_migration/test_export.py` | `0b23aba51db97dbd` | with pytest.raises(CommandError) as error: |  |
 | 2026-11-15T17:54:42+00:00 | export-tests-hardening | 0 | 1.62 | `pytest -q tests/data_migration/test_export.py` | `16aece7227088486` |  |  |
+| 2026-11-15T17:54:58+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:55:01+00:00 | build-check | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T17:55:04+00:00 | idiom-lint | 0 | 0.01 | `ruff check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T17:55:07+00:00 | idiom-format | 0 | 0.01 | `ruff format --check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `eee76f865de5a9f2` |  |  |
+| 2026-11-15T17:55:48+00:00 | tests | 0 | 37.73 | `pytest -q` | `1d1d62dc103b0c26` |  |  |
+| 2026-11-15T17:56:27+00:00 | crap-coverage | 0 | 35.38 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `24a58b7e1f98472a` |  |  |
+| 2026-11-15T17:56:30+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T17:56:34+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `930b48b91bcde5b4` |  | gate=crap max=26.0 threshold=30 over=0 methods=182 |
+| 2026-11-15T17:57:32+00:00 | mutation-changed | 0 | 54.82 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `da593679cfc1036a` |  | gate=mutation score=0.827 threshold=0.8 killed=43 survived=9 files=2 base=origin/main |
