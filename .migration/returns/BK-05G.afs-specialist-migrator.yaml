@@ -2,14 +2,14 @@ role: afs-specialist-migrator
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
 specialty: ui
-pr: martins-vds/ai-factory-pilot-target#402
+pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/402
 gates:
   build: 0
   behavior: 0
   idiom: 0
-  crap: 0
+  crap: 'n/a: not run in this session'
   mutation_changed: 0.889
-  regression: 0
+  regression: 'n/a: full suite not run in this session'
 specialty_evidence:
   - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_exposes_destination_and_deadline_dialogs
   - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_filters_options_without_mutating_locations
