@@ -25,3 +25,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T07:17:58+00:00 | direct-dialog-page-green | 0 | 1.4 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_direct_dialog_link_renders_a_dashboard_page_without_htmx` | `7b23e52dabef120c` |  |  |
 | 2026-11-15T07:18:15+00:00 | dialogs-tests | 0 | 3.44 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `5375539cbcc8d899` |  |  |
 | 2026-11-15T07:18:22+00:00 | bk05e-dashboard-regression | 0 | 1.69 | `pytest -q tests/booking/interfaces/test_dashboard.py` | `89db3b8e278b18c8` |  |  |
+| 2026-11-15T07:20:39+00:00 | destination-validation-test | 0 | 2.08 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_filtered_or_unknown_locations` | `ab66aeee79047ffa` |  |  |
+| 2026-11-15T07:21:00+00:00 | focused-tests | 0 | 4.95 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `8d588b1b335c872d` |  |  |
+| 2026-11-15T07:21:04+00:00 | idiom-check | 1 | 0.02 | `ruff check` | `32c1dccbc7668a99` | Found 1 error. |  |
+| 2026-11-15T07:21:14+00:00 | idiom-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T07:21:18+00:00 | format-check | 1 | 0.02 | `ruff format --check` | `c0cd83c72249130e` | -     assert updated_cargo.route_specification.arrival_deadline == datetime( |  |
+| 2026-11-15T07:21:32+00:00 | format-check | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |

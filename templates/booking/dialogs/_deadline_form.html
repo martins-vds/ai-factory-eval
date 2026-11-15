@@ -22,18 +22,18 @@
       {% csrf_token %}
       <label class="mb-2 block font-medium" for="deadline">Arrival deadline</label>
       <input
-        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+        class="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
         id="deadline"
         name="deadline"
         type="date"
         value="{{ deadline_value }}"
         required
-        aria-describedby="{% if deadline_error %}deadline-error{% endif %}"
-        {% if deadline_error %}aria-invalid="true"{% endif %}
+        autofocus
+        {% if deadline_error %}aria-describedby="deadline-error" aria-invalid="true"{% endif %}
       >
       <div class="mt-6 flex justify-end gap-3">
-        <button class="min-h-11 rounded-md px-5 py-2 hover:bg-slate-100" type="submit" name="action" value="cancel">Cancel</button>
-        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" name="action" value="update">Update</button>
+        <button class="min-h-11 rounded-md px-5 py-2 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit" name="action" value="cancel">Cancel</button>
+        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit" name="action" value="update">Update</button>
       </div>
     </form>
   </section>

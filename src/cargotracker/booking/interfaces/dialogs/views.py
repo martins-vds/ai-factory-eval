@@ -26,11 +26,7 @@ def _render_dialog(
     page_template: str,
     context: dict[str, object],
 ) -> HttpResponse:
-    template = (
-        fragment_template
-        if request.headers.get('HX-Request') == 'true'
-        else page_template
-    )
+    template = fragment_template if request.headers.get('HX-Request') == 'true' else page_template
     return render(request, template, context)
 
 
@@ -51,14 +47,19 @@ def create_booking_dialog_views(
         destinations = [
             location
             for location in locations
-            if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
         ]
         if request.method == 'POST':
             if request.POST.get('action') == 'cancel':
                 return _dialog_response(request)
             destination_code = request.POST.get('destination', '')
             selected_destination = next(
-                (location for location in destinations if location.unlocode.value == destination_code),
+                (
+                    location
+                    for location in destinations
+                    if location.unlocode.value == destination_code
+                ),
                 None,
             )
             if selected_destination is None:

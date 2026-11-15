@@ -29,12 +29,12 @@
       {% csrf_token %}
       <label class="mb-2 block font-medium" for="destination">New destination</label>
       <select
-        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+        class="min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
         id="destination"
         name="destination"
         required
-        aria-describedby="{% if destination_error %}destination-error{% endif %}"
-        {% if destination_error %}aria-invalid="true"{% endif %}
+        autofocus
+        {% if destination_error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
       >
         {% for location in destinations %}
           <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
@@ -43,8 +43,8 @@
         {% endfor %}
       </select>
       <div class="mt-6 flex justify-end gap-3">
-        <button class="min-h-11 rounded-md px-5 py-2 hover:bg-slate-100" type="submit" name="action" value="cancel">Cancel</button>
-        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" name="action" value="update">Update</button>
+        <button class="min-h-11 rounded-md px-5 py-2 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit" name="action" value="cancel">Cancel</button>
+        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit" name="action" value="update">Update</button>
       </div>
     </form>
   </section>

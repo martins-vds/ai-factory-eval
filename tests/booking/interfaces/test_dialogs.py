@@ -13,9 +13,8 @@ from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
-from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.location.domain.un_locode import UnLocode
-
+from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
 cargo_repository = DjangoCargoRepository()
 dashboard = CargoDashboard(cargo_repository)
@@ -141,6 +140,27 @@ def test_destination_dialog_update_preserves_other_specification_fields_and_refr
     assert 'USNYC' in not_routed_table
 
 
+@pytest.mark.parametrize('destination', ('CNHKG', 'AUMEL', 'MISSING'))
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_filtered_or_unknown_locations(client, destination):
+    call_command('seed_sample_data')
+    cargo_before = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo_before is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'action': 'update', 'destination': destination},
+        HTTP_HX_REQUEST='true',
+    )
+    cargo_after = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert 'aria-invalid="true"' in response.content.decode()
+    assert cargo_after == cargo_before
+
+
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_update_preserves_route_and_refreshes(client):
@@ -167,9 +187,7 @@ def test_deadline_dialog_update_preserves_route_and_refreshes(client):
         updated_cargo.route_specification.destination
         == cargo_before.route_specification.destination
     )
-    assert updated_cargo.route_specification.arrival_deadline == datetime(
-        2027, 1, 20, tzinfo=UTC
-    )
+    assert updated_cargo.route_specification.arrival_deadline == datetime(2027, 1, 20, tzinfo=UTC)
     assert '01/20/2027' in not_routed_table
 
 
