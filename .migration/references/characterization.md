@@ -17,7 +17,19 @@ The legacy source is Java 17, JAX-RS 3.1 on Grizzly, JPA/Hibernate 6.4, and H2 2
    L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03
    ```
 
-   `GET /loans/L1` returned 200 and `L1;ana;9780134685991;2026-01-02;2026-01-16;`. `GET /fees/L1` returned 200, `text/html`, and `<h1>Late fee for L1</h1><p>Due 2026-01-16, 303 day(s) late.</p><p class="fee">Fee: $10.00</p>`. `GET /about` returned 200, `text/html`, with the Lending Library title, Monday–Saturday 9:00–18:00 hours, a 14-day lending period, and `desk@lending-library.invalid`.
+   `GET /loans/L1` returned 200 and `L1;ana;9780134685991;2026-01-02;2026-01-16;`. `GET /fees/L1` returned 200, `text/html`, and `<h1>Late fee for L1</h1><p>Due 2026-01-16, 303 day(s) late.</p><p class="fee">Fee: $10.00</p>`. `GET /about` returned 200, `text/html`, with this exact body:
+
+   ```html
+   <!doctype html>
+   <html lang="en">
+   <head><meta charset="utf-8"><title>About the Lending Library</title></head>
+   <body>
+     <h1>About the Lending Library</h1>
+     <p>Open Monday to Saturday, 9:00 to 18:00. Books are lent for 14 days.</p>
+     <p>Contact: desk@lending-library.invalid</p>
+   </body>
+   </html>
+   ```
 
    `POST /loans` with form fields `member=characterization&isbn=9780000000000` returned 201 and `L4;characterization;9780000000000;2026-11-15;2026-11-29;`. `POST /loans/L1/return` returned 200 and the L1 row with returned date `2026-11-15`.
 3. Ran `PORT=18081 timeout --signal=INT 20s ./legacy/run.sh`, then issued the following `curl -i` requests against `http://127.0.0.1:18081`:
