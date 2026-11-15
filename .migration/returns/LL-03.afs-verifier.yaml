@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/319
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.843
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: tests/loans/test_catalog.py:395
+    what: "The full regression and CRAP coverage test runs fail on the existing browser loan flow; its isolated test passes. The required full regression gate remains failed, outside LL-03 scope."
+  - severity: minor
+    where: .migration/harness/installed.json:4
+    what: "The PR changes only installed_at in a pinned harness manifest, outside the ticket file scope."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:3
+    what: "Changed-code mutation score is 0.843 (threshold 0.8); 17 survivors are recorded. Treat known module-level route/method selection survivors as harness limitations, and judge routes by behavior tests: all four fee/payment routes have allowed-method coverage and wrong-method 405 assertions."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_wrong_http_methods
+  - tests/fees/test_fee_calculation.py::test_pay_use_case_uses_injected_repository_and_gateway
+  - tests/fees/test_fee_calculation.py::test_pay_use_case_does_not_charge_unknown_loan
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
