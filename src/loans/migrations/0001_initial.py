@@ -45,9 +45,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Loan',
             fields=[
-                ('id', models.CharField(max_length=32, primary_key=True, serialize=False)),
-                ('member', models.CharField(max_length=255)),
-                ('isbn', models.CharField(max_length=64)),
+                ('id', models.TextField(primary_key=True, serialize=False)),
+                ('member', models.TextField()),
+                ('isbn', models.TextField()),
                 ('lent_on', models.DateField()),
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],

@@ -58,6 +58,11 @@ def test_reapplying_migrations_preserves_persisted_loans():
 
 
 @pytest.mark.django_db
+def test_loan_model_matches_its_migrations():
+    call_command('makemigrations', 'loans', check=True, dry_run=True, verbosity=0)
+
+
+@pytest.mark.django_db
 def test_repository_commits_new_loan_records():
     loan = create_loan(
         loan_id='L4',
@@ -100,6 +105,16 @@ def test_loan_list_export_escapes_field_and_record_delimiters(client):
 
 
 @pytest.mark.django_db
+def test_catalog_page_renders_seeded_records(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'>ana<' in response.content
+    assert b'href="/ui/loans/L1/"' in response.content
+
+
+@pytest.mark.django_db
 def test_loan_page_shows_due_date_and_return_status(client):
     response = client.get('/ui/loans/L1/')
 
@@ -107,3 +122,36 @@ def test_loan_page_shows_due_date_and_return_status(client):
     assert b'Loan L1' in response.content
     assert b'Jan 16, 2026' in response.content
     assert b'Not yet returned' in response.content
+
+
+@pytest.mark.django_db
+def test_unreturned_loan_is_valid_with_no_return_date():
+    loan = Loan(
+        id='L4',
+        member='new member',
+        isbn='new-isbn',
+        lent_on=date(2026, 2, 1),
+        returned_on=None,
+    )
+
+    loan.full_clean()
+
+    assert loan.returned_on is None
+
+
+@pytest.mark.django_db
+def test_catalog_preserves_long_loan_fields_through_text_api(client):
+    loan_id = f'L{"x" * 32}'
+    member = 'm' * 256
+    isbn = 'i' * 65
+    Loan.objects.create(
+        id=loan_id,
+        member=member,
+        isbn=isbn,
+        lent_on=date(2026, 2, 1),
+    )
+
+    response = client.get(f'/loans/{loan_id}')
+
+    assert response.status_code == 200
+    assert response.content.decode() == (f'{loan_id};{member};{isbn};2026-02-01;2026-02-15;\n')
