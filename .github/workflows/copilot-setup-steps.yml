@@ -67,7 +67,13 @@ jobs:
           # yet (afs-setup-check unshallows later, too late for this step). This repo is public: no token needed.
           git fetch -q --unshallow origin 2>/dev/null || git fetch -q --deepen=500 origin
           base=$(git log --grep='^Eval case .*: base at ' -1 --format=%H)
-          if [ -n "$base" ]; then echo "AFS_BASE=$base" >> "$GITHUB_ENV"; echo "AFS_BASE=$base"; else echo "::warning::no eval case base commit"; fi
+          if [ -n "$base" ]; then
+            echo "AFS_BASE=$base" >> "$GITHUB_ENV"; echo "AFS_BASE=$base"
+            # Agents also compare against origin/main themselves (scope checks, `git diff origin/main`). On a live
+            # target that is the ticket's base; here main is unrelated, so point the remote-tracking ref at the case
+            # base. The clone is already complete, so afs-setup-check's unshallow fetch doesn't run and reset it.
+            git update-ref refs/remotes/origin/main "$base"; echo "origin/main -> $base"
+          else echo "::warning::no eval case base commit"; fi
 
       - uses: actions/setup-python@v5
         with: { python-version: "3.13" }
