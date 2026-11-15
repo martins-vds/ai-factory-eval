@@ -4,12 +4,12 @@ issue: martins-vds/ai-factory-pilot-target#293
 specialty: ui
 pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
 gates:
-  build: 0
-  behavior: 0
-  idiom: 0
-  crap: 26.0
-  mutation_changed: 0.790
-  regression: 0
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
@@ -27,3 +27,22 @@ ledger_updated:
   - booking.routing-assign
 quirk_tickets: []
 handoff: .migration/handoffs/BK-05F.md
+equivalent_mutants:
+  - >-
+    views.py:22 #1, `'booking.route_selection'` → `'XXbooking.route_selectionXX'`: the view signs
+    and validates tokens with the same salt; no cross-deployment token compatibility is specified.
+  - >-
+    views.py:34 #10 and :70 #27, unknown-cargo 404 detail strings changed: debug-off 404 pages do not
+    render the Http404 detail.
+  - >-
+    views.py:37 #13, stale-route 404 detail string changed: the user-facing debug-off 404 page is
+    unchanged.
+  - >-
+    views.py:39 #14, `quote(..., safe="")` → `quote(..., safe="XXXX")`: X is unreserved and remains
+    unescaped by urllib.parse.quote.
+  - >-
+    views.py:95 #40, missing-token default `''` → `'XXXX'`: both values fail signature validation and
+    result in the same 404.
+  - >-
+    views.py:97 #44 and :100 #46, invalid-candidate error details changed: the error is converted to
+    the same debug-off 404 page.
