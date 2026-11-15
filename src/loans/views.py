@@ -30,7 +30,6 @@ def loan_detail(request, loan_id):
     return HttpResponse(body, content_type='text/plain')
 
 
-@require_POST
 def loan_lend(request):
     form = LendLoanForm(request.POST)
     if not form.is_valid():
@@ -53,6 +52,7 @@ def loan_return(request, loan_id):
     return HttpResponse(loan_line(loan), content_type='text/plain')
 
 
+@require_http_methods(['GET', 'POST'])
 def loan_lend_page(request):
     form = LendLoanForm(request.POST if request.method == 'POST' else None)
     if request.method == 'POST' and form.is_valid():

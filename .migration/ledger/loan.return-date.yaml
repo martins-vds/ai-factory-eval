@@ -14,6 +14,6 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_updates_a_loan_and_rejects_repeated_returns]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_updates_a_loan_and_rejects_repeated_returns, tests/loans/test_circulation.py::test_reading_room_can_lend_and_return_with_htmx]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
