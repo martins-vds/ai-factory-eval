@@ -23,6 +23,28 @@ def test_lending_creates_a_loan_with_a_fourteen_day_due_date(client, monkeypatch
     assert loan.due_on == due_on
 
 
+@pytest.mark.django_db
+def test_api_lending_matches_characterization_golden(client, monkeypatch):
+    monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 11, 8))
+
+    response = client.post('/loans', {'member': 'dee', 'isbn': '123'})
+
+    assert response.status_code == 201
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'L4;dee;123;2026-11-08;2026-11-22;\n'
+
+
+@pytest.mark.django_db
+def test_first_return_matches_characterization_golden(client, monkeypatch):
+    monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 11, 8))
+
+    response = client.post('/loans/L1/return')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == ('L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-08\n')
+
+
 @pytest.mark.parametrize(
     'form_data',
     [

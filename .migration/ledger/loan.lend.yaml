@@ -25,9 +25,11 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_api_lending_matches_characterization_golden
   - tests/loans/test_circulation.py::test_lending_creates_a_loan_with_a_fourteen_day_due_date
   - tests/loans/test_circulation.py::test_lending_rejects_missing_or_blank_fields
   - tests/loans/test_circulation.py::test_lending_quotes_delimiter_characters
   - tests/loans/test_circulation.py::test_reading_room_shows_field_errors_for_blank_loan_details
+  - tests/loans/browser_flow.py::test_reading_room_can_lend_and_return_a_book
 notes: "Rulings #39 and #43 reject blank values and escape delimiters."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]

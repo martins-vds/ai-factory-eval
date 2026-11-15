@@ -22,6 +22,7 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_first_return_matches_characterization_golden
   - tests/loans/test_circulation.py::test_returning_a_loan_persists_today_and_returns_its_record
   - tests/loans/test_circulation.py::test_repeated_return_is_rejected_without_changing_the_date
 notes: "Ruling #41 rejects repeated returns and preserves the original return date."

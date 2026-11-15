@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Loan
+from .repository import LoanRepository
 from .services import (
     get_loan_text,
     lend_loan,
@@ -115,7 +116,7 @@ def _render_loan_catalog(request, error=None, errors=None, form_data=None, statu
         request,
         template,
         {
-            'loans': Loan.objects.all(),
+            'loans': LoanRepository().all(),
             'error': error,
             'errors': errors or {},
             'form_data': form_data or {},
