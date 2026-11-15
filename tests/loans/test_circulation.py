@@ -1,15 +1,16 @@
 from datetime import date
 
 import pytest
+from django.test import Client
 from django.utils import timezone
-from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 
 
 @pytest.mark.django_db
-def test_lending_creates_a_loan_with_a_fourteen_day_due_date(client):
-    today = date.today()
+def test_lending_creates_a_loan_with_a_fourteen_day_due_date(client, monkeypatch):
+    today = date(2026, 11, 15)
+    monkeypatch.setattr(timezone, 'localdate', lambda: today)
     due_on = date.fromordinal(today.toordinal() + 14)
 
     response = client.post('/loans', {'member': 'dee', 'isbn': '123'})
@@ -65,9 +66,7 @@ def test_returning_a_loan_persists_today_and_returns_its_record(client, monkeypa
 
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        'L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-15\n'
-    )
+    assert response.content.decode() == ('L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-15\n')
     assert Loan.objects.get(pk='L1').returned_on == today
 
 
@@ -95,27 +94,36 @@ def test_repeated_return_is_rejected_without_changing_the_date(client, monkeypat
 
 
 @pytest.mark.django_db
-def test_reading_room_can_lend_and_return_a_book_in_the_browser(live_server):
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page()
-            page.goto(f'{live_server.url}/ui/loans/')
-            assert page.get_by_role('heading', name='Books in good company.').is_visible()
-            assert page.get_by_label('Member').count() == 1
+def test_htmx_can_lend_and_return_a_book_with_csrf(monkeypatch):
+    today = date(2026, 11, 15)
+    monkeypatch.setattr(timezone, 'localdate', lambda: today)
+    csrf_client = Client(enforce_csrf_checks=True)
+    page = csrf_client.get('/ui/loans/')
+    assert b'name="csrfmiddlewaretoken"' in page.content
+    csrf_token = csrf_client.cookies['csrftoken'].value
 
-            page.get_by_label('Member').fill('reader')
-            page.get_by_label('ISBN').fill('9780000000001')
-            page.get_by_role('button', name='Record loan').click()
-            loan = page.locator('#loan-L4')
-            assert loan.get_by_text('reader · ISBN 9780000000001').is_visible()
-            assert loan.get_by_text('On loan').is_visible()
+    lend_response = csrf_client.post(
+        '/ui/loans/new/',
+        {
+            'member': 'reader',
+            'isbn': '9780000000001',
+            'csrfmiddlewaretoken': csrf_token,
+        },
+        HTTP_HX_REQUEST='true',
+    )
+    assert lend_response.status_code == 200
+    assert b'id="loan-L4"' in lend_response.content
+    assert b'reader \xc2\xb7 ISBN 9780000000001' in lend_response.content
+    assert b'On loan' in lend_response.content
 
-            loan.get_by_role('button', name='Mark returned').click()
-            assert loan.get_by_text('Returned', exact=False).is_visible()
-            assert loan.get_by_role('button', name='Mark returned').count() == 0
-        finally:
-            browser.close()
+    return_response = csrf_client.post(
+        '/ui/loans/L4/return/',
+        {'csrfmiddlewaretoken': csrf_token},
+        HTTP_HX_REQUEST='true',
+    )
+    assert return_response.status_code == 200
+    assert b'Returned Nov 15, 2026' in return_response.content
+    assert Loan.objects.get(pk='L4').returned_on == today
 
 
 @pytest.mark.django_db

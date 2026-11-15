@@ -6,8 +6,8 @@ from .services import (
     get_loan_text,
     lend_loan,
     list_loans_text,
-    loan_line,
     loan_field_errors,
+    loan_line,
     return_loan,
 )
 
