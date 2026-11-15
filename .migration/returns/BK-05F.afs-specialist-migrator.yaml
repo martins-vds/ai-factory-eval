@@ -8,7 +8,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: 0.855
+  mutation_changed: "n/a: not run in this session"
   regression: 0
 mutation_survivor_classifications:
   - >-
@@ -50,6 +50,7 @@ specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_reject_unsupported_http_methods
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
 ledger_updated:
