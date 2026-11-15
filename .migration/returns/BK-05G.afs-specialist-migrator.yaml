@@ -2,7 +2,7 @@ role: afs-specialist-migrator
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
 specialty: ui
-pr: martins-vds/ai-factory-pilot-target#402
+pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/402
 gates:
   build: 0
   behavior: 0
@@ -16,6 +16,8 @@ specialty_evidence:
   - tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open
   - tests/booking/interfaces/test_dialogs.py::test_destination_update_redirects_and_refreshes_not_routed_row
   - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_route_and_refreshes_not_routed_row
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_cargo_dialog_returns_not_found
+  - .migration/evidence/runs/BK-05G.md (verifier-targeted, stale-dialog-404s)
   - .migration/evidence/runs/BK-05G.md
   - .migration/evidence/mutants/BK-05G.md
 ledger_updated:
