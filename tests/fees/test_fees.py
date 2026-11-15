@@ -1,5 +1,5 @@
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from datetime import date
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest

@@ -2,7 +2,6 @@ import os
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
