@@ -84,6 +84,15 @@
         "source",
         "trigger"
       ],
+      "subagent.completed": [
+        "agentDisplayName",
+        "agentName",
+        "durationMs",
+        "model",
+        "toolCallId",
+        "totalTokens",
+        "totalToolCalls"
+      ],
       "subagent.selected": [
         "agentDisplayName",
         "agentName",
@@ -136,28 +145,29 @@
       ]
     },
     "event_types": {
-      "assistant.message": 116,
+      "assistant.message": 125,
       "assistant.turn_end": 24,
       "assistant.turn_start": 25,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 256,
-      "hook.start": 257,
-      "permission.completed": 118,
-      "permission.requested": 118,
+      "hook.end": 272,
+      "hook.start": 273,
+      "permission.completed": 126,
+      "permission.requested": 126,
       "session.start": 1,
       "skill.invoked": 10,
+      "subagent.completed": 1,
       "subagent.selected": 1,
       "subagent.started": 2,
       "system.message": 5,
-      "tool.execution_complete": 149,
-      "tool.execution_start": 151,
+      "tool.execution_complete": 157,
+      "tool.execution_start": 159,
       "user.message": 7
     },
-    "events": 1242,
+    "events": 1316,
     "usage_fields": []
   },
-  "ended_at": "2026-11-15T04:20:00.144Z",
+  "ended_at": "2026-11-15T04:20:59.094Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -199,12 +209,12 @@
   "log": "/home/runner/.copilot/session-state/dcbee5d7-383c-4ab8-a597-8f58b6f74a45/events.jsonl",
   "models": {
     "gpt-6-luna": {
-      "output": 50814,
-      "requests": 116
+      "output": 54180,
+      "requests": 125
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-15T04:20:03+00:00",
+  "recorded_at": "2026-11-15T04:21:03+00:00",
   "schema": "afs-cost/1",
   "session_id": "dcbee5d7-383c-4ab8-a597-8f58b6f74a45",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -228,6 +238,6 @@
   ],
   "started_at": "2026-11-15T04:10:13.317Z",
   "surface": "coding-agent",
-  "trigger_id": "call_Hj10IO9balkAzj6lX1ZfMIwE",
+  "trigger_id": "call_AVtWYhutF7S27DZDEHg8I9HZ",
   "usage_source": "assistant.message (output only, partial)"
 }
