@@ -26,3 +26,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T06:27:49+00:00 | idiom-mutation-ready-rerun | 1 | 0.01 | `bash -c 'ruff check && ruff format --check'` | `0dafb45777fd7c91` | Found 1 error. |  |
 | 2026-11-15T06:28:03+00:00 | idiom-mutation-ready-final | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
 | 2026-11-15T06:28:41+00:00 | behavior-mutation-ready | 0 | 26.08 | `pytest -q` | `424be322847c9138` |  |  |
+| 2026-11-15T06:29:36+00:00 | regression-final | 0 | 27.4 | `pytest -q` | `ec18a82124a47894` |  |  |
+| 2026-11-15T06:30:08+00:00 | crap-final | 0 | 27.58 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `79f864784a7c1b52` |  | gate=crap max=26.0 threshold=30 over=0 methods=184 |
