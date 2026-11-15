@@ -80,3 +80,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-15T02:08:23+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T02:11:37+00:00 | verifier-stale-ui-test | 0 | 1.84 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_stale_tracking_id_returns_not_found_for_route_and_itinerary_screens` | `fabde5c8e97ed72e` |  |  |
+| 2026-11-15T02:11:48+00:00 | build-compile-verifier | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T02:11:48+00:00 | build-django-check-verifier | 0 | 0.23 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T02:11:49+00:00 | idiom-ruff-check-verifier | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T02:11:49+00:00 | idiom-ruff-format-verifier | 0 | 0.02 | `ruff format --check` | `c3ac60a207092b7f` |  |  |
+| 2026-11-15T02:12:27+00:00 | behavior-verifier | 0 | 35.23 | `pytest -q` | `947b93ca375a4b10` |  |  |
+| 2026-11-15T02:13:06+00:00 | crap-pytest-verifier | 0 | 32.91 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `8e7def97978f0999` |  |  |
+| 2026-11-15T02:13:06+00:00 | crap-lizard-verifier | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T02:13:06+00:00 | crap-score-verifier | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-15T02:48:28+00:00 | regression-verifier | 0 | 68.17 | `pytest -q` | `8e3f1f600d52a62a` |  |  |
