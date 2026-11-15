@@ -3,26 +3,26 @@
 {% block title %}Lend a book · The Lending Library{% endblock %}
 
 {% block content %}
-<section class="mx-auto max-w-2xl">
+<section class="mx-auto max-w-3xl">
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
   <div class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
       <h1 class="card-title text-4xl">Lend a book.</h1>
       <p class="text-[#66705b]">Add a member and the book’s ISBN to the collection.</p>
-      <form method="post" action="/ui/loans/" class="mt-4 grid gap-5">
+      <form method="post" action="/ui/loans/" class="mt-6 grid gap-4">
         {% csrf_token %}
         <div>
           <label class="label" for="member"><span class="label-text">Member</span></label>
-          <input class="input input-bordered w-full" id="member" name="member" maxlength="255" value="{{ form.member.value|default_if_none:'' }}">
+          <input class="input input-bordered" id="member" name="member" maxlength="255" required style="width: 100%" value="{{ form.member.value|default_if_none:'' }}">
           {% if form.member.errors %}<p class="mt-1 text-sm text-[#a94e37]" role="alert">{{ form.member.errors|join:", " }}</p>{% endif %}
         </div>
         <div>
           <label class="label" for="isbn"><span class="label-text">ISBN</span></label>
-          <input class="input input-bordered w-full" id="isbn" name="isbn" maxlength="255" value="{{ form.isbn.value|default_if_none:'' }}">
+          <input class="input input-bordered" id="isbn" name="isbn" maxlength="255" required style="width: 100%" value="{{ form.isbn.value|default_if_none:'' }}">
           {% if form.isbn.errors %}<p class="mt-1 text-sm text-[#a94e37]" role="alert">{{ form.isbn.errors|join:", " }}</p>{% endif %}
         </div>
-        <button class="btn btn-primary w-fit" type="submit">Add loan</button>
+        <button class="btn btn-primary" type="submit">Add loan</button>
       </form>
     </div>
   </div>

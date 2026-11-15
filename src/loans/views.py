@@ -1,9 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
-from .models import Loan
 from .forms import LoanForm
+from .models import Loan
 from .services import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
 
 
@@ -18,6 +18,7 @@ def loan_catalog(request):
     return render(request, 'loans/list.html', {'loans': Loan.objects.all()})
 
 
+@require_GET
 def loan_new(request):
     return render(request, 'loans/new.html', {'form': LoanForm()})
 
@@ -35,7 +36,7 @@ def loan_list(request):
             return HttpResponse(form.errors.as_text(), status=400, content_type='text/plain')
         loan = lend_loan(**form.cleaned_data)
         return HttpResponse(
-            get_loan_text(loan.id),
+            loan_line(loan),
             status=201,
             content_type='text/plain',
         )
@@ -64,6 +65,8 @@ def loan_catalog_return(request, loan_id):
     loan, updated = return_loan(loan_id)
     if loan is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    if request.headers.get('HX-Request') != 'true':
+        return redirect('/ui/loans/')
     feedback = None
     if not updated:
         feedback = (
