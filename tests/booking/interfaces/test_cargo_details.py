@@ -56,6 +56,7 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
     assert 'Arrival deadline:' in content
     assert 'Itinerary' in content
     assert '0200T' in content
+    assert 'Reroute' not in content
 
 
 @pytest.mark.django_db

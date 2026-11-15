@@ -21,3 +21,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T04:10:31+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-15T04:17:23+00:00 | verifier-focused-tests | 1 | 7.32 | `pytest -q tests/booking/interfaces/test_dashboard.py tests/booking/interfaces/test_cargo_details.py` | `bd9757b2c908ad60` | E       NameError: name 'TrackingId' is not defined |  |
 | 2026-11-15T04:17:39+00:00 | verifier-focused-tests | 0 | 4.76 | `pytest -q tests/booking/interfaces/test_dashboard.py tests/booking/interfaces/test_cargo_details.py` | `4b2aac9c61149332` |  |  |
+| 2026-11-15T04:18:01+00:00 | verifier-final-build-compileall | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T04:18:05+00:00 | verifier-final-build-django-check | 0 | 0.37 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T04:19:10+00:00 | verifier-final-behavior-tests | 0 | 60.98 | `pytest -q` | `efa121283ccc5eeb` |  |  |
+| 2026-11-15T04:19:15+00:00 | verifier-final-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T04:19:15+00:00 | verifier-final-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `df313bb2dd82ede5` |  |  |
+| 2026-11-15T04:20:31+00:00 | verifier-final-crap-coverage | 0 | 70.57 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f7a7b54d1e69800d` |  |  |
+| 2026-11-15T04:20:35+00:00 | verifier-final-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T04:20:38+00:00 | verifier-final-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-15T04:46:48+00:00 | verifier-final-detail-branches | 0 | 4.82 | `pytest -q tests/booking/interfaces/test_cargo_details.py tests/booking/interfaces/test_dashboard.py` | `cd9c342e604a3cfd` |  |  |
+| 2026-11-15T04:48:04+00:00 | verifier-final-regression | 0 | 70.79 | `pytest -q` | `83be8426c131127c` |  |  |
+| 2026-11-15T04:49:13+00:00 | verifier-final-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T04:49:13+00:00 | verifier-final-format | 0 | 0.01 | `ruff format --check` | `df313bb2dd82ede5` |  |  |
