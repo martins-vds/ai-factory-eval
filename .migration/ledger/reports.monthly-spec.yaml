@@ -10,7 +10,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 target:
   components:
     - src.reports.management.commands.monthly_report.Command
-status: in-progress
+status: migrated
 verification: spec-derived
 characterization_tier: C
 evidence:
