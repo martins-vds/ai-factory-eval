@@ -11,6 +11,8 @@ by hand. It checks the session's own work, with the same rules CI applies:
               session's own records, plus `AFS-SCOPE: <path>` lines in the issue (an operator extension).
               A file outside them needs a handoff that names it: an agent never widens its own scope.
   stuck gate  a return that reports a handoff (`handoff:` set) must have committed that handoff.
+  own return  no other return file differs from the base branch: a session writes only its own (pilot:
+              a Verifier rewrote the Migrator's return to point at its own PR).
 
 As a hook it reads the hook payload on stdin and prints `{"decision": "block", "reason": …}` to send the
 agent back with the exact fix, or nothing to let it stop. It allows the stop:
@@ -61,33 +63,45 @@ def git(*args):
     return r.stdout if r.returncode == 0 else ""
 
 
-def other_branch_tips(branch):
-    """Commits at the tip of every other branch on the remote that HEAD already contains.
+def base_points(branch):
+    """The commits this session's work started from: the merge-base of HEAD with every other branch.
 
-    The cloud agent's clone may track only its own branch, so the remote-tracking refs can miss the base
-    branch of a stacked PR (pilot, 2026-11-07: a Verifier on a Migrator's branch was charged with the
-    Migrator's files). `git ls-remote` lists every branch; a tip HEAD contains is base history, not this
-    session's work."""
-    tips = set()
-    for line in git("ls-remote", "--heads", "origin").splitlines():
-        sha, _, ref = line.partition("\t")
-        if not sha or ref == f"refs/heads/{branch}":
+    Branch tips alone aren't enough. The cloud clone may not track a stacked PR's base branch, and `main`
+    moves on while a session runs (pilot, 2026-11-08: three sessions were charged with BK-05F's return,
+    merged to `main` after they started). So fetch every branch, then take the merge-base with each:
+    for `main` that is where the session branched off, for a stack's base it is that base's tip."""
+    subprocess.run(["git", "fetch", "-q", "origin", "+refs/heads/*:refs/remotes/origin/*"],
+                   capture_output=True, timeout=90)
+    points = set()
+    for ref in git("for-each-ref", "--format=%(refname)", "refs/remotes/origin").split():
+        if ref in (f"refs/remotes/origin/{branch}", "refs/remotes/origin/HEAD"):
             continue
-        if subprocess.run(["git", "merge-base", "--is-ancestor", sha, "HEAD"], capture_output=True).returncode == 0:
-            tips.add(sha)
-    tips |= {r for r in git("for-each-ref", "--format=%(refname)", "refs/remotes/origin").split()
-             if r not in (f"refs/remotes/origin/{branch}", "refs/remotes/origin/HEAD")}
-    return sorted(tips)
+        mb = git("merge-base", "HEAD", ref).strip()
+        if mb:
+            points.add(mb)
+    return sorted(points)
+
+
+def changed_since_bases(pathspec=()):
+    """Paths whose content differs from every base point: this session's net work. A file added and removed
+    again matches the base; work merged in from `main` or the stack's base matches that branch."""
+    branch = git("rev-parse", "--abbrev-ref", "HEAD").strip()
+    paths = None
+    for point in base_points(branch):
+        diff = {p for p in git("diff", "--name-only", point, "--", *pathspec).splitlines() if p}
+        paths = diff if paths is None else paths & diff
+    return set(paths or ())
+
+
+def net_changed_returns():
+    """Return files this session changed (net)."""
+    untracked = git("ls-files", "--others", "--exclude-standard", "--", ".migration/returns/")
+    return sorted(changed_since_bases((".migration/returns/",)) | {p for p in untracked.splitlines() if p})
 
 
 def branch_changes():
-    """Paths this branch changed: commits on no other branch, plus uncommitted work."""
-    branch = git("rev-parse", "--abbrev-ref", "HEAD").strip()
-    others = other_branch_tips(branch)
-    paths = set()
-    if others:
-        out = git("log", "--format=", "--name-only", "HEAD", "--not", *others)
-        paths |= {p for p in out.splitlines() if p}
+    """Paths this session changed (net, see changed_since_bases), plus uncommitted work."""
+    paths = changed_since_bases()
     for line in git("status", "--porcelain", "--untracked-files=all").splitlines():
         p = line[3:].split(" -> ")[-1].strip().strip('"')
         if p:
@@ -189,6 +203,12 @@ def findings(ticket, role, changed, prompt):
         found.append(("mechanical", "stale-return",
                       f"`{ret_rel}` exists but this branch didn't update it. Update it with this session's gates "
                       "and PR, and commit it."))
+    others = [p for p in net_changed_returns() if p != ret_rel]
+    if others:
+        found.append(("mechanical", "other-returns:" + ",".join(others),
+                      "You changed another role's or ticket's return file: " + ", ".join(f"`{p}`" for p in others)
+                      + ". A session writes only its own return (`" + ret_rel + "`). Restore each one exactly as it "
+                      "was on your base branch (`git checkout <base> -- <file>`) and commit."))
     for err in validate_errors(changed):
         found.append(("mechanical", "validate:" + err.split(":")[0],
                       f"CI's validate.py will fail on this: {err}. Fix it and commit."))
