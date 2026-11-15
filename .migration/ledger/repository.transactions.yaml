@@ -8,7 +8,17 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.88}
 boundary: "Each repository read closes its EntityManager; each write begins and commits a transaction, rolls back if still active after failure, and closes the EntityManager."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/risk-map/SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_loan_record_survives_database_connection_reopen
+  - tests/loans/test_catalog.py::test_repository_rolls_back_a_failed_write
+target:
+  components: [src.loans.repository.save_loan, src.loans.migrations]
