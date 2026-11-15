@@ -9,3 +9,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T05:49:14+00:00 | export-tests-red | 1 | 3.57 | `pytest -q tests/data_migration/test_export.py` | `96274bc1eb7d29c5` | E               KeyError: 'export_data_snapshot' |  |
 | 2026-11-15T05:49:57+00:00 | export-tests-green | 1 | 1.24 | `pytest -q tests/data_migration/test_export.py` | `0a36ff088aaeb6af` | assert { |  |
 | 2026-11-15T05:50:07+00:00 | export-tests-green | 0 | 1.19 | `pytest -q tests/data_migration/test_export.py` | `62f575628765ad31` |  |  |
+| 2026-11-15T05:51:05+00:00 | build | 0 | 0.29 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T05:51:09+00:00 | idiom | 1 | 0.03 | `bash -c 'ruff check && ruff format --check'` | `f3e1bc5a39efa090` |  |  |
+| 2026-11-15T05:51:18+00:00 | idiom-rerun | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `178f4aac2b404dcb` |  |  |
+| 2026-11-15T05:51:49+00:00 | behavior | 0 | 27.25 | `pytest -q` | `b5f39350bedaf2df` |  |  |

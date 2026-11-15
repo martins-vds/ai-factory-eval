@@ -34,10 +34,7 @@ def _mapped_tables(mapping, models_by_table):
         raise DataExportError('mapping has no tables')
 
     targets = [spec.get('target') for spec in specs]
-    if (
-        any(not isinstance(target, str) for target in targets)
-        or len(targets) != len(set(targets))
-    ):
+    if any(not isinstance(target, str) for target in targets) or len(targets) != len(set(targets)):
         raise DataExportError('mapping targets must be unique table names')
 
     prepared = []
