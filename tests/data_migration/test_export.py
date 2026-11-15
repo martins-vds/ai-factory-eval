@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 from django.core.management import call_command
+from django.core.management.base import CommandError
 
 from cargotracker.location.infrastructure.models import LocationRecord
 
@@ -19,8 +20,9 @@ def test_export_snapshot_round_trips_fixture_rows_and_preserves_nulls(tmp_path):
         mapping=str(MAPPING),
     )
     LocationRecord.objects.create(id=100, unlocode='AUSYD', name='Sydney')
-    output = tmp_path / 'target'
+    output = tmp_path / 'nested' / 'target'
 
+    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
 
     assert {path.stem for path in output.glob('*.csv')} == {
@@ -49,3 +51,25 @@ def test_export_snapshot_round_trips_fixture_rows_and_preserves_nulls(tmp_path):
     assert cargo['last_known_location_id'] == r'\N'
     assert cargo['next_expected_location_id'] == r'\N'
     assert cargo['calculated_at'] == '2026-11-07T10:11:12Z'
+
+
+@pytest.mark.parametrize(
+    ('options', 'missing_option'),
+    [
+        ({'out': 'target'}, '--mapping'),
+        ({'mapping': str(MAPPING)}, '--out'),
+    ],
+)
+def test_export_command_requires_mapping_and_output(options, missing_option):
+    with pytest.raises(CommandError, match=f'required: {missing_option}'):
+        call_command('export_data_snapshot', **options)
+
+
+def test_export_command_rejects_non_object_mapping(tmp_path):
+    mapping = tmp_path / 'mapping.yaml'
+    mapping.write_text('[]', encoding='utf-8')
+
+    with pytest.raises(CommandError) as error:
+        call_command('export_data_snapshot', mapping=str(mapping), out=str(tmp_path / 'target'))
+
+    assert str(error.value) == f'{mapping}: mapping must be an object'
