@@ -55,6 +55,20 @@ def test_monthly_report_summarizes_prior_month_started_loans_in_fee_order():
         isbn='7',
         lent_on=date(2026, 10, 1),
     )
+    Loan.objects.create(
+        id='R11',
+        member='beta',
+        isbn='11',
+        lent_on=date(2026, 10, 3),
+        returned_on=date(2026, 10, 19),
+    )
+    Loan.objects.create(
+        id='R12',
+        member='on_time',
+        isbn='12',
+        lent_on=date(2026, 10, 1),
+        returned_on=date(2026, 10, 15),
+    )
     output = StringIO()
 
     with patch('django.utils.timezone.localdate', return_value=date(2026, 11, 1)):
@@ -62,10 +76,11 @@ def test_monthly_report_summarizes_prior_month_started_loans_in_fee_order():
 
     assert output.getvalue() == (
         'member_id,loans_started,loans_returned_late,late_fees_cents\n'
-        'beta,2,1,475\n'
+        'beta,3,2,475\n'
         'delta,1,0,425\n'
         'alpha,1,1,0\n'
         'charlie,1,0,0\n'
+        'on_time,1,0,0\n'
     )
 
 
