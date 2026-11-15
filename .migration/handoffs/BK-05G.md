@@ -1,18 +1,18 @@
-## Handoff — afs-specialist-migrator · 2026-11-07T23:07:41Z
-**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-build-destination-deadline-dialogs` / https://github.com/martins-vds/ai-factory-pilot-target/pull/395  ·  **Last commit:** ff8225e
+## Handoff — afs-specialist-migrator · 2026-11-15T23:54:26Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-fix-dialogs-from-not-routed-table` / https://github.com/martins-vds/ai-factory-eval/pull/435  ·  **Last commit:** 69609b98
 ### Done
-- Setup checks passed; pinned source SHA is `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`.
-- Setup probe completed with exit 0; journal: `.migration/evidence/runs/BK-05G.md`.
-- Confirmed the BK-05E dashboard template's not-routed table has no destination/deadline dialog triggers or dialog container.
+- Implemented destination and deadline dialogs, opened from the not-routed table, using the booking application specification use cases.
+- Added focused dialog tests; `behavior` gate passed (466 tests), see `.migration/evidence/runs/BK-05G.md`.
+- `build` gate passed; CodeQL found no alerts.
+- Updated the destination, deadline, and dialog-chain ledger entries.
 ### Remaining
-- [ ] Resolve the ticket scope to allow updating `templates/booking/dashboard/not_routed_table.html` so the dialogs can be opened from the not-routed table.
-- [ ] Implement and test BK-05G after scope is approved, then update the three dialog ledger entries and replace this handoff with passing gate evidence.
+- [ ] Resolve the full idiom gate failure without changing out-of-scope `tests/conftest.py`.
+- [ ] Run the remaining profile gates through `afs-run` and update this return with their results.
 ### Decisions made
-- No application code was changed because the table integration requires a file outside the approved ticket scope.
+- Kept the change within BK-05G plus the approved not-routed-table scope extension; did not reformat the unrelated pre-existing `tests/conftest.py`.
 ### Blockers / questions
-- BK-05G lists `src/cargotracker/booking/interfaces/dialogs/views.py`, `templates/booking/dialogs/`, and `tests/booking/interfaces/test_dialogs.py`, while the existing not-routed table is in `templates/booking/dashboard/not_routed_table.html`.
-- The migration contract requires stopping and naming any additional required file; a human should approve adding the dashboard template to BK-05G or assign its UI integration to another ticket.
+- The profile-wide formatting check includes `tests/conftest.py`, which was already unformatted and is outside this ticket's approved files. A human must decide whether to extend scope to that file or resolve the baseline gate issue separately.
 ### Failing commands
-- None.
+- `.migration/harness/tools/afs-run --ticket BK-05G --name idiom -- bash -c 'ruff check && ruff format --check'` → exit 1, see `.migration/runs/BK-05G/20261115T235307159818Z-idiom.log:1-10`.
 ### Next step for the next session
-Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+After the formatter scope/baseline is resolved, rerun the idiom gate and the remaining CRAP, changed-code mutation, and regression gates through `afs-run`, then finalize the return.
