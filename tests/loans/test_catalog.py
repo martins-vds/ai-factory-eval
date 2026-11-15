@@ -97,3 +97,13 @@ def test_loan_list_export_escapes_field_and_record_delimiters(client):
     assert response.status_code == 200
     assert records[-1] == ['L4', 'a;b\nc', '123;456', '2026-02-01', '2026-02-15', '']
     assert response.content.endswith(b'\n')
+
+
+@pytest.mark.django_db
+def test_loan_page_shows_due_date_and_return_status(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'Loan L1' in response.content
+    assert b'Jan 16, 2026' in response.content
+    assert b'Not yet returned' in response.content

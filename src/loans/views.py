@@ -1,8 +1,7 @@
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.http import Http404, HttpResponse
+from django.shortcuts import render
 
 from src.loans.export import loan_line
-from src.loans.models import Loan
 from src.loans.repository import all_loans, find_loan
 
 
@@ -25,5 +24,7 @@ def loan_catalog(request):
 
 
 def loan_page(request, loan_id):
-    loan = get_object_or_404(Loan, pk=loan_id)
+    loan = find_loan(loan_id)
+    if loan is None:
+        raise Http404
     return render(request, 'loans/detail.html', {'loan': loan})
