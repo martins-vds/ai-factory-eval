@@ -1,0 +1,19 @@
+<article class="grid gap-4 py-5 sm:grid-cols-[1fr_auto]" id="loan-{{ loan.id }}">
+  <div>
+    <h2 class="text-xl font-semibold"><a class="underline decoration-[#d8cdbb] underline-offset-4" href="/ui/loans/{{ loan.id }}/">Loan {{ loan.id }}</a></h2>
+    <p class="mt-1 text-[#66705b]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+    {% if error %}<p class="mt-2 text-sm text-[#a94e37]" role="alert">{{ error }}</p>{% endif %}
+  </div>
+  <div class="sm:text-right">
+    <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+    {% if loan.returned_on %}
+    <p class="text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+    {% else %}
+    <p class="mt-2 text-sm font-semibold text-[#a94e37]">On loan</p>
+    <form method="post" action="{% url 'loan-return-ui' loan.id %}" hx-post="{% url 'loan-return-ui' loan.id %}" hx-target="#loan-{{ loan.id }}" hx-swap="outerHTML">
+      {% csrf_token %}
+      <button class="btn btn-outline btn-sm mt-2" type="submit">Return book</button>
+    </form>
+    {% endif %}
+  </div>
+</article>
