@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}The Lending Library · Loans{% endblock %}
+
+{% block content %}
+<section aria-labelledby="catalog-title" class="space-y-8">
+  <div class="max-w-3xl space-y-4">
+    <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#77744f]">The lending shelf</p>
+    <h1 id="catalog-title" class="text-5xl font-semibold leading-tight md:text-6xl">The Lending Library</h1>
+    <p class="max-w-2xl text-lg leading-relaxed text-[#686958]">
+      A quiet record of the books making their way through our neighborhood.
+    </p>
+  </div>
+
+  <div class="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)]">
+    <section aria-labelledby="loans-heading" class="card border border-[#d8cdbb] bg-[#fbf8f1] shadow-sm">
+      <div class="card-body">
+        <div class="flex items-end justify-between border-b border-[#e5ddcf] pb-4">
+          <div>
+            <p class="text-sm uppercase tracking-widest text-[#77744f]">Catalog</p>
+            <h2 id="loans-heading" class="card-title mt-1 text-2xl">On loan</h2>
+          </div>
+          <span class="badge badge-outline">{{ loans|length }} records</span>
+        </div>
+        <div class="divide-y divide-[#e5ddcf]">
+          {% for loan in loans %}
+          <article class="grid gap-3 py-5 sm:grid-cols-[5rem_minmax(0,1fr)_auto] sm:items-center">
+            <a class="btn btn-ghost btn-sm justify-self-start font-mono" href="{% url 'ui-loan-detail' loan_id=loan.pk %}">
+              {{ loan.pk }}
+            </a>
+            <div class="min-w-0">
+              <p class="truncate text-lg font-semibold">{{ loan.isbn }}</p>
+              <p class="text-sm text-[#686958]">Borrowed by {{ loan.member }}</p>
+            </div>
+            <p class="text-sm text-[#686958]">
+              Due <time datetime="{{ loan.due_on|date:'Y-m-d' }}">{{ loan.due_on|date:'M j, Y' }}</time>
+            </p>
+          </article>
+          {% empty %}
+          <p class="py-8 text-[#686958]">The catalog is quiet for now.</p>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <aside class="card h-fit border border-[#d8cdbb] bg-[#eae2d2] shadow-none">
+      <div class="card-body">
+        <p class="text-sm uppercase tracking-widest text-[#77744f]">A small note</p>
+        <h2 class="card-title text-2xl">Fourteen days, then home</h2>
+        <p class="leading-relaxed text-[#686958]">
+          Every book is lent for two weeks. Open a catalog record to see its lending dates.
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}No such loan · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl space-y-4">
+  <p class="text-sm font-semibold uppercase tracking-[0.2em] text-[#77744f]">Catalog record</p>
+  <h1 class="text-4xl font-semibold">No such loan</h1>
+  <p class="text-[#686958]">We couldn't find loan {{ loan_id }}.</p>
+  <a class="link link-hover" href="{% url 'ui-loan-list' %}">Return to the catalog</a>
+</section>
+{% endblock %}
