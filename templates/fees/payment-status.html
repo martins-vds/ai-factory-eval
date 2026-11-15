@@ -1,0 +1,5 @@
+<div id="payment-status" class="mt-6 rounded-lg border border-[#d8cdbb] bg-[#f5f0e5] p-4"
+     role="{% if feedback.success %}status{% else %}alert{% endif %}">
+  <p>{{ feedback.message }}</p>
+  {% if feedback.gateway_body %}<p class="mt-1 text-sm">{{ feedback.gateway_body }}</p>{% endif %}
+</div>
