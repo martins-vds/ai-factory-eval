@@ -1,0 +1,22 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#145
+setup_pr: null
+characterization_tier: A
+tier_evidence: "Ran ./legacy/run.sh (Maven 3.10.0, OpenJDK 17.0.21); the service listened on port 8080 and the exercised endpoints returned their expected seeded-loan, 200, 201, and missing-loan 404 responses."
+capabilities:
+  met: 11
+  gap: 8
+  waived: 1
+  not_applicable: 0
+gap_tickets:
+  - "new (step 5): build-run (target)"
+  - "new (step 5): characterization-harness (source)"
+  - "new (step 5): unit-integration-tests (source)"
+  - "new (step 5): coverage (source, best effort)"
+  - "new (step 5): crap (source, best effort)"
+  - "new (step 5): lint-format (source)"
+  - "new (step 5): lint-format (target)"
+  - "new (step 5): ui-end-to-end (both)"
+handoff: .migration/handoffs/SY-01.md
+validation: "pass: YAML and consistency checks passed; profile, capabilities, and return validate against schemas at harness commit f195ae3d25110bdcf4bd78cadd0676c25c614a5c; docker compose config passed. Harness validate.py remains dispatcher-owned."
