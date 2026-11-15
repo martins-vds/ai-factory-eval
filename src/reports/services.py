@@ -6,6 +6,8 @@ from typing import Protocol
 class MonthlyReportRepository(Protocol):
     def loans_started_between(self, start: date, end: date): ...
 
+    def loans_returned_between(self, start: date, end: date): ...
+
 
 @dataclass(frozen=True)
 class MemberMonthlyReport:
@@ -34,7 +36,10 @@ class MonthlyReport:
         for loan in self.repository.loans_started_between(month_start, month_end):
             summary = summaries.setdefault(loan.member, _MemberSummary())
             summary.loans_started += 1
-            if loan.returned_on is None or loan.returned_on <= loan.due_on:
+
+        for loan in self.repository.loans_returned_between(month_start, month_end):
+            summary = summaries.get(loan.member)
+            if summary is None or loan.returned_on <= loan.due_on:
                 continue
 
             summary.loans_returned_late += 1

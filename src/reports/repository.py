@@ -10,3 +10,10 @@ class DjangoMonthlyReportRepository:
             'lent_on',
             'returned_on',
         )
+
+    def loans_returned_between(self, start: date, end: date):
+        return Loan.objects.filter(returned_on__gte=start, returned_on__lt=end).only(
+            'member',
+            'lent_on',
+            'returned_on',
+        )
