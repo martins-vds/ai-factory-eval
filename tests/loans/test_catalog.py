@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
@@ -424,6 +424,7 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
@@ -455,3 +456,26 @@ def test_repository_write_rolls_back_failed_transaction():
         )
 
     assert Loan.objects.get(pk='L1').member == 'ana'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_repository_return_runs_row_lock_inside_atomic_transaction(monkeypatch):
+    loan = Loan.objects.create(
+        id='T1',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 1, 1),
+    )
+
+    select_for_update = Loan.objects.select_for_update
+
+    def select_for_update_inside_atomic_block(*args, **kwargs):
+        assert connection.in_atomic_block
+        return select_for_update(*args, **kwargs)
+
+    monkeypatch.setattr(Loan.objects, 'select_for_update', select_for_update_inside_atomic_block)
+    returned_on = timezone.localdate()
+    _, updated = LoanRepository().mark_returned(loan.pk, returned_on)
+
+    assert updated is True
+    assert Loan.objects.get(pk='T1').returned_on == returned_on
