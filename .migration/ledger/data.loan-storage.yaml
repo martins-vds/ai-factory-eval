@@ -6,10 +6,12 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#259]
+target:
+  components: [src.loans.models.Loan, src.loans.migrations.0001_initial]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_loan_list_matches_characterized_export, tests/loans/test_catalog.py::test_seeded_loan_changes_survive_database_connection_reopen]
 notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
