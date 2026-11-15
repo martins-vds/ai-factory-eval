@@ -20,6 +20,27 @@ specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
+  - >-
+    Provisional equivalent prior-run mutant #10 (`views.py:34`): the unknown-cargo `Http404`
+    detail changes to an XX-wrapped message; the public response remains the same generic 404.
+  - >-
+    Provisional equivalent prior-run mutant #13 (`views.py:37`): the unsatisfied-specification
+    `Http404` detail changes to an XX-wrapped message; the public response remains the same generic 404.
+  - >-
+    Provisional equivalent prior-run mutant #14 (`views.py:39`): `quote(..., safe="")` changes to
+    `safe="XXXX"`; X is unreserved, so both calls encode the path identically.
+  - >-
+    Provisional equivalent prior-run mutant #27 (`views.py:70`): the unknown-cargo `Http404`
+    detail changes to an XX-wrapped message; the public response remains the same generic 404.
+  - >-
+    Provisional equivalent prior-run mutant #40 (`views.py:95`): the missing-candidate default
+    changes from `''` to `'XXXX'`; either invalid signature produces the same 404.
+  - >-
+    Provisional equivalent prior-run mutant #44 (`views.py:97`): the `BadSignature` detail changes;
+    it is caught and replaced by the same generic invalid-selection 404.
+  - >-
+    Provisional equivalent prior-run mutant #46 (`views.py:100`): the invalid-selection `Http404`
+    detail changes to an XX-wrapped message; the public response remains the same generic 404.
 ledger_updated:
   - booking.routing-chain
   - booking.screen-route
