@@ -1,0 +1,3 @@
+# ADR-0039 mitigation 4: changes to workflows, agents, skills and the installed harness need the owner's review.
+/.github/ @martins-vds
+/.migration/harness/ @martins-vds
