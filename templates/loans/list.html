@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog · The Lending Library{% endblock %}
+
+{% block content %}
+<div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+  <section aria-labelledby="catalog-title">
+    <p class="text-xs uppercase tracking-[.2em] text-stone-600">The collection · {{ loans|length }} loans in view</p>
+    <h1 id="catalog-title" class="mb-4 mt-3 text-5xl font-medium md:text-6xl">Books in good company.</h1>
+    <p class="mb-8 max-w-2xl text-lg text-stone-600">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    <div aria-label="Loan catalog">
+      {% for loan in loans %}
+      <article class="grid gap-4 border-b border-stone-300 py-5 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <p class="text-xl font-semibold">{{ loan.member }}</p>
+          <p class="text-sm text-stone-600">Loan {{ loan.id }} · ISBN {{ loan.isbn }}</p>
+          <p class="mt-2">Due {{ loan.due_on|date:"M j, Y" }}</p>
+          {% if loan.returned_on %}<p class="text-sm text-stone-600">Returned {{ loan.returned_on|date:"M j, Y" }}</p>{% endif %}
+        </div>
+        <a class="btn btn-sm border-0 text-white" style="background:var(--accent)" href="{% url 'ui-loan-detail' loan.id %}">
+          Read record <span aria-hidden="true">→</span>
+        </a>
+      </article>
+      {% empty %}
+      <p class="border-y border-stone-300 py-8 text-stone-600">No loans are in the collection yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="h-fit border border-stone-300 p-6" style="background:var(--surface)">
+    <p class="text-xs uppercase tracking-[.2em] text-stone-600">At the desk</p>
+    <h2 class="mb-3 mt-2 text-2xl">A shared collection</h2>
+    <p class="leading-relaxed text-stone-600">Every book has a reader, a return date, and another story waiting.</p>
+    <a class="mt-5 inline-block font-semibold underline decoration-[var(--accent)] underline-offset-4" href="{% url 'loan-list' %}">
+      Browse the text export
+    </a>
+  </aside>
+</div>
+{% endblock %}

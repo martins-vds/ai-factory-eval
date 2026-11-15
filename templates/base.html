@@ -1,0 +1,52 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}The Lending Library{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"></script>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #2f3428;
+      --paper: #f5f0e5;
+      --accent: #a94e37;
+      --line: #d8cdbb;
+      --surface: #fffdf7;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      min-height: 100vh;
+    }
+
+    a:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <header class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-5 px-6 py-7">
+    <a class="text-2xl font-bold tracking-tight" href="{% url 'ui-loan-list' %}">
+      The Lending Library
+      <span class="ml-1 text-sm font-normal">/ a neighborhood collection</span>
+    </a>
+    <nav aria-label="Library pages" class="flex items-center gap-2 text-sm">
+      <a class="btn btn-ghost btn-sm" href="{% url 'ui-loan-list' %}">Loans</a>
+      <a class="btn btn-ghost btn-sm" href="{% url 'loan-list' %}">Text export</a>
+    </nav>
+  </header>
+  <main id="main-content" class="mx-auto max-w-6xl px-6 pb-16" hx-boost="true">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="border-t border-stone-300 px-6 py-6 text-center text-sm text-stone-600">
+    Books are lent for 14 days. Handle every story with care.
+  </footer>
+</body>
+</html>
