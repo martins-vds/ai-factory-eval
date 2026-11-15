@@ -1,0 +1,81 @@
+harness_version: 0.2.0
+source:
+  repo: martins-vds/ai-factory-synthetic-target
+  sha: 563c316ed51462b08fd6e58f3781a3c8b2890453
+  path: legacy
+  stacks: [java-17, jax-rs, jpa-hibernate, h2, grizzly]
+  encoding: UTF-8
+target:
+  repo: martins-vds/ai-factory-eval
+  stacks:
+    backend: [python-3.13, django-5]
+    frontend: [django-templates]
+    data: [postgresql-17]
+  architecture:
+    style: clean-architecture
+    adrs: []
+characterization:
+  tier: A
+  reason: "`./legacy/run.sh` builds and starts the legacy app, and its HTTP endpoints were exercised; see references/characterization.md."
+graph:
+  tool: understand-anything
+  commit: 4e6d3299017a7432da15957874992837a315c5b4
+  patches: [understand-anything/argument-hint.patch]
+  enrich:
+    source: [java-ee]
+    target: [django]
+  require:
+    source:
+      nodes: [table, page, endpoint]
+      edges: [reads_from, writes_to, routes, calls]
+    target:
+      nodes: [table, endpoint]
+      edges: [reads_from, writes_to, routes, calls]
+risk_map:
+  exclude: ["*.min.js", "*/vendor/*", "*/generated/*"]
+skills:
+  source:
+    read: [java-docs]
+    characterize: [java-junit]
+  target:
+    patterns: [django-patterns]
+    security: [django-security]
+    tdd: [django-tdd]
+    verify: [django-verification]
+    coverage: [pytest-coverage]
+    performance: [python-performance-optimization]
+  specialists:
+    data: [postgresql-code-review, postgresql-optimization]
+gates:
+  build: ["python -m compileall -q src", "python manage.py check"]
+  idiom: ["ruff check", "ruff format --check"]
+  tests: ["pytest -q"]
+  crap:
+    - "pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov"
+    - "lizard --csv src > .migration/runs/lizard.csv"
+    - "python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30"
+  mutation_changed: ["python .migration/harness/tools/afs-mutation --changed-since origin/main"]
+  mutation_full: ["python .migration/harness/tools/afs-mutation --all"]
+thresholds:
+  crap_max_per_method: 30
+  mutation_score_min: 0.8
+concurrency:
+  max_parallel_workers: 4
+  remote_workers: true
+context:
+  working_budget: 0.45
+  soft_limit: 0.6
+rtk:
+  edition: oss
+  version: 1.1.0
+services:
+  compose: compose.yaml
+  test: [db]
+  env:
+    PGHOST: 127.0.0.1
+    PGPORT: "5432"
+    PGDATABASE: library
+    PGUSER: library
+    PGPASSWORD: library
+signoff:
+  approvers: [martins-vds]
