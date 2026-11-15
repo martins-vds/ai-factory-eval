@@ -8,6 +8,7 @@ source:
   stacks: [java-8, java-ee-7, jsf-2.2, primefaces-8, cdi-1.1, ejb-3.2, jpa-2.1-eclipselink, jax-rs-2-jersey, jms-2, jbatch-1.0, payara-4, derby]
   encoding: UTF-8
 target:
+  shared_test_files: [tests/conftest.py]   # project-wide test isolation any ticket may change
   repo: martins-vds/ai-factory-pilot-target
   stacks:
     backend: [python-3.13, django-5]
