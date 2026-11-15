@@ -33,7 +33,7 @@ def loan_list(request):
 
 def loan_lend(request):
     if request.method == 'GET':
-        return render(request, 'loans/new.html', {'form': LoanLendForm()})
+        return render(request, 'loans/new.html')
     if request.method != 'POST':
         return HttpResponse(status=405)
 
@@ -41,7 +41,9 @@ def loan_lend(request):
     if not form.is_valid():
         response = render(
             request,
-            'loans/_loan_form.html' if request.headers.get('HX-Request') == 'true' else 'loans/new.html',
+            'loans/_loan_form.html'
+            if request.headers.get('HX-Request') == 'true'
+            else 'loans/new.html',
             {'form': form},
             status=400,
         )
@@ -52,7 +54,7 @@ def loan_lend(request):
         return render(
             request,
             'loans/_loan_form.html',
-            {'form': LoanLendForm(), 'message': f'Loan {loan.id} created.'},
+            {'message': f'Loan {loan.id} created.'},
             status=201,
         )
     return redirect('loan_catalog_detail', loan_id=loan.id)
