@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 from django.utils import timezone
+from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 
@@ -172,9 +173,7 @@ def test_payment_api_does_not_call_gateway_for_unknown_loan(client, payment_gate
 
 
 @pytest.mark.django_db
-def test_payment_api_maps_connection_failure_to_characterized_gateway_failure(
-    client, monkeypatch
-):
+def test_payment_api_maps_connection_failure_to_characterized_gateway_failure(client, monkeypatch):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
 
     response = client.post('/payments/L1')
@@ -201,7 +200,43 @@ def test_payment_api_preserves_interruption_while_returning_gateway_failure(
 
     assert response.status_code == 502
     assert response.content == b'payment gateway unavailable\n'
+    assert 'PaymentInterrupted: payment gateway request was interrupted' in caplog.text
     assert 'InterruptedError: gateway call interrupted' in caplog.text
+
+
+@pytest.mark.django_db
+def test_payment_api_uses_configured_default_gateway_url(client, monkeypatch):
+    from src.fees import gateway
+
+    class GatewayResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def read(self):
+            return b'charged\n'
+
+    class GatewayOpener:
+        request = None
+
+        def open(self, request):
+            self.request = request
+            return GatewayResponse()
+
+    opener = GatewayOpener()
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    monkeypatch.setattr(gateway, 'build_opener', lambda *handlers: opener)
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 200
+    assert opener.request.full_url == ('https://payments.lending-library.invalid/charge?loan=L1')
+    assert opener.request.get_method() == 'POST'
+    assert opener.request.data == b''
 
 
 @pytest.mark.django_db
@@ -216,6 +251,34 @@ def test_ui_payment_updates_htmx_status_after_success(client, payment_gateway):
 
 
 @pytest.mark.django_db
+def test_regular_ui_payment_renders_full_fee_page_with_status(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert b'Payment successful.' in response.content
+    assert b'id="payment-status"' in response.content
+    assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_browser_can_pay_late_fee_from_fee_page(live_server, payment_gateway):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            page.get_by_role('button', name='Pay late fee').click()
+            status = page.get_by_role('status')
+            status.wait_for()
+
+            assert status.inner_text() == 'Payment successful.'
+            assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
 def test_ui_payment_updates_htmx_status_after_gateway_failure(client, payment_gateway):
     payment_gateway.status = 503
     payment_gateway.body = b'declined\n'
@@ -225,3 +288,20 @@ def test_ui_payment_updates_htmx_status_after_gateway_failure(client, payment_ga
     assert response.status_code == 200
     assert b'role="alert"' in response.content
     assert b'Payment could not be processed.' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/fees/L1/', 'post'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway.requests == []
