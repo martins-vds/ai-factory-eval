@@ -31,3 +31,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T07:21:14+00:00 | idiom-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-15T07:21:18+00:00 | format-check | 1 | 0.02 | `ruff format --check` | `c0cd83c72249130e` | -     assert updated_cargo.route_specification.arrival_deadline == datetime( |  |
 | 2026-11-15T07:21:32+00:00 | format-check | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-15T07:25:19+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:25:23+00:00 | django-check | 0 | 0.27 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T07:26:05+00:00 | behavior | 0 | 37.17 | `pytest -q` | `e24c3ff4e5e007bf` |  |  |
+| 2026-11-15T07:26:49+00:00 | regression | 0 | 37.4 | `pytest -q` | `50c93271d17864a7` |  |  |
+| 2026-11-15T07:27:32+00:00 | crap-coverage | 0 | 37.37 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `693f7107c98d2fe7` |  |  |
+| 2026-11-15T07:27:38+00:00 | crap-lizard | 0 | 0.1 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T07:27:44+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `c39a1df9986b8fca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
