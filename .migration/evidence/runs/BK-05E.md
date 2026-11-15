@@ -30,3 +30,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T17:56:16+00:00 | crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-15T17:56:16+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
 | 2026-11-15T18:29:11+00:00 | mutation_changed | 2 | 1965.34 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `07532ee1e98d7ec5` | afs-mutation: mutmut failed on src/cargotracker/cargo/domain/delivery.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=3 files=79 base=origin/main |
+| 2026-11-15T18:32:30+00:00 | final-regression | 1 | 53.03 | `pytest -q` | `a0865e83139ff0d5` | assert unknown_response.status_code == 404 |  |
