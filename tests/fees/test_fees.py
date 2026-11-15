@@ -3,6 +3,7 @@ from datetime import date
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 
@@ -105,3 +106,96 @@ def test_payment_endpoint_forwards_the_gateway_success(payment_gateway, client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content == b'charged\n'
     assert payment_gateway[1] == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_maps_non_200_gateway_responses_to_502(payment_gateway, client):
+    payment_gateway[0].update(status=503, body=b'declined\n')
+
+    response = client.post('/payments/L2')
+
+    assert response.status_code == 502
+    assert response.content == b'declined\n'
+    assert payment_gateway[1] == [('POST', '/charge?loan=L2', b'')]
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan(payment_gateway, client):
+    response = client.post('/payments/unknown')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert payment_gateway[1] == []
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_maps_gateway_connection_failures_to_502(client, monkeypatch):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_logs_an_interrupted_gateway_call(client, caplog, monkeypatch):
+    from src.fees import gateway
+
+    def interrupt(_request):
+        raise InterruptedError('request interrupted')
+
+    monkeypatch.setattr(gateway, 'urlopen', interrupt)
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+    assert 'InterruptedError: request interrupted' in caplog.text
+
+
+@pytest.mark.django_db
+def test_fee_page_htmx_action_shows_gateway_success(payment_gateway, client):
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="status"' in response.content
+    assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_can_view_and_pay_a_late_fee(payment_gateway, live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+
+            assert page.get_by_text('19 day(s) late.').is_visible()
+            assert page.get_by_text('Late fee: $4.75').is_visible()
+            page.get_by_role('button', name='Pay late fee').click()
+
+            result = page.get_by_role('status')
+            result.wait_for()
+            assert result.inner_text() == 'charged'
+        finally:
+            browser.close()
+    assert payment_gateway[1] == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/fees/L3/', 'post'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+@pytest.mark.django_db
+def test_fee_and_payment_routes_reject_unsupported_methods(client, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
