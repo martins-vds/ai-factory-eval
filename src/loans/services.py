@@ -4,6 +4,14 @@ from io import StringIO
 from .repository import LoanRepository
 
 
+def lend_loan(member, isbn):
+    return LoanRepository().lend(member, isbn)
+
+
+def return_loan(loan_id):
+    return LoanRepository().mark_returned(loan_id)
+
+
 def loan_line(loan):
     output = StringIO(newline='')
     writer = csv.writer(output, delimiter=';', lineterminator='\n')

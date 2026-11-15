@@ -1,0 +1,48 @@
+<form
+  id="lend-form"
+  method="post"
+  action="{% url 'loan-lend' %}"
+  hx-post="{% url 'loan-lend' %}"
+  hx-target="#lend-form"
+  hx-swap="outerHTML"
+  class="grid gap-5"
+>
+  {% csrf_token %}
+  <div>
+    <label class="label" for="{{ form.member.id_for_label }}">Member</label>
+    <input
+      class="input input-bordered w-full"
+      id="{{ form.member.id_for_label }}"
+      name="{{ form.member.html_name }}"
+      value="{{ form.member.value|default_if_none:'' }}"
+      maxlength="255"
+      required
+      aria-invalid="{% if form.member.errors %}true{% else %}false{% endif %}"
+      {% if form.member.errors %}aria-describedby="member-errors"{% endif %}
+    >
+    {% if form.member.errors %}
+    <p class="mt-1 text-sm text-[#a94e37]" id="member-errors" role="alert">
+      {% for error in form.member.errors %}{{ error }}{% endfor %}
+    </p>
+    {% endif %}
+  </div>
+  <div>
+    <label class="label" for="{{ form.isbn.id_for_label }}">ISBN</label>
+    <input
+      class="input input-bordered w-full"
+      id="{{ form.isbn.id_for_label }}"
+      name="{{ form.isbn.html_name }}"
+      value="{{ form.isbn.value|default_if_none:'' }}"
+      maxlength="255"
+      required
+      aria-invalid="{% if form.isbn.errors %}true{% else %}false{% endif %}"
+      {% if form.isbn.errors %}aria-describedby="isbn-errors"{% endif %}
+    >
+    {% if form.isbn.errors %}
+    <p class="mt-1 text-sm text-[#a94e37]" id="isbn-errors" role="alert">
+      {% for error in form.isbn.errors %}{{ error }}{% endfor %}
+    </p>
+    {% endif %}
+  </div>
+  <button class="btn btn-primary w-fit" type="submit">Lend book</button>
+</form>
