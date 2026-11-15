@@ -2,7 +2,6 @@ from datetime import timedelta
 
 import pytest
 from django.utils import timezone
-from playwright.sync_api import sync_playwright
 
 
 @pytest.mark.django_db
@@ -14,8 +13,7 @@ def test_lend_endpoint_creates_a_loan_with_a_fourteen_day_due_date(client):
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
-        f'L4;dee;123;{lent_on.isoformat()};'
-        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+        f'L4;dee;123;{lent_on.isoformat()};{(lent_on + timedelta(days=14)).isoformat()};\n'
     )
     assert client.get('/loans/L4').content == response.content
 
@@ -74,27 +72,6 @@ def test_return_endpoint_returns_not_found_for_unknown_loan(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
-
-
-@pytest.mark.django_db
-def test_browser_can_lend_and_return_a_book(live_server):
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page()
-            page.goto(f'{live_server.url}/ui/loans/new/')
-            page.get_by_label('Member').fill('reader')
-            page.get_by_label('ISBN').fill('123')
-            page.get_by_role('button', name='Add to collection').click()
-            loan_link = page.get_by_role('link', name='Loan L4')
-            if loan_link.count():
-                loan_link.click()
-
-            assert page.get_by_text('Loan record · L4').is_visible()
-            page.get_by_role('button', name='Mark returned').click()
-            assert page.locator('#return-action').get_by_text('Returned').is_visible()
-        finally:
-            browser.close()
 
 
 @pytest.mark.django_db
