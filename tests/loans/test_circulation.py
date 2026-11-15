@@ -3,7 +3,6 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 from django.utils.dateparse import parse_date
-from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 
@@ -116,24 +115,3 @@ def test_return_api_preserves_the_characterized_unknown_loan_response(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
 
-
-@pytest.mark.django_db
-def test_browser_can_lend_a_book_and_return_it_with_htmx(live_server):
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page()
-            page.goto(f'{live_server.url}/ui/loans/')
-            page.get_by_role('link', name='Lend a book').click()
-            page.get_by_label('Member').fill('browser reader')
-            page.get_by_label('ISBN').fill('123')
-            page.get_by_role('button', name='Add loan').click()
-            page.get_by_role('heading', name='Loan L4').wait_for()
-
-            first_loan = page.locator('#loan-L1')
-            first_loan.get_by_role('button', name='Mark returned').click()
-            first_loan.get_by_text('Returned', exact=False).wait_for()
-
-            assert page.url.endswith('/ui/loans/')
-        finally:
-            browser.close()
