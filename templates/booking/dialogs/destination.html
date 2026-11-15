@@ -1,0 +1,46 @@
+<dialog open aria-labelledby="destination-dialog-heading" class="fixed inset-0 z-50 m-0 flex h-dvh w-screen max-w-none items-center justify-center bg-slate-950/50 p-4">
+  <div class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+    <h2 id="destination-dialog-heading" class="mb-4 text-xl font-semibold text-slate-900">
+      Change destination for {{ cargo.tracking_id.value }}
+    </h2>
+    <p class="mb-4 text-slate-700">
+      Origin: {{ cargo.route_specification.origin.name }}
+      ({{ cargo.route_specification.origin.unlocode.value }})<br>
+      Current destination: {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </p>
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+      class="flex flex-col gap-5"
+    >
+      {% csrf_token %}
+      <label class="flex flex-col gap-2 font-medium text-slate-800" for="destination">
+        New destination
+        <select
+          id="destination"
+          name="destination"
+          class="min-h-11 rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-blue-700"
+          {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+          autofocus
+        >
+          {% for location in destinations %}
+            <option value="{{ location.unlocode.value }}">
+              {{ location.name }} ({{ location.unlocode.value }})
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+      {% if destination_error %}
+        <p id="destination-error" role="alert" class="text-red-700">{{ destination_error }}</p>
+      {% endif %}
+      <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+        <a class="min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" href="/admin/dashboard/">Cancel</a>
+        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update</button>
+      </nav>
+    </form>
+  </div>
+</dialog>
