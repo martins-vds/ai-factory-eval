@@ -13,8 +13,9 @@ from src.loans.models import Loan
         (0, '$0.00'),
         (1, '$0.00'),
         (2, '$0.00'),
-        (3, '$0.25'),
-        (40, '$9.50'),
+        (3, '$0.75'),
+        (19, '$4.75'),
+        (40, '$10.00'),
         (42, '$10.00'),
         (100, '$10.00'),
     ],
@@ -57,7 +58,7 @@ def test_fee_for_returned_loan_uses_return_date_instead_of_today(client, monkeyp
 
     assert response.status_code == 200
     assert f'Due {due_on.isoformat()}, 3 day(s) late.'.encode() in response.content
-    assert b'Fee: $0.25' in response.content
+    assert b'Fee: $0.75' in response.content
 
 
 @pytest.mark.django_db

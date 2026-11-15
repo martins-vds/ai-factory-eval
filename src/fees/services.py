@@ -27,7 +27,7 @@ class PaymentResult:
 def calculate_late_fee(loan, today: date | None = None) -> LateFee:
     assessed_on = loan.returned_on or today or timezone.localdate()
     days_late = max(0, (assessed_on - loan.due_on).days)
-    fee_cents = min(max(days_late - 2, 0) * 25, 1000)
+    fee_cents = min(days_late * 25, 1000) if days_late > 2 else 0
     return LateFee(days_late, Decimal(fee_cents) / 100)
 
 
