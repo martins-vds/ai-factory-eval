@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import transaction
 
 from .models import Loan
@@ -13,3 +15,13 @@ class LoanRepository:
     @transaction.atomic
     def create(self, **fields):
         return Loan.objects.create(**fields)
+
+    @transaction.atomic
+    def lend(self, member, isbn):
+        loan_id = f'L{Loan.objects.count() + 1}'
+        return Loan.objects.create(
+            id=loan_id,
+            member=member,
+            isbn=isbn,
+            lent_on=date.today(),
+        )
