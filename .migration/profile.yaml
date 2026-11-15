@@ -6,6 +6,7 @@ source:
   stacks: [java-17, java-ee, maven, jax-rs-3.1, hibernate-orm-6.4, h2-2.2]
   encoding: UTF-8
 target:
+  shared_test_files: [tests/conftest.py]   # project-wide test isolation any ticket may change
   repo: martins-vds/ai-factory-synthetic-target
   stacks:
     backend: [python-3.13, django-5]
