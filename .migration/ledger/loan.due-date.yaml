@@ -7,8 +7,10 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/Loan.java:44-46
 boundary: "Every loan is due 14 calendar days after its lentOn date; the due date is included in loan text output and late-fee calculation."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
-verification: differential
+tickets: [martins-vds/ai-factory-eval#168]
+target:
+  components: [src.loans.models.Loan.due_on, src.loans.export.loan_line]
+status: migrated
+verification: characterized
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_loan_detail_api_returns_one_record_with_due_date, tests/loans/test_catalog.py::test_loan_page_shows_due_date_and_return_status]

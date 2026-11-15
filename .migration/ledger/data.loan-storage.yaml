@@ -6,10 +6,11 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
-verification: differential
+tickets: [martins-vds/ai-factory-eval#168]
+target:
+  components: [src.loans.models.Loan, src.loans.repository]
+status: migrated
+verification: characterized
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
-quirks: [martins-vds/ai-factory-synthetic-target#42]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_repository_commits_new_loan_records, tests/loans/test_catalog.py::test_reapplying_migrations_preserves_persisted_loans, tests/loans/test_catalog.py::test_loan_model_matches_its_migrations, tests/loans/test_catalog.py::test_unreturned_loan_is_valid_with_no_return_date, tests/loans/test_catalog.py::test_catalog_preserves_long_loan_fields_through_text_api]
+notes: "Approved divergence in martins-vds/ai-factory-synthetic-target#42: target records persist in PostgreSQL across restarts rather than resetting to seed data."

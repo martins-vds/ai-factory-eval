@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl py-8" aria-labelledby="loan-title">
+  <a class="mb-8 inline-block text-sm underline underline-offset-4" href="{% url 'ui-loan-list' %}">← Back to the collection</a>
+  <p class="text-xs uppercase tracking-[.2em] text-stone-600">The collection · loan record</p>
+  <h1 id="loan-title" class="mb-8 mt-3 text-5xl font-medium">Loan {{ loan.id }}</h1>
+  <dl class="border-y border-stone-300" style="background:var(--surface)">
+    <div class="grid gap-2 border-b border-stone-300 px-6 py-5 sm:grid-cols-[10rem_1fr]">
+      <dt class="text-stone-600">Member</dt><dd class="font-semibold">{{ loan.member }}</dd>
+    </div>
+    <div class="grid gap-2 border-b border-stone-300 px-6 py-5 sm:grid-cols-[10rem_1fr]">
+      <dt class="text-stone-600">ISBN</dt><dd>{{ loan.isbn }}</dd>
+    </div>
+    <div class="grid gap-2 border-b border-stone-300 px-6 py-5 sm:grid-cols-[10rem_1fr]">
+      <dt class="text-stone-600">Lent</dt><dd>{{ loan.lent_on|date:"M j, Y" }}</dd>
+    </div>
+    <div class="grid gap-2 border-b border-stone-300 px-6 py-5 sm:grid-cols-[10rem_1fr]">
+      <dt class="text-stone-600">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd>
+    </div>
+    <div class="grid gap-2 px-6 py-5 sm:grid-cols-[10rem_1fr]">
+      <dt class="text-stone-600">Returned</dt>
+      <dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd>
+    </div>
+  </dl>
+</section>
+{% endblock %}
