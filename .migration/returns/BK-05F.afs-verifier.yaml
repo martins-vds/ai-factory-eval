@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/338
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no-mutable-code-changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+builder_mutation_evidence: "0.855, threshold 0.8; .migration/evidence/runs/BK-05F.md, 2026-11-08T00:26:25+00:00"
+ledger_review:
+  - booking.routing-chain: RoutingService-backed use case; target view calls CargoRouting.route_candidates.
+  - booking.screen-route: Populated and empty screen behavior has target tests and gate evidence.
+  - booking.screen-select-itinerary: Candidate and empty states are covered; approved #252 behavior is present.
+  - booking.routing-assign: UI assignment redirects to details; BK-05C tests persisted itinerary and ROUTED state.
+survivor_review:
+  - "#1, #2: Paired token signing and verification use the same salt; only opaque token values change."
+  - "#10, #13, #27, #46: Http404 diagnostic text changes; 404 status and route flow are unchanged."
+  - "#14: X is unreserved in URL quoting, so redirect URL is unchanged."
+  - "#40: Both empty and XXXX inputs fail signing validation and map to the same 404."
+  - "#44: Wrapped BadSignature text is caught and does not change the response."
