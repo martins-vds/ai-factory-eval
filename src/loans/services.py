@@ -32,9 +32,15 @@ def get_loan_text(loan_id):
 
 
 def lend_book(member, isbn):
-    loan = LoanRepository().lend(
+    return LoanRepository().lend(
         member=member,
         isbn=isbn,
         lent_on=timezone.localdate(),
     )
-    return loan_line(loan)
+
+
+def return_loan(loan_id):
+    return LoanRepository().mark_returned(
+        loan_id,
+        timezone.localdate(),
+    )
