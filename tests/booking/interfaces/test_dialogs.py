@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.core.management import call_command
@@ -9,6 +9,7 @@ from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
+from cargotracker.cargo.domain.delivery import RoutingStatus
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -91,8 +92,20 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize(
+    ('dialog', 'method'),
+    [
+        ('destination', 'get'),
+        ('destination', 'post'),
+        ('deadline', 'get'),
+        ('deadline', 'post'),
+    ],
+)
+def test_unknown_cargo_dialog_returns_not_found(client, dialog, method):
+    response = getattr(client, method)(
+        f'/admin/cargo/MISSING1/{dialog}/',
+        HTTP_HX_REQUEST='true',
+    )
 
     assert response.status_code == 404
 
@@ -212,3 +225,45 @@ def test_deadline_update_preserves_route_and_refreshes_not_routed_row(client):
     assert updated.itinerary == cargo.itinerary
     assert '01/15/2027' in not_routed_table
     assert 'Widget for var' not in response.content.decode()
+
+
+def test_destination_update_recalculates_routing_status(client):
+    cargo = cargo_repository.find(TrackingId('ABC123'))
+    assert cargo is not None
+    assert cargo.delivery.routing_status is RoutingStatus.ROUTED
+    destination = next(
+        location
+        for location in shipping_locations
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
+
+    response = client.post(
+        '/admin/cargo/ABC123/destination/',
+        {'destination': destination.unlocode.value},
+    )
+    updated = cargo_repository.find(TrackingId('ABC123'))
+
+    assert response.status_code == 302
+    assert updated is not None
+    assert updated.route_specification.destination == destination
+    assert updated.itinerary == cargo.itinerary
+    assert updated.delivery.routing_status is RoutingStatus.MISROUTED
+
+
+def test_deadline_update_recalculates_routing_status(client):
+    cargo = cargo_repository.find(TrackingId('ABC123'))
+    assert cargo is not None
+    assert cargo.delivery.routing_status is RoutingStatus.ROUTED
+    deadline = cargo.itinerary.legs[-1].unload_time.date() - timedelta(days=1)
+
+    response = client.post(
+        '/admin/cargo/ABC123/deadline/',
+        {'deadline': deadline.isoformat()},
+    )
+    updated = cargo_repository.find(TrackingId('ABC123'))
+
+    assert response.status_code == 302
+    assert updated is not None
+    assert updated.route_specification.arrival_deadline.date() == deadline
+    assert updated.itinerary == cargo.itinerary
+    assert updated.delivery.routing_status is RoutingStatus.MISROUTED
