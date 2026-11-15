@@ -1,0 +1,25 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#326
+setup_pr: null
+characterization_tier: A
+tier_evidence: "Ran legacy/run.sh; the service built and started on port 8080, and seeded loans, fee, payment, about, return, and unknown-loan responses were probed. See .migration/references/characterization.md."
+capabilities:
+  met: 6
+  gap: 11
+  waived: 0
+  not_applicable: 0
+gap_tickets:
+  - "new: build-run (target)"
+  - "new: characterization-harness (source)"
+  - "new: unit-integration-tests (both)"
+  - "new: coverage (source)"
+  - "new: coverage (target)"
+  - "new: crap (source)"
+  - "new: crap (target)"
+  - "new: mutation-testing (both)"
+  - "new: lint-format (both)"
+  - "new: data-migration (both)"
+  - "new: ui-end-to-end (both)"
+validation: "Pass: YAML parsed, source/profile bindings and capability counts verified, and docker compose config passed. Full harness validation is deferred until step 5 installs validate.py."
+handoff: .migration/handoffs/SY-01.md
