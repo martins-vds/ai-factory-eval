@@ -14,6 +14,6 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_updates_a_loan_and_rejects_repeated_returns, tests/loans/test_circulation.py::test_return_unknown_loan_returns_not_found, tests/loans/test_circulation.py::test_reading_room_returns_useful_responses_for_repeats_and_unknown_loans]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_updates_a_loan_and_rejects_repeated_returns, tests/loans/test_circulation.py::test_return_unknown_loan_returns_not_found, tests/loans/test_circulation.py::test_reading_room_returns_useful_responses_for_repeats_and_unknown_loans, tests/loans/test_circulation.py::test_reading_room_return_redirects_after_first_return]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

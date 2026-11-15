@@ -11,7 +11,7 @@ from src.loans.models import Loan
 @pytest.mark.django_db
 def test_lending_creates_a_formatted_loan_with_escaped_fields(client):
     member = ' Reader; Example\nSecond line '
-    isbn = '978"xyz'
+    isbn = ' 978"xyz '
     today = timezone.localdate()
 
     response = client.post('/loans', {'member': member, 'isbn': isbn})
@@ -131,6 +131,7 @@ def test_reading_room_can_lend_and_return_with_htmx(client):
     )
 
     assert return_response.status_code == 200
+    assert b'Loan L1' in return_response.content
     assert b'role="status">L1 marked returned today.</p>' in return_response.content
     assert b'hx-post="/ui/loans/L1/return/"' not in return_response.content
 
@@ -148,10 +149,20 @@ def test_reading_room_can_lend_and_return_with_htmx(client):
 
 
 @pytest.mark.django_db
+def test_reading_room_return_redirects_after_first_return(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
 def test_reading_room_returns_useful_responses_for_repeats_and_unknown_loans(client):
     repeated_response = client.post('/ui/loans/L2/return/')
 
     assert repeated_response.status_code == 409
+    assert b'Loan L2 was already returned on Jan 20, 2026.' in repeated_response.content
     assert b'The original return date has been kept.' in repeated_response.content
 
     missing_response = client.post(
