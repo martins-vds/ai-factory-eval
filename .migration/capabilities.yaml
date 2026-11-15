@@ -1,0 +1,105 @@
+harness_version: 0.2.0
+checked_at: "2026-11-15T02:26:07Z"
+characterization:
+  legacy_environment: unavailable
+  source_builds: unknown
+  blockers:
+    - "legacy/run.sh remained in Maven dependency resolution for 5m28s without starting the server; the command was stopped."
+    - "The isolated Loan.java compile failed because jakarta.persistence is unavailable in the local classpath."
+  tier: C
+  reason: "The pinned source cannot be run or compiled in isolation in this session."
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "Maven did not complete dependency resolution; Java source could not be run."
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "The target application and Django build environment are not scaffolded yet."
+  - id: characterization-harness
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No legacy test sources or JUnit dependency are present; isolated compilation failed."
+  - id: unit-integration-tests
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "The target test runner is part of the later scaffold."
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source test suite or coverage runner is available."
+  - id: coverage
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Coverage tooling is part of the later scaffold."
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard, version: "1.24.3" }
+  - id: crap
+    applies_to: source
+    status: met
+    best_effort: true
+    provided_by:
+      - { kind: tool, name: crap.py }
+    notes: "Best-effort source risk mapping uses complexity without source coverage."
+  - id: crap
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "The target coverage and CRAP gate are part of the later scaffold."
+  - id: mutation-testing
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Mutation testing is part of the later scaffold."
+  - id: lint-format
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "The target lint and format tools are part of the later scaffold."
+  - id: stack-idioms
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "The pinned stack pack has Java documentation and test skills, but no Java idiom skill."
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: django-patterns }
+      - { kind: skill, name: django-security }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: "The source uses H2; the pinned database migration skills cover Oracle rather than H2-to-PostgreSQL."
+  - id: ui-end-to-end
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: "No runnable source UI or target UI test harness is available."
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)", version: "f195ae3d25110bdcf4bd78cadd0676c25c614a5c" }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
