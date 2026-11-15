@@ -36,3 +36,23 @@ def test_monthly_report_aggregates_previous_month_loans(monkeypatch):
         ['zeta', '1', '1', '75'],
         ['current', '1', '0', '0'],
     ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_uses_december_when_run_on_january_first(monkeypatch):
+    Loan.objects.all().delete()
+    Loan.objects.bulk_create(
+        [
+            Loan('december-1', 'december', '108', date(2025, 12, 31)),
+            Loan('january-1', 'january', '109', date(2026, 1, 1)),
+        ]
+    )
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 1, 1))
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert list(csv.reader(StringIO(output.getvalue()))) == [
+        ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
+        ['december', '1', '0', '0'],
+    ]
