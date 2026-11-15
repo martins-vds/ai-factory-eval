@@ -1,0 +1,23 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#190
+setup_pr: null
+characterization_tier: A
+tier_evidence: "legacy/run.sh built and started the app; curl probes covered the loan list/lookup/create/return, late-fee success/error, payment-gateway failure, and About endpoints. Responses are in .migration/references/characterization.md."
+capabilities:
+  met: 6
+  gap: 10
+  waived: 1
+  not_applicable: 0
+gap_tickets:
+  - "new: build-run (target)"
+  - "new: characterization-harness (source)"
+  - "new: unit-integration-tests (both)"
+  - "new: coverage (source, best-effort)"
+  - "new: coverage (target)"
+  - "new: crap (source, best-effort)"
+  - "new: crap (target)"
+  - "new: mutation-testing (both)"
+  - "new: lint-format (both)"
+  - "new: ui-end-to-end (both)"
+validation: "fail: the pinned harness validator is not installed because bootstrap step 5 was deferred; setup also needs .source refreshed to the requested SHA (current shallow HEAD 47fff80a28ba4e72e35eb5ffb598aa0844ecf8c5)."
