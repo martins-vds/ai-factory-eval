@@ -217,6 +217,24 @@ def test_detail_export_quotes_delimiters_quotes_and_line_breaks(client):
 
 
 @pytest.mark.django_db
+def test_list_export_quotes_delimiters_quotes_and_line_breaks(client):
+    Loan.objects.create(
+        id='L9',
+        member='Reader; Example\nSecond line',
+        isbn='978"xyz',
+        lent_on=date(2026, 3, 1),
+    )
+
+    response = client.get('/loans')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode().endswith(
+        'L9;"Reader; Example\nSecond line";"978""xyz";2026-03-01;2026-03-15;\n'
+    )
+
+
+@pytest.mark.django_db
 def test_model_enforces_required_fields_and_source_string_limits():
     with pytest.raises(ValidationError) as missing_fields:
         Loan(id='L9', member='', isbn='', lent_on=date(2026, 3, 1)).full_clean()
@@ -424,7 +442,19 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert 'Loan record · L2' in response.content.decode()
+    assert 'bo · ISBN 9780596007126' in response.content.decode()
+    assert 'Jan 20, 2026' in response.content.decode()
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_for_unknown_loan_returns_not_found(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db
@@ -455,3 +485,14 @@ def test_repository_write_rolls_back_failed_transaction():
         )
 
     assert Loan.objects.get(pk='L1').member == 'ana'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_repository_uses_a_transaction_for_its_row_lock():
+    returned_on = date(2026, 1, 25)
+
+    loan, updated = LoanRepository().mark_returned('L1', returned_on)
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
