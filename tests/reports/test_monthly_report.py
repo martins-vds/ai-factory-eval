@@ -16,11 +16,15 @@ def test_monthly_report_groups_month_activity_and_sorts_by_fees(monkeypatch):
         ('L10', 'zed', date(2026, 3, 1), date(2026, 3, 18)),
         ('L11', 'zed', date(2026, 2, 1), date(2026, 3, 1)),
         ('L12', 'zed', date(2026, 2, 1), date(2026, 4, 1)),
+        ('L18', 'zed', date(2026, 3, 20), None),
         ('L13', 'amy', date(2026, 3, 31), None),
+        ('L19', 'amy', date(2026, 2, 15), date(2026, 3, 1)),
         ('L14', 'bob', date(2026, 3, 1), date(2026, 3, 17)),
         ('L15', 'cara', date(2026, 3, 1), None),
         ('L16', 'hidden', date(2026, 2, 1), date(2026, 3, 1)),
         ('L17', 'outside', date(2026, 4, 1), None),
+        ('L20', 'maxed', date(2026, 3, 1), None),
+        ('L21', 'maxed', date(2026, 1, 1), date(2026, 3, 31)),
     ]
     for loan_id, member, lent_on, returned_on in loans:
         Loan.objects.create(
@@ -36,7 +40,8 @@ def test_monthly_report_groups_month_activity_and_sorts_by_fees(monkeypatch):
 
     assert list(csv.reader(StringIO(output.getvalue()))) == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
-        ['zed', '1', '2', '425'],
+        ['maxed', '1', '1', '1000'],
+        ['zed', '2', '2', '425'],
         ['amy', '1', '0', '0'],
         ['bob', '1', '1', '0'],
         ['cara', '1', '0', '0'],
