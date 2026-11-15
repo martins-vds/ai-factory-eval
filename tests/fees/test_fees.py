@@ -59,6 +59,15 @@ def test_fee_page_shows_amount_and_htmx_payment_action(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
 def test_payment_api_posts_to_gateway_and_forwards_success(client, local_gateway):
     response = client.post('/payments/L1')
 
