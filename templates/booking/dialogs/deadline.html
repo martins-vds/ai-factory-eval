@@ -1,0 +1,8 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Change arrival deadline | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-4 text-2xl font-semibold">Change cargo arrival deadline</h1>
+  {% include "booking/dialogs/_deadline_form.html" %}
+{% endblock %}

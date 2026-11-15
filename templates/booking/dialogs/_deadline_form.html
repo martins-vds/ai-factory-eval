@@ -1,0 +1,40 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" role="presentation">
+  <section
+    class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="deadline-dialog-title"
+  >
+    <h2 id="deadline-dialog-title" class="mb-4 text-xl font-semibold">Change arrival deadline</h2>
+    <p class="mb-4">
+      {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
+    </p>
+    {% if deadline_error %}
+      <p class="mb-3 text-red-700" id="deadline-error" role="alert">{{ deadline_error }}</p>
+    {% endif %}
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+    >
+      {% csrf_token %}
+      <label class="mb-2 block font-medium" for="deadline">Arrival deadline</label>
+      <input
+        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+        id="deadline"
+        name="deadline"
+        type="date"
+        value="{{ deadline_value }}"
+        required
+        aria-describedby="{% if deadline_error %}deadline-error{% endif %}"
+        {% if deadline_error %}aria-invalid="true"{% endif %}
+      >
+      <div class="mt-6 flex justify-end gap-3">
+        <button class="min-h-11 rounded-md px-5 py-2 hover:bg-slate-100" type="submit" name="action" value="cancel">Cancel</button>
+        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" name="action" value="update">Update</button>
+      </div>
+    </form>
+  </section>
+</div>

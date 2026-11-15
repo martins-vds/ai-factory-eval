@@ -16,7 +16,16 @@
         <dd>{{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})</dd>
       </div>
     </dl>
-    <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/">
+    {% if destination_error %}
+      <p class="mb-3 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+    >
       {% csrf_token %}
       <label class="mb-2 block font-medium" for="destination">New destination</label>
       <select
@@ -24,9 +33,11 @@
         id="destination"
         name="destination"
         required
+        aria-describedby="{% if destination_error %}destination-error{% endif %}"
+        {% if destination_error %}aria-invalid="true"{% endif %}
       >
         {% for location in destinations %}
-          <option value="{{ location.unlocode.value }}"{% if location == selected_destination %} selected{% endif %}>
+          <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
             {{ location.name }} ({{ location.unlocode.value }})
           </option>
         {% endfor %}
