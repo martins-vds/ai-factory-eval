@@ -139,29 +139,29 @@
       ]
     },
     "event_types": {
-      "assistant.message": 291,
-      "assistant.turn_end": 83,
-      "assistant.turn_start": 84,
-      "hook.end": 561,
-      "hook.start": 562,
-      "permission.completed": 315,
-      "permission.requested": 315,
+      "assistant.message": 308,
+      "assistant.turn_end": 92,
+      "assistant.turn_start": 92,
+      "hook.end": 580,
+      "hook.start": 581,
+      "permission.completed": 317,
+      "permission.requested": 317,
       "session.start": 1,
-      "skill.invoked": 19,
-      "subagent.completed": 3,
+      "skill.invoked": 20,
+      "subagent.completed": 4,
       "subagent.selected": 1,
       "subagent.started": 4,
       "system.message": 9,
       "system.notification": 2,
-      "tool.execution_complete": 345,
-      "tool.execution_start": 347,
-      "user.message": 13
+      "tool.execution_complete": 354,
+      "tool.execution_start": 354,
+      "user.message": 16
     },
-    "events": 2955,
+    "events": 3052,
     "usage_fields": []
   },
-  "ended_at": "2026-11-15T06:28:10.891Z",
-  "event": "agentStop",
+  "ended_at": "2026-11-15T06:36:14.234Z",
+  "event": "sessionEnd",
   "harness_tools": [
     {
       "count": 26,
@@ -212,12 +212,12 @@
   "log": "/home/runner/.copilot/session-state/e598387a-d7d7-4be9-b882-8d8b0d748d41/events.jsonl",
   "models": {
     "gpt-6-luna": {
-      "output": 125631,
-      "requests": 291
+      "output": 132470,
+      "requests": 308
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-15T06:28:15+00:00",
+  "recorded_at": "2026-11-15T06:36:21+00:00",
   "schema": "afs-cost/1",
   "session_id": "e598387a-d7d7-4be9-b882-8d8b0d748d41",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -227,7 +227,7 @@
       "skill": "afs-evidence"
     },
     {
-      "count": 2,
+      "count": 3,
       "skill": "afs-handoff"
     },
     {
@@ -261,6 +261,5 @@
   ],
   "started_at": "2026-11-15T05:45:44.143Z",
   "surface": "coding-agent",
-  "trigger_id": "call_O4FXLD9Cit2XoIUkLDduleiq",
   "usage_source": "assistant.message (output only, partial)"
 }
