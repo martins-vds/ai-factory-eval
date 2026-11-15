@@ -1,8 +1,10 @@
 import json
+import logging
 from contextlib import contextmanager
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
+from urllib import request as url_request
 
 import pytest
 
@@ -108,7 +110,7 @@ def test_fee_page_uses_reading_room_layout_and_htmx_payment_action(client):
 
     assert response.status_code == 200
     assert b'Late fee for L3' in response.content
-    assert b'Fee: $4.75' in response.content
+    assert b'$4.75' in response.content
     assert b'class="card' in response.content
     assert b'action="/ui/payments/L3/"' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
@@ -125,3 +127,54 @@ def test_htmx_payment_action_returns_visible_gateway_feedback(client, monkeypatc
     assert b'role="status"' in response.content
     assert b'Payment complete' in response.content
     assert requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_displays_gateway_failure(client, monkeypatch):
+    with payment_gateway(503, b'declined\n') as (url, requests):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', url)
+
+        response = client.post('/ui/payments/L2/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'Payment could not be completed.' in response.content
+    assert b'declined' in response.content
+    assert requests == [('POST', '/charge?loan=L2', b'')]
+
+
+@pytest.mark.django_db
+def test_payment_io_failure_maps_to_gateway_unavailable(client, monkeypatch):
+    def unavailable(*args, **kwargs):
+        raise OSError('connection refused')
+
+    monkeypatch.setattr(url_request, 'urlopen', unavailable)
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
+def test_interrupted_payment_returns_502_and_logs_original_exception(
+    client, monkeypatch, caplog
+):
+    interruption = InterruptedError('gateway call interrupted')
+
+    def interrupt(*args, **kwargs):
+        raise interruption
+
+    monkeypatch.setattr(url_request, 'urlopen', interrupt)
+    with caplog.at_level(logging.WARNING, logger='src.fees.views'):
+        response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+    record = next(
+        record
+        for record in caplog.records
+        if record.getMessage() == 'Payment gateway call interrupted'
+    )
+    assert record.exc_info[1].__cause__ is interruption
