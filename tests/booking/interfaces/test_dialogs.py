@@ -59,9 +59,11 @@ def test_not_routed_table_exposes_destination_and_deadline_dialogs(client):
     assert 'aria-labelledby="cargo-edit-dialog-title"' in not_routed_table
     assert 'id="cargo-edit-dialog-title">Edit cargo</h2>' in not_routed_table
     assert 'aria-haspopup="dialog"' in not_routed_table
+    assert 'hx-target="#cargo-edit-dialog-content"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in not_routed_table
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
+    assert 'dialog.showModal()' in not_routed_table
 
 
 def test_destination_dialog_filters_options_without_mutating_locations(client):
@@ -91,8 +93,9 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize('dialog', ('destination', 'deadline'))
+def test_unknown_cargo_dialog_returns_not_found(client, dialog):
+    response = client.get(f'/admin/cargo/MISSING1/{dialog}/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
 
