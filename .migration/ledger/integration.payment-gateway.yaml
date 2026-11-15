@@ -8,10 +8,12 @@ source:
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#135]
+target:
+  components: [src.fees.services.charge_late_fee, src.fees.views.payment_detail, src.fees.views.payment_page, src.fees.urls, templates/fees/payment-status.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_payments.py::test_payment_api_posts_to_gateway_and_forwards_success_response, tests/fees/test_payments.py::test_payment_api_maps_non_success_gateway_response_to_bad_gateway, tests/fees/test_payments.py::test_payment_api_does_not_call_gateway_for_unknown_loan, tests/fees/test_payments.py::test_payment_api_maps_gateway_io_failure_to_unavailable, tests/fees/test_payments.py::test_payment_api_maps_interrupted_gateway_call_and_retains_interruption, tests/fees/test_payments.py::test_payment_api_retains_interruption_wrapped_by_url_error, tests/fees/test_payments.py::test_htmx_payment_action_renders_success_status, tests/fees/test_payments.py::test_htmx_payment_action_swaps_gateway_failure_message]
+notes: "The approved fix in #40 maps interrupted calls to 502 and logs the original exception, including when urlopen wraps it in URLError."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
