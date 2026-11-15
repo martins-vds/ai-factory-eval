@@ -1,0 +1,19 @@
+role: afs-verifier
+ticket: BK-05B
+issue: martins-vds/ai-factory-pilot-target#289
+pr: null
+verdict: blocked
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs:
+  - .migration/runs/BK-05B/20261115T020814787742Z-setup-probe.log
+findings: null
+tests_added: null
+ledger_issues: null
+quirk_tickets: null
+handoff: .migration/handoffs/BK-05B.md
