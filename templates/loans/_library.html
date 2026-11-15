@@ -1,0 +1,55 @@
+<div id="library">
+  <section class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+    <div>
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The collection · {{ loans|length }} loans in view</p>
+      <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+      <p class="mb-8 text-[#66705b]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+      <div id="loan-list" class="divide-y divide-[#d8cdbb]">
+        {% for loan in loans %}
+        <article id="loan-{{ loan.id }}" class="grid gap-4 py-5 sm:grid-cols-[1fr_auto]">
+          <div>
+            <h2 class="text-xl font-semibold"><a class="underline decoration-[#d8cdbb] underline-offset-4" href="/ui/loans/{{ loan.id }}/">Loan {{ loan.id }}</a></h2>
+            <p class="mt-1 text-[#66705b]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+          </div>
+          <div class="sm:text-right">
+            <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+            {% if loan.returned_on %}
+            <p class="text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+            {% else %}
+            <p class="mt-2 text-sm font-semibold text-[#a94e37]">On loan</p>
+            <form action="/ui/loans/{{ loan.id }}/return/" method="post" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#library" hx-swap="outerHTML">
+              {% csrf_token %}
+              <button class="btn btn-outline btn-sm mt-2" type="submit">Mark returned</button>
+            </form>
+            {% endif %}
+          </div>
+        </article>
+        {% empty %}
+        <p class="border-t border-[#d8cdbb] py-6 text-[#66705b]">There are no loans in the collection yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+    <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-widest text-[#66705b]">At the desk</p>
+        <h2 class="card-title text-2xl">Lend a book</h2>
+        <p>Give a reader two weeks with a new title.</p>
+        {% if error %}<p role="alert" class="text-[#a94e37]">{{ error }}</p>{% endif %}
+        <form action="/ui/loans/new/" method="post" hx-post="/ui/loans/new/" hx-target="#library" hx-swap="outerHTML">
+          {% csrf_token %}
+          <label class="form-control">
+            <span class="label-text">Member</span>
+            <input class="input input-bordered" type="text" name="member" value="{{ form_data.member }}" aria-invalid="{% if errors.member %}true{% else %}false{% endif %}" {% if errors.member %}aria-describedby="member-error"{% endif %} required>
+            {% if errors.member %}<span id="member-error" role="alert" class="text-[#a94e37]">{{ errors.member }}</span>{% endif %}
+          </label>
+          <label class="form-control mt-3">
+            <span class="label-text">ISBN</span>
+            <input class="input input-bordered" type="text" name="isbn" value="{{ form_data.isbn }}" aria-invalid="{% if errors.isbn %}true{% else %}false{% endif %}" {% if errors.isbn %}aria-describedby="isbn-error"{% endif %} required>
+            {% if errors.isbn %}<span id="isbn-error" role="alert" class="text-[#a94e37]">{{ errors.isbn }}</span>{% endif %}
+          </label>
+          <button class="btn btn-primary mt-4" type="submit">Record loan</button>
+        </form>
+      </div>
+    </aside>
+  </section>
+</div>
