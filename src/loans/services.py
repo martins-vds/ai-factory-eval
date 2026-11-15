@@ -1,6 +1,8 @@
 import csv
 from io import StringIO
 
+from django.utils import timezone
+
 from .repository import LoanRepository
 
 
@@ -27,3 +29,11 @@ def list_loans_text():
 def get_loan_text(loan_id):
     loan = LoanRepository().find(loan_id)
     return loan_line(loan) if loan else None
+
+
+def lend_book(member, isbn):
+    return LoanRepository().lend(member, isbn, timezone.localdate())
+
+
+def return_book(loan_id):
+    return LoanRepository().mark_returned(loan_id, timezone.localdate())
