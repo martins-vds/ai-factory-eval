@@ -21,26 +21,30 @@ specialty_evidence:
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
   - >-
-    Equivalent mutant #10: changing the missing-cargo POST Http404 detail does not change the 404
-    page or status.
+    Equivalent mutant #10: `Http404(f'Cargo with tracking ID {tracking_id} not found.')` to
+    `Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')` leaves the 404 page and status
+    unchanged.
   - >-
-    Equivalent mutant #13: changing the stale-route Http404 detail does not change the 404 page or
-    status.
+    Equivalent mutant #13: `Http404('The selected route no longer satisfies the route
+    specification.')` to `Http404('XXThe selected route no longer satisfies the route
+    specification.XX')` leaves the 404 page and status unchanged.
   - >-
     Equivalent mutant #14: `quote(..., safe="")` to `quote(..., safe="XXXX")` is equivalent because
     `X` is unreserved and always left unescaped.
   - >-
-    Equivalent mutant #27: changing the missing-cargo GET Http404 detail does not change the 404
-    page or status.
+    Equivalent mutant #27: `Http404(f'Cargo with tracking ID {tracking_id} not found.')` to
+    `Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')` leaves the 404 page and status
+    unchanged.
   - >-
     Equivalent mutant #40: absent candidate defaults `''` and `'XXXX'` both fail signature
     validation and produce the same 404 response.
   - >-
-    Equivalent mutant #44: the changed BadSignature detail is caught and normalized to the same
+    Equivalent mutant #44: `BadSignature('Candidate belongs to another cargo.')` to
+    `BadSignature('XXCandidate belongs to another cargo.XX')` is caught and normalized to the same
     Http404 response.
   - >-
-    Equivalent mutant #46: changing the invalid-candidate Http404 detail does not change the 404
-    page or status.
+    Equivalent mutant #46: `Http404('The selected route is invalid.')` to
+    `Http404('XXThe selected route is invalid.XX')` leaves the 404 page and status unchanged.
   - .migration/handoffs/BK-05F.md
 ledger_updated:
   - booking.routing-chain

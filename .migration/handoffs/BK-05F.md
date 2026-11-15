@@ -54,19 +54,19 @@ Resume BK-05F by reproducing and resolving the mutation-score shortfall first; t
 
 | Mutant | Diff | Classification |
 |---|---|---|
-| #1 | `_CANDIDATE_SALT = 'booking.route_selection'` → `'XXbooking.route_selectionXX'` | Missing interface test: submit a candidate signed with the stable, previously issued salt and assert assignment redirects to the details page. |
-| #2 | `_CANDIDATE_SALT = 'booking.route_selection'` → `None` | Missing interface test: same stable-salt compatibility assertion as #1. |
-| #5 | Remove `@require_http_methods(['GET', 'POST'])` from route selection | Test-selection anomaly: `test_route_screens_reject_unsupported_http_methods` already expects 405 for PUT; verify the test is selected and executed after the correct base is available. Not equivalent. |
-| #10 | Prefix/suffix the missing-cargo `Http404` detail on POST | Equivalent at the UI boundary: response remains the same 404 page; only the internal exception detail changes. |
-| #13 | Prefix/suffix the stale-route-specification `Http404` detail | Equivalent at the UI boundary: assignment remains rejected with 404; only internal exception detail changes. |
+| #1 | `_CANDIDATE_SALT = 'booking.route_selection'` → `_CANDIDATE_SALT = 'XXbooking.route_selectionXX'` | Missing interface test: submit a candidate signed with the stable, previously issued salt and assert assignment redirects to the details page. |
+| #2 | `_CANDIDATE_SALT = 'booking.route_selection'` → `_CANDIDATE_SALT = None` | Missing interface test: same stable-salt compatibility assertion as #1. |
+| #5 | `@require_http_methods(['GET', 'POST'])` → removed | Test-selection anomaly: `test_route_screens_reject_unsupported_http_methods` already expects 405 for PUT; verify the test is selected and executed after the correct base is available. Not equivalent. |
+| #10 | `raise Http404(f'Cargo with tracking ID {tracking_id} not found.')` → `raise Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')` | Equivalent at the UI boundary: response remains the same 404 page; only the internal exception detail changes. |
+| #13 | `raise Http404('The selected route no longer satisfies the route specification.')` → `raise Http404('XXThe selected route no longer satisfies the route specification.XX')` | Equivalent at the UI boundary: assignment remains rejected with 404; only internal exception detail changes. |
 | #14 | `quote(tracking_id, safe="")` → `quote(tracking_id, safe="XXXX")` | Equivalent: `X` is an unreserved character which `urllib.parse.quote` leaves unescaped regardless of `safe`. |
-| #16 | Prefix/suffix the route page's no-route guidance | Test-selection anomaly: the current empty-state interface test already asserts the exact visible guidance; verify that assertion is selected/executed on the correct base. Not equivalent. |
-| #20 | Remove `@require_http_methods(['GET'])` from itinerary selection | Test-selection anomaly: the current unsupported-method interface test already expects 405 for POST; verify it is selected/executed on the correct base. Not equivalent. |
-| #21 | Prefix/suffix itinerary page's no-route guidance | Test-selection anomaly: the current empty-state interface test already asserts the exact visible guidance; verify that assertion is selected/executed on the correct base. Not equivalent. |
-| #27 | Prefix/suffix the missing-cargo `Http404` detail in `_selection_context` | Equivalent at the UI boundary: the response remains the same 404 page; only internal exception detail changes. |
-| #40 | `request.POST.get('candidate', '')` → default `'XXXX'` | Equivalent: both missing-field defaults fail signature validation and produce the same 404 response. |
-| #44 | Change the internal `BadSignature` detail | Equivalent: the exception is caught and normalized to the same `Http404` response. |
-| #46 | Prefix/suffix the invalid-candidate `Http404` detail | Equivalent at the UI boundary: response remains the same 404 page; only internal exception detail changes. |
+| #16 | `'Try setting an arrival deadline further into the future.'` → `'XXTry setting an arrival deadline further into the future.XX'` | Test-selection anomaly: the current empty-state interface test already asserts the exact visible guidance; verify that assertion is selected/executed on the correct base. Not equivalent. |
+| #20 | `@require_http_methods(['GET'])` → removed | Test-selection anomaly: the current unsupported-method interface test already expects 405 for POST; verify it is selected/executed on the correct base. Not equivalent. |
+| #21 | `'Try setting the arrival deadline further into the future (a few weeks at least).'` → `'XXTry setting the arrival deadline further into the future (a few weeks at least).XX'` | Test-selection anomaly: the current empty-state interface test already asserts the exact visible guidance; verify that assertion is selected/executed on the correct base. Not equivalent. |
+| #27 | `raise Http404(f'Cargo with tracking ID {tracking_id} not found.')` → `raise Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')` | Equivalent at the UI boundary: the response remains the same 404 page; only internal exception detail changes. |
+| #40 | `request.POST.get('candidate', '')` → `request.POST.get('candidate', 'XXXX')` | Equivalent: both missing-field defaults fail signature validation and produce the same 404 response. |
+| #44 | `raise BadSignature('Candidate belongs to another cargo.')` → `raise BadSignature('XXCandidate belongs to another cargo.XX')` | Equivalent: the exception is caught and normalized to the same `Http404` response. |
+| #46 | `raise Http404('The selected route is invalid.')` → `raise Http404('XXThe selected route is invalid.XX')` | Equivalent at the UI boundary: response remains the same 404 page; only internal exception detail changes. |
 
 ### Next step for the next session
 Make the correct BK-05F base ref available in this checkout (or resume in the matching target checkout), then rerun the profile's exact changed-code mutation command. Do not edit the unrelated files selected by the interrupted run.
