@@ -15,6 +15,9 @@
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
       </dl>
+      {% if not loan.returned_on %}
+      {% include "loans/_return_action.html" %}
+      {% endif %}
     </div>
   </article>
 </section>
