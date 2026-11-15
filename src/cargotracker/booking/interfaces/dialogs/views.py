@@ -37,7 +37,8 @@ def create_dialog_views(
         destinations = [
             location
             for location in locations
-            if location not in (
+            if location
+            not in (
                 cargo.route_specification.origin,
                 cargo.route_specification.destination,
             )
@@ -91,9 +92,7 @@ def create_dialog_views(
             except ValueError:
                 error = 'Enter a valid arrival deadline.'
             else:
-                arrival_deadline = timezone.make_aware(
-                    datetime.combine(parsed_deadline, time.min)
-                )
+                arrival_deadline = timezone.make_aware(datetime.combine(parsed_deadline, time.min))
                 try:
                     cargo_specification.change_deadline(tracking, arrival_deadline)
                 except LookupError as exc:

@@ -2,15 +2,24 @@ role: afs-specialist-migrator
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
 specialty: ui
-pr: null
+pr: https://github.com/martins-vds/ai-factory-eval/pull/214
 gates:
-  build: null
-  behavior: null
-  idiom: null
-  crap: null
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
   mutation_changed: null
-  regression: null
-specialty_evidence: []
-ledger_updated: []
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_filters_without_mutating_locations
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_deadline_and_reports_parse_errors
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_fields_and_refreshes_table
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_route_fields_and_refreshes_table
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
 quirk_tickets: []
 handoff: .migration/handoffs/BK-05G.md

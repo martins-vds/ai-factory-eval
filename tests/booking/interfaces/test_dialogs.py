@@ -144,7 +144,9 @@ def test_destination_update_preserves_other_route_fields_and_refreshes_table(cli
     updated = _cargo()
     assert updated.route_specification.origin == cargo.route_specification.origin
     assert updated.route_specification.destination == destination
-    assert updated.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    )
 
     refreshed = client.get('/admin/dashboard/').content.decode()
     not_routed_table = refreshed.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
