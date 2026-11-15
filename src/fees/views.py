@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fees_application, payment_gateway
 from .gateway import GatewayResponse, PaymentGatewayError

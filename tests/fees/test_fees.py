@@ -1,6 +1,6 @@
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from datetime import date, timedelta
 from decimal import Decimal
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
@@ -107,9 +107,7 @@ def test_payment_endpoint_forwards_the_characterized_gateway_request(client, pay
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_maps_gateway_failure_to_502_and_preserves_body(
-    client, payment_gateway
-):
+def test_payment_endpoint_maps_gateway_failure_to_502_and_preserves_body(client, payment_gateway):
     payment_gateway.response_status = 503
     payment_gateway.response_body = b'declined\n'
 
@@ -156,9 +154,7 @@ def test_interrupted_gateway_request_is_preserved_as_the_gateway_error_cause(mon
 
 
 @pytest.mark.django_db
-def test_htmx_payment_displays_success_and_forwards_the_gateway_request(
-    client, payment_gateway
-):
+def test_htmx_payment_displays_success_and_forwards_the_gateway_request(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 200

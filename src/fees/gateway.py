@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-
 DEFAULT_PAYMENT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
