@@ -32,7 +32,7 @@ references below hold detail — read one only when your procedure points to it.
    (`afs-evidence`). "Should pass" is not evidence.
 6. **No hidden state.** New work, reorderings, deferrals and decisions go to the tracker or ledger the
    moment they happen. Another agent must be able to continue from the ticket alone.
-7. **Stay in scope.** Do exactly your ticket. Record anything else you find as a new ticket.
+7. **Stay in scope.** Do exactly your ticket. Its scope is the `files` list in `.migration/plan/<slice>.tickets.yaml`, plus `AFS-SCOPE: <path>` lines in the issue (operator extensions). If the work needs any other file, stop and write a handoff that names it. Record anything else you find as a new ticket. Before you stop, `afs-finish-check` (the stop hook, ADR-0034) checks your return file, the CI rules and your scope, and may send you back once or twice to fix them.
 8. **Follow the requested approach; never assume limits.** Do not sample, skip, batch or approximate to
    save effort. If a real limit blocks you (quota, tool cap, context), stop and say so with specifics.
 9. **Keep context small.** Load only the skills your agent file lists. Run commands through `rtk` (or
@@ -68,7 +68,7 @@ session is a **committed file on your branch**, in the same PR as the work:
 | Handoff | `.migration/handoffs/<ticket>.md` | `afs-handoff` |
 | Quirk ticket draft | `.migration/quirks/<short-id>.md` | `afs-quirk-ticket` |
 | Gate runs | `.migration/evidence/runs/<ticket>.md` (written by `afs-run`) | `afs-evidence` |
-| Surviving mutants | `.migration/evidence/mutants/<ticket>.md` (written by `afs-mutation`) | `afs-handoff`: cite it |
+| Surviving mutants | `.migration/evidence/mutants/<ticket>.md` (written by `afs-mutation`; each survivor carries the diff mutmut made) | `afs-handoff`: cite it |
 | Session record | `.migration/costs/<session>.json` (written by the session hook, ADR-0021) | none: expected in every agent PR |
 
 **Session records are expected, never edited.** The harness's session hook commits one record per agent
