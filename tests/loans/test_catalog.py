@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -122,6 +123,13 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+def test_loan_form_requires_member_and_isbn():
+    form = LoanForm(data={})
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert set(form.errors) == {'member', 'isbn'}
 
 
 @pytest.mark.django_db
@@ -318,8 +326,18 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db
@@ -422,9 +440,20 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     response = client.post('/ui/loans/L2/return/')
 
     assert response.status_code == 409
+    assert b'Loan record \xc2\xb7 L2' in response.content
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_endpoint_succeeds_in_autocommit_mode(client):
+    Loan.objects.create(id='L99', member='reader', isbn='123', lent_on=date(2026, 3, 1))
+
+    response = client.post('/loans/L99/return')
+
+    assert response.status_code == 200
+    assert Loan.objects.get(pk='L99').returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db

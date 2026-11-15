@@ -1,0 +1,30 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/75
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.978
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:5
+    what: "Three survivors are LL-01 catalog template/context/route mutations, outside LL-02; no lending or return mutant remains."
+tests_added:
+  - test_loan_form_requires_member_and_isbn
+  - test_browser_lending_page_shows_errors_for_blank_fields
+  - test_browser_return_page_returns_not_found_for_unknown_loan
+  - test_browser_regular_repeat_return_shows_an_error
+  - test_return_endpoint_succeeds_in_autocommit_mode
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
