@@ -30,6 +30,17 @@
         "interactionId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -125,26 +136,28 @@
       ]
     },
     "event_types": {
-      "assistant.message": 68,
+      "assistant.message": 116,
       "assistant.turn_end": 24,
       "assistant.turn_start": 25,
-      "hook.end": 172,
-      "hook.start": 173,
-      "permission.completed": 72,
-      "permission.requested": 72,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 256,
+      "hook.start": 257,
+      "permission.completed": 118,
+      "permission.requested": 118,
       "session.start": 1,
-      "skill.invoked": 7,
+      "skill.invoked": 10,
       "subagent.selected": 1,
       "subagent.started": 2,
-      "system.message": 4,
-      "tool.execution_complete": 99,
-      "tool.execution_start": 101,
+      "system.message": 5,
+      "tool.execution_complete": 149,
+      "tool.execution_start": 151,
       "user.message": 7
     },
-    "events": 828,
+    "events": 1242,
     "usage_fields": []
   },
-  "ended_at": "2026-11-15T04:17:21.029Z",
+  "ended_at": "2026-11-15T04:20:00.144Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -163,7 +176,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 2,
+      "count": 6,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -173,7 +186,7 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 2,
+      "count": 6,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -186,26 +199,26 @@
   "log": "/home/runner/.copilot/session-state/dcbee5d7-383c-4ab8-a597-8f58b6f74a45/events.jsonl",
   "models": {
     "gpt-6-luna": {
-      "output": 32768,
-      "requests": 68
+      "output": 50814,
+      "requests": 116
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-15T04:17:24+00:00",
+  "recorded_at": "2026-11-15T04:20:03+00:00",
   "schema": "afs-cost/1",
   "session_id": "dcbee5d7-383c-4ab8-a597-8f58b6f74a45",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
   "skills_invoked": [
     {
-      "count": 1,
+      "count": 2,
       "skill": "afs-evidence"
     },
     {
-      "count": 2,
+      "count": 3,
       "skill": "afs-migration-contract"
     },
     {
-      "count": 2,
+      "count": 3,
       "skill": "afs-setup-check"
     },
     {
