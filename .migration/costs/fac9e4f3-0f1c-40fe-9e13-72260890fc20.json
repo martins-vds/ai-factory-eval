@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -55,6 +66,41 @@
         "permissionRequest",
         "promptRequest",
         "requestId"
+      ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
       ],
       "session.start": [
         "alreadyInUse",
@@ -190,31 +236,35 @@
       ]
     },
     "event_types": {
-      "assistant.message": 203,
-      "assistant.turn_end": 106,
-      "assistant.turn_start": 107,
-      "hook.end": 406,
-      "hook.start": 407,
-      "permission.completed": 250,
-      "permission.requested": 250,
+      "assistant.message": 233,
+      "assistant.turn_end": 121,
+      "assistant.turn_start": 121,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 448,
+      "hook.start": 449,
+      "permission.completed": 267,
+      "permission.requested": 267,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 107,
-      "skill.context_delivered_ref": 11,
-      "skill.invoked": 9,
+      "session.usage_record": 121,
+      "skill.context_delivered_ref": 12,
+      "skill.invoked": 10,
       "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 255,
-      "tool.execution_start": 256,
+      "tool.execution_complete": 277,
+      "tool.execution_start": 277,
       "user.message": 3
     },
-    "events": 2384,
+    "events": 2627,
     "usage_fields": []
   },
-  "ended_at": "2026-11-16T13:53:16.216Z",
+  "ended_at": "2026-11-16T13:56:46.382Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -253,7 +303,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 2,
+      "count": 4,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -263,7 +313,7 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 2,
+      "count": 4,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -277,11 +327,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 203
+      "requests": 233
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-16T13:53:25+00:00",
+  "recorded_at": "2026-11-16T13:56:55+00:00",
   "schema": "afs-cost/1",
   "session_id": "fac9e4f3-0f1c-40fe-9e13-72260890fc20",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -289,6 +339,10 @@
     {
       "count": 1,
       "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-handoff"
     },
     {
       "count": 1,
@@ -325,6 +379,5 @@
   ],
   "started_at": "2026-11-16T13:32:26.305Z",
   "surface": "coding-agent",
-  "trigger_id": "be8e3a42-a560-4650-aa6d-f8a8a88d9c76",
   "usage_source": "assistant.message (output only, partial)"
 }
