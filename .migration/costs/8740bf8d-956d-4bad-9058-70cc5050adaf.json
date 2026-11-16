@@ -152,6 +152,8 @@
         "responsesReasoning"
       ],
       "tool.execution_complete": [
+        "error",
+        "fileEdits",
         "interactionId",
         "model",
         "parentToolCallId",
@@ -192,32 +194,32 @@
       ]
     },
     "event_types": {
-      "assistant.message": 64,
-      "assistant.turn_end": 41,
-      "assistant.turn_start": 42,
-      "hook.end": 169,
-      "hook.start": 170,
-      "permission.completed": 74,
-      "permission.requested": 74,
+      "assistant.message": 104,
+      "assistant.turn_end": 59,
+      "assistant.turn_start": 60,
+      "hook.end": 220,
+      "hook.start": 221,
+      "permission.completed": 103,
+      "permission.requested": 103,
       "session.start": 1,
-      "session.usage_record": 41,
-      "skill.context_delivered_ref": 11,
-      "skill.invoked": 9,
+      "session.usage_record": 60,
+      "skill.context_delivered_ref": 12,
+      "skill.invoked": 10,
       "skill.invoked_ref": 2,
       "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 1,
       "subagent.started": 2,
       "system.message": 3,
-      "system.notification": 3,
-      "tool.execution_complete": 103,
-      "tool.execution_start": 103,
-      "user.message": 4
+      "system.notification": 4,
+      "tool.execution_complete": 130,
+      "tool.execution_start": 131,
+      "user.message": 5
     },
-    "events": 921,
+    "events": 1235,
     "usage_fields": []
   },
-  "ended_at": "2026-11-16T06:06:00.318Z",
+  "ended_at": "2026-11-16T06:08:45.847Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -226,7 +228,7 @@
       "tool": "afs-mutation"
     },
     {
-      "count": 7,
+      "count": 12,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -265,11 +267,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 64
+      "requests": 104
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-16T06:06:04+00:00",
+  "recorded_at": "2026-11-16T06:08:58+00:00",
   "schema": "afs-cost/1",
   "session_id": "8740bf8d-956d-4bad-9058-70cc5050adaf",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -309,10 +311,14 @@
     {
       "count": 1,
       "skill": "patterns-of-enterprise-application-architecture"
+    },
+    {
+      "count": 1,
+      "skill": "tdd"
     }
   ],
   "started_at": "2026-11-16T05:59:39.213Z",
   "surface": "coding-agent",
-  "trigger_id": "0feeb1d4-b8a4-4879-b98f-8fc8b758209f",
+  "trigger_id": "f528b078-9c92-46ed-a0d7-c8dd8ae28a45",
   "usage_source": "assistant.message (output only, partial)"
 }
