@@ -16,6 +16,11 @@ def _read_csv(path):
         return list(csv.reader(stream))
 
 
+def _read_dict_csv(path):
+    with path.open(newline='', encoding='utf-8') as stream:
+        return list(csv.DictReader(stream))
+
+
 @pytest.mark.django_db(transaction=True)
 def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
     call_command(
@@ -43,11 +48,11 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
             int(row[key_index]) for row in rows[1:]
         )
 
-    cargo = list(csv.DictReader((out / 'cargo.csv').open(newline='', encoding='utf-8')))
+    cargo = _read_dict_csv(out / 'cargo.csv')
     assert cargo[0]['last_known_location_id'] == r'\N'
     assert cargo[0]['next_expected_location_id'] == r'\N'
     assert cargo[0]['calculated_at'] == '2026-11-07T10:11:12Z'
-    voyage = list(csv.DictReader((out / 'voyage.csv').open(newline='', encoding='utf-8')))
+    voyage = _read_dict_csv(out / 'voyage.csv')
     assert voyage[0]['voyage_number'] == ''
 
 
@@ -67,7 +72,8 @@ def test_export_data_snapshot_orders_rows_by_primary_key(tmp_path):
                         'columns': {'id': 'id', 'unlocode': 'unlocode', 'name': 'name'},
                     }
                 ]
-            }
+            },
+            sort_keys=False,
         ),
         encoding='utf-8',
     )
