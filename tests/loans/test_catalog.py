@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
@@ -23,6 +23,29 @@ HTTP_GOLDENS = json.loads(
         else Path(__file__).parent / 'fixtures/http.json'
     ).read_text(encoding='utf-8')
 )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_repository_owns_transaction_for_row_lock():
+    Loan.objects.create(
+        id='L11',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+
+    assert connection.get_autocommit()
+    assert not connection.in_atomic_block
+
+    def assert_atomic(execute, sql, params, many, context):
+        assert connection.in_atomic_block
+        return execute(sql, params, many, context)
+
+    with connection.execute_wrapper(assert_atomic):
+        loan, updated = LoanRepository().mark_returned('L11', date(2026, 3, 2))
+
+    assert updated
+    assert loan.returned_on == date(2026, 3, 2)
 
 
 @pytest.mark.django_db
@@ -102,6 +125,7 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'isbn': '123'}, 'member'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -221,6 +245,25 @@ def test_detail_export_quotes_delimiters_quotes_and_line_breaks(client):
     assert response.status_code == 200
     assert response.content.decode() == (
         'L9;"Reader; Example\nSecond line";"978""xyz";2026-03-01;2026-03-15;\n'
+    )
+
+
+@pytest.mark.django_db
+def test_list_export_quotes_delimiters_quotes_and_line_breaks(client):
+    Loan.objects.create(
+        id='L9',
+        member='Reader; Example\nSecond line',
+        isbn='978"xyz',
+        lent_on=date(2026, 3, 1),
+    )
+
+    response = client.get('/loans')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert (
+        'L9;"Reader; Example\nSecond line";"978""xyz";2026-03-01;2026-03-15;\n'
+        in response.content.decode()
     )
 
 
@@ -475,18 +518,3 @@ def test_repository_write_rolls_back_failed_transaction():
         )
 
     assert Loan.objects.get(pk='L1').member == 'ana'
-
-
-@pytest.mark.django_db(transaction=True)
-def test_return_repository_owns_transaction_for_row_lock():
-    Loan.objects.create(
-        id='L11',
-        member='reader',
-        isbn='123',
-        lent_on=date(2026, 3, 1),
-    )
-
-    loan, updated = LoanRepository().mark_returned('L11', date(2026, 3, 2))
-
-    assert updated
-    assert loan.returned_on == date(2026, 3, 2)
