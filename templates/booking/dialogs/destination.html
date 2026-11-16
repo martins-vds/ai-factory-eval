@@ -1,9 +1,10 @@
-<dialog
+<dialog {% if dialog_open %}open{% endif %}
   id="destination-dialog"
   aria-labelledby="destination-dialog-title"
   class="fixed inset-0 m-auto max-h-[90vh] w-full max-w-lg rounded-xl p-6 shadow-xl backdrop:bg-black/50"
 >
   <form
+    id="destination-update-form"
     method="post"
     action="/admin/cargo/{{ cargo.tracking_id.value }}/destination-dialog/"
     hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination-dialog/"
@@ -41,20 +42,22 @@
         <p id="destination-error" class="mt-2 text-red-800" role="alert">{{ destination_error }}</p>
       {% endif %}
     </div>
-    <div class="flex justify-end gap-3">
+  </form>
+  <div class="flex justify-end gap-3">
+    <form method="dialog">
       <button
-        type="button"
+        type="submit"
         class="min-h-11 rounded-md border border-gray-500 px-4 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
-        onclick="this.closest('dialog').close()"
       >
         Cancel
       </button>
-      <button
-        type="submit"
-        class="min-h-11 rounded-md bg-blue-700 px-4 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
-      >
-        Update destination
-      </button>
-    </div>
-  </form>
+    </form>
+    <button
+      type="submit"
+      form="destination-update-form"
+      class="min-h-11 rounded-md bg-blue-700 px-4 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+    >
+      Update destination
+    </button>
+  </div>
 </dialog>

@@ -65,11 +65,27 @@ def test_not_routed_table_offers_destination_and_deadline_dialog_openers(client)
     assert response.status_code == 200
     assert 'data-tracking-id="DEF789"' in not_routed_table
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
+    assert 'href="/admin/cargo/DEF789/destination-dialog/"' in not_routed_table
+    assert 'href="/admin/cargo/DEF789/deadline-dialog/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/destination-dialog/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline-dialog/"' in not_routed_table
     assert 'id="dialog-container"' in not_routed_table
     assert 'hx-on::after-swap=' in not_routed_table
     assert 'hx-trigger="cargoUpdated from:body"' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_has_a_native_no_javascript_fallback(client):
+    response = client.get('/admin/cargo/DEF789/destination-dialog/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert '<!doctype html>' in content
+    assert re.search(r'<dialog\b[^>]*\bopen(?:\s|>)', content)
+    assert 'method="dialog"' in content
+    assert '<noscript>' in content
+    assert 'href="/admin/dashboard/"' in content
 
 
 @pytest.mark.django_db

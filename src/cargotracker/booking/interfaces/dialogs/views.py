@@ -23,6 +23,26 @@ def _complete_dialog(request: HttpRequest) -> HttpResponse:
     return redirect('/admin/dashboard/')
 
 
+def _render_dialog(
+    request: HttpRequest,
+    dialog_template: str,
+    page_title: str,
+    context: dict[str, object],
+) -> HttpResponse:
+    context['dialog_open'] = request.headers.get('HX-Request') != 'true'
+    if not context['dialog_open']:
+        return render(request, dialog_template, context)
+    return render(
+        request,
+        'booking/dialogs/page.html',
+        {
+            **context,
+            'dialog_template': dialog_template,
+            'page_title': page_title,
+        },
+    )
+
+
 def create_destination_dialog_view(
     specification: CargoSpecification,
     cargo_dashboard: CargoDashboard,
@@ -55,9 +75,10 @@ def create_destination_dialog_view(
                 specification.change_destination(cargo.tracking_id, destination)
                 return _complete_dialog(request)
 
-        return render(
+        return _render_dialog(
             request,
             'booking/dialogs/destination.html',
+            'Change destination',
             {
                 'cargo': cargo,
                 'available_destinations': available_destinations,
@@ -90,9 +111,10 @@ def create_deadline_dialog_view(
                 )
                 return _complete_dialog(request)
 
-        return render(
+        return _render_dialog(
             request,
             'booking/dialogs/deadline.html',
+            'Change deadline',
             {
                 'cargo': cargo,
                 'deadline_value': deadline_value,
