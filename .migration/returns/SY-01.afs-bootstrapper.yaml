@@ -1,0 +1,24 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-synthetic-target#3
+setup_pr: null
+characterization_tier: A
+tier_evidence: >-
+  Ran `legacy/run.sh` with PORT=18080 and a local refused payment gateway on port
+  9; Maven built and the server started. Live probes returned HTTP 200 for
+  GET /loans, /loans/L1, /fees/L3, and /about; HTTP 404 for unknown loans/fees
+  and payments; HTTP 502 for POST /payments/L3; HTTP 201 for creating L4 and
+  HTTP 200 for returning L4. See .migration/references/characterization.md.
+capabilities:
+  met: 15
+  gap: 3
+  waived: 0
+  not_applicable: 2
+gap_tickets:
+  - "new: characterization-harness (source)"
+  - "new: coverage (source, best_effort)"
+  - "new: crap (source, best_effort)"
+validation: >-
+  PyYAML metadata checks and `docker compose -f compose.yaml config --quiet`
+  pass. The pinned harness validate.py was not run because step 5 is assigned
+  to the dispatcher.
