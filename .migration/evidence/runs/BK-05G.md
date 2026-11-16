@@ -20,3 +20,18 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T06:02:26+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-16T06:02:29+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-16T06:03:34+00:00 | behavior-suite | 0 | 61.47 | `pytest -q` | `75de2da7cc381e63` |  |  |
+| 2026-11-16T06:04:53+00:00 | crap-coverage | 0 | 59.86 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `e9c001b4acd89f6b` |  |  |
+| 2026-11-16T06:04:57+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T06:05:01+00:00 | crap | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `bfee3b6a3acefaf6` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-16T06:08:30+00:00 | mutation-changed | 1 | 203.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `41fd5c8defbcc890` | afs-mutation: FAILED score=0.720 threshold=0.8 killed=59 survived=23 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.720 threshold=0.8 killed=59 survived=23 files=1 base=origin/main |
+| 2026-11-16T06:09:57+00:00 | focused-mutant-coverage | 1 | 6.55 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `ec098dd0578c9b21` | assert first.status_code == 200 |  |
+| 2026-11-16T06:10:30+00:00 | focused-mutant-coverage | 0 | 6.62 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `44edd162ba024d43` |  |  |
+| 2026-11-16T06:10:37+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T06:10:41+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T06:13:23+00:00 | mutation-changed | 0 | 158.81 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `773d5c838a221491` |  | gate=mutation score=0.986 threshold=0.8 killed=72 survived=1 files=1 base=origin/main |
+| 2026-11-16T06:13:53+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T06:13:57+00:00 | build-check | 0 | 0.37 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T06:15:04+00:00 | behavior-suite | 0 | 62.01 | `pytest -q` | `e0fb684151b1445a` |  |  |
+| 2026-11-16T06:16:12+00:00 | crap-coverage | 0 | 61.84 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `1fbbed818539814f` |  |  |
+| 2026-11-16T06:16:16+00:00 | crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T06:16:20+00:00 | crap | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `38f05226bd6f9e64` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |

@@ -13,10 +13,7 @@ from cargotracker.location.domain.location import Location
 
 
 def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo:
-    try:
-        cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
-    except ValueError as error:
-        raise Http404(f'Cargo with tracking ID {tracking_id} not found.') from error
+    cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
     if cargo is None:
         raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
     return cargo
@@ -66,21 +63,18 @@ def create_booking_dialog_views(
         context: dict[str, object] = {
             'cargo': cargo,
             'locations': locations,
-            'destination_error': '',
-            'destination_value': '',
         }
 
         if request.method == 'POST':
             if request.POST.get('action') == 'cancel':
                 return _complete_dialog(request)
-            destination_code = request.POST.get('destination', '')
+            destination_code = request.POST.get('destination')
             selected_destination = next(
                 (location for location in locations if location.unlocode.value == destination_code),
                 None,
             )
             if selected_destination is None:
                 context['destination_error'] = 'Select a valid destination.'
-                context['destination_value'] = destination_code
                 return _render_dialog(request, 'destination', context)
             cargo_specification.change_destination(
                 TrackingId(tracking_id),
@@ -98,13 +92,12 @@ def create_booking_dialog_views(
         context: dict[str, object] = {
             'cargo': cargo,
             'deadline_value': deadline_value,
-            'deadline_error': '',
         }
 
         if request.method == 'POST':
             if request.POST.get('action') == 'cancel':
                 return _complete_dialog(request)
-            deadline_value = request.POST.get('deadline', '')
+            deadline_value = request.POST.get('deadline') or ''
             context['deadline_value'] = deadline_value
             try:
                 arrival_date = date.fromisoformat(deadline_value)
