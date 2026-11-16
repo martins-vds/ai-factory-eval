@@ -67,6 +67,41 @@
         "promptRequest",
         "requestId"
       ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
       "session.model_change": [
         "contextTier",
         "newModel",
@@ -150,6 +185,11 @@
         "metadata",
         "role"
       ],
+      "system.notification": [
+        "content",
+        "kind",
+        "responsesReasoning"
+      ],
       "tool.execution_complete": [
         "error",
         "fileEdits",
@@ -193,33 +233,36 @@
       ]
     },
     "event_types": {
-      "assistant.message": 181,
-      "assistant.turn_end": 113,
-      "assistant.turn_start": 114,
-      "external_tool.completed": 3,
-      "external_tool.requested": 3,
-      "hook.end": 385,
-      "hook.start": 386,
-      "permission.completed": 199,
-      "permission.requested": 199,
+      "assistant.message": 231,
+      "assistant.turn_end": 144,
+      "assistant.turn_start": 144,
+      "external_tool.completed": 4,
+      "external_tool.requested": 4,
+      "hook.end": 466,
+      "hook.start": 467,
+      "permission.completed": 235,
+      "permission.requested": 235,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.model_change": 4,
       "session.start": 1,
-      "session.usage_record": 114,
+      "session.usage_record": 144,
       "skill.context_delivered_ref": 11,
       "skill.invoked": 11,
-      "subagent.completed": 3,
+      "subagent.completed": 4,
       "subagent.configured": 4,
       "subagent.selected": 5,
       "subagent.started": 4,
       "system.message": 5,
-      "tool.execution_complete": 227,
-      "tool.execution_start": 228,
+      "system.notification": 1,
+      "tool.execution_complete": 272,
+      "tool.execution_start": 272,
       "user.message": 5
     },
-    "events": 2205,
+    "events": 2675,
     "usage_fields": []
   },
-  "ended_at": "2026-11-16T20:55:31.571Z",
+  "ended_at": "2026-11-16T21:05:59.411Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -228,7 +271,7 @@
       "tool": "afs-mutation"
     },
     {
-      "count": 26,
+      "count": 33,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -248,7 +291,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 6,
+      "count": 8,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -263,7 +306,7 @@
       "tool": "data_reconcile.py"
     },
     {
-      "count": 5,
+      "count": 7,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -282,15 +325,15 @@
   "models": {
     "gpt-5.6-luna": {
       "output": 0,
-      "requests": 14
+      "requests": 15
     },
     "gpt-6-luna": {
       "output": 0,
-      "requests": 167
+      "requests": 216
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-16T20:55:33+00:00",
+  "recorded_at": "2026-11-16T21:06:16+00:00",
   "schema": "afs-cost/1",
   "session_id": "22214e40-1b76-476d-8441-69cfe64e6855",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -342,6 +385,5 @@
   ],
   "started_at": "2026-11-16T20:36:11.351Z",
   "surface": "coding-agent",
-  "trigger_id": "e2759759-9218-4ca2-894f-ea4dddf05be2",
   "usage_source": "assistant.message (output only, partial)"
 }
