@@ -1,0 +1,18 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#633
+setup_pr: null
+characterization_tier: A
+tier_evidence: "Ran PORT=18080 ./legacy/run.sh successfully and probed the loans, fees, payments, and about endpoints; see .migration/references/characterization.md."
+capabilities:
+  met: 11
+  gap: 4
+  waived: 1
+  not_applicable: 0
+gap_tickets:
+  - "new: characterization-harness (source)"
+  - "new: coverage (source, best_effort)"
+  - "new: crap (source, best_effort)"
+  - "new: ui-end-to-end (both)"
+validation: "Pass: profile, capabilities, and return match the pinned schemas; Compose config and PostgreSQL health check pass. Run the harness validator and afs-services checks after step 5."
+handoff: .migration/handoffs/SY-01.md
