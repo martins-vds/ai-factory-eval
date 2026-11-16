@@ -57,3 +57,29 @@ def test_fee_page_shows_calculation_and_htmx_payment_action(client):
     assert b'19 days late' in response.content
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_shows_the_zero_day_boundary(client):
+    today = timezone.localdate()
+    Loan.objects.create(
+        id='L9',
+        member='reader',
+        isbn='123',
+        lent_on=today - timedelta(days=14),
+    )
+
+    response = client.get('/fees/L9')
+
+    assert response.status_code == 200
+    assert b'0 day(s) late' in response.content
+    assert b'Fee: $0.00' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'

@@ -5,7 +5,7 @@ from decimal import Decimal
 from django.utils import timezone
 
 
-@dataclass(frozen=True)
+@dataclass
 class LateFee:
     days_late: int
     amount_cents: int

@@ -16,6 +16,7 @@ from .services import calculate_late_fee
 
 logger = logging.getLogger(__name__)
 
+
 def _find_loan(loan_id):
     return Loan.objects.filter(pk=loan_id).first()
 
