@@ -8,8 +8,6 @@ from src.reports.composition import monthly_report
 
 
 class Command(BaseCommand):
-    help = 'Print the previous month lending report as CSV.'
-
     def handle(self, *args, **options):
         current_month_starts = timezone.localdate().replace(day=1)
         previous_month_ends = current_month_starts
