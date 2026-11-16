@@ -1,0 +1,43 @@
+<dialog {% if open_dialog %}open{% endif %} class="modal" aria-labelledby="destination-dialog-title">
+  <div class="modal-box max-w-xl rounded-lg bg-white p-6 shadow-xl">
+    <h2 id="destination-dialog-title" class="mb-5 text-xl font-semibold text-gray-900">Change destination</h2>
+    <p class="mb-4 text-gray-700">
+      Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}.
+      Current destination: {{ cargo.route_specification.destination.name }}.
+    </p>
+    <form
+      id="destination-form"
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="closest dialog"
+      hx-swap="outerHTML"
+      class="flex flex-col gap-5"
+    >
+      {% csrf_token %}
+      <label class="block font-medium text-gray-800" for="destination">New destination</label>
+      <select
+        class="select select-bordered min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+        id="destination"
+        name="destination"
+        required
+        aria-describedby="{% if destination_error %}destination-error{% endif %}"
+        {% if destination_error %}aria-invalid="true"{% endif %}
+      >
+        <option value="">Choose a destination</option>
+        {% for location in locations %}
+          <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+        {% endfor %}
+      </select>
+      {% if destination_error %}
+        <p id="destination-error" class="text-red-700">{{ destination_error }}</p>
+      {% endif %}
+    </form>
+    <div class="mt-5 flex justify-end gap-3">
+      <form method="dialog">
+        <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="submit">Cancel</button>
+      </form>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" form="destination-form">Update</button>
+    </div>
+  </div>
+</dialog>
