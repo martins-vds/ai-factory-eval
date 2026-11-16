@@ -16,8 +16,8 @@ def test_monthly_report_summarizes_the_previous_month(monkeypatch):
             Loan('L11', 'alpha', '2', date(2026, 2, 2), date(2026, 2, 20)),
             Loan('L12', 'beta', '3', date(2026, 2, 3), date(2026, 2, 17)),
             Loan('L13', 'beta', '4', date(2026, 2, 10)),
-            Loan('L14', 'zoe', '5', date(2026, 2, 5), date(2026, 2, 19)),
-            Loan('L15', 'aardvark', '6', date(2026, 2, 6), date(2026, 2, 20)),
+            Loan('L14', 'zoe', '5', date(2026, 2, 5), date(2026, 2, 20)),
+            Loan('L15', 'aardvark', '6', date(2026, 2, 6), date(2026, 2, 22)),
             Loan('L16', 'old-only', '7', date(2026, 1, 1), date(2026, 2, 20)),
             Loan('L17', 'march-only', '8', date(2026, 3, 1)),
         ]
