@@ -51,3 +51,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T02:00:08+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-16T02:01:32+00:00 | build | 0 | 0.48 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
 | 2026-11-16T02:02:31+00:00 | behavior | 0 | 48.74 | `pytest -q` | `dde7475f1aec5b47` |  |  |
+| 2026-11-16T02:04:52+00:00 | stale-dialogs | 0 | 2.1 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_stale_cargo_dialog_returns_not_found` | `825826ec75aed015` |  |  |
