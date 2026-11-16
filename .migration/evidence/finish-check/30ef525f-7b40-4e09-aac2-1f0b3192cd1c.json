@@ -1,0 +1,31 @@
+[
+  {
+    "at": "2026-11-16T04:31:51Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 15454,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05D",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/evidence/mutants/DM-05D.md",
+      ".migration/evidence/runs/DM-05D.md",
+      ".migration/returns/DM-05D.afs-specialist-migrator.yaml",
+      "src/cargotracker/data_migration/management/commands/export_data_snapshot.py",
+      "tests/data_migration/test_export.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
