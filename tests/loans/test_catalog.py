@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -122,6 +123,13 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+def test_loan_form_requires_member_and_isbn_fields():
+    form = LoanForm()
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert all(form.fields[field].required for field in ('member', 'isbn'))
 
 
 @pytest.mark.django_db
@@ -291,6 +299,14 @@ def test_browser_detail_page_shows_loan_dates(client):
 
 
 @pytest.mark.django_db
+def test_browser_catalog_page_renders_seeded_loans(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'ana \xc2\xb7 ISBN 9780134685991' in response.content
+
+
+@pytest.mark.django_db
 def test_browser_can_create_a_loan_from_the_new_loan_page(client):
     lent_on = timezone.localdate()
     due_on = lent_on + date.resolution * 14
@@ -318,6 +334,7 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -379,6 +396,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
 
 
 @pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
 def test_real_browser_can_lend_and_return_a_book(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -422,6 +448,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     response = client.post('/ui/loans/L2/return/')
 
     assert response.status_code == 409
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
