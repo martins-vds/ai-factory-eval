@@ -91,6 +91,23 @@ def test_payment_endpoint_rejects_unknown_loan_without_calling_gateway(client, p
     assert payment_gateway.requests == []
 
 
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/fees/L1/', 'post'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+@pytest.mark.django_db
+def test_fee_routes_reject_unsupported_methods(client, payment_gateway, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway.requests == []
+
+
 @pytest.mark.django_db
 def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
     response = client.get('/ui/fees/L3/')
