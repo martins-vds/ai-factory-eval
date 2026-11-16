@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+from django.contrib.staticfiles import finders
 from playwright.sync_api import sync_playwright
 
 HTTP_GOLDEN_PATH = (
@@ -25,6 +26,10 @@ def test_about_pages_reject_non_get_requests(client, path):
 
     assert response.status_code == 405
     assert response['Allow'] == 'GET'
+
+
+def test_tailwind_stylesheet_is_discoverable_by_staticfiles():
+    assert finders.find('css/tailwind.css') is not None
 
 
 @pytest.mark.django_db

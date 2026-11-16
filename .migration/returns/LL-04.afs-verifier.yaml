@@ -1,0 +1,23 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-synthetic-target#65
+pr: https://github.com/martins-vds/ai-factory-eval/pull/538
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: "n/a: test suite fails before CRAP analysis"
+  mutation_changed: "n/a: mutation shards aborted on the failing test suite"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings:
+  - severity: major
+    where: templates/base.html:8
+    what: "The linked Tailwind stylesheet returns 404 and is undiscoverable by Django staticfiles, so the approved reading-room utility styles are not applied."
+tests_added:
+  - tests/library_info/test_about_page.py::test_about_pages_reject_non_get_requests
+  - tests/library_info/test_about_page.py::test_tailwind_stylesheet_is_discoverable_by_staticfiles
+ledger_issues: []
+quirk_tickets: []
