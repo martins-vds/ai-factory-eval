@@ -1,4 +1,12 @@
-<section id="not-routed-cargo" aria-labelledby="not-routed-cargo-heading">
+<section
+  id="not-routed-cargo"
+  aria-labelledby="not-routed-cargo-heading"
+  hx-get="/admin/dashboard/"
+  hx-trigger="bookingCargoUpdated from:body"
+  hx-select="#not-routed-cargo"
+  hx-target="this"
+  hx-swap="outerHTML"
+>
   <h2 id="not-routed-cargo-heading" class="mb-3 text-xl font-semibold text-gray-900">Not Routed Cargo</h2>
   <div class="overflow-x-auto">
     <table class="w-full border-collapse text-left">
@@ -8,6 +16,7 @@
           <th scope="col" class="p-3">Origin</th>
           <th scope="col" class="p-3">Destination</th>
           <th scope="col" class="p-3">Deadline</th>
+          <th scope="col" class="p-3">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -30,9 +39,43 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <div class="flex flex-wrap gap-2">
+                <button
+                  class="min-h-11 rounded-md px-3 py-2 font-medium text-blue-700 hover:bg-blue-50"
+                  type="button"
+                  hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                  hx-target="#booking-dialog-content"
+                  hx-select="unset"
+                  hx-swap="innerHTML"
+                >Change destination</button>
+                <button
+                  class="min-h-11 rounded-md px-3 py-2 font-medium text-blue-700 hover:bg-blue-50"
+                  type="button"
+                  hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                  hx-target="#booking-dialog-content"
+                  hx-select="unset"
+                  hx-swap="innerHTML"
+                >Change deadline</button>
+              </div>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+<dialog id="booking-dialog" class="m-auto w-full max-w-xl rounded-lg p-0 backdrop:bg-black/50">
+  <div id="booking-dialog-content"></div>
+</dialog>
+<script>
+  document.body.addEventListener("htmx:afterSwap", function (event) {
+    if (event.detail.target.id === "booking-dialog-content") {
+      const dialog = document.getElementById("booking-dialog");
+      if (!dialog.open) dialog.showModal();
+    }
+  });
+  document.body.addEventListener("bookingDialogClose", function () {
+    document.getElementById("booking-dialog").close();
+  });
+</script>
