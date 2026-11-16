@@ -101,3 +101,35 @@ def test_lending_page_creates_a_loan_and_returns_to_its_reading_room_detail(clie
     assert detail.status_code == 200
     assert b'Loan record \xc2\xb7 L4' in detail.content
     assert b'dee \xc2\xb7 ISBN 123' in detail.content
+
+
+@pytest.mark.django_db
+def test_reading_room_lists_return_controls_only_for_active_loans(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'href="/ui/loans/new/"' in response.content
+    assert b'hx-post="/ui/loans/L1/return/"' in response.content
+    assert b'hx-post="/ui/loans/L2/return/"' not in response.content
+
+
+@pytest.mark.django_db
+def test_reading_room_return_updates_the_loan_detail(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+    detail = client.get(response['Location'])
+
+    assert detail.status_code == 200
+    assert b'Returned' in detail.content
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_reading_room_repeat_return_is_rejected_without_overwriting_date(client):
+    response = client.post('/ui/loans/L2/return/')
+
+    assert response.status_code == 409
+    assert b'already returned' in response.content
+    assert Loan.objects.get(pk='L2').returned_on.isoformat() == '2026-01-20'
