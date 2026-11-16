@@ -16,4 +16,4 @@ specialty_evidence:
   - tests/data_migration/test_export.py::test_export_snapshot_preserves_null_empty_string_and_utc_timestamp
 ledger_updated: []
 quirk_tickets: []
-handoff: none
+handoff: .migration/handoffs/DM-05D.md

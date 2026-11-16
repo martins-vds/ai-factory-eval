@@ -34,3 +34,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T15:44:27+00:00 | snapshot-reconcile | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target .migration/data/target-export --mapping .migration/data/mapping.yaml --report .migration/runs/DM-05D/reconciliation.md` | `0e5f155ede36068f` |  | gate=data-reconcile tables=6 rows=54 mismatched_tables=0 |
 | 2026-11-16T15:45:46+00:00 | validate | 0 | 1.17 | `python .migration/harness/tools/validate.py .migration` | `b05e2a864e5153ee` |  |  |
 | 2026-11-16T15:47:53+00:00 | validate-final | 0 | 1.17 | `python .migration/harness/tools/validate.py .migration` | `b05e2a864e5153ee` |  |  |
+| 2026-11-16T15:50:48+00:00 | handoff-validate | 0 | 1.18 | `python .migration/harness/tools/validate.py .migration` | `a19ed5a217834789` |  |  |
