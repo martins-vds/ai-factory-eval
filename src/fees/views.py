@@ -76,7 +76,7 @@ def payment_api(request, loan_id):
     except PaymentGatewayFailure as error:
         _log_interruption(error)
         return HttpResponse(
-            str(error),
+            'payment gateway unavailable\n',
             status=502,
             content_type='text/plain',
         )
@@ -100,7 +100,7 @@ def payment_page(request, loan_id):
     except PaymentGatewayFailure as error:
         _log_interruption(error)
         success = False
-        message = str(error)
+        message = 'payment gateway unavailable\n'
 
     template = (
         'fees/payment-status.html'
