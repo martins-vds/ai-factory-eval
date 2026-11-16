@@ -1,5 +1,7 @@
 import csv
 import json
+import subprocess
+import sys
 from io import StringIO
 from pathlib import Path
 
@@ -72,6 +74,25 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
     assert cargo[0]['calculated_at'] == '2026-11-07T10:11:12Z'
     voyage = _read_dict_csv(out / 'voyage.csv')
     assert voyage[0]['voyage_number'] == ''
+    reconciliation = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / '.migration' / 'harness' / 'tools' / 'data_reconcile.py'),
+            'reconcile',
+            '--snapshot',
+            str(FIXTURE_SNAPSHOT),
+            '--target',
+            str(out),
+            '--mapping',
+            str(MAPPING),
+            '--report',
+            str(tmp_path / 'reconciliation.md'),
+        ],
+        capture_output=True,
+        check=False,
+        text=True,
+    )
+    assert reconciliation.returncode == 0, reconciliation.stdout + reconciliation.stderr
 
 
 @pytest.mark.django_db(transaction=True)

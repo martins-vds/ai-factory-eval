@@ -32,3 +32,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T20:46:58+00:00 | export-tests-expanded | 0 | 1.22 | `python -m pytest -q tests/data_migration/test_export.py` | `4f9388d0687553c9` |  |  |
 | 2026-11-16T20:47:04+00:00 | restore-db | 0 | 0.23 | `python manage.py flush --noinput` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-16T20:47:58+00:00 | mutation-changed | 0 | 49.5 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `1925f9acb951f0b5` |  | gate=mutation score=0.813 threshold=0.8 killed=61 survived=14 files=1 base=origin/main |
+| 2026-11-16T20:50:19+00:00 | regression | 0 | 28.32 | `pytest -q` | `6569e18802b47ee0` |  |  |
+| 2026-11-16T20:50:24+00:00 | build-compile | 0 | 0.02 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:50:28+00:00 | build-check | 0 | 0.22 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T20:50:31+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T20:50:39+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `c7a0bcb17dd5241a` |  |  |
+| 2026-11-16T20:50:57+00:00 | export-tests-roundtrip | 0 | 1.28 | `python -m pytest -q tests/data_migration/test_export.py` | `f9d3ad9faf72bf2b` |  |  |
