@@ -6,3 +6,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 |---|---|---|---|---|---|---|---|
 | 2026-11-07T23:07:55+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-16T20:35:36+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:38:51+00:00 | red-destination-dialog | 2 | 0.8 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `b10a6f0b78f6db33` | __________ ERROR collecting tests/booking/interfaces/test_dialogs.py ___________ |  |
+| 2026-11-16T20:39:25+00:00 | green-destination-initial | 1 | 1.42 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `147b628fdd5fa191` | assert cargo is not None |  |
+| 2026-11-16T20:39:39+00:00 | green-destination-initial | 0 | 1.27 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `a558b8376cd28466` |  |  |
+| 2026-11-16T20:40:00+00:00 | destination-options | 1 | 1.57 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `c3b1d5a5ecd1fb96` | E       django.template.exceptions.TemplateDoesNotExist: booking/dialogs/deadline.html |  |
+| 2026-11-16T20:40:10+00:00 | destination-options | 1 | 1.6 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `25af8d90605f8fe7` | assert locations == original_locations |  |
+| 2026-11-16T20:40:20+00:00 | destination-options | 0 | 1.63 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `00b28118fe496cca` |  |  |
+| 2026-11-16T20:40:34+00:00 | destination-update | 0 | 1.86 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `a971a7c2ec0752fd` |  |  |
+| 2026-11-16T20:40:46+00:00 | red-deadline-invalid | 1 | 1.37 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_a_field_error_without_changing_cargo` | `b40c02a09158f403` | assert cargo is not None |  |
+| 2026-11-16T20:40:59+00:00 | green-deadline-invalid | 0 | 2.11 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `58a0ecfcf570da4b` |  |  |
+| 2026-11-16T20:41:11+00:00 | deadline-update | 0 | 2.42 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `8f337870cb203dee` |  |  |
+| 2026-11-16T20:41:23+00:00 | red-dashboard-launch | 1 | 1.37 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs` | `ebd6065123079d57` | assert cargo is not None |  |
+| 2026-11-16T20:41:39+00:00 | green-dashboard-launch | 0 | 3.19 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `38315f851ae7c42c` |  |  |
+| 2026-11-16T20:42:18+00:00 | focused-dialogs-dashboard | 0 | 3.32 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `2e6245b75f87acbf` |  |  |
+| 2026-11-16T20:43:08+00:00 | focused-dialogs-dashboard | 0 | 3.7 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `dd5a4f11f76a4b9e` |  |  |

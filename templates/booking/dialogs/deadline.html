@@ -1,0 +1,40 @@
+<dialog {% if open_dialog %}open{% endif %} class="modal" aria-labelledby="deadline-dialog-title">
+  <div class="modal-box max-w-xl rounded-lg bg-white p-6 shadow-xl">
+    <h2 id="deadline-dialog-title" class="mb-5 text-xl font-semibold text-gray-900">Change arrival deadline</h2>
+    <p class="mb-4 text-gray-700">
+      Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}
+      to {{ cargo.route_specification.destination.name }}.
+    </p>
+    <form
+      id="deadline-form"
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+      hx-target="closest dialog"
+      hx-swap="outerHTML"
+      class="flex flex-col gap-5"
+    >
+      {% csrf_token %}
+      <label class="block font-medium text-gray-800" for="deadline">Arrival deadline</label>
+      <input
+        class="input input-bordered min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+        id="deadline"
+        name="deadline"
+        type="date"
+        value="{{ deadline_value }}"
+        required
+        aria-describedby="{% if deadline_error %}deadline-error{% endif %}"
+        {% if deadline_error %}aria-invalid="true"{% endif %}
+      >
+      {% if deadline_error %}
+        <p id="deadline-error" class="text-red-700">{{ deadline_error }}</p>
+      {% endif %}
+    </form>
+    <div class="mt-5 flex justify-end gap-3">
+      <form method="dialog">
+        <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="submit">Cancel</button>
+      </form>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" form="deadline-form">Update</button>
+    </div>
+  </div>
+</dialog>
