@@ -1,3 +1,5 @@
+import re
+
 from django.core.management import call_command
 from django.test import override_settings
 from django.urls import path
@@ -5,18 +7,49 @@ from django.urls import path
 import pytest
 
 from cargotracker.booking.application.dashboard import CargoDashboard
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.booking.interfaces.dialogs.views import create_destination_dialog_view
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
+from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
-dashboard_view, _ = create_booking_views(CargoDashboard(DjangoCargoRepository()))
-urlpatterns = [path('admin/dashboard/', dashboard_view)]
+cargo_repository = DjangoCargoRepository()
+location_repository = DjangoLocationRepository()
+available_locations = []
+cargo_dashboard = CargoDashboard(cargo_repository)
+dashboard_view, _ = create_booking_views(cargo_dashboard)
+specification = CargoSpecification(cargo_repository, DjangoHandlingEventRepository())
+
+
+def _available_locations():
+    return available_locations
+
+
+destination_dialog_view = create_destination_dialog_view(
+    specification,
+    cargo_dashboard,
+    _available_locations,
+)
+urlpatterns = [
+    path('admin/dashboard/', dashboard_view),
+    path(
+        'admin/cargo/<str:tracking_id>/destination-dialog/',
+        destination_dialog_view,
+    ),
+]
+
+
+@pytest.fixture(autouse=True)
+def reset_sample_data():
+    call_command('seed_sample_data')
+    available_locations[:] = location_repository.find_all()
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_not_routed_table_offers_destination_and_deadline_dialog_openers(client):
-    call_command('seed_sample_data')
-
     response = client.get('/admin/dashboard/')
     content = response.content.decode()
     not_routed_table = content.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
@@ -27,3 +60,67 @@ def test_not_routed_table_offers_destination_and_deadline_dialog_openers(client)
     assert 'hx-get="/admin/cargo/DEF789/destination-dialog/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline-dialog/"' in not_routed_table
     assert 'id="dialog-container"' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_shows_current_values_and_stable_filtered_options(client):
+    original_codes = tuple(location.unlocode.value for location in available_locations)
+
+    first_response = client.get(
+        '/admin/cargo/DEF789/destination-dialog/',
+        HTTP_HX_REQUEST='true',
+    )
+    second_response = client.get(
+        '/admin/cargo/DEF789/destination-dialog/',
+        HTTP_HX_REQUEST='true',
+    )
+    first_content = first_response.content.decode()
+    second_content = second_response.content.decode()
+    options = re.search(
+        r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>',
+        first_content,
+        re.DOTALL,
+    )
+    second_options = re.search(
+        r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>',
+        second_content,
+        re.DOTALL,
+    )
+
+    assert first_response.status_code == 200
+    assert second_response.status_code == 200
+    assert 'Hong Kong' in first_content and 'Melbourne' in first_content
+    assert options is not None
+    assert 'value="CNHKG"' not in options.group(1)
+    assert 'value="AUMEL"' not in options.group(1)
+    assert 'value="USNYC"' in options.group(1)
+    assert tuple(location.unlocode.value for location in available_locations) == original_codes
+    assert second_options is not None
+    assert options.group(1) == second_options.group(1)
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_update_preserves_other_specification_fields_and_refreshes_table(client):
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination-dialog/',
+        {'destination': 'USNYC'},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    dashboard = client.get('/admin/dashboard/').content.decode()
+    not_routed_table = dashboard.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+
+    assert response.status_code == 200
+    assert response.headers['HX-Trigger'] == 'cargoUpdated'
+    assert b'Widget' not in response.content
+    assert updated is not None
+    assert updated.route_specification.origin == original.route_specification.origin
+    assert updated.route_specification.destination.unlocode.value == 'USNYC'
+    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert 'New York' in not_routed_table
+    assert 'USNYC' in not_routed_table
