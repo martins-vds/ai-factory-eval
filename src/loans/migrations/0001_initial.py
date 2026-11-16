@@ -1,4 +1,5 @@
 from datetime import date
+from typing import ClassVar
 
 from django.db import migrations, models
 
@@ -36,13 +37,13 @@ def seed_loans(apps, schema_editor):
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies: ClassVar[list] = []
 
-    operations = [
+    operations: ClassVar[list] = [
         migrations.CreateModel(
             name='Loan',
             fields=[
-                ('id', models.CharField(max_length=32, primary_key=True, serialize=False)),
+                ('id', models.TextField(primary_key=True, serialize=False)),
                 ('member', models.TextField()),
                 ('isbn', models.TextField()),
                 ('lent_on', models.DateField()),

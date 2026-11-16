@@ -21,3 +21,4 @@ evidence:
   - .migration/risk-map/SY-05.md
   - tests/loans/test_catalog.py::test_saved_loan_is_available_to_later_api_requests
   - .migration/evidence/runs/LL-01.md
+notes: "Django/PostgreSQL autocommit provides atomic persistence for the repository's single-row writes."

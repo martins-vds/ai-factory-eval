@@ -20,7 +20,7 @@
   <section id="loan-list" class="pt-8" aria-labelledby="catalog-heading">
     <div class="mb-2 flex flex-wrap items-center justify-between gap-3">
       <h2 id="catalog-heading" class="text-2xl">On the shelves</h2>
-      <button class="btn btn-ghost btn-sm text-[#a94e37]" type="button" hx-get="/ui/loans/" hx-select="#loan-list" hx-target="#loan-list" hx-swap="outerHTML">
+      <button class="btn btn-ghost btn-sm text-[#a94e37]" type="button" hx-get="{% url 'ui-loan-list' %}" hx-select="#loan-list" hx-target="#loan-list" hx-swap="outerHTML">
         Refresh catalog
       </button>
     </div>

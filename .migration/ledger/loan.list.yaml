@@ -20,4 +20,6 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
   - tests/loans/test_catalog.py::test_list_returns_seed_loans_in_source_order_and_text_format
+  - tests/loans/test_catalog.py::test_catalog_routes_preserve_the_public_paths
+  - tests/loans/test_catalog.py::test_ui_catalog_renders_the_seed_records
   - .migration/evidence/runs/LL-01.md

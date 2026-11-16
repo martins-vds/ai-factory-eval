@@ -18,6 +18,7 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/characterization/source/goldens/restart.json
   - tests/loans/test_catalog.py::test_saved_loan_is_available_to_later_api_requests
+  - tests/loans/test_catalog.py::test_loan_id_longer_than_thirty_two_characters_is_preserved
   - .migration/evidence/runs/LL-01.md
 notes: "Loans persist in PostgreSQL; the approved restart behavior is linked to martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
