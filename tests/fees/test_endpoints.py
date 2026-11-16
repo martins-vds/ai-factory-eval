@@ -180,6 +180,7 @@ def test_payment_page_fallback_renders_gateway_failure(client, payment_gateway):
     assert response.status_code == 502
     assert response['Content-Type'] == 'text/html; charset=utf-8'
     assert b'Late fee for L1' in response.content
+    assert b'2026-01-16' in response.content
     assert b'Fee: $10.00' in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
