@@ -19,8 +19,6 @@ from cargotracker.voyage.domain.schedule import Schedule
 from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
 
-_CANDIDATE_SALT = 'booking.route_selection'
-
 
 def create_route_selection_views(
     cargo_routing: CargoRouting,
@@ -82,7 +80,7 @@ def _selection_context(
                         'tracking_id': tracking_id.value,
                         'legs': _serialize_itinerary(itinerary),
                     },
-                    salt=_CANDIDATE_SALT,
+                    salt='booking.route_selection',
                 ),
             }
             for number, itinerary in enumerate(itineraries, start=1)
@@ -92,7 +90,7 @@ def _selection_context(
 
 def _selected_itinerary(request: HttpRequest, tracking_id: str) -> Itinerary:
     try:
-        candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
+        candidate = signing.loads(request.POST.get('candidate', ''), salt='booking.route_selection')
         if candidate['tracking_id'] != tracking_id:
             raise BadSignature('Candidate belongs to another cargo.')
         return _deserialize_itinerary(candidate['legs'])

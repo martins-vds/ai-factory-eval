@@ -2,22 +2,17 @@ role: afs-specialist-migrator
 ticket: BK-05F
 issue: martins-vds/ai-factory-pilot-target#293
 specialty: ui
-pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+pr: https://github.com/martins-vds/ai-factory-eval/pull/430
 gates:
   build: 0
-  behavior: 0
-  idiom: 0
-  crap: 26.0
-  mutation_changed: 0.790
-  regression: 0
+  behavior: null
+  idiom: 1
+  crap: null
+  mutation_changed: 0.887
+  regression: null
 specialty_evidence:
-  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
-  - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available
   - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
-  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
-  - tests/booking/interfaces/test_route_selection.py::test_route_screens_reject_unsupported_http_methods
-  - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
 ledger_updated:
@@ -27,3 +22,11 @@ ledger_updated:
   - booking.routing-assign
 quirk_tickets: []
 handoff: .migration/handoffs/BK-05F.md
+equivalent_mutants:
+  - "views.py:31 #8 diff: `Http404(f'Cargo with tracking ID {tracking_id} not found.')` → `Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')`; the production 404 response is generic and does not display exception detail."
+  - "views.py:34 #11 diff: `Http404('The selected route no longer satisfies the route specification.')` → `Http404('XXThe selected route no longer satisfies the route specification.XX')`; only hidden Http404 detail changes."
+  - 'views.py:36 #12 diff: `quote(tracking_id, safe="")` → `quote(tracking_id, safe="XXXX")`; X is always an unescaped unreserved character, so the redirect URL is unchanged.'
+  - "views.py:67 #25 diff: `Http404(f'Cargo with tracking ID {tracking_id} not found.')` → `Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')`; the production 404 response is generic and does not display exception detail."
+  - "views.py:92 #39 diff: `request.POST.get('candidate', '')` → `request.POST.get('candidate', 'XXXX')`; both absent-token values fail signing validation and produce the same generic 404."
+  - "views.py:94 #44 diff: `BadSignature('Candidate belongs to another cargo.')` → `BadSignature('XXCandidate belongs to another cargo.XX')`; this message is caught and replaced by the same generic 404."
+  - "views.py:97 #46 diff: `Http404('The selected route is invalid.')` → `Http404('XXThe selected route is invalid.XX')`; only hidden Http404 detail changes."

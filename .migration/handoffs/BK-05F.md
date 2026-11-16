@@ -25,3 +25,22 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-specialist-migrator · 2026-11-16T00:02:00Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-fix-changed-code-mutation-another-one` / https://github.com/martins-vds/ai-factory-eval/pull/430 · **Last commit:** `48b36703`
+### Done
+- Inlined the candidate signing salt to remove equivalent shared-constant mutants; `candidate-assignment-after-salt-inline` passed.
+- Strengthened empty-state interface assertions to match the complete displayed guidance. The test failed on the `XX…XX` mutant and passed after the original text was restored (`no-route-guidance-exact-assertion-red` and `no-route-guidance-exact-assertion-green`).
+- Changed-code mutation passed at 0.887 (55 killed, 7 survived): `.migration/runs/BK-05F/20261115T235549111468Z-mutation-changed-exact-guidance.log`; fresh survivor diffs are in `.migration/evidence/mutants/BK-05F.md`.
+- Build compile, Django check and Ruff check passed in this session.
+### Remaining
+- [ ] Resolve the repository-wide `ruff format --check` failure only after an operator approves scope for `tests/conftest.py`, or provides the intended pinned formatter behavior.
+- [ ] Run the full behavior and CRAP gates through `afs-run`, then update this return with final gate results.
+### Decisions made
+- The seven remaining mutant diffs are equivalent at the UI boundary: #8, #11, #25 and #46 alter Http404 exception text hidden by the generic 404 page; #12 adds `X` to `quote`'s safe set, but X is always unescaped; #39 changes the invalid-token fallback, with either value producing the same caught invalid-signature 404; #44 changes a BadSignature message immediately replaced by the same generic 404.
+### Blockers / questions
+- The required whole-repository formatter gate flags `/home/runner/work/ai-factory-eval/ai-factory-eval/tests/conftest.py:6`, which is not in BK-05F's planned file list. The ticket requires stopping and handing off rather than touching an unplanned file.
+### Failing commands
+- `ruff format --check` → exit 1, see `.migration/runs/BK-05F/20261116T000153620213Z-idiom-ruff-format-final.log:1-9`.
+### Next step for the next session
+Ask the operator to authorize the out-of-scope `tests/conftest.py` formatting change or confirm an environment-specific resolution; then rerun the full profile gates and finalize the return.
