@@ -36,6 +36,15 @@ def test_list_endpoint_returns_seeded_records(client):
 
 
 @pytest.mark.django_db
+def test_browser_catalog_page_lists_seeded_loans(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'ana \xc2\xb7 ISBN 9780134685991' in response.content
+
+
+@pytest.mark.django_db
 def test_detail_endpoint_returns_one_formatted_loan(client):
     response = client.get('/loans/L1')
     expected = HTTP_GOLDENS['GET /loans/{id}']['response']
