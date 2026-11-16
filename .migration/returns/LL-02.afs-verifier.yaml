@@ -2,7 +2,7 @@ role: afs-verifier
 ticket: LL-02
 issue: martins-vds/ai-factory-synthetic-target#61
 pr: https://github.com/martins-vds/ai-factory-eval/pull/487
-verdict: pass
+verdict: changes-required
 gates:
   build: 0
   behavior: 0
@@ -13,7 +13,13 @@ gates:
 evidence_logs:
   - .migration/evidence/runs/LL-02.md
   - .migration/evidence/mutants/LL-02.md
-findings: []
+findings:
+  - severity: major
+    where: src/loans/services.py:4,9-20
+    what: "Use cases depend directly on Django's clock and return ORM entities; keep framework and persistence details behind outer boundaries per the target architecture rules."
+  - severity: major
+    where: src/loans/repository.py:17-25
+    what: "The repository owns the repeat-return lifecycle decision; move the domain invariant into Loan while retaining atomic row locking at the persistence boundary."
 tests_added:
   - tests/loans/test_catalog.py::test_loan_form_requires_member_and_isbn_fields
   - tests/loans/test_catalog.py::test_browser_catalog_page_renders_seeded_loans
