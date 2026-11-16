@@ -10,7 +10,6 @@ import pytest
 from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
-from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -184,7 +183,9 @@ def test_loaded_cargo_delivery_matches_its_handling_history(loaded_snapshot):
             cargo.delivery.calculated_at,
         )
         if derived.eta is not None:
-            derived = replace(derived, eta=derived.eta.replace(hour=0, minute=0, second=0, microsecond=0))
+            derived = replace(
+                derived, eta=derived.eta.replace(hour=0, minute=0, second=0, microsecond=0)
+            )
 
         assert replace(derived, last_event_id=history.most_recent_event_id) == cargo.delivery
 
