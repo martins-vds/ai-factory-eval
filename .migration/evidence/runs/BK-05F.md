@@ -57,3 +57,20 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T23:33:57+00:00 | mutation-changed-security-fix | 1 | 61.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
 | 2026-11-07T23:35:56+00:00 | unknown-route-404-test | 0 | 1.41 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `a558b8376cd28466` |  |  |
 | 2026-11-07T23:37:02+00:00 | mutation-changed-after-404-test | 1 | 61.99 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
+| 2026-11-16T17:28:41+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:28:56+00:00 | mutation-changed-initial | 0 | 0.24 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T17:31:36+00:00 | behavior-route-selection-focused | 0 | 2.3 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `212c8c71cc67cb16` |  |  |
+| 2026-11-16T17:31:47+00:00 | behavior-route-selection-updated | 0 | 1.8 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `9624d746bc921384` |  |  |
+| 2026-11-16T17:35:43+00:00 | mutation-changed-final | 0 | 213.3 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `a9e77be666a743ae` |  | gate=mutation score=0.869 threshold=0.8 killed=53 survived=8 files=1 base=origin/main |
+| 2026-11-16T17:37:32+00:00 | mutation-survivor-16-diagnostic | 0 | 1.48 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `b29404b0332b987b` |  |  |
+| 2026-11-16T17:38:18+00:00 | mutation-survivor-16-red | 1 | 1.57 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `5567579411c767cd` | assert route_response.status_code == 200 |  |
+| 2026-11-16T17:38:28+00:00 | behavior-route-selection-exact-empty-sta | 0 | 1.79 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `9624d746bc921384` |  |  |
+| 2026-11-16T17:42:25+00:00 | mutation-changed-final | 0 | 202.82 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `66cc33e6586689f4` |  | gate=mutation score=0.902 threshold=0.8 killed=55 survived=6 files=1 base=origin/main |
+| 2026-11-16T17:42:30+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:42:30+00:00 | build-django-check-final | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T17:42:31+00:00 | idiom-ruff-check-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T17:42:31+00:00 | idiom-ruff-format-final | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T17:43:26+00:00 | behavior-final | 0 | 51.29 | `pytest -q` | `4ac0fb7920e04f8c` |  |  |
+| 2026-11-16T17:44:14+00:00 | crap-coverage-final | 0 | 42.21 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `2b63e82ee550aa5b` |  |  |
+| 2026-11-16T17:44:15+00:00 | crap-lizard-final | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:44:15+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |

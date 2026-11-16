@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -125,15 +126,28 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert itinerary_response.status_code == 200
     route_content = route_response.content.decode()
     itinerary_content = itinerary_response.content.decode()
-    assert 'No routes found that satisfy the route specification.' in route_content
+    route_message = re.search(
+        r'<p[^>]*role="status"[^>]*>(.*?)</p>',
+        route_content,
+        re.DOTALL,
+    )
+    itinerary_message = re.search(
+        r'<p[^>]*role="status"[^>]*>(.*?)</p>',
+        itinerary_content,
+        re.DOTALL,
+    )
+    assert route_message is not None
+    assert itinerary_message is not None
+    assert re.sub(r'\s+', ' ', route_message.group(1)).strip() == (
+        'No routes found that satisfy the route specification. '
+        'Try setting an arrival deadline further into the future.'
+    )
+    assert re.sub(r'\s+', ' ', itinerary_message.group(1)).strip() == (
+        'No routes found that satisfy the route specification. '
+        'Try setting the arrival deadline further into the future (a few weeks at least).'
+    )
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
-    assert 'No routes found that satisfy the route specification.' in itinerary_content
-    assert (
-        'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
-    )
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
 
@@ -156,6 +170,23 @@ def test_select_itinerary_renders_candidate_routes_when_available(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_candidate_is_signed_for_route_assignment(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    response = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        response.content.decode(),
+    ).group(1)
+
+    candidate = signing.loads(candidate_token, salt='booking.route_selection')
+
+    assert response.status_code == 200
+    assert candidate['tracking_id'] == tracking_id.value
+    assert len(candidate['legs']) == 2
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(client):
     tracking_id = _create_cargo(_candidate_paths())
     route_url = f'/admin/cargo/{tracking_id.value}/route/'
@@ -174,6 +205,20 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
     assert 'Itinerary' in content
     assert 'CM003' in content
     assert 'CM001' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_without_a_candidate_returns_not_found(client):
+    tracking_id = _create_cargo(_candidate_paths())
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/route/',
+        {},
+    )
+
+    assert response.status_code == 404
+    assert 'Not routed' in client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
 
 
 @pytest.mark.django_db
