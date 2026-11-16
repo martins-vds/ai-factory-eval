@@ -4,6 +4,7 @@ from threading import Thread
 
 import pytest
 from django.test import override_settings
+from playwright.sync_api import sync_playwright
 
 from src.fees.gateway import HttpPaymentGateway, PaymentGatewayUnavailable
 from src.loans.models import Loan
@@ -54,6 +55,18 @@ def test_fee_endpoint_charges_each_late_day_after_grace_period(client):
     assert response.content.decode() == (
         '<h1>Late fee for F1</h1><p>Due 2026-01-01, 3 day(s) late.</p>'
         '<p class="fee">Fee: $0.75</p>'
+    )
+
+
+@pytest.mark.django_db
+def test_fee_endpoint_matches_characterized_late_fee_for_seed_loan(client):
+    response = client.get('/fees/L3')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html'
+    assert response.content.decode() == (
+        '<h1>Late fee for L3</h1><p>Due 2025-12-15, 19 day(s) late.</p>'
+        '<p class="fee">Fee: $4.75</p>'
     )
 
 
@@ -121,6 +134,53 @@ def test_htmx_payment_action_returns_gateway_success_fragment(client, payment_ga
     assert b'role="status"' in response.content
     assert b'charged' in response.content
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_htmx_payment_failure_shows_alert_fragment(client, payment_gateway):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    with override_settings(PAYMENT_GATEWAY_URL=payment_gateway.url):
+        response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'<html' not in response.content
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_non_htmx_payment_returns_complete_result_page(client, payment_gateway):
+    with override_settings(PAYMENT_GATEWAY_URL=payment_gateway.url):
+        response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert b'<title>Payment result' in response.content
+    assert b'role="status"' in response.content
+    assert b'href="/ui/fees/L1/"' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_can_view_and_pay_a_late_fee(live_server, payment_gateway, settings):
+    settings.PAYMENT_GATEWAY_URL = payment_gateway.url
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+
+            assert page.get_by_role('heading', name='Late fee for L3').is_visible()
+            assert page.get_by_text('Fee: $4.75').is_visible()
+            page.get_by_role('button', name='Pay late fee').click()
+
+            status = page.get_by_role('status')
+            status.wait_for()
+            assert status.inner_text() == 'Payment received. charged'
+        finally:
+            browser.close()
 
 
 @pytest.mark.django_db
