@@ -3,6 +3,8 @@ from datetime import UTC, date, datetime
 
 import pytest
 from django.core.management import call_command
+from django.http import Http404
+from django.test import RequestFactory
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -134,9 +136,22 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
 
 @pytest.mark.parametrize('dialog', ['destination', 'deadline'])
 def test_unknown_cargo_dialog_returns_not_found(client, dialog):
-    response = client.get(f'/admin/cargo/MISSING1/{dialog}/', HTTP_HX_REQUEST='true')
+    tracking_id = 'MISSING1'
+    response = client.get(
+        f'/admin/cargo/{tracking_id}/{dialog}/',
+        HTTP_HX_REQUEST='true',
+    )
+    view = destination_dialog_view if dialog == 'destination' else deadline_dialog_view
 
     assert response.status_code == 404
+    with pytest.raises(
+        Http404,
+        match=f'^Cargo with tracking ID {tracking_id} not found\\.$',
+    ):
+        view(
+            RequestFactory().get(f'/admin/cargo/{tracking_id}/{dialog}/'),
+            tracking_id,
+        )
 
 
 @pytest.mark.parametrize('dialog', ['destination', 'deadline'])
@@ -146,8 +161,17 @@ def test_stale_cargo_dialog_returns_not_found(client, dialog):
     CargoRecord.objects.filter(tracking_id=tracking_id).delete()
 
     response = client.get(f'/admin/cargo/{tracking_id}/{dialog}/', HTTP_HX_REQUEST='true')
+    view = destination_dialog_view if dialog == 'destination' else deadline_dialog_view
 
     assert response.status_code == 404
+    with pytest.raises(
+        Http404,
+        match=f'^Cargo with tracking ID {tracking_id} not found\\.$',
+    ):
+        view(
+            RequestFactory().get(f'/admin/cargo/{tracking_id}/{dialog}/'),
+            tracking_id,
+        )
 
 
 @pytest.mark.parametrize('dialog', ['destination', 'deadline'])
