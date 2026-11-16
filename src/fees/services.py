@@ -43,10 +43,13 @@ def pay_late_fee(loan_id: str) -> PaymentResult:
                 response.read().decode('utf-8', errors='replace'),
             )
     except HTTPError as error:
-        return PaymentResult(
-            502,
-            error.read().decode('utf-8', errors='replace'),
-        )
+        try:
+            body = error.read().decode('utf-8', errors='replace')
+        except InterruptedError as interruption:
+            return PaymentResult(502, 'payment gateway unavailable\n', interruption)
+        except (OSError, URLError):
+            return PaymentResult(502, 'payment gateway unavailable\n')
+        return PaymentResult(502, body)
     except InterruptedError as error:
         return PaymentResult(502, 'payment gateway unavailable\n', error)
     except (OSError, URLError):

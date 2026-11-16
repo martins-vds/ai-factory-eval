@@ -1,6 +1,8 @@
+import json
 from contextlib import contextmanager
 from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from threading import Thread
 
 import pytest
@@ -8,6 +10,11 @@ from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
+
+GOLDENS = Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens'
+HTTP_GOLDENS = json.loads((GOLDENS / 'http.json').read_text(encoding='utf-8'))
+EDGE_GOLDENS = json.loads((GOLDENS / 'edge-cases.json').read_text(encoding='utf-8'))
+GATEWAY_GOLDENS = json.loads((GOLDENS / 'gateway.json').read_text(encoding='utf-8'))
 
 
 @contextmanager
@@ -46,14 +53,12 @@ def local_gateway(status, body):
 
 @pytest.mark.django_db
 def test_fee_endpoint_renders_the_characterized_loan_fee(client):
-    response = client.get('/fees/L3')
+    golden = HTTP_GOLDENS['GET /fees/{id}']['response']
+    response = client.get(HTTP_GOLDENS['GET /fees/{id}']['request']['path'])
 
-    assert response.status_code == 200
-    assert response['Content-Type'] == 'text/html'
-    assert response.content.decode() == (
-        '<h1>Late fee for L3</h1><p>Due 2025-12-15, 19 day(s) late.</p>'
-        '<p class="fee">Fee: $4.75</p>'
-    )
+    assert response.status_code == golden['status']
+    assert response['Content-Type'] == golden['content_type']
+    assert response.content.decode() == golden['body']
 
 
 @pytest.mark.django_db
@@ -65,6 +70,7 @@ def test_fee_endpoint_renders_the_characterized_loan_fee(client):
         (date(2026, 3, 17), 2, '0.00'),
         (date(2026, 3, 18), 3, '0.75'),
         (date(2026, 4, 24), 40, '10.00'),
+        (date(2026, 4, 25), 41, '10.00'),
     ],
 )
 def test_fee_endpoint_applies_grace_period_and_cap(
@@ -104,11 +110,12 @@ def test_unreturned_fee_uses_the_server_local_date(client):
 
 @pytest.mark.django_db
 def test_fee_endpoint_returns_the_characterized_missing_loan_response(client):
-    response = client.get('/fees/unknown')
+    golden = EDGE_GOLDENS['GET /fees/unknown']['response']
+    response = client.get(EDGE_GOLDENS['GET /fees/unknown']['request']['path'])
 
-    assert response.status_code == 404
-    assert response['Content-Type'] == 'text/html'
-    assert response.content == b'<p>No such loan.</p>'
+    assert response.status_code == golden['status']
+    assert response['Content-Type'] == golden['content_type']
+    assert response.content.decode() == golden['body']
 
 
 @pytest.mark.django_db
@@ -124,16 +131,62 @@ def test_fee_page_uses_reading_room_layout_and_offers_htmx_payment(client):
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_forwards_the_gateway_request(client, monkeypatch):
-    with local_gateway(200, b'charged\n') as (gateway_url, requests):
+def test_fee_page_returns_the_not_found_fragment_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_forwards_the_gateway_request(client, monkeypatch, caplog):
+    source_result = GATEWAY_GOLDENS['responses']['POST /payments/L1 via test gateway']['response']
+    with local_gateway(source_result['status'], source_result['body'].encode()) as (
+        gateway_url,
+        requests,
+    ):
         monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
 
-        response = client.post('/payments/L3')
+        response = client.post('/payments/L1')
+
+    assert response.status_code == source_result['status']
+    assert response.content.decode() == source_result['body']
+    assert requests == [('POST', '/charge?loan=L1', b'')]
+    assert 'Payment gateway call interrupted' not in caplog.text
+
+
+@pytest.mark.django_db
+def test_payment_endpoint_uses_the_configured_default_gateway(client, monkeypatch):
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    requests = []
+
+    class GatewayResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def read(self):
+            return b'charged\n'
+
+    def open_gateway(request):
+        requests.append(request)
+        return GatewayResponse()
+
+    monkeypatch.setattr('src.fees.services._open_gateway', open_gateway)
+
+    response = client.post('/payments/L3')
 
     assert response.status_code == 200
-    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'charged\n'
-    assert requests == [('POST', '/charge?loan=L3', b'')]
+    assert len(requests) == 1
+    assert requests[0].full_url == ('https://payments.lending-library.invalid/charge?loan=L3')
+    assert requests[0].get_method() == 'POST'
+    assert requests[0].data is None
 
 
 @pytest.mark.django_db
@@ -154,7 +207,21 @@ def test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan(client, monk
     with local_gateway(200, b'charged\n') as (gateway_url, requests):
         monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
 
-        response = client.post('/payments/unknown')
+        golden = EDGE_GOLDENS['POST /payments/unknown']['response']
+        response = client.post(EDGE_GOLDENS['POST /payments/unknown']['request']['path'])
+
+    assert response.status_code == golden['status']
+    assert response['Content-Type'] == golden['content_type']
+    assert response.content.decode() == golden['body']
+    assert requests == []
+
+
+@pytest.mark.django_db
+def test_payment_page_does_not_call_gateway_for_an_unknown_loan(client, monkeypatch):
+    with local_gateway(200, b'charged\n') as (gateway_url, requests):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+        response = client.post('/ui/payments/unknown/')
 
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
@@ -175,6 +242,7 @@ def test_fee_page_payment_returns_an_htmx_status(client, monkeypatch):
     assert response.status_code == 200
     assert b'id="payment-status"' in response.content
     assert b'role="status"' in response.content
+    assert b'<!doctype html>' not in response.content
     assert b'charged' in response.content
     assert requests == [('POST', '/charge?loan=L3', b'')]
 
@@ -227,4 +295,52 @@ def test_interrupted_payment_is_a_gateway_failure_and_remains_visible(client, mo
 
     assert response.status_code == 502
     assert response.content == b'payment gateway unavailable\n'
-    assert 'InterruptedError' in caplog.text
+    assert 'Payment gateway call interrupted (InterruptedError)' in caplog.text
+
+
+@pytest.mark.django_db
+def test_payment_gateway_io_failure_becomes_bad_gateway(client, monkeypatch):
+    def fail(_request):
+        raise OSError('socket closed')
+
+    monkeypatch.setattr('src.fees.services._open_gateway', fail)
+
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
+def test_non_200_gateway_body_read_failure_becomes_bad_gateway(client, monkeypatch):
+    from urllib.error import HTTPError
+
+    class BrokenHTTPError(HTTPError):
+        def read(self):
+            raise OSError('socket closed')
+
+    def fail(_request):
+        raise BrokenHTTPError('gateway', 503, 'unavailable', {}, None)
+
+    monkeypatch.setattr('src.fees.services._open_gateway', fail)
+
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/ui/fees/L3/', 'post'),
+        ('/payments/L3', 'get'),
+        ('/ui/payments/L3/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405

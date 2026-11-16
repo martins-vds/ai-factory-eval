@@ -17,6 +17,7 @@ evidence:
   - tests/fees/test_fees.py::test_fee_endpoint_renders_the_characterized_loan_fee
   - tests/fees/test_fees.py::test_fee_endpoint_returns_the_characterized_missing_loan_response
   - tests/fees/test_fees.py::test_fee_page_uses_reading_room_layout_and_offers_htmx_payment
+  - tests/fees/test_fees.py::test_fee_page_returns_the_not_found_fragment_for_an_unknown_loan
   - tests/fees/test_fees.py::test_real_browser_can_pay_a_late_fee
   - .migration/evidence/runs/LL-03.md
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."

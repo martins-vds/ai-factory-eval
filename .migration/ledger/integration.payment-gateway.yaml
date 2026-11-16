@@ -12,6 +12,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eva
 target:
   components:
     - src.fees.services.pay_late_fee
+    - src.fees.views._charge_loan
     - src.fees.views.payment_endpoint
     - src.fees.views.payment_page
     - templates/fees/payment-result.html
@@ -20,9 +21,14 @@ verification: differential
 characterization_tier: A
 evidence:
   - tests/fees/test_fees.py::test_payment_endpoint_forwards_the_gateway_request
+  - tests/fees/test_fees.py::test_payment_endpoint_uses_the_configured_default_gateway
   - tests/fees/test_fees.py::test_non_200_gateway_responses_become_bad_gateway
   - tests/fees/test_fees.py::test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_fees.py::test_payment_page_does_not_call_gateway_for_an_unknown_loan
   - tests/fees/test_fees.py::test_interrupted_payment_is_a_gateway_failure_and_remains_visible
+  - tests/fees/test_fees.py::test_payment_gateway_io_failure_becomes_bad_gateway
+  - tests/fees/test_fees.py::test_non_200_gateway_body_read_failure_becomes_bad_gateway
+  - tests/fees/test_fees.py::test_fee_and_payment_routes_reject_unsupported_methods
   - tests/fees/test_fees.py::test_fee_page_payment_returns_an_htmx_status
   - tests/fees/test_fees.py::test_fee_page_payment_shows_gateway_failure_in_htmx
   - tests/fees/test_fees.py::test_real_browser_can_pay_a_late_fee

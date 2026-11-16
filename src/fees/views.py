@@ -19,9 +19,18 @@ def _fee_context(loan):
     return {
         'loan': loan,
         'days_late': days_late,
-        'fee': amount,
         'fee_display': f'{amount:.2f}',
     }
+
+
+def _charge_loan(loan_id):
+    result = pay_late_fee(loan_id)
+    if result.interruption is not None:
+        logger.error(
+            'Payment gateway call interrupted (%s)',
+            type(result.interruption).__name__,
+        )
+    return result
 
 
 @require_GET
@@ -53,12 +62,7 @@ def fee_page(request, loan_id):
 def payment_endpoint(request, loan_id):
     if not Loan.objects.filter(pk=loan_id).exists():
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-    result = pay_late_fee(loan_id)
-    if result.interruption is not None:
-        logger.error(
-            'Payment gateway call interrupted (%s)',
-            type(result.interruption).__name__,
-        )
+    result = _charge_loan(loan_id)
     return HttpResponse(result.body, status=result.status_code, content_type='text/plain')
 
 
@@ -68,12 +72,7 @@ def payment_page(request, loan_id):
     if loan is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
 
-    result = pay_late_fee(loan_id)
-    if result.interruption is not None:
-        logger.error(
-            'Payment gateway call interrupted (%s)',
-            type(result.interruption).__name__,
-        )
+    result = _charge_loan(loan_id)
     context = {**_fee_context(loan), 'payment_result': result}
     if request.headers.get('HX-Request') == 'true':
         return render(
