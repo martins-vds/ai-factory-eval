@@ -97,7 +97,9 @@ def test_destination_dialog_shows_current_values_and_filters_options_without_mut
 @pytest.mark.django_db
 def test_invalid_destination_shows_field_error_and_keeps_dialog_open(booking_dialogs):
     (change_destination, _), cargo_repository, _ = booking_dialogs
-    previous_destination = cargo_repository.find(TrackingId('DEF789')).route_specification.destination
+    previous_destination = cargo_repository.find(
+        TrackingId('DEF789')
+    ).route_specification.destination
 
     response = change_destination(
         _request(

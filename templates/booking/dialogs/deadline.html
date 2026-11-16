@@ -1,0 +1,34 @@
+<form
+  method="post"
+  action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+  hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+  hx-target="#cargo-edit-dialog"
+  hx-swap="innerHTML"
+  class="flex flex-col gap-6 p-6"
+>
+  {% csrf_token %}
+  <section aria-labelledby="deadline-dialog-heading">
+    <h2 id="deadline-dialog-heading" class="mb-4 text-xl font-semibold">Change cargo deadline</h2>
+    <p class="mb-4">
+      Origin: {{ cargo.route_specification.origin.name }}.
+      Destination: {{ cargo.route_specification.destination.name }}.
+    </p>
+    <label class="label mb-1 block font-medium text-slate-800" for="arrival-deadline">Arrival deadline</label>
+    {% if deadline_error %}
+      <p class="mb-2 text-red-700" id="deadline-error" role="alert">{{ deadline_error }}</p>
+    {% endif %}
+    <input
+      class="input input-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      type="date"
+      id="arrival-deadline"
+      name="deadline"
+      value="{{ deadline_value }}"
+      required
+      {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+    >
+  </section>
+  <nav aria-label="Deadline dialog actions" class="flex justify-end gap-3">
+    <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="button" onclick="this.closest('dialog').close()">Cancel</button>
+    <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update deadline</button>
+  </nav>
+</form>
