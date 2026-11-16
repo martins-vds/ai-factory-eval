@@ -152,3 +152,6 @@ translation_rules: .migration/translation-rules.md
 signoff:
   approvers:
   - martins-vds
+self_heal:
+  enabled: true
+  max_blocks: 2
