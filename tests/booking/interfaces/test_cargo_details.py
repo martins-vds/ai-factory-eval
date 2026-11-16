@@ -3,8 +3,14 @@ from django.core.management import call_command
 from django.test import override_settings
 from django.urls import path
 
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.cargo.domain.delivery import RoutingStatus
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
+from cargotracker.location.domain.un_locode import UnLocode
+from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
 
 class CargoRepository:
@@ -54,6 +60,27 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_misrouted_cargo_details_offer_reroute(client):
+    call_command('seed_sample_data')
+    destination = DjangoLocationRepository().find(UnLocode('CNHKG'))
+    cargo = CargoSpecification(
+        DjangoCargoRepository(),
+        DjangoHandlingEventRepository(),
+    ).change_destination(TrackingId('MNO456'), destination)
+
+    assert cargo.delivery.routing_status is RoutingStatus.MISROUTED
+    assert not cargo.delivery.misdirected
+
+    response = client.get('/admin/cargo/MNO456/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Misrouted cargo!' in content
+    assert 'href="/admin/cargo/MNO456/itineraries/"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_unknown_and_stale_cargo_details_return_http_404(client):
     call_command('seed_sample_data')
     repository.missing_tracking_ids.add('MNO456')
@@ -63,3 +90,5 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+    assert b'Cargo with tracking ID UNKNOWN not found.' in unknown_response.content
+    assert b'Cargo with tracking ID MNO456 not found.' in stale_response.content
