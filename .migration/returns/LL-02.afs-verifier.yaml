@@ -1,0 +1,33 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/532
+verdict: blocked
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.932
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: blocker
+    where: tests/loans/test_catalog.py:399
+    what: Two full-suite runs timed out in the real-browser flow after an exploratory transaction-aware test; the test was reverted and the stop rule fired.
+  - severity: minor
+    where: src/loans/repository.py:17
+    what: The mutant removing @transaction.atomic survives; tests do not independently establish the return row-lock boundary under autocommit.
+  - severity: major
+    where: src/loans/forms.py:8
+    what: The mutant setting LoanForm.Meta.model to None survives despite required-field API tests; investigate the mutation execution context before accepting it.
+tests_added:
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+handoff: .migration/handoffs/LL-02.md
