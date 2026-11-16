@@ -10,6 +10,31 @@ from src.loans.repository import LoanRepository
 
 
 @pytest.mark.django_db
+def test_lending_form_trims_values_and_rejects_overlong_fields(client):
+    response = client.post(
+        '/loans',
+        {'member': f'{"m" * 255} ', 'isbn': f' {"i" * 255} '},
+    )
+
+    assert response.status_code == 201
+    loan = Loan.objects.get(pk='L4')
+    assert loan.member == 'm' * 255
+    assert loan.isbn == 'i' * 255
+
+    for fields in (
+        {'member': 'm' * 256, 'isbn': '123'},
+        {'member': 'reader', 'isbn': 'i' * 256},
+    ):
+        response = client.post('/loans', fields)
+        assert response.status_code == 400
+
+    response = client.post('/ui/loans/new/', {'member': '  ', 'isbn': '\t'})
+    page = response.content.decode()
+    assert 'Enter a member name; blank values are not accepted.' in page
+    assert 'Enter an ISBN; blank values are not accepted.' in page
+
+
+@pytest.mark.django_db
 def test_list_endpoint_returns_seeded_records(client):
     response = client.get('/loans')
 

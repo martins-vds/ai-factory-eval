@@ -8,10 +8,12 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
 boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#441]
+target:
+  components: [src.loans.views.loan_list, src.loans.services.lend_loan, src.loans.forms.LoanLendingForm, templates.loans.list]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/loans/test_circulation.py::test_lending_creates_a_durable_fourteen_day_loan, tests/loans/test_circulation.py::test_lending_rejects_blank_member_or_isbn, tests/loans/test_circulation.py::test_browser_lending_shows_field_errors_for_blank_values, tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks, .migration/evidence/runs/LL-02.md]
+notes: "Human rulings fix blank or whitespace-only member/ISBN values under #39 and escape delimiters under #43; API and browser tests pin the approved divergence."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
