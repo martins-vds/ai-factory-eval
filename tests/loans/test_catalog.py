@@ -27,11 +27,13 @@ def test_lookup_returns_formatted_loan_and_not_found_text(client):
     response = client.get('/loans/L1')
 
     assert response.status_code == 200
+    assert response['Content-Type'].startswith('text/plain')
     assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
 
     missing = client.get('/loans/missing')
 
     assert missing.status_code == 404
+    assert missing['Content-Type'].startswith('text/plain')
     assert missing.content == b'no such loan\n'
 
 
@@ -82,17 +84,34 @@ def test_loan_detail_page_shows_characterized_due_date(client):
 
 
 @pytest.mark.django_db
+def test_loan_catalog_page_displays_the_seeded_collection(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'With ana' in response.content
+    assert b'ISBN 9780134685991' in response.content
+
+
+@pytest.mark.django_db
+def test_unknown_loan_page_returns_the_reading_room_not_found_page(client):
+    response = client.get('/ui/loans/missing/')
+
+    assert response.status_code == 404
+    assert b"We couldn't find that loan." in response.content
+
+
+@pytest.mark.django_db
 def test_repository_transaction_rolls_back_failed_work():
     repository = LoanRepository()
 
-    with pytest.raises(RuntimeError):
-        with repository.transaction():
-            Loan.objects.create(
-                id='L99',
-                member='temporary',
-                isbn='999',
-                lent_on=datetime.date(2026, 1, 1),
-            )
-            raise RuntimeError('transaction failed')
+    with pytest.raises(RuntimeError), repository.transaction():
+        Loan.objects.create(
+            id='L99',
+            member='temporary',
+            isbn='999',
+            lent_on=datetime.date(2026, 1, 1),
+        )
+        raise RuntimeError('transaction failed')
 
     assert not Loan.objects.filter(pk='L99').exists()
