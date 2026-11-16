@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from .models import Loan
-from .services import get_loan_text, list_loans_text
+from .services import get_loan_text, lend_loan, list_loans_text, loan_line
 
 
 def loan_catalog(request):
@@ -15,6 +15,20 @@ def loan_catalog_detail(request, loan_id):
 
 
 def loan_list(request):
+    if request.method == 'POST':
+        member = request.POST.get('member', '')
+        isbn = request.POST.get('isbn', '')
+        if not member.strip() or not isbn.strip():
+            return HttpResponse(
+                'member and isbn are required\n',
+                status=400,
+                content_type='text/plain',
+            )
+        return HttpResponse(
+            loan_line(lend_loan(member, isbn)),
+            status=201,
+            content_type='text/plain',
+        )
     return HttpResponse(list_loans_text(), content_type='text/plain')
 
 

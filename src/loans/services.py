@@ -1,7 +1,18 @@
 import csv
+from datetime import date
 from io import StringIO
 
 from .repository import LoanRepository
+
+
+def lend_loan(member, isbn):
+    repository = LoanRepository()
+    return repository.create(
+        id=f'L{repository.all().count() + 1}',
+        member=member,
+        isbn=isbn,
+        lent_on=date.today(),
+    )
 
 
 def loan_line(loan):
