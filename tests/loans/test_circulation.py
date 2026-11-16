@@ -131,5 +131,5 @@ def test_reading_room_repeat_return_is_rejected_without_overwriting_date(client)
     response = client.post('/ui/loans/L2/return/')
 
     assert response.status_code == 409
-    assert b'already returned' in response.content
+    assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on.isoformat() == '2026-01-20'

@@ -30,6 +30,21 @@ def loan_catalog_detail(request, loan_id):
     return render(request, 'loans/detail.html', {'loan': loan})
 
 
+@require_POST
+def loan_return_page(request, loan_id):
+    loan, already_returned = return_loan(loan_id)
+    if loan is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    if already_returned:
+        return render(
+            request,
+            'loans/detail.html',
+            {'loan': loan, 'return_error': 'This loan has already been returned.'},
+            status=409,
+        )
+    return redirect('loan_catalog_detail', loan_id=loan.id)
+
+
 @require_http_methods(['GET', 'POST'])
 def loan_list(request):
     if request.method == 'POST':
