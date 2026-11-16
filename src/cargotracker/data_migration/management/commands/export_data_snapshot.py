@@ -32,10 +32,7 @@ def _prepare_tables(mapping, models):
         raise DataExportError('mapping has no tables')
 
     targets = [spec.get('target') if isinstance(spec, dict) else None for spec in specs]
-    if (
-        any(not isinstance(target, str) for target in targets)
-        or len(targets) != len(set(targets))
-    ):
+    if any(not isinstance(target, str) for target in targets) or len(targets) != len(set(targets)):
         raise DataExportError('mapping targets must be unique table names')
 
     prepared = []
@@ -44,16 +41,11 @@ def _prepare_tables(mapping, models):
         model = models.get(target)
         if model is None:
             raise DataExportError(f'{target}: no registered Django model for target table')
-        if Path(target).name != target:
-            raise DataExportError(f'{target}: invalid target table name')
 
         columns = spec.get('columns')
         if not isinstance(columns, dict) or not columns:
             raise DataExportError(f'{target}: mapping has no columns')
-        fields = [
-            (column, _field_for_column(model, column))
-            for column in columns
-        ]
+        fields = [(column, _field_for_column(model, column)) for column in columns]
         if model._meta.pk not in (field for _, field in fields):
             raise DataExportError(f'{target}: mapping must include its primary key')
         prepared.append((target, model, fields))
@@ -64,8 +56,6 @@ def _format_value(value):
     if value is None:
         return r'\N'
     if isinstance(value, datetime.datetime):
-        if value.utcoffset() is None:
-            value = value.replace(tzinfo=datetime.UTC)
         return value.astimezone(datetime.UTC).isoformat().replace('+00:00', 'Z')
     if isinstance(value, datetime.date):
         return value.isoformat()
@@ -77,9 +67,11 @@ def _format_value(value):
 def export_snapshot(mapping_path, output_path):
     mapping_file = Path(mapping_path)
     try:
-        mapping = yaml.safe_load(mapping_file.read_text(encoding='utf-8')) or {}
+        mapping = yaml.safe_load(mapping_file.read_text(encoding='utf-8'))
     except (OSError, yaml.YAMLError) as error:
         raise DataExportError(f'{mapping_file}: unable to read mapping: {error}') from error
+    if mapping is None:
+        mapping = {}
     if not isinstance(mapping, dict):
         raise DataExportError(f'{mapping_file}: mapping must be an object')
 
