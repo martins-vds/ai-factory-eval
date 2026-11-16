@@ -18,7 +18,7 @@ evidence:
   - .migration/evidence/runs/LL-01.md
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/characterization/source/goldens/restart.json
-  - tests/loans/test_catalog.py::test_catalog_data_survives_a_database_connection_reopen
+  - tests/loans/test_catalog.py::test_saved_catalog_record_is_available_to_later_requests
 approval:
   by: martins-vds
   ref: martins-vds/ai-factory-synthetic-target#42

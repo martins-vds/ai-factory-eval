@@ -6,10 +6,9 @@ from io import StringIO
 import pytest
 from django.apps import apps
 from django.db import connection, transaction
-from django.urls import reverse
 
+from src.loans import repository
 from src.loans.models import Loan
-from src.loans.repository import LoanRepository
 
 
 @pytest.mark.django_db
@@ -41,10 +40,12 @@ def test_loan_lookup_returns_one_line_or_characterized_not_found(client):
     response = client.get('/loans/L1')
 
     assert response.status_code == 200
+    assert response['Content-Type'].startswith('text/plain')
     assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
 
     missing = client.get('/loans/unknown')
     assert missing.status_code == 404
+    assert missing['Content-Type'].startswith('text/plain')
     assert missing.content.decode() == 'no such loan\n'
 
 
@@ -58,6 +59,16 @@ def test_due_date_is_fourteen_calendar_days_after_lending():
     )
 
     assert loan.due_on == date(2027, 1, 8)
+
+
+@pytest.mark.django_db
+def test_unreturned_loan_passes_model_validation():
+    loan = Loan(id='L9', member='dee', isbn='123', lent_on=date(2026, 1, 1))
+    return_field = Loan._meta.get_field('returned_on')
+
+    assert return_field.null
+    assert return_field.blank
+    loan.full_clean()
 
 
 @pytest.mark.django_db
@@ -86,30 +97,31 @@ def test_repository_writes_roll_back_with_the_transaction():
     )
 
     with pytest.raises(RuntimeError), transaction.atomic():
-        LoanRepository.save(loan)
+        repository.save(loan)
         raise RuntimeError('abort write')
 
     assert not Loan.objects.filter(pk='L9').exists()
 
 
-@pytest.mark.django_db(transaction=True)
-def test_catalog_data_survives_a_database_connection_reopen():
-    Loan.objects.create(id='L9', member='dee', isbn='123', lent_on=date(2026, 1, 1))
+@pytest.mark.django_db
+def test_saved_catalog_record_is_available_to_later_requests(client):
+    repository.save(Loan(id='L9', member='dee', isbn='123', lent_on=date(2026, 1, 1)))
 
-    connection.close()
+    response = client.get('/loans/L9')
 
-    assert Loan.objects.get(pk='L9').member == 'dee'
+    assert response.status_code == 200
+    assert response.content.decode() == 'L9;dee;123;2026-01-01;2026-01-15;\n'
 
 
 @pytest.mark.django_db
 def test_catalog_pages_render_in_separate_ui_routes(client):
-    response = client.get(reverse('loans:ui-list'))
+    response = client.get('/ui/loans/')
 
     assert response.status_code == 200
     assert b'Lending Library' in response.content
     assert b'9780134685991' in response.content
     assert b'/loans/L1' in response.content
 
-    detail = client.get(reverse('loans:ui-detail', kwargs={'loan_id': 'L1'}))
+    detail = client.get('/ui/loans/L1/')
     assert detail.status_code == 200
     assert b'2026-01-16' in detail.content
