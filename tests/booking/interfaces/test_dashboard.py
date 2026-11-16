@@ -90,11 +90,16 @@ def test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_
     assert 'XXXXX' not in routed_table
     assert 'Status' in routed_table and 'IN_PORT' in routed_table
     assert 'Deadline' in routed_table and re.search(r'\d{2}/\d{2}/\d{4}', routed_table)
+    assert 'href="/admin/cargo/JKL567/"' in routed_table
+    assert 'href="/admin/cargo/ABC123/"' in routed_table
     assert 'Hong Kong' in not_routed_table and 'Melbourne' in not_routed_table
     assert 'AUMEL' in not_routed_table and 'Deadline' in not_routed_table
     assert 'New York' in claimed_table and 'Dallas' in claimed_table
+    assert 'USNYC' in claimed_table and 'USDAL' in claimed_table
+    assert 'Deadline' in claimed_table and re.search(r'\d{2}/\d{2}/\d{4}', claimed_table)
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
     assert 'href="/admin/cargo/MNO456/"' in claimed_table
+    assert 'MNO456' in claimed_table
     assert 'title="Click to see details"' in claimed_table
     assert 'Click to see history' not in claimed_table
     assert 'ShowTrackingDialog' not in content
