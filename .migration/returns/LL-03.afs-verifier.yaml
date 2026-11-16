@@ -18,6 +18,9 @@ findings:
     where: src/fees/views.py:65-71
     what: "When htmx loads, its pinned 2.0.11 default 4xx/5xx handling is swap:false, so the 502 alert fragment will not replace the target; the local browser probe could not load htmx from its CDN to confirm the flow."
   - severity: minor
+    where: src/fees/services.py:20-62
+    what: "FeeApplication combines fee calculation and payment gateway orchestration in the fees module, while decision-map #38 names fees and payments as separate bounded contexts; confirm this boundary or split it in a follow-up."
+  - severity: minor
     where: .migration/ledger/fees.calculation.yaml:14
     what: "All three LL-03 ledger entries remain in-progress although the handoff deferred promotion only until full regression and remaining gates passed; Migrator should reconcile their statuses."
   - severity: minor
