@@ -59,6 +59,17 @@ def _make_invariant_snapshot(snapshot):
 
     header, rows = _read_table(snapshot, 'HANDLINGEVENT')
     rows[0].update(TYPE='LOAD', LOCATION_ID='101')
+    rows.append(
+        {
+            'ID': '72',
+            'TYPE': 'RECEIVE',
+            'VOYAGE_ID': '\\N',
+            'LOCATION_ID': '101',
+            'COMPLETIONTIME': '2026-11-06T10:00:00Z',
+            'REGISTRATION': '2026-11-06T10:01:00Z',
+            'CARGO_ID': '13',
+        }
+    )
     _write_table(snapshot, 'HANDLINGEVENT', header, rows)
 
     header, rows = _read_table(snapshot, 'LEG')
@@ -169,11 +180,13 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(
     events = list(HandlingEventRecord.objects.all())
 
     assert events
+    assert any(event.voyage_id is not None for event in events)
+    assert any(event.voyage_id is None for event in events)
     for event in events:
-        assert event.voyage_id is not None
-        assert VoyageRecord.objects.filter(pk=event.voyage_id).exists()
         assert event.location_id is not None
         assert LocationRecord.objects.filter(pk=event.location_id).exists()
+        if event.voyage_id is not None:
+            assert VoyageRecord.objects.filter(pk=event.voyage_id).exists()
 
 
 @pytest.mark.django_db(transaction=True)
