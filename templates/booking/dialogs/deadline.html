@@ -1,0 +1,57 @@
+<dialog {% if dialog_open %}open{% endif %}
+  id="deadline-dialog"
+  aria-labelledby="deadline-dialog-title"
+  class="fixed inset-0 m-auto max-h-[90vh] w-full max-w-lg rounded-xl p-6 shadow-xl backdrop:bg-black/50"
+>
+  <form
+    id="deadline-update-form"
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline-dialog/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline-dialog/"
+    hx-target="#dialog-container"
+    hx-swap="innerHTML"
+    class="space-y-5"
+  >
+    {% csrf_token %}
+    <h2 id="deadline-dialog-title" class="text-xl font-semibold text-gray-900">
+      Change deadline for cargo {{ cargo.tracking_id.value }}
+    </h2>
+    <p>
+      Route: {{ cargo.route_specification.origin.name }} to
+      {{ cargo.route_specification.destination.name }}
+    </p>
+    <div>
+      <label for="arrival-deadline" class="mb-1 block font-medium">Arrival deadline</label>
+      <input
+        id="arrival-deadline"
+        name="deadline"
+        type="date"
+        value="{{ deadline_value }}"
+        required
+        autofocus
+        {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+        class="min-h-11 w-full rounded-md border border-gray-400 px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+      >
+      {% if deadline_error %}
+        <p id="deadline-error" class="mt-2 text-red-800" role="alert">{{ deadline_error }}</p>
+      {% endif %}
+    </div>
+  </form>
+  <div class="flex justify-end gap-3">
+    <form method="dialog">
+      <button
+        type="submit"
+        class="min-h-11 rounded-md border border-gray-500 px-4 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+      >
+        Cancel
+      </button>
+    </form>
+    <button
+      type="submit"
+      form="deadline-update-form"
+      class="min-h-11 rounded-md bg-blue-700 px-4 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+    >
+      Update deadline
+    </button>
+  </div>
+</dialog>

@@ -16,3 +16,28 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-specialist-migrator · 2026-11-16T13:58:49Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-from-table  ·  **Last commit:** de5dfa0d
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05G.afs-specialist-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it.
+- [ ] `.migration/returns/BK-05G.afs-specialist-migrator.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty.
+- [ ] Your return reports a handoff (`.migration/handoffs/BK-05G.md`) but this branch didn't commit it. Write the `## Handoff` section with afs-handoff and commit `.migration/handoffs/BK-05G.md`.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 3 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
+
+## Handoff — afs-specialist-migrator · 2026-11-16T14:02:33Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-from-table  ·  **Last commit:** 78625265
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05G.afs-specialist-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it.
+- [ ] `.migration/returns/BK-05G.afs-specialist-migrator.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 2 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.

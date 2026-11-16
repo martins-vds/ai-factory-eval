@@ -1,0 +1,63 @@
+<dialog {% if dialog_open %}open{% endif %}
+  id="destination-dialog"
+  aria-labelledby="destination-dialog-title"
+  class="fixed inset-0 m-auto max-h-[90vh] w-full max-w-lg rounded-xl p-6 shadow-xl backdrop:bg-black/50"
+>
+  <form
+    id="destination-update-form"
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/destination-dialog/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination-dialog/"
+    hx-target="#dialog-container"
+    hx-swap="innerHTML"
+    class="space-y-5"
+  >
+    {% csrf_token %}
+    <h2 id="destination-dialog-title" class="text-xl font-semibold text-gray-900">
+      Change destination for cargo {{ cargo.tracking_id.value }}
+    </h2>
+    <p>
+      Current route: {{ cargo.route_specification.origin.name }} to
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </p>
+    <div>
+      <label for="destination-choice" class="mb-1 block font-medium">New destination</label>
+      <select
+        id="destination-choice"
+        name="destination"
+        required
+        autofocus
+        {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+        class="min-h-11 w-full rounded-md border border-gray-400 px-3 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+      >
+        <option value="">Select a destination</option>
+        {% for location in available_destinations %}
+          <option value="{{ location.unlocode.value }}">
+            {{ location.name }} ({{ location.unlocode.value }})
+          </option>
+        {% endfor %}
+      </select>
+      {% if destination_error %}
+        <p id="destination-error" class="mt-2 text-red-800" role="alert">{{ destination_error }}</p>
+      {% endif %}
+    </div>
+  </form>
+  <div class="flex justify-end gap-3">
+    <form method="dialog">
+      <button
+        type="submit"
+        class="min-h-11 rounded-md border border-gray-500 px-4 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+      >
+        Cancel
+      </button>
+    </form>
+    <button
+      type="submit"
+      form="destination-update-form"
+      class="min-h-11 rounded-md bg-blue-700 px-4 py-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-700"
+    >
+      Update destination
+    </button>
+  </div>
+</dialog>
