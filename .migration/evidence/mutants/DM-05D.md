@@ -1,6 +1,6 @@
 # Surviving mutants: DM-05D
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, threshold 0.8, killed 49, survived 30. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.762, threshold 0.8, killed 61, survived 19. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:18 Mutant #3`
 
@@ -54,18 +54,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
        return str(value)
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:42 Mutant #17`
-
-  ```diff
-  @@ -39,7 +39,7 @@
-   def _prepare_tables(mapping, models):
-       specs = mapping.get('tables')
-  -    if not isinstance(specs, list) or not specs:
-  +    if not isinstance(specs, list) and not specs:
-           raise DataExportError('mapping has no tables')
-       targets = set()
-  ```
-
 - `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:43 Mutant #18`
 
   ```diff
@@ -91,20 +79,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
            target = spec.get('target')
            if not isinstance(target, str) or target in targets:
                raise DataExportError('mapping targets must be unique table names')
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:51 Mutant #27`
-
-  ```diff
-  @@ -48,7 +48,7 @@
-           if not isinstance(spec, dict):
-               raise DataExportError('each mapped table must be an object')
-           target = spec.get('target')
-  -        if not isinstance(target, str) or target in targets:
-  +        if not isinstance(target, str) and target in targets:
-               raise DataExportError('mapping targets must be unique table names')
-           targets.add(target)
-           model = models.get(target)
   ```
 
 - `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:52 Mutant #28`
@@ -133,20 +107,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
            columns = spec.get('columns')
            if not isinstance(columns, dict) or not columns:
                raise DataExportError(f'{target}: mapping has no columns')
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:58 Mutant #36`
-
-  ```diff
-  @@ -55,7 +55,7 @@
-           if model is None:
-               raise DataExportError(f'{target}: no registered Django model for target table')
-           columns = spec.get('columns')
-  -        if not isinstance(columns, dict) or not columns:
-  +        if not isinstance(columns, dict) and not columns:
-               raise DataExportError(f'{target}: mapping has no columns')
-           fields = [_field_for_column(model, column) for column in columns]
-           if model._meta.pk not in fields:
   ```
 
 - `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:59 Mutant #37`
@@ -190,62 +150,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
        try:
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:75 Mutant #47`
-
-  ```diff
-  @@ -72,7 +72,7 @@
-           .values_list(*values)
-           .iterator(chunk_size=1000)
-       )
-  -    count = 0
-  +    count = 1
-       try:
-           with path.open('w', newline='', encoding='utf-8') as stream:
-               writer = csv.writer(stream)
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:82 Mutant #53`
-
-  ```diff
-  @@ -79,7 +79,7 @@
-               writer.writerow(columns)
-               for row in rows:
-                   writer.writerow(_format_value(value) for value in row)
-  -                count += 1
-  +                count = 1
-       except OSError as error:
-           raise DataExportError(f'{path}: {error}') from error
-       return target, count
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:82 Mutant #54`
-
-  ```diff
-  @@ -79,7 +79,7 @@
-               writer.writerow(columns)
-               for row in rows:
-                   writer.writerow(_format_value(value) for value in row)
-  -                count += 1
-  +                count -= 1
-       except OSError as error:
-           raise DataExportError(f'{path}: {error}') from error
-       return target, count
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:82 Mutant #55`
-
-  ```diff
-  @@ -79,7 +79,7 @@
-               writer.writerow(columns)
-               for row in rows:
-                   writer.writerow(_format_value(value) for value in row)
-  -                count += 1
-  +                count += 2
-       except OSError as error:
-           raise DataExportError(f'{path}: {error}') from error
-       return target, count
-  ```
-
 - `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:84 Mutant #56`
 
   ```diff
@@ -258,25 +162,39 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
        return target, count
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:93 Mutant #61`
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:93 Mutant #60`
 
   ```diff
   @@ -90,7 +90,7 @@
        try:
-           mapping = yaml.safe_load(mapping_file.read_text(encoding='utf-8')) or {}
+           mapping = yaml.safe_load(mapping_file.read_text(encoding='utf-8'))
        except (OSError, yaml.YAMLError) as error:
   -        raise DataExportError(f'{mapping_file}: unable to read mapping: {error}') from error
   +        raise DataExportError(f'XX{mapping_file}: unable to read mapping: {error}XX') from error
+       if mapping is None:
+           mapping = {}
        if not isinstance(mapping, dict):
-           raise DataExportError(f'{mapping_file}: mapping must be an object')
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:95 Mutant #63`
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:95 Mutant #62`
 
   ```diff
   @@ -92,7 +92,7 @@
        except (OSError, yaml.YAMLError) as error:
            raise DataExportError(f'{mapping_file}: unable to read mapping: {error}') from error
+       if mapping is None:
+  -        mapping = {}
+  +        mapping = None
+       if not isinstance(mapping, dict):
+           raise DataExportError(f'{mapping_file}: mapping must be an object')
+  ```
+
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:97 Mutant #64`
+
+  ```diff
+  @@ -94,7 +94,7 @@
+       if mapping is None:
+           mapping = {}
        if not isinstance(mapping, dict):
   -        raise DataExportError(f'{mapping_file}: mapping must be an object')
   +        raise DataExportError(f'XX{mapping_file}: mapping must be an objectXX')
@@ -284,38 +202,10 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
        output_dir = Path(output_path)
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:100 Mutant #66`
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:104 Mutant #69`
 
   ```diff
-  @@ -97,7 +97,7 @@
-       prepared = _prepare_tables(mapping, _model_index())
-       output_dir = Path(output_path)
-       try:
-  -        output_dir.mkdir(parents=True, exist_ok=True)
-  +        output_dir.mkdir(parents=False, exist_ok=True)
-       except OSError as error:
-           raise DataExportError(f'{output_dir}: {error}') from error
-       return [
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:100 Mutant #67`
-
-  ```diff
-  @@ -97,7 +97,7 @@
-       prepared = _prepare_tables(mapping, _model_index())
-       output_dir = Path(output_path)
-       try:
-  -        output_dir.mkdir(parents=True, exist_ok=True)
-  +        output_dir.mkdir(parents=True, exist_ok=False)
-       except OSError as error:
-           raise DataExportError(f'{output_dir}: {error}') from error
-       return [
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:102 Mutant #68`
-
-  ```diff
-  @@ -99,7 +99,7 @@
+  @@ -101,7 +101,7 @@
        try:
            output_dir.mkdir(parents=True, exist_ok=True)
        except OSError as error:
@@ -326,10 +216,10 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
            for target, model, columns, fields in prepared
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:110 Mutant #69`
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:112 Mutant #70`
 
   ```diff
-  @@ -107,7 +107,7 @@
+  @@ -109,7 +109,7 @@
    class Command(BaseCommand):
   -    help = 'Export mapped target tables as a relational snapshot.'
   +    help = 'XXExport mapped target tables as a relational snapshot.XX'
@@ -337,10 +227,10 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
            parser.add_argument('--mapping', required=True)
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:110 Mutant #70`
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:112 Mutant #71`
 
   ```diff
-  @@ -107,7 +107,7 @@
+  @@ -109,7 +109,7 @@
    class Command(BaseCommand):
   -    help = 'Export mapped target tables as a relational snapshot.'
   +    help = None
@@ -348,48 +238,10 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.620, thr
            parser.add_argument('--mapping', required=True)
   ```
 
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:113 Mutant #72`
+- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:125 Mutant #80`
 
   ```diff
-  @@ -110,7 +110,7 @@
-       help = 'Export mapped target tables as a relational snapshot.'
-       def add_arguments(self, parser):
-  -        parser.add_argument('--mapping', required=True)
-  +        parser.add_argument('--mapping', required=False)
-           parser.add_argument('--out', required=True)
-       def handle(self, *args, **options):
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:114 Mutant #74`
-
-  ```diff
-  @@ -111,7 +111,7 @@
-       def add_arguments(self, parser):
-           parser.add_argument('--mapping', required=True)
-  -        parser.add_argument('--out', required=True)
-  +        parser.add_argument('--out', required=False)
-       def handle(self, *args, **options):
-           try:
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:121 Mutant #78`
-
-  ```diff
-  @@ -118,7 +118,7 @@
-               exported = export_snapshot(options['mapping'], options['out'])
-           except DataExportError as error:
-               raise CommandError(str(error)) from error
-  -        total = sum(rows for _, rows in exported)
-  +        total = None
-           self.stdout.write(
-               self.style.SUCCESS(f'Exported {total} rows across {len(exported)} mapped tables.')
-           )
-  ```
-
-- `src/cargotracker/data_migration/management/commands/export_data_snapshot.py:123 Mutant #79`
-
-  ```diff
-  @@ -120,6 +120,6 @@
+  @@ -122,6 +122,6 @@
                raise CommandError(str(error)) from error
            total = sum(rows for _, rows in exported)
            self.stdout.write(
