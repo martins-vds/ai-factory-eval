@@ -62,3 +62,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T13:35:32+00:00 | missing-candidate-test | 0 | 4.04 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_missing_candidate` | `c3baee36b68f244b` |  |  |
 | 2026-11-16T13:35:43+00:00 | route-selection-tests | 0 | 2.41 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `459557aa694b1d3e` |  |  |
 | 2026-11-16T13:35:46+00:00 | mutation-changed | 0 | 0.08 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T13:41:34+00:00 | mutation-changed-committed | 0 | 316.51 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `c9d1d45c1a9ddc30` |  | gate=mutation score=0.836 threshold=0.8 killed=51 survived=10 files=1 base=origin/main |
