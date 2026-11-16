@@ -20,6 +20,10 @@ from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
 
 _CANDIDATE_SALT = 'booking.route_selection'
+_ROUTE_NO_CANDIDATES_GUIDANCE = 'Try setting an arrival deadline further into the future.'
+_ITINERARY_NO_CANDIDATES_GUIDANCE = (
+    'Try setting the arrival deadline further into the future (a few weeks at least).'
+)
 
 
 def create_route_selection_views(
@@ -41,7 +45,7 @@ def create_route_selection_views(
             cargo_routing,
             cargo_dashboard,
             tracking_id,
-            'Try setting an arrival deadline further into the future.',
+            _ROUTE_NO_CANDIDATES_GUIDANCE,
         )
         return render(request, 'booking/route_selection/route.html', context)
 
@@ -51,7 +55,7 @@ def create_route_selection_views(
             cargo_routing,
             cargo_dashboard,
             tracking_id,
-            'Try setting the arrival deadline further into the future (a few weeks at least).',
+            _ITINERARY_NO_CANDIDATES_GUIDANCE,
         )
         return render(request, 'booking/route_selection/select_itinerary.html', context)
 
