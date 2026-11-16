@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
@@ -101,6 +101,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -314,6 +316,16 @@ def test_browser_can_create_a_loan_from_the_new_loan_page(client):
 
 
 @pytest.mark.django_db
+def test_htmx_get_of_new_loan_page_returns_the_complete_page(client):
+    response = client.get('/ui/loans/new/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert b'name="member"' in response.content
+    assert b'name="isbn"' in response.content
+
+
+@pytest.mark.django_db
 def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
@@ -379,6 +391,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
 
 
 @pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
 def test_real_browser_can_lend_and_return_a_book(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -424,6 +445,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
@@ -455,3 +478,15 @@ def test_repository_write_rolls_back_failed_transaction():
         )
 
     assert Loan.objects.get(pk='L1').member == 'ana'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_repository_return_locks_and_updates_within_a_transaction():
+    assert connection.get_autocommit()
+
+    returned_on = date(2026, 3, 10)
+    loan, updated = LoanRepository().mark_returned('L1', returned_on)
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
