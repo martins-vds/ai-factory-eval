@@ -22,5 +22,5 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_fee_application_calculates_fee_with_injected_repository_and_clock
+  - tests/fees/test_fee_application.py::test_late_fee_application_calculates_fee_with_injected_repository_and_clock
   - tests/fees/test_fees.py::test_fee_api_applies_waiver_rate_and_cap

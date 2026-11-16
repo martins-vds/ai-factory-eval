@@ -25,14 +25,17 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/gateway.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_payment_application_keeps_interruption_cause_and_maps_to_gateway_failure
+  - tests/fees/test_fee_application.py::test_payment_application_keeps_interruption_cause_and_maps_to_gateway_failure
   - tests/fees/test_fees.py::test_payment_api_forwards_the_charge_request
   - tests/fees/test_fees.py::test_payment_api_maps_gateway_errors_and_preserves_response_body
   - tests/fees/test_fees.py::test_payment_api_does_not_call_gateway_for_an_unknown_loan
   - tests/fees/test_fees.py::test_payment_api_maps_connection_errors_to_gateway_unavailable
   - tests/fees/test_fees.py::test_payment_api_logs_interruption_and_returns_gateway_failure
+  - tests/fees/test_fees.py::test_ui_routes_return_not_found_for_unknown_loans
+  - tests/fees/test_fees.py::test_fee_and_payment_routes_restrict_http_methods
   - tests/fees/test_fees.py::test_browser_payment_action_swaps_a_success_status
   - tests/fees/test_fees.py::test_browser_payment_action_swaps_a_gateway_error
+  - tests/fees/test_fees.py::test_regular_browser_payment_failure_renders_safe_gateway_message
   - tests/fees/test_fees.py::test_real_browser_can_view_and_pay_a_late_fee
 notes: "Approved fix #40 maps interruptions to HTTP 502 and retains the original InterruptedError as the chained cause, logged by the HTTP presenter."
 quirks: [martins-vds/ai-factory-synthetic-target#40]

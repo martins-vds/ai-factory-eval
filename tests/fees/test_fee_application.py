@@ -41,7 +41,7 @@ class InMemoryPaymentGateway:
     ('days_late', 'expected_fee'),
     [(2, Decimal('0.00')), (3, Decimal('0.75')), (50, Decimal('10.00'))],
 )
-def test_fee_application_calculates_fee_with_injected_repository_and_clock(
+def test_late_fee_application_calculates_fee_with_injected_repository_and_clock(
     days_late,
     expected_fee,
 ):

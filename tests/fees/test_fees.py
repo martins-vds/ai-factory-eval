@@ -102,6 +102,33 @@ def test_fee_page_uses_reading_room_layout_and_htmx_payment_action(client):
 
 
 @pytest.mark.django_db
+def test_ui_routes_return_not_found_for_unknown_loans(client, payment_gateway):
+    fee_response = client.get('/ui/fees/unknown/')
+    payment_response = client.post('/ui/payments/unknown/')
+
+    assert fee_response.status_code == 404
+    assert fee_response['Content-Type'] == 'text/html'
+    assert fee_response.content == b'<p>No such loan.</p>'
+    assert payment_response.status_code == 404
+    assert payment_response['Content-Type'] == 'text/html'
+    assert payment_response.content == b'<p>No such loan.</p>'
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_fee_and_payment_routes_restrict_http_methods(client, payment_gateway):
+    responses = [
+        client.post('/fees/L3'),
+        client.put('/payments/L1'),
+        client.post('/ui/fees/L3/'),
+        client.get('/ui/payments/L1/'),
+    ]
+
+    assert [response.status_code for response in responses] == [405, 405, 405, 405]
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
 def test_payment_api_forwards_the_charge_request(client, payment_gateway):
     response = client.post('/payments/L1')
 
@@ -187,6 +214,21 @@ def test_browser_payment_form_redirects_after_successful_charge(client, payment_
     assert response.status_code == 302
     assert response['Location'] == '/ui/fees/L1/'
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_regular_browser_payment_failure_renders_safe_gateway_message(client, payment_gateway):
+    payment_gateway.status = 503
+    payment_gateway.response_body = b'<script>declined\xff</script>\n'
+
+    response = client.post('/ui/payments/L2/')
+
+    assert response.status_code == 200
+    assert b'Late fee for L2' in response.content
+    assert b'Fee: $0.00' in response.content
+    assert b'role="alert"' in response.content
+    assert b'&lt;script&gt;declined\xef\xbf\xbd&lt;/script&gt;' in response.content
+    assert b'<script>' not in response.content
 
 
 @pytest.mark.django_db
