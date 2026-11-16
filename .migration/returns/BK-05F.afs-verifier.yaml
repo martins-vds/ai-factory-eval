@@ -1,0 +1,30 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/602
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 'n/a: no mutable code changed'
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_404_for_unknown_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_returns_404_when_cargo_becomes_stale
+ledger_issues: []
+quirk_tickets: []
+mutation_survivor_review:
+  run: verifier-route-mutation-diagnostic
+  result: '0.855; 53 killed, 9 survived; explicit path diagnostic, not profile changed-code score'
+  matters: []
+  equivalent:
+    - 'Mutants #1/#2 alter the opaque token signature salt; creation and validation share it, and there are no other signing consumers.'
+    - 'Mutants #10/#13/#27/#44/#46 alter exception text only; normal UI behavior remains the same 404.'
+    - 'Mutant #14 adds X to quote safe characters; X is unreserved, so the redirect URL is unchanged.'
+    - 'Mutant #40 changes the missing-token fallback; both values fail signature validation and produce the same 404.'
