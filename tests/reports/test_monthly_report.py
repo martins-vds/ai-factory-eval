@@ -21,12 +21,48 @@ def test_monthly_report_lists_monthly_members_with_late_returns_and_fees():
                 returned_on=date(2026, 2, 3),
             ),
             Loan(
+                id='L18',
+                member='alpha',
+                isbn='18',
+                lent_on=date(2026, 1, 1),
+                returned_on=date(2026, 2, 1),
+            ),
+            Loan(
+                id='L20',
+                member='alpha',
+                isbn='20',
+                lent_on=date(2025, 12, 1),
+                returned_on=date(2026, 2, 25),
+            ),
+            Loan(
+                id='L21',
+                member='alpha',
+                isbn='21',
+                lent_on=date(2026, 1, 18),
+                returned_on=date(2026, 2, 2),
+            ),
+            Loan(
+                id='L22',
+                member='alpha',
+                isbn='22',
+                lent_on=date(2026, 1, 19),
+                returned_on=date(2026, 2, 4),
+            ),
+            Loan(
+                id='L23',
+                member='alpha',
+                isbn='23',
+                lent_on=date(2026, 1, 20),
+                returned_on=date(2026, 2, 3),
+            ),
+            Loan(
                 id='L11',
                 member='alpha',
                 isbn='11',
                 lent_on=date(2026, 2, 1),
                 returned_on=date(2026, 2, 14),
             ),
+            Loan(id='L19', member='alpha', isbn='19', lent_on=date(2026, 2, 10)),
             Loan(
                 id='L12',
                 member='beta',
@@ -59,7 +95,7 @@ def test_monthly_report_lists_monthly_members_with_late_returns_and_fees():
 
     assert list(csv.reader(StringIO(output.getvalue()))) == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
-        ['alpha', '1', '1', '475'],
+        ['alpha', '2', '5', '1900'],
         ['beta', '1', '1', '75'],
         ['delta', '1', '0', '0'],
         ['gamma', '1', '0', '0'],
