@@ -20,3 +20,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T15:39:24+00:00 | export-tests | 1 | 0.87 | `pytest -q --no-cov tests/data_migration/test_export.py` | `b6fa7a4e91fdd7df` | E       AssertionError: Regex pattern did not match. |  |
 | 2026-11-16T15:39:33+00:00 | export-tests | 0 | 0.88 | `pytest -q --no-cov tests/data_migration/test_export.py` | `4e076a5dd9af08ff` |  |  |
 | 2026-11-16T15:40:20+00:00 | mutation-changed | 0 | 42.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `e9f41b2117ae16ff` |  | gate=mutation score=0.907 threshold=0.8 killed=49 survived=5 files=2 base=origin/main |
+| 2026-11-16T15:40:51+00:00 | build-final | 0 | 0.32 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T15:40:54+00:00 | idiom-final | 1 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `3274b89642d9c334` | -     assert _format_value(datetime.datetime(2026, 11, 7, 10, 11, 12)) == ( |  |
+| 2026-11-16T15:41:04+00:00 | idiom-final | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `10aeae5796307327` |  |  |
+| 2026-11-16T15:41:43+00:00 | behavior-final | 0 | 35.46 | `pytest -q` | `f4c438de22dbb20e` |  |  |
+| 2026-11-16T15:42:24+00:00 | crap-final | 0 | 37.08 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `e2b90827abb56026` |  | gate=crap max=26.0 threshold=30 over=0 methods=181 |
+| 2026-11-16T15:43:04+00:00 | regression-final | 0 | 35.98 | `pytest -q` | `2f535c9a3a3784ee` |  |  |
+| 2026-11-16T15:43:54+00:00 | mutation-changed-final | 0 | 41.56 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `e9f41b2117ae16ff` |  | gate=mutation score=0.907 threshold=0.8 killed=49 survived=5 files=2 base=origin/main |
+| 2026-11-16T15:44:00+00:00 | snapshot-load | 1 | 0.34 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `39d84694036a43bc` | Traceback (most recent call last): |  |
+| 2026-11-16T15:44:14+00:00 | database-migrate | 0 | 0.41 | `python manage.py migrate --noinput` | `56d728c244009843` |  |  |
+| 2026-11-16T15:44:19+00:00 | snapshot-load | 0 | 0.35 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
+| 2026-11-16T15:44:23+00:00 | snapshot-export | 0 | 0.33 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export` | `ba754ea10ff616fb` |  |  |
+| 2026-11-16T15:44:27+00:00 | snapshot-reconcile | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target .migration/data/target-export --mapping .migration/data/mapping.yaml --report .migration/runs/DM-05D/reconciliation.md` | `0e5f155ede36068f` |  | gate=data-reconcile tables=6 rows=54 mismatched_tables=0 |

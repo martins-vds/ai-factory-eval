@@ -189,9 +189,7 @@ def test_export_snapshot_reports_output_write_errors(tmp_path):
 
 
 def test_export_formats_naive_and_offset_timestamps_as_utc():
-    assert _format_value(datetime.datetime(2026, 11, 7, 10, 11, 12)) == (
-        '2026-11-07T10:11:12Z'
-    )
+    assert _format_value(datetime.datetime(2026, 11, 7, 10, 11, 12)) == ('2026-11-07T10:11:12Z')
     offset_timestamp = datetime.datetime(
         2026,
         11,
