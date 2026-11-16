@@ -1,0 +1,13 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#546
+setup_pr: null
+characterization_tier: A
+tier_evidence: "ran: PORT=18080 ./legacy/run.sh -> Maven package succeeded; GET /loans returned seeded loans, GET /about and GET /fees/L1 returned 200, missing-loan GET/POST returned 404, invalid POST /loans returned 400, valid create and return POSTs returned 201/200; exact observations are in .migration/references/characterization.md"
+capabilities:
+  met: 17
+  gap: 0
+  waived: 0
+  not_applicable: 5
+gap_tickets: []
+validation: "pass: profile and capability checklist were checked against the pinned schemas; harness validate.py remains for step 5."
