@@ -20,7 +20,7 @@ All requests used `http://127.0.0.1:18080`:
 
 | Request | Observed response |
 |---|---|
-| `GET /loans` | `200`; seeded rows were returned in ID order: `L1;ana;9780134685991;2026-01-02;2026-01-16;`, `L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20`, `L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03`. |
+| `GET /loans` | `curl -fsS` succeeded and returned the seeded rows in ID order: `L1;ana;9780134685991;2026-01-02;2026-01-16;`, `L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20`, `L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03`. The status code was not printed for this request. |
 | `GET /loans/L1` | `200`; `L1;ana;9780134685991;2026-01-02;2026-01-16;`. |
 | `GET /about` | `200 text/html`; page title and heading were “About the Lending Library”; it states Monday–Saturday, 9:00–18:00 and 14-day loans. |
 | `GET /loans/no-such-loan` | `404 text/plain`; body `no such loan`. |
@@ -33,15 +33,19 @@ All requests used `http://127.0.0.1:18080`:
 Commands used for the HTTP checks:
 
 ```sh
-curl -sS -i http://127.0.0.1:18080/loans
-curl -sS -i http://127.0.0.1:18080/loans/L1
-curl -sS -i http://127.0.0.1:18080/about
-curl -sS -i http://127.0.0.1:18080/loans/no-such-loan
-curl -sS -i http://127.0.0.1:18080/fees/L1
-curl -sS -i -X POST http://127.0.0.1:18080/loans -H 'Content-Type: application/x-www-form-urlencoded' -d 'member=only'
-curl -sS -i -X POST http://127.0.0.1:18080/loans -H 'Content-Type: application/x-www-form-urlencoded' -d 'member=eval&isbn=9780000000000'
-curl -sS -i -X POST http://127.0.0.1:18080/loans/L4/return
-curl -sS -i -X POST http://127.0.0.1:18080/payments/missing
+for i in $(seq 1 30); do
+  if curl -fsS http://127.0.0.1:18080/loans > /tmp/legacy-loans.txt; then break; fi
+  sleep 1
+done
+cat /tmp/legacy-loans.txt
+curl -sS -i http://127.0.0.1:18080/about | head -15
+curl -sS -i http://127.0.0.1:18080/loans/no-such-loan | head -10
+curl -sS -i http://127.0.0.1:18080/fees/L1 | head -10
+curl -sS -i -X POST http://127.0.0.1:18080/loans -H 'Content-Type: application/x-www-form-urlencoded' -d 'member=only' | head -10
+curl -sS -i -X POST http://127.0.0.1:18080/loans -H 'Content-Type: application/x-www-form-urlencoded' -d 'member=eval&isbn=9780000000000' | head -12
+curl -sS -i -X POST http://127.0.0.1:18080/loans/L4/return | head -12
+curl -sS -i -X POST http://127.0.0.1:18080/payments/missing | head -10
+curl -sS -i http://127.0.0.1:18080/loans/L1 | head -12
 ```
 
 The valid-loan payment path was not called because it would contact the configured external gateway; only the missing-loan response was observed. The app ran against its real seeded H2 instance, and no files under `legacy/` were changed.
