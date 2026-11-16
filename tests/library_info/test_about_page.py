@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import sync_playwright
 
-
 HTTP_GOLDENS_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )
@@ -19,6 +18,13 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
+
+
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_reject_non_get_requests(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
 
 
 @pytest.mark.django_db
