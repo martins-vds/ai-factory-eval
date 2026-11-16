@@ -5,7 +5,7 @@ from src.fees.services import FeeApplication, GatewayResponse
 
 
 @dataclass
-class Loan:
+class FeeLoan:
     id: str
 
 
@@ -32,7 +32,7 @@ class InMemoryPaymentGateway:
 
 
 def test_pay_uses_injected_loan_repository_and_gateway():
-    repository = InMemoryLoanRepository(Loan('L1'))
+    repository = InMemoryLoanRepository(FeeLoan('L1'))
     gateway = InMemoryPaymentGateway()
     application = FeeApplication(repository, FixedClock(), gateway)
 
