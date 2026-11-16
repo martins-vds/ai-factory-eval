@@ -34,7 +34,8 @@ def create_destination_dialog_view(
         available_destinations = [
             location
             for location in locations
-            if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
         ]
         destination_error = ''
 

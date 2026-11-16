@@ -1,10 +1,9 @@
 import re
 
+import pytest
 from django.core.management import call_command
 from django.test import override_settings
 from django.urls import path
-
-import pytest
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
@@ -68,6 +67,8 @@ def test_not_routed_table_offers_destination_and_deadline_dialog_openers(client)
     assert 'hx-get="/admin/cargo/DEF789/destination-dialog/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline-dialog/"' in not_routed_table
     assert 'id="dialog-container"' in not_routed_table
+    assert 'hx-on::after-swap=' in not_routed_table
+    assert 'hx-trigger="cargoUpdated from:body"' in not_routed_table
 
 
 @pytest.mark.django_db
@@ -98,6 +99,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
 
     assert first_response.status_code == 200
     assert second_response.status_code == 200
+    assert 'aria-labelledby="destination-dialog-title"' in first_content
     assert 'Hong Kong' in first_content and 'Melbourne' in first_content
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
@@ -129,9 +131,32 @@ def test_destination_update_preserves_other_specification_fields_and_refreshes_t
     assert updated is not None
     assert updated.route_specification.origin == original.route_specification.origin
     assert updated.route_specification.destination.unlocode.value == 'USNYC'
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
     assert 'New York' in not_routed_table
     assert 'USNYC' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_update_rejects_origin_and_leaves_cargo_unchanged(client):
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination-dialog/',
+        {'destination': 'CNHKG'},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert 'aria-invalid="true"' in response.content.decode()
+    assert updated is not None
+    assert updated.route_specification == original.route_specification
 
 
 @pytest.mark.django_db
@@ -173,7 +198,10 @@ def test_unparseable_deadline_shows_field_error_without_updating_cargo(client):
     assert 'Enter a valid arrival deadline.' in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
 
 
 @pytest.mark.django_db
