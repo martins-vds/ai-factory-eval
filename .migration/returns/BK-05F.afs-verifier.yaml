@@ -1,0 +1,49 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/691
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed in verifier PR"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+ledger_review:
+  verified:
+    - capability: booking.routing-chain
+      evidence: CargoRouting receives RoutingService; route UI calls route_candidates; application tests cover path conversion and candidate filtering.
+    - capability: booking.routing-assign
+      evidence: Route selection calls assign_route; BK-05C tests verify persisted itinerary and recalculated ROUTED state; UI test verifies chosen itinerary and #236 redirect.
+    - capability: booking.screen-route
+      evidence: UI tests cover candidate counts, numbered legs, details, and empty-state guidance.
+    - capability: booking.screen-select-itinerary
+      evidence: UI tests cover rendering candidates under #252 and the empty-candidate guidance.
+cross_cutting_checks:
+  routing: Candidate generation uses the injected RoutingService through CargoRouting, not repositories.
+  deadline: CargoRouting filters converted candidates using RouteSpecification.is_satisfied_by; the test excludes a missed deadline.
+  not_found: Unknown and stale route/itinerary requests return HTTP 404; the view and application raise the cargo-not-found Http404.
+mutation_survivor_assessment:
+  implementation_score: 0.855
+  implementation_evidence: .migration/evidence/runs/BK-05F.md (2026-11-08T00:26:25+00:00)
+  survivors:
+    - mutants: [1, 2]
+      matters: false
+      reason: Candidate salt is private to route-selection token signing; generation and verification share it, and there are no other signing consumers.
+    - mutants: [10, 13, 27, 44, 46]
+      matters: false
+      reason: These change diagnostic text only; the approved route/not-found outcomes remain HTTP 404. The normal response is Django's standard 404 page.
+    - mutants: [14]
+      matters: false
+      reason: X is unreserved and always remains unquoted, so the redirect URL is unchanged.
+    - mutants: [40]
+      matters: false
+      reason: Both missing-token defaults fail signature validation and produce the same HTTP 404.
