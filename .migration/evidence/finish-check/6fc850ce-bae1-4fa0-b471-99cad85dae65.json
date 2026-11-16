@@ -1,0 +1,64 @@
+[
+  {
+    "at": "2026-11-16T20:46:40Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16631,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6d04161a-e16c-4158-8fec-3797df4ab22a.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-migrator.yaml",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  },
+  {
+    "at": "2026-11-16T20:47:09Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17021,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6d04161a-e16c-4158-8fec-3797df4ab22a.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-migrator.yaml",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
