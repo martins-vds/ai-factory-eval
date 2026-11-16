@@ -67,6 +67,41 @@
         "promptRequest",
         "requestId"
       ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
       "session.start": [
         "alreadyInUse",
         "context",
@@ -158,6 +193,11 @@
         "metadata",
         "role"
       ],
+      "system.notification": [
+        "content",
+        "kind",
+        "responsesReasoning"
+      ],
       "tool.execution_complete": [
         "error",
         "fileEdits",
@@ -201,37 +241,45 @@
       ]
     },
     "event_types": {
-      "assistant.message": 219,
-      "assistant.turn_end": 116,
-      "assistant.turn_start": 117,
-      "external_tool.completed": 1,
-      "external_tool.requested": 1,
-      "hook.end": 370,
-      "hook.start": 371,
-      "permission.completed": 215,
-      "permission.requested": 215,
+      "assistant.message": 272,
+      "assistant.turn_end": 149,
+      "assistant.turn_start": 149,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 461,
+      "hook.start": 462,
+      "permission.completed": 259,
+      "permission.requested": 259,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 117,
-      "skill.context_delivered_ref": 11,
+      "session.usage_record": 149,
+      "skill.context_delivered_ref": 14,
       "skill.invoked": 9,
-      "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "skill.invoked_ref": 5,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 220,
-      "tool.execution_start": 221,
+      "system.notification": 1,
+      "tool.execution_complete": 272,
+      "tool.execution_start": 272,
       "user.message": 3
     },
-    "events": 2220,
+    "events": 2755,
     "usage_fields": []
   },
-  "ended_at": "2026-11-16T14:07:06.199Z",
+  "ended_at": "2026-11-16T14:12:47.044Z",
   "event": "agentStop",
   "harness_tools": [
     {
-      "count": 22,
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-finish-check"
+    },
+    {
+      "count": 31,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -251,7 +299,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 2,
+      "count": 4,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -261,7 +309,7 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 2,
+      "count": 4,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -275,11 +323,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 219
+      "requests": 272
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-16T14:07:15+00:00",
+  "recorded_at": "2026-11-16T14:12:56+00:00",
   "schema": "afs-cost/1",
   "session_id": "815ff60b-e4fb-41a0-bb26-14e730860e78",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -323,6 +371,5 @@
   ],
   "started_at": "2026-11-16T13:40:26.750Z",
   "surface": "coding-agent",
-  "trigger_id": "dbe51246-0b87-43be-9529-e70fcce906dc",
   "usage_source": "assistant.message (output only, partial)"
 }
