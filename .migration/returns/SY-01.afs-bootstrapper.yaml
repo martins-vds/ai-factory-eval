@@ -1,0 +1,21 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#723
+setup_pr: null
+characterization_tier: A
+tier_evidence: "Existing Tier A evidence: legacy/run.sh packaged and started the app; live HTTP probes exercised /about, /loans, /fees, loan creation/return, and missing-payment behavior. No probes were rerun."
+capabilities: {met: 12, gap: 11, waived: 0, not_applicable: 0}
+gap_tickets:
+  - "new: unit-integration-tests (source)"
+  - "new: coverage (source; best_effort)"
+  - "new: complexity (source)"
+  - "new: crap (source; best_effort)"
+  - "new: mutation-testing (source)"
+  - "new: lint-format (source)"
+  - "new: stack-idioms (source)"
+  - "new: build-run (target)"
+  - "new: characterization-harness (target)"
+  - "new: lint-format (target)"
+  - "new: data-migration (source and target)"
+validation: "not run: limited to procedures 1–4; no bootstrap install, scaffold, service startup/lint, build, test, or validation was run. See .migration/handoffs/SY-01.md."
+handoff: .migration/handoffs/SY-01.md
