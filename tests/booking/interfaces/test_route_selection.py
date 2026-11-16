@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -128,11 +129,18 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert 'No routes found that satisfy the route specification.' in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
+    assert re.search(
+        r'<p class="my-6" role="status">\s*'
+        r'No routes found that satisfy the route specification\.\s+'
+        r'Try setting an arrival deadline further into the future\.\s*</p>',
+        route_content,
+    )
     assert 'No routes found that satisfy the route specification.' in itinerary_content
-    assert (
-        'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
+    assert re.search(
+        r'<p class="my-6" role="status">\s*'
+        r'No routes found that satisfy the route specification\.\s+'
+        r'Try setting the arrival deadline further into the future \(a few weeks at least\)\.\s*</p>',
+        itinerary_content,
     )
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
@@ -178,6 +186,39 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_assigning_previously_signed_candidate_redirects_to_details(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    token = signing.dumps(
+        {
+            'tracking_id': tracking_id.value,
+            'legs': [
+                {
+                    'voyage_number': 'CM003',
+                    'load_location': {'unlocode': 'USNYC', 'name': 'New York'},
+                    'unload_location': {'unlocode': 'FIHEL', 'name': 'Helsinki'},
+                    'load_time': datetime(2030, 11, 1, tzinfo=UTC).isoformat(),
+                    'unload_time': datetime(2030, 11, 4, tzinfo=UTC).isoformat(),
+                }
+            ],
+        },
+        salt='booking.route_selection',
+    )
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/route/',
+        {'candidate': token},
+        follow=True,
+    )
+
+    assert response.status_code == 200
+    assert response.redirect_chain == [(f'/admin/cargo/{tracking_id.value}/', 302)]
+    content = response.content.decode()
+    assert 'CM003' in content
+    assert 'CM001' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_assignment_rejects_a_modified_candidate(client):
     tracking_id = _create_cargo(_candidate_paths())
     route_url = f'/admin/cargo/{tracking_id.value}/route/'
@@ -209,5 +250,5 @@ def test_route_screens_reject_unsupported_http_methods(client):
 def test_route_selection_raises_not_found_for_unknown_cargo():
     request = RequestFactory().get('/admin/cargo/MISSING1/route/')
 
-    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
+    with pytest.raises(Http404, match=r'\ACargo with tracking ID MISSING1 not found\.\Z'):
         route_view(request, 'MISSING1')

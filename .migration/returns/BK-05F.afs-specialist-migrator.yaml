@@ -2,28 +2,39 @@ role: afs-specialist-migrator
 ticket: BK-05F
 issue: martins-vds/ai-factory-pilot-target#293
 specialty: ui
-pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+pr: https://github.com/martins-vds/ai-factory-eval/pull/517
 gates:
   build: 0
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: 0.790
+  mutation_changed: "n/a: no mutable code changed versus origin/main; profile command returned score=n/a"
   regression: 0
 specialty_evidence:
-  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
-  - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available
-  - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
-  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
-  - tests/booking/interfaces/test_route_selection.py::test_route_screens_reject_unsupported_http_methods
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_assigning_previously_signed_candidate_redirects_to_details
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
-ledger_updated:
-  - booking.routing-chain
-  - booking.screen-route
-  - booking.screen-select-itinerary
-  - booking.routing-assign
+ledger_updated: []
 quirk_tickets: []
 handoff: .migration/handoffs/BK-05F.md
+equivalent_survivors:
+  - mutant: "views.py:34 Mutant #10"
+    diff: "`Http404(f'Cargo with tracking ID {tracking_id} not found.')` → `Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')`"
+    why: "Both produce the same 404 status and generic production error page; the Http404 reason is not rendered."
+  - mutant: "views.py:37 Mutant #13"
+    diff: "`Http404('The selected route no longer satisfies the route specification.')` → `Http404('XXThe selected route no longer satisfies the route specification.XX')`"
+    why: "Both produce the same 404 status and generic production error page; the Http404 reason is not rendered."
+  - mutant: "views.py:39 Mutant #14"
+    diff: "`quote(tracking_id, safe='')` → `quote(tracking_id, safe='XXXX')`"
+    why: "X is unreserved and is always left unescaped by urllib.parse.quote, so the resulting redirect is identical."
+  - mutant: "views.py:95 Mutant #40"
+    diff: "`request.POST.get('candidate', '')` → `request.POST.get('candidate', 'XXXX')`"
+    why: "Both empty and malformed candidate tokens fail signature verification and are normalized to the same 404 response."
+  - mutant: "views.py:97 Mutant #44"
+    diff: "`BadSignature('Candidate belongs to another cargo.')` → `BadSignature('XXCandidate belongs to another cargo.XX')`"
+    why: "The exception is caught and converted to the same generic 404 response; its cause text is not rendered."
+  - mutant: "views.py:100 Mutant #46"
+    diff: "`Http404('The selected route is invalid.')` → `Http404('XXThe selected route is invalid.XX')`"
+    why: "Both produce the same 404 status and generic production error page; the Http404 reason is not rendered."
