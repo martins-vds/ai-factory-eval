@@ -8,8 +8,18 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:25-28
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans returns every loan ordered by id as one semicolon-separated text line per record, with a trailing newline."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#524]
+target:
+  components: [src.loans.views.loan_list, src.loans.repository.list_loans]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/loans/test_catalog.py::test_list_returns_seed_loans_in_source_order_and_text_format
+  - tests/loans/test_catalog.py::test_catalog_routes_preserve_the_public_paths
+  - tests/loans/test_catalog.py::test_ui_catalog_renders_the_seed_records
+  - .migration/evidence/runs/LL-01.md

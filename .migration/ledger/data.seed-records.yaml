@@ -6,10 +6,18 @@ source:
   graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
   location: legacy/src/main/resources/META-INF/seed.sql:1-3
 boundary: "The persistence unit loads three fixed example loan rows at startup: L1, L2, and L3, with their member, ISBN, and lent/returned dates."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#524]
+target:
+  components: [src.loans.migrations.0001_initial]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/restart.json]
-notes: "Seed reload and reset-on-restart behavior are raised in martins-vds/ai-factory-synthetic-target#42."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/restart.json
+  - tests/loans/test_catalog.py::test_list_returns_seed_loans_in_source_order_and_text_format
+  - .migration/evidence/runs/LL-01.md
+notes: "The three seeds load with the initial migration and are not overwritten on restart, per martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]

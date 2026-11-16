@@ -6,10 +6,19 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#524]
+target:
+  components: [src.loans.models.Loan, src.loans.repository]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/characterization/source/goldens/restart.json
+  - tests/loans/test_catalog.py::test_saved_loan_is_available_to_later_api_requests
+  - tests/loans/test_catalog.py::test_loan_id_longer_than_thirty_two_characters_is_preserved
+  - .migration/evidence/runs/LL-01.md
+notes: "Loans persist in PostgreSQL; the approved restart behavior is linked to martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
