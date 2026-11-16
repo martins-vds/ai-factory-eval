@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -56,6 +67,41 @@
         "permissionRequest",
         "promptRequest",
         "requestId"
+      ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
       ],
       "session.start": [
         "alreadyInUse",
@@ -148,8 +194,14 @@
         "metadata",
         "role"
       ],
+      "system.notification": [
+        "content",
+        "kind",
+        "responsesReasoning"
+      ],
       "tool.execution_complete": [
         "error",
+        "fileEdits",
         "interactionId",
         "model",
         "parentToolCallId",
@@ -190,40 +242,45 @@
       ]
     },
     "event_types": {
-      "assistant.message": 72,
-      "assistant.turn_end": 37,
-      "assistant.turn_start": 38,
-      "hook.end": 229,
-      "hook.start": 230,
-      "permission.completed": 121,
-      "permission.requested": 121,
+      "assistant.message": 202,
+      "assistant.turn_end": 107,
+      "assistant.turn_start": 107,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 407,
+      "hook.start": 408,
+      "permission.completed": 190,
+      "permission.requested": 190,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 38,
-      "skill.context_delivered_ref": 10,
-      "skill.invoked": 8,
+      "session.usage_record": 107,
+      "skill.context_delivered_ref": 11,
+      "skill.invoked": 9,
       "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 154,
-      "tool.execution_start": 155,
-      "user.message": 3
+      "system.notification": 1,
+      "tool.execution_complete": 253,
+      "tool.execution_start": 253,
+      "user.message": 4
     },
-    "events": 1230,
+    "events": 2270,
     "usage_fields": []
   },
-  "ended_at": "2026-11-16T05:59:50.029Z",
+  "ended_at": "2026-11-16T06:43:27.348Z",
   "event": "agentStop",
   "harness_tools": [
     {
-      "count": 1,
+      "count": 2,
       "exit": 0,
       "tool": "afs-mutation"
     },
     {
-      "count": 29,
+      "count": 183,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -262,11 +319,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 72
+      "requests": 202
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-16T06:00:04+00:00",
+  "recorded_at": "2026-11-16T06:43:41+00:00",
   "schema": "afs-cost/1",
   "session_id": "c37c0652-628e-4cfb-8e8b-d62334689498",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -274,6 +331,10 @@
     {
       "count": 1,
       "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-ledger"
     },
     {
       "count": 1,
@@ -306,6 +367,5 @@
   ],
   "started_at": "2026-11-16T05:54:15.391Z",
   "surface": "coding-agent",
-  "trigger_id": "916cd9e6-adb8-42ac-8dbf-5059494f6e7f",
   "usage_source": "assistant.message (output only, partial)"
 }
