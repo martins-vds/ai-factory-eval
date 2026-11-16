@@ -74,6 +74,11 @@
         "startTime",
         "version"
       ],
+      "session.usage_checkpoint": [
+        "modelCacheState",
+        "totalNanoAiu",
+        "totalPremiumRequests"
+      ],
       "skill.invoked": [
         "content",
         "description",
@@ -149,30 +154,31 @@
       ]
     },
     "event_types": {
-      "assistant.message": 240,
-      "assistant.turn_end": 131,
-      "assistant.turn_start": 131,
+      "assistant.message": 241,
+      "assistant.turn_end": 132,
+      "assistant.turn_start": 132,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 429,
-      "hook.start": 430,
+      "hook.end": 433,
+      "hook.start": 434,
       "permission.completed": 251,
       "permission.requested": 251,
       "session.start": 1,
+      "session.usage_checkpoint": 1,
       "skill.invoked": 12,
       "subagent.completed": 2,
       "subagent.selected": 1,
       "subagent.started": 2,
-      "system.message": 3,
+      "system.message": 4,
       "system.notification": 1,
       "tool.execution_complete": 248,
       "tool.execution_start": 248,
-      "user.message": 13
+      "user.message": 14
     },
-    "events": 2396,
+    "events": 2410,
     "usage_fields": []
   },
-  "ended_at": "2026-11-16T00:28:43.595Z",
+  "ended_at": "2026-11-16T00:29:09.359Z",
   "event": "sessionEnd",
   "harness_tools": [
     {
@@ -239,12 +245,12 @@
   "log": "/home/runner/.copilot/session-state/cd218e13-18ee-4e24-9fd2-e941960dbe42/events.jsonl",
   "models": {
     "gpt-6-luna": {
-      "output": 98270,
-      "requests": 240
+      "output": 98962,
+      "requests": 241
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-16T00:28:52+00:00",
+  "recorded_at": "2026-11-16T00:29:17+00:00",
   "schema": "afs-cost/1",
   "session_id": "cd218e13-18ee-4e24-9fd2-e941960dbe42",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
