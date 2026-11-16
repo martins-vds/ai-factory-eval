@@ -2,17 +2,18 @@ role: afs-specialist-migrator
 ticket: BK-05F
 issue: martins-vds/ai-factory-pilot-target#293
 specialty: ui
-pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+pr: https://github.com/martins-vds/ai-factory-eval/pull/605
 gates:
   build: 0
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: 0.790
+  mutation_changed: 0.869
   regression: 0
 specialty_evidence:
-  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_missing_candidate
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
   - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available
   - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
   - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
@@ -20,10 +21,16 @@ specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
+  - >-
+    Equivalent survivors: #1/#2 change the opaque candidate salt used identically by signing and
+    verification; #10/#27 alter Http404 wording that is not rendered by the generic 404 page;
+    #13 changes the same hidden 404 detail for an unsatisfied route; #14 adds X to quote's safe
+    set, but X is already unreserved; #43 changes BadSignature text immediately mapped to a
+    generic Http404; #45 changes the hidden generic Http404 detail.
 ledger_updated:
   - booking.routing-chain
   - booking.screen-route
   - booking.screen-select-itinerary
   - booking.routing-assign
 quirk_tickets: []
-handoff: .migration/handoffs/BK-05F.md
+handoff: none
