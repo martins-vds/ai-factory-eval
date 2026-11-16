@@ -10,8 +10,8 @@ from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_views
-from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 

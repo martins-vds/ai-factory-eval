@@ -37,7 +37,8 @@ def create_booking_dialog_views(
         destinations = [
             location
             for location in locations
-            if location not in (
+            if location
+            not in (
                 cargo.route_specification.origin,
                 cargo.route_specification.destination,
             )
@@ -47,7 +48,11 @@ def create_booking_dialog_views(
         if request.method == 'POST':
             destination_code = request.POST.get('destination', '')
             destination = next(
-                (location for location in destinations if location.unlocode.value == destination_code),
+                (
+                    location
+                    for location in destinations
+                    if location.unlocode.value == destination_code
+                ),
                 None,
             )
             if destination is None:
