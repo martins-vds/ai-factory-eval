@@ -19,3 +19,8 @@ class AboutPageTests(TestCase):
         self.assertEqual(response.status_code, expected['status'])
         self.assertEqual(response['Content-Type'], expected['content_type'])
         self.assertEqual(response.content.decode(), expected['body'])
+
+    def test_about_routes_reject_post_requests(self):
+        for path in ('/about', '/ui/about/'):
+            with self.subTest(path=path):
+                self.assertEqual(self.client.post(path).status_code, 405)
