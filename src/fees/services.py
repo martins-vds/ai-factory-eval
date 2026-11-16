@@ -81,12 +81,6 @@ class LateFeeApplication:
 
         try:
             response = self.payment_gateway.charge(loan_id)
-        except PaymentGatewayInterrupted as failure:
-            return PaymentResult(
-                502,
-                b'payment gateway unavailable\n',
-                failure,
-            )
         except PaymentGatewayUnavailable as failure:
             return PaymentResult(
                 502,

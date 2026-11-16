@@ -8,6 +8,7 @@ import pytest
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.fees.gateway import HttpPaymentGateway
 from src.loans.models import Loan
 
 
@@ -43,6 +44,34 @@ def payment_gateway(monkeypatch):
         server.shutdown()
         thread.join()
         server.server_close()
+
+
+def test_payment_gateway_does_not_override_the_default_timeout(monkeypatch):
+    class GatewayResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            return None
+
+        def read(self):
+            return b'charged\n'
+
+    urlopen_options = {}
+
+    def urlopen(request, **options):
+        urlopen_options.update(options)
+        return GatewayResponse()
+
+    monkeypatch.setattr(urllib.request, 'urlopen', urlopen)
+
+    response = HttpPaymentGateway().charge('L1')
+
+    assert response.status_code == 200
+    assert response.body == b'charged\n'
+    assert urlopen_options == {}
 
 
 @pytest.mark.django_db

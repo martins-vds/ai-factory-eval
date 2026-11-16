@@ -26,7 +26,7 @@ class HttpPaymentGateway:
             method='POST',
         )
         try:
-            with urllib.request.urlopen(request, timeout=5) as response:
+            with urllib.request.urlopen(request) as response:
                 return GatewayResponse(response.status, response.read())
         except HTTPError as error:
             return GatewayResponse(error.code, error.read())

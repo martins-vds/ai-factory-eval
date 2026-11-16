@@ -26,6 +26,7 @@ evidence:
   - .migration/characterization/source/goldens/gateway.json
   - .migration/evidence/runs/LL-03.md
   - tests/fees/test_fee_application.py::test_payment_application_keeps_interruption_cause_and_maps_to_gateway_failure
+  - tests/fees/test_fees.py::test_payment_gateway_does_not_override_the_default_timeout
   - tests/fees/test_fees.py::test_payment_api_forwards_the_charge_request
   - tests/fees/test_fees.py::test_payment_api_maps_gateway_errors_and_preserves_response_body
   - tests/fees/test_fees.py::test_payment_api_does_not_call_gateway_for_an_unknown_loan
