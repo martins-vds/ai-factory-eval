@@ -172,7 +172,6 @@ def test_payment_api_maps_success_status_other_than_200_to_bad_gateway(client, p
 def test_payment_api_does_not_follow_gateway_redirect(client, payment_gateway):
     payment_gateway['status'] = 302
     payment_gateway['body'] = b'payment moved\n'
-    payment_gateway['location'] = f'http://127.0.0.1:{payment_gateway["port"]}/charge?loan=L1'
 
     response = client.post('/payments/L1')
 
@@ -313,6 +312,21 @@ def test_reading_room_payment_redirects_after_regular_success(client, payment_ga
     assert response.status_code == 302
     assert response['Location'] == '/ui/fees/L3/'
     assert payment_gateway['requests'] == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
+def test_reading_room_payment_redirect_escapes_loan_id(client, payment_gateway):
+    Loan.objects.create(
+        id='L9?x=1',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 1, 2),
+    )
+
+    response = client.post('/ui/payments/L9%3Fx%3D1/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L9%3Fx=1/'
 
 
 @pytest.mark.django_db

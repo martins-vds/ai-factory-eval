@@ -6,15 +6,15 @@ import pytest
 
 @pytest.fixture
 def payment_gateway(monkeypatch):
-    state = {'status': 200, 'body': b'charged\n', 'location': None, 'requests': []}
+    state = {'status': 200, 'body': b'charged\n', 'requests': []}
 
     class PaymentHandler(BaseHTTPRequestHandler):
         def _respond(self):
             body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
             state['requests'].append((self.command, self.path, body))
             self.send_response(state['status'])
-            if state['location'] is not None:
-                self.send_header('Location', state['location'])
+            if state['status'] == 302:
+                self.send_header('Location', '/charge?loan=L1')
             self.end_headers()
             self.wfile.write(state['body'])
 
@@ -28,7 +28,6 @@ def payment_gateway(monkeypatch):
             pass
 
     server = ThreadingHTTPServer(('127.0.0.1', 0), PaymentHandler)
-    state['port'] = server.server_port
     thread = Thread(target=server.serve_forever)
     thread.start()
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', f'http://127.0.0.1:{server.server_port}')
