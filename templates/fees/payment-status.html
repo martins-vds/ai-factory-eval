@@ -1,0 +1,5 @@
+{% if successful %}
+<p class="alert border border-[#d8cdbb] bg-[#fffdf7] text-[#2f3428]" role="status">Payment complete: {{ message }}</p>
+{% else %}
+<p class="alert alert-error" role="alert">Payment failed: {{ message }}</p>
+{% endif %}
