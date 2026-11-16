@@ -52,9 +52,7 @@ def test_return_records_the_date_and_returns_the_updated_loan(client, monkeypatc
 
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        'L1;ana;9780134685991;2026-01-02;2026-01-16;2026-03-01\n'
-    )
+    assert response.content.decode() == ('L1;ana;9780134685991;2026-01-02;2026-01-16;2026-03-01\n')
 
 
 @pytest.mark.django_db
