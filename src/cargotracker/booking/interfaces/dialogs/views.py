@@ -17,7 +17,7 @@ def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo:
     except ValueError as error:
         raise Http404 from error
     if cargo is None:
-        raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+        raise Http404
     return cargo
 
 
@@ -49,7 +49,7 @@ def create_booking_dialog_views(
         error = ''
 
         if request.method == 'POST':
-            destination_code = request.POST.get('destination', '')
+            destination_code = request.POST.get('destination')
             destination = next(
                 (
                     location

@@ -46,6 +46,15 @@ def test_destination_dialog_shows_current_values_and_excludes_origin_and_destina
     assert options is not None
     assert cargo.route_specification.origin.unlocode.value not in options.group(1)
     assert cargo.route_specification.destination.unlocode.value not in options.group(1)
+    assert len(re.findall(r'<option\b', options.group(1))) > 1
+    assert 'destination-error' not in content
+    assert '<dialog open ' in content
+
+    htmx_response = client.get(
+        '/admin/cargo/DEF789/destination/',
+        headers={'HX-Request': 'true'},
+    )
+    assert '<dialog open ' not in htmx_response.content.decode()
 
 
 @pytest.mark.django_db
@@ -110,6 +119,27 @@ def test_destination_update_uses_specification_and_redirects_after_completion(cl
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_destination_update_without_htmx_redirects_to_the_dashboard(client):
+    call_command('seed_sample_data')
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    destination = next(
+        location
+        for location in location_repository.find_all()
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': destination.unlocode.value},
+    )
+
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/admin/dashboard/'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_invalid_destination_keeps_the_dialog_open_with_a_field_error(client):
     call_command('seed_sample_data')
     cargo = cargo_repository.find(TrackingId('DEF789'))
@@ -123,12 +153,12 @@ def test_invalid_destination_keeps_the_dialog_open_with_a_field_error(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in content
+    assert '<p id="destination-error" class="text-red-700">Select a valid destination.</p>' in (
+        content
+    )
     assert 'aria-invalid="true"' in content
     assert updated_cargo is not None
-    assert updated_cargo.route_specification.destination == (
-        cargo.route_specification.destination
-    )
+    assert updated_cargo.route_specification.destination == (cargo.route_specification.destination)
 
 
 @pytest.mark.django_db
@@ -142,11 +172,20 @@ def test_invalid_deadline_shows_a_field_error_without_changing_cargo(client):
         '/admin/cargo/DEF789/deadline/',
         {'deadline': 'not-a-date'},
     )
+    empty_deadline_response = client.post('/admin/cargo/DEF789/deadline/', {})
     updated_cargo = cargo_repository.find(cargo.tracking_id)
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in response.content.decode()
+    assert (
+        '<p id="deadline-error" class="text-red-700">Enter a valid arrival deadline.</p>'
+        in response.content.decode()
+    )
+    assert 'aria-describedby="deadline-error"' in response.content.decode()
     assert 'aria-invalid="true"' in response.content.decode()
+    assert re.search(
+        r'<input\b[^>]*id="deadline"[^>]*value=""',
+        empty_deadline_response.content.decode(),
+    )
     assert updated_cargo is not None
     assert updated_cargo.route_specification.arrival_deadline == (
         cargo.route_specification.arrival_deadline
@@ -158,10 +197,17 @@ def test_invalid_deadline_shows_a_field_error_without_changing_cargo(client):
 def test_dialog_views_return_not_found_and_reject_other_methods(client):
     call_command('seed_sample_data')
 
-    assert client.get('/admin/cargo/MISSING1/destination/').status_code == 404
-    assert client.get('/admin/cargo/MISSING1/deadline/').status_code == 404
-    assert client.put('/admin/cargo/DEF789/destination/').status_code == 405
-    assert client.put('/admin/cargo/DEF789/deadline/').status_code == 405
+    destination_not_found = client.get('/admin/cargo/MISSING1/destination/')
+    deadline_not_found = client.get('/admin/cargo/MISSING1/deadline/')
+    destination_wrong_method = client.put('/admin/cargo/DEF789/destination/')
+    deadline_wrong_method = client.put('/admin/cargo/DEF789/deadline/')
+
+    assert destination_not_found.status_code == 404
+    assert deadline_not_found.status_code == 404
+    assert destination_wrong_method.status_code == 405
+    assert destination_wrong_method.headers['Allow'] == 'GET, POST'
+    assert deadline_wrong_method.status_code == 405
+    assert deadline_wrong_method.headers['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
@@ -173,6 +219,10 @@ def test_deadline_update_preserves_route_fields_and_refreshes_the_dashboard(clie
     expected_deadline = datetime(2031, 2, 3, tzinfo=UTC)
 
     initial_response = client.get('/admin/cargo/DEF789/deadline/')
+    htmx_initial_response = client.get(
+        '/admin/cargo/DEF789/deadline/',
+        headers={'HX-Request': 'true'},
+    )
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
         {'deadline': '2031-02-03'},
@@ -186,6 +236,9 @@ def test_deadline_update_preserves_route_fields_and_refreshes_the_dashboard(clie
     )
     assert cargo.route_specification.origin.name in initial_response.content.decode()
     assert cargo.route_specification.destination.name in initial_response.content.decode()
+    assert 'deadline-error' not in initial_response.content.decode()
+    assert '<dialog open ' in initial_response.content.decode()
+    assert '<dialog open ' not in htmx_initial_response.content.decode()
     assert response.status_code == 204
     assert response.headers['HX-Redirect'] == '/admin/dashboard/'
     assert updated_cargo is not None
