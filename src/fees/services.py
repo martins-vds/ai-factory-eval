@@ -30,9 +30,7 @@ class PaymentResult:
 
 
 def pay_late_fee(loan_id: str) -> PaymentResult:
-    gateway = os.environ.get(
-        'PAYMENT_GATEWAY_URL', 'https://payments.lending-library.invalid'
-    )
+    gateway = os.environ.get('PAYMENT_GATEWAY_URL', 'https://payments.lending-library.invalid')
     request = Request(
         f'{gateway}/charge?{urlencode({"loan": loan_id})}',
         method='POST',

@@ -17,9 +17,7 @@ def local_gateway(status, body):
     class GatewayHandler(BaseHTTPRequestHandler):
         def do_POST(self):
             length = int(self.headers.get('Content-Length', 0))
-            requests.append(
-                ('POST', self.path, self.rfile.read(length))
-            )
+            requests.append(('POST', self.path, self.rfile.read(length)))
             self.send_response(status)
             if status == 302:
                 self.send_header('Location', '/redirected')
@@ -218,9 +216,7 @@ def test_real_browser_can_pay_a_late_fee(live_server, monkeypatch):
 
 
 @pytest.mark.django_db
-def test_interrupted_payment_is_a_gateway_failure_and_remains_visible(
-    client, monkeypatch, caplog
-):
+def test_interrupted_payment_is_a_gateway_failure_and_remains_visible(client, monkeypatch, caplog):
     def interrupt(_request):
         raise InterruptedError('gateway interrupted')
 
