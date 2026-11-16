@@ -2,7 +2,8 @@ import re
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -72,6 +73,17 @@ def test_not_routed_table_offers_destination_and_deadline_dialog_openers(client)
 
 
 @pytest.mark.django_db
+def test_destination_dialog_reports_unknown_cargo():
+    request = RequestFactory().get('/admin/cargo/MISSING1/destination-dialog/')
+
+    with pytest.raises(
+        Http404,
+        match=r'^Cargo with tracking ID MISSING1 not found\.$',
+    ):
+        destination_dialog_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_destination_dialog_shows_current_values_and_stable_filtered_options(client):
     original_codes = tuple(location.unlocode.value for location in available_locations)
@@ -101,6 +113,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     assert second_response.status_code == 200
     assert 'aria-labelledby="destination-dialog-title"' in first_content
     assert 'Hong Kong' in first_content and 'Melbourne' in first_content
+    assert 'destination-error' not in first_content
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
@@ -153,10 +166,25 @@ def test_destination_update_rejects_origin_and_leaves_cargo_unchanged(client):
     updated = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in response.content.decode()
+    assert (
+        '<p id="destination-error" class="mt-2 text-red-800" role="alert">'
+        'Select a valid destination.</p>'
+    ) in response.content.decode()
     assert 'aria-invalid="true"' in response.content.decode()
     assert updated is not None
     assert updated.route_specification == original.route_specification
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_update_redirects_after_non_htmx_submission(client):
+    response = client.post(
+        '/admin/cargo/DEF789/destination-dialog/',
+        {'destination': 'USNYC'},
+    )
+
+    assert response.status_code == 302
+    assert response.url == '/admin/dashboard/'
 
 
 @pytest.mark.django_db
@@ -173,6 +201,7 @@ def test_deadline_dialog_shows_current_specification_values(client):
 
     assert response.status_code == 200
     assert 'Hong Kong' in content and 'Melbourne' in content
+    assert 'deadline-error' not in content
     expected_deadline = original.route_specification.arrival_deadline.date().isoformat()
     assert re.search(
         rf'<input\b(?=[^>]*name="deadline")(?=[^>]*value="{expected_deadline}")',
@@ -195,13 +224,34 @@ def test_unparseable_deadline_shows_field_error_without_updating_cargo(client):
     updated = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert (
+        '<p id="deadline-error" class="mt-2 text-red-800" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
     assert (
         updated.route_specification.arrival_deadline
         == original.route_specification.arrival_deadline
     )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_missing_deadline_keeps_empty_field_and_shows_field_error(client):
+    response = client.post(
+        '/admin/cargo/DEF789/deadline-dialog/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert (
+        '<p id="deadline-error" class="mt-2 text-red-800" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
+    assert re.search(r'<input\b(?=[^>]*name="deadline")(?=[^>]*value="")', content)
 
 
 @pytest.mark.django_db
