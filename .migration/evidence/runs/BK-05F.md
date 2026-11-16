@@ -62,3 +62,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T04:05:29+00:00 | mutation-path-diagnostic | 0 | 236.22 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `8f2491b815e74391` |  | gate=mutation score=0.823 threshold=0.8 killed=51 survived=11 files=1 base=explicit |
 | 2026-11-16T04:07:48+00:00 | guidance-assertions | 0 | 1.53 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `5170303fb78c192f` |  |  |
 | 2026-11-16T04:11:33+00:00 | mutation-path-verified | 0 | 220.81 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `fb318b8999a09881` |  | gate=mutation score=0.871 threshold=0.8 killed=54 survived=8 files=1 base=explicit |
+| 2026-11-16T04:12:09+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T04:12:13+00:00 | build-django-check | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T04:12:16+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T04:12:19+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T04:13:08+00:00 | behavior | 0 | 46.21 | `pytest -q` | `16ed9407ef4fd641` |  |  |
+| 2026-11-16T04:13:55+00:00 | crap-coverage | 0 | 43.61 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `3941152ef69677a2` |  |  |
+| 2026-11-16T04:14:00+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T04:14:03+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-16T04:14:06+00:00 | mutation-changed-final | 0 | 0.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
