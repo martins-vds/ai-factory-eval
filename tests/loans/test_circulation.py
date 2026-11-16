@@ -32,6 +32,7 @@ def test_repeat_return_is_rejected_without_replacing_the_original_date(client):
     response = client.post('/loans/L2/return')
 
     assert response.status_code == 409
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'loan already returned\n'
     assert client.get('/loans/L2').content.decode() == (
         'L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\n'
@@ -56,6 +57,18 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, form_data):
 
     assert response.status_code == 400
     assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'member and isbn are required\n'
+
+
+@pytest.mark.parametrize('field', ['member', 'isbn'])
+@pytest.mark.django_db
+def test_lend_endpoint_rejects_fields_longer_than_255_characters(client, field):
+    form_data = {'member': 'reader', 'isbn': '123'}
+    form_data[field] = 'x' * 256
+
+    response = client.post('/loans', form_data)
+
+    assert response.status_code == 400
     assert response.content.decode() == 'member and isbn are required\n'
 
 
@@ -92,6 +105,21 @@ def test_return_endpoint_reports_unknown_loan_in_the_characterized_format(client
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/ui/loans/new/'),
+        ('get', '/loans/L1/return'),
+        ('get', '/ui/loans/L1/return/'),
+    ],
+)
+@pytest.mark.django_db
+def test_write_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path, {'member': 'reader', 'isbn': '123'})
+
+    assert response.status_code == 405
 
 
 @pytest.mark.django_db
@@ -133,6 +161,7 @@ def test_ui_lend_form_creates_a_loan_and_returns_to_the_collection(client):
 
     assert response.status_code == 200
     assert b'Loan L4 created.' in response.content
+    assert b'role="status"' in response.content
     assert b'Loan L4' in response.content
     assert client.get('/loans/L4').content.decode().startswith('L4;reader;123;')
 
@@ -143,6 +172,7 @@ def test_ui_return_form_updates_the_collection(client):
 
     assert response.status_code == 200
     assert b'Loan L1 returned.' in response.content
+    assert b'role="status"' in response.content
     assert b'Returned ' in response.content
     assert b'Return L1' not in response.content
     assert client.get('/loans/L1').content.decode().endswith(f'{timezone.localdate()}\n')
@@ -156,6 +186,15 @@ def test_ui_rejects_repeated_returns_without_replacing_the_original_date(client)
     assert b'role="alert"' in response.content
     assert b'original return date is unchanged' in response.content
     assert client.get('/loans/L2').content.decode().endswith('2026-01-20\n')
+
+
+@pytest.mark.django_db
+def test_ui_return_form_reports_unknown_loan_as_not_found(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
 
 
 @pytest.mark.django_db
