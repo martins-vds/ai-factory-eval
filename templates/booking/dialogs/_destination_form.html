@@ -1,0 +1,41 @@
+<form
+  method="post"
+  action="{{ request.path }}"
+  hx-post="{{ request.path }}"
+  hx-target="#cargo-edit-dialog"
+  hx-swap="innerHTML"
+  class="flex flex-col gap-6"
+>
+  {% csrf_token %}
+  <section aria-labelledby="destination-dialog-heading" class="rounded-box rounded-lg border border-base-300 border-slate-300 bg-white p-6 shadow-sm">
+    <h2 id="destination-dialog-heading" class="mb-4 text-xl font-semibold">Change cargo destination</h2>
+    <dl class="mb-4">
+      <dt class="font-semibold">Origin</dt>
+      <dd>{{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})</dd>
+      <dt class="mt-2 font-semibold">Current destination</dt>
+      <dd>{{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})</dd>
+    </dl>
+    {% if destination_error %}
+      <p class="mb-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <label class="label mb-1 block font-medium text-slate-800" for="destination">New destination</label>
+    <select
+      class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      id="destination"
+      name="destination"
+      required
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    >
+      <option value="">Select a destination</option>
+      {% for location in locations %}
+        <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
+          {{ location.name }} ({{ location.unlocode.value }})
+        </option>
+      {% endfor %}
+    </select>
+  </section>
+  <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+    <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="submit" name="action" value="cancel">Cancel</button>
+    <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" name="action" value="update">Update</button>
+  </nav>
+</form>
