@@ -13,10 +13,22 @@ def test_lending_creates_a_fourteen_day_loan_and_returns_its_api_record(client):
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
-        f'L4;dee;123;{lent_on.isoformat()};'
-        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+        f'L4;dee;123;{lent_on.isoformat()};{(lent_on + timedelta(days=14)).isoformat()};\n'
     )
     assert client.get('/loans/L4').content.decode() == response.content.decode()
+
+
+@pytest.mark.django_db
+def test_lending_preserves_whitespace_around_nonblank_fields(client):
+    lent_on = timezone.localdate()
+
+    response = client.post('/loans', {'member': ' dee ', 'isbn': ' 123 '})
+
+    assert response.status_code == 201
+    assert response.content.decode() == (
+        f'L4; dee ; 123 ;{lent_on.isoformat()};'
+        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+    )
 
 
 @pytest.mark.django_db
@@ -28,8 +40,7 @@ def test_returning_a_loan_sets_today_and_returns_its_api_record(client):
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
-        f'L1;ana;9780134685991;2026-01-02;2026-01-16;'
-        f'{returned_on.isoformat()}\n'
+        f'L1;ana;9780134685991;2026-01-02;2026-01-16;{returned_on.isoformat()}\n'
     )
     assert client.get('/loans/L1').content.decode() == response.content.decode()
 
@@ -39,7 +50,10 @@ def test_new_loan_page_offers_a_form_posting_to_the_ui_route(client):
     response = client.get('/ui/loans/new/')
 
     assert response.status_code == 200
-    assert b'<h1 class="mb-4 mt-3 text-5xl md:text-6xl">A new loan, carefully noted.</h1>' in response.content
+    assert (
+        b'<h1 class="mb-4 mt-3 text-5xl md:text-6xl">A new loan, carefully noted.</h1>'
+        in response.content
+    )
     assert b'<form action="/ui/loans/" method="post" hx-post="/ui/loans/">' in response.content
     assert b'name="member"' in response.content
     assert b'name="isbn"' in response.content
@@ -137,3 +151,19 @@ def test_api_return_of_unknown_loan_preserves_the_characterized_response(client)
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.parametrize(
+    'return_path',
+    ['/loans/L1/return', '/ui/loans/L1/return/'],
+)
+@pytest.mark.django_db
+def test_return_routes_reject_get_requests_without_mutating_the_loan(
+    client, return_path
+):
+    response = client.get(return_path)
+
+    assert response.status_code == 405
+    assert client.get('/loans/L1').content.decode() == (
+        'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
+    )
