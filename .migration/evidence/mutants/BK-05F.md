@@ -1,42 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.790, threshold 0.8, killed 49, survived 13. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:22 Mutant #1`
-
-  ```diff
-  @@ -19,7 +19,7 @@
-   from cargotracker.voyage.domain.voyage import Voyage
-   from cargotracker.voyage.domain.voyage_number import VoyageNumber
-  -_CANDIDATE_SALT = 'booking.route_selection'
-  +_CANDIDATE_SALT = 'XXbooking.route_selectionXX'
-   def create_route_selection_views(
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:22 Mutant #2`
-
-  ```diff
-  @@ -19,7 +19,7 @@
-   from cargotracker.voyage.domain.voyage import Voyage
-   from cargotracker.voyage.domain.voyage_number import VoyageNumber
-  -_CANDIDATE_SALT = 'booking.route_selection'
-  +_CANDIDATE_SALT = None
-   def create_route_selection_views(
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:29 Mutant #5`
-
-  ```diff
-  @@ -26,7 +26,7 @@
-       cargo_routing: CargoRouting,
-       cargo_dashboard: CargoDashboard,
-   ) -> tuple[Callable[[HttpRequest, str], HttpResponse], Callable[[HttpRequest, str], HttpResponse]]:
-  -    @require_http_methods(['GET', 'POST'])
-  +
-       def route_selection(request: HttpRequest, tracking_id: str) -> HttpResponse:
-           if request.method == 'POST':
-               cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
-  ```
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.869, threshold 0.8, killed 53, survived 8. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:34 Mutant #10`
 
@@ -93,18 +57,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.790, thr
            return render(request, 'booking/route_selection/route.html', context)
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:48 Mutant #20`
-
-  ```diff
-  @@ -45,7 +45,6 @@
-           )
-           return render(request, 'booking/route_selection/route.html', context)
-  -    @require_http_methods(['GET'])
-       def select_itinerary(request: HttpRequest, tracking_id: str) -> HttpResponse:
-           context = _selection_context(
-               cargo_routing,
-  ```
-
 - `src/cargotracker/booking/interfaces/route_selection/views.py:54 Mutant #21`
 
   ```diff
@@ -132,25 +84,12 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.790, thr
            'cargo': cargo,
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:95 Mutant #40`
-
-  ```diff
-  @@ -92,7 +92,7 @@
-   def _selected_itinerary(request: HttpRequest, tracking_id: str) -> Itinerary:
-       try:
-  -        candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
-  +        candidate = signing.loads(request.POST.get('candidate', 'XXXX'), salt=_CANDIDATE_SALT)
-           if candidate['tracking_id'] != tracking_id:
-               raise BadSignature('Candidate belongs to another cargo.')
-           return _deserialize_itinerary(candidate['legs'])
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:97 Mutant #44`
+- `src/cargotracker/booking/interfaces/route_selection/views.py:97 Mutant #43`
 
   ```diff
   @@ -94,7 +94,7 @@
        try:
-           candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
+           candidate = signing.loads(request.POST.get('candidate'), salt=_CANDIDATE_SALT)
            if candidate['tracking_id'] != tracking_id:
   -            raise BadSignature('Candidate belongs to another cargo.')
   +            raise BadSignature('XXCandidate belongs to another cargo.XX')
@@ -159,7 +98,7 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.790, thr
            raise Http404('The selected route is invalid.') from error
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:100 Mutant #46`
+- `src/cargotracker/booking/interfaces/route_selection/views.py:100 Mutant #45`
 
   ```diff
   @@ -97,7 +97,7 @@
