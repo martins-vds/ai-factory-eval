@@ -23,6 +23,35 @@ def loan_lend_ui(request):
     return render(request, 'loans/new.html', {'form': form})
 
 
+def loan_return_ui(request, loan_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    loan = return_book(loan_id)
+    if loan is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+
+    is_htmx = request.headers.get('HX-Request') == 'true'
+    if loan is False:
+        current_loan = Loan.objects.get(pk=loan_id)
+        if is_htmx:
+            return render(
+                request,
+                'loans/_loan_row.html',
+                {'loan': current_loan, 'error': 'This book has already been returned.'},
+                status=200,
+            )
+        return render(
+            request,
+            'loans/detail.html',
+            {'loan': current_loan, 'error': 'This book has already been returned.'},
+            status=409,
+        )
+    if is_htmx:
+        return render(request, 'loans/_loan_row.html', {'loan': loan})
+    return redirect('/ui/loans/')
+
+
 def loan_list(request):
     if request.method == 'POST':
         form = LoanLendForm(request.POST)

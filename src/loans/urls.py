@@ -8,5 +8,6 @@ urlpatterns = [
     path('loans/<str:loan_id>/return', views.loan_return),
     path('ui/loans/new/', views.loan_lend_ui),
     path('ui/loans/', views.loan_catalog),
+    path('ui/loans/<str:loan_id>/return/', views.loan_return_ui),
     path('ui/loans/<str:loan_id>/', views.loan_catalog_detail),
 ]

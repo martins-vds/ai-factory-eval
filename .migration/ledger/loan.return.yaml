@@ -8,10 +8,22 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#705]
+target:
+  components:
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_ui
+    - templates/loans/_loan_row.html
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_api_persists_date_and_rejects_a_repeat
+  - tests/loans/test_circulation.py::test_htmx_return_updates_row_and_rejects_repeated_return
+status: migrated
+notes: "The human ruling in martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
