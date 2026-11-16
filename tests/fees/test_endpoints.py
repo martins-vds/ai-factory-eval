@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,7 @@ from playwright.sync_api import sync_playwright
 
 from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import PaymentGatewayFailure
+from src.loans.models import Loan
 
 HTTP_GOLDENS = json.loads(
     (
@@ -119,6 +121,14 @@ def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_formats_capped_fee_as_ten_dollars(client):
+    response = client.get('/ui/fees/L1/')
+
+    assert response.status_code == 200
+    assert b'Fee: $10.00' in response.content
+
+
+@pytest.mark.django_db
 def test_fee_page_payment_returns_gateway_status_fragment(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
@@ -192,6 +202,30 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             status = page.get_by_role('status')
             status.wait_for()
             assert status.inner_text().strip() == 'charged'
+            assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_displays_gateway_failure(live_server, payment_gateway):
+    payment_gateway.status = 503
+    payment_gateway.body = b'declined\n'
+    Loan.objects.get_or_create(
+        pk='L3',
+        defaults={'member': 'cy', 'isbn': '9781617294945', 'lent_on': date(2025, 12, 1)},
+    )
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for(timeout=2000)
+            assert alert.inner_text().strip() == 'declined'
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
         finally:
             browser.close()
