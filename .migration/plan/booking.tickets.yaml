@@ -113,7 +113,7 @@ tickets:
   - BK-05E
 - id: BK-05G
   title: Build destination and deadline edit dialogs
-  role: afs-specialist-migrator
+  role: afs-migrator
   specialty: ui
   files:
   - src/cargotracker/booking/interfaces/dialogs/views.py

@@ -32,3 +32,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T20:50:57+00:00 | idiom | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
 | 2026-11-16T20:51:04+00:00 | focused-dialogs-dashboard | 0 | 3.94 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `62210fe5ce8477a3` |  |  |
 | 2026-11-16T20:52:35+00:00 | mutation-changed | 0 | 86.14 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `5c4d9813c7e9787c` |  | gate=mutation score=0.970 threshold=0.8 killed=64 survived=2 files=1 base=origin/main |
+| 2026-11-16T20:54:41+00:00 | build | 0 | 0.24 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T20:54:45+00:00 | idiom | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
+| 2026-11-16T20:55:23+00:00 | crap | 0 | 33.79 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `914d61be2a69e615` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-16T20:56:00+00:00 | regression | 0 | 32.1 | `pytest -q` | `1b49a8b7ecbb5222` |  |  |
+| 2026-11-16T20:56:22+00:00 | behavior | 0 | 3.94 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `62210fe5ce8477a3` |  |  |

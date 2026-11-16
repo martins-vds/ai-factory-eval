@@ -7,12 +7,14 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Not Routed Cargo table shows tracking ID/route link, origin, destination and deadline; destination and deadline links open their respective modal editors and refresh this table on dialogReturn."
 slice: booking
-tickets: ["martins-vds/ai-factory-pilot-target#292"]
+tickets:
+  - "martins-vds/ai-factory-pilot-target#292"
+  - "martins-vds/ai-factory-pilot-target#294"
 target:
   components:
     - templates/booking/dashboard/not_routed_table.html
-status: in-progress
-verification: legacy-test
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
@@ -21,5 +23,7 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dashboard.py::test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_link"
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
   - ".migration/evidence/runs/BK-05E.md"
-notes: "BK-05E renders the not-routed rows and route links; destination/deadline dialog actions and refresh remain with BK-05G."
+  - ".migration/evidence/runs/BK-05G.md"
+notes: "BK-05E's row partition, fields and route link remain unchanged. BK-05G adds destination/deadline modal launch actions and refreshes the dashboard after successful edits."
