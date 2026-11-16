@@ -8,6 +8,7 @@
           <th scope="col" class="p-3">Origin</th>
           <th scope="col" class="p-3">Destination</th>
           <th scope="col" class="p-3">Deadline</th>
+          <th scope="col" class="p-3">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -30,9 +31,32 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <button
+                class="min-h-11 rounded-md px-3 py-2 text-blue-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                type="button"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog"
+                onclick="document.getElementById('cargo-edit-dialog').showModal()"
+                aria-label="Edit destination for cargo {{ cargo.tracking_id.value }}"
+              >Edit destination</button>
+              <button
+                class="min-h-11 rounded-md px-3 py-2 text-blue-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                type="button"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog"
+                onclick="document.getElementById('cargo-edit-dialog').showModal()"
+                aria-label="Edit deadline for cargo {{ cargo.tracking_id.value }}"
+              >Edit deadline</button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog
+    id="cargo-edit-dialog"
+    aria-label="Edit cargo route specification"
+    class="w-full max-w-xl rounded-lg bg-white p-0 shadow-xl backdrop:bg-slate-900/50"
+  ></dialog>
 </section>
