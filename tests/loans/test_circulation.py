@@ -14,9 +14,7 @@ def test_lend_endpoint_creates_a_loan_with_fourteen_day_due_date(client):
     today = timezone.localdate()
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        f'L4;dee;123;{today};{today + timedelta(days=14)};\n'
-    )
+    assert response.content.decode() == (f'L4;dee;123;{today};{today + timedelta(days=14)};\n')
 
 
 @pytest.mark.django_db
@@ -26,9 +24,7 @@ def test_return_endpoint_records_today_and_returns_the_updated_loan(client):
     today = timezone.localdate()
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today}\n'
-    )
+    assert response.content.decode() == (f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today}\n')
 
 
 @pytest.mark.django_db
@@ -73,8 +69,7 @@ def test_lend_endpoint_escapes_field_and_record_delimiters(client):
     today = timezone.localdate()
     assert response.status_code == 201
     assert response.content.decode() == (
-        f'L4;"Reader; Example\nSecond line";"978""xyz";'
-        f'{today};{today + timedelta(days=14)};\n'
+        f'L4;"Reader; Example\nSecond line";"978""xyz";{today};{today + timedelta(days=14)};\n'
     )
 
 
@@ -87,9 +82,7 @@ def test_api_write_endpoints_accept_legacy_requests_without_csrf_tokens():
 
     assert lend_response.status_code == 201
     assert return_response.status_code == 200
-    assert return_response.content.decode().endswith(
-        f'{timezone.localdate()}\n'
-    )
+    assert return_response.content.decode().endswith(f'{timezone.localdate()}\n')
 
 
 @pytest.mark.django_db
@@ -152,9 +145,7 @@ def test_ui_return_form_updates_the_collection(client):
     assert b'Loan L1 returned.' in response.content
     assert b'Returned ' in response.content
     assert b'Return L1' not in response.content
-    assert client.get('/loans/L1').content.decode().endswith(
-        f'{timezone.localdate()}\n'
-    )
+    assert client.get('/loans/L1').content.decode().endswith(f'{timezone.localdate()}\n')
 
 
 @pytest.mark.django_db

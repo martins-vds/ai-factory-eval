@@ -5,8 +5,8 @@ from django.views.decorators.http import require_GET, require_POST
 
 from .forms import LoanForm
 from .models import Loan
+from .repository import LoanAlreadyReturned
 from .services import (
-    LoanAlreadyReturned,
     get_loan_text,
     lend_loan,
     list_loans_text,

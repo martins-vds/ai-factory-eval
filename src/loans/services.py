@@ -3,7 +3,7 @@ from io import StringIO
 
 from django.utils import timezone
 
-from .repository import LoanAlreadyReturned, LoanRepository
+from .repository import LoanRepository
 
 
 def lend_loan(member, isbn):
