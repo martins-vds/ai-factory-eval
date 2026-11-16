@@ -20,6 +20,9 @@ findings:
   - severity: major
     where: tests/conftest.py:6
     what: "The repository-wide format gate fails on this out-of-scope file; the changed fee tests pass targeted lint and format checks."
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "The HTMX payment action returns gateway failures with HTTP 502, which htmx 2.0.11 does not swap by default; no response-error override is present, so the failure alert is not surfaced in an HTMX browser flow. The CDN asset was unavailable in this session, so only the full-page fallback could be exercised."
   - severity: minor
     where: .migration/evidence/mutants/LL-03.md:5
     what: "Mutation score 0.972 meets threshold; 3 survivors remain (two HTMX header literals and frozen GatewayResponse). The known module-level route/method/LoanForm.Meta.model selection limitation is noted; all four LL-03 routes are tested for supported and unsupported methods, and no fee form is in scope."
