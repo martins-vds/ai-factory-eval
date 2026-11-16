@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -179,6 +180,39 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
     content = response.content.decode()
     assert f'Routing Details for Cargo {tracking_id.value}' in content
     assert 'Itinerary' in content
+    assert 'CM003' in content
+    assert 'CM001' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_assigning_previously_signed_candidate_redirects_to_details(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    token = signing.dumps(
+        {
+            'tracking_id': tracking_id.value,
+            'legs': [
+                {
+                    'voyage_number': 'CM003',
+                    'load_location': {'unlocode': 'USNYC', 'name': 'New York'},
+                    'unload_location': {'unlocode': 'FIHEL', 'name': 'Helsinki'},
+                    'load_time': datetime(2030, 11, 1, tzinfo=UTC).isoformat(),
+                    'unload_time': datetime(2030, 11, 4, tzinfo=UTC).isoformat(),
+                }
+            ],
+        },
+        salt='booking.route_selection',
+    )
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/route/',
+        {'candidate': token},
+        follow=True,
+    )
+
+    assert response.status_code == 200
+    assert response.redirect_chain == [(f'/admin/cargo/{tracking_id.value}/', 302)]
+    content = response.content.decode()
     assert 'CM003' in content
     assert 'CM001' not in content
 
