@@ -21,3 +21,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T20:44:01+00:00 | crap-lizard | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-16T20:44:04+00:00 | crap-threshold | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0e71f99bcc37d642` |  | gate=crap max=26.0 threshold=30 over=0 methods=204 |
 | 2026-11-16T20:44:08+00:00 | mutation-changed | 0 | 0.05 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T20:48:24+00:00 | mutation-changed-final | 1 | 225.41 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `aff096ccac3138d1` | afs-mutation: FAILED score=0.673 threshold=0.8 killed=35 survived=17 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.673 threshold=0.8 killed=35 survived=17 files=1 base=origin/main |
+| 2026-11-16T20:49:29+00:00 | behavior-dialogs-strengthened | 0 | 3.89 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `81aa9b7ab0c1021c` |  |  |
+| 2026-11-16T20:49:50+00:00 | behavior-dialogs-final-focused | 0 | 4.22 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `e9e3a5962c5eeb9a` |  |  |
+| 2026-11-16T20:49:53+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T20:49:56+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T20:50:39+00:00 | regression-final | 0 | 37.63 | `pytest -q` | `48c5ee152ffc6bd1` |  |  |
+| 2026-11-16T20:51:24+00:00 | crap-coverage-final | 0 | 36.2 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `100de28f3234d193` |  |  |
+| 2026-11-16T20:51:28+00:00 | crap-threshold-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `ab3b17f4230bbacd` |  | gate=crap max=26.0 threshold=30 over=0 methods=204 |

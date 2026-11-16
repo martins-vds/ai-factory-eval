@@ -3,7 +3,8 @@ from datetime import UTC, datetime
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -74,10 +75,23 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
 
     assert first.status_code == 200
     assert '<dialog' in content and 'Change destination' in content
+    assert f'action="{url}" hx-post="{url}"' in content
+    assert 'destination-error' not in content
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
     assert options is not None and repeated_options is not None
     assert options.group(1) == repeated_options.group(1)
+    option_values = re.findall(r'<option value="([^"]*)"', options.group(1))
+    expected_values = {
+        '',
+        *(
+            location.unlocode.value
+            for location in backing_locations
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
+        ),
+    }
+    assert set(option_values) == expected_values
     assert cargo.route_specification.origin.unlocode.value not in options.group(1)
     assert cargo.route_specification.destination.unlocode.value not in options.group(1)
     assert [location.unlocode.value for location in backing_locations] == initial_location_codes
@@ -92,9 +106,12 @@ def test_deadline_dialog_shows_initial_value_and_parse_error_near_the_field(clie
     url = f'/admin/cargo/{cargo.tracking_id.value}/deadline/'
 
     initial = client.get(url)
-    assert (
-        f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in initial.content.decode()
-    )
+    initial_content = initial.content.decode()
+    assert f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in initial_content
+    assert f'action="{url}" hx-post="{url}"' in initial_content
+    assert cargo.route_specification.origin.name in initial_content
+    assert cargo.route_specification.destination.name in initial_content
+    assert 'deadline-error' not in initial_content
 
     invalid = client.post(
         url,
@@ -104,9 +121,41 @@ def test_deadline_dialog_shows_initial_value_and_parse_error_near_the_field(clie
     content = invalid.content.decode()
 
     assert invalid.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert (
+        '<p id="deadline-error" class="mt-2 text-red-700" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
     assert 'aria-invalid="true"' in content
     assert 'value="2031-02-31"' in content
+    assert cargo_repository.find(cargo.tracking_id).route_specification == cargo.route_specification
+
+    missing_value = client.post(url, {}, HTTP_HX_REQUEST='true')
+    missing_content = missing_value.content.decode()
+    assert missing_value.status_code == 200
+    assert 'Enter a valid arrival deadline.' in missing_content
+    assert 'value=""' in missing_content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_a_filtered_out_destination(client):
+    call_command('seed_sample_data')
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    url = f'/admin/cargo/{cargo.tracking_id.value}/destination/'
+
+    response = client.post(
+        url,
+        {'destination': cargo.route_specification.origin.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert (
+        '<p id="destination-error" class="mt-2 text-red-700" role="alert">'
+        'Select a valid destination.</p>'
+    ) in content
     assert cargo_repository.find(cargo.tracking_id).route_specification == cargo.route_specification
 
 
@@ -162,3 +211,31 @@ def test_deadline_dialog_updates_through_specification_and_refreshes(client):
     assert updated.route_specification.origin == cargo.route_specification.origin
     assert updated.route_specification.destination == cargo.route_specification.destination
     assert updated.route_specification.arrival_deadline == deadline
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
+    'url',
+    (
+        '/admin/cargo/DEF789/destination/',
+        '/admin/cargo/DEF789/deadline/',
+    ),
+)
+def test_dialog_views_reject_unsupported_methods(client, url):
+    call_command('seed_sample_data')
+
+    assert client.put(url).status_code == 405
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('view', 'url'),
+    (
+        (destination_dialog_view, '/admin/cargo/MISSING1/destination/'),
+        (deadline_dialog_view, '/admin/cargo/MISSING1/deadline/'),
+    ),
+)
+def test_dialog_views_report_missing_cargo(view, url):
+    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
+        view(RequestFactory().get(url), 'MISSING1')

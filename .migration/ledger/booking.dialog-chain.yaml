@@ -7,8 +7,13 @@ source:
   risk: {crap: 2, complexity: 1, coverage: 0.0}
 boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - src/cargotracker/booking/interfaces/dialogs/views.py
+    - templates/booking/dialogs/
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +22,8 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_through_specification_and_refreshes"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_through_specification_and_refreshes"
+  - ".migration/evidence/runs/BK-05G.md"
+notes: "The target dialog views call CargoSpecification; successful HTMX updates refresh the dashboard. The unavailable-widget warning is omitted per ruling #251."
