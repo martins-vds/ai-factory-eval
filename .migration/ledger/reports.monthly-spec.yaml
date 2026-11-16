@@ -18,4 +18,5 @@ evidence:
   - .migration/evidence/runs/LL-05.md
   - tests/reports/test_monthly_report.py::test_monthly_report_lists_previous_month_member_totals_in_specified_order
   - tests/reports/test_monthly_report.py::test_monthly_report_includes_december_when_run_on_january_first
+  - tests/reports/test_monthly_report.py::test_monthly_report_caps_each_loan_fee
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
