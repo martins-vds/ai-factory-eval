@@ -73,3 +73,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T04:14:06+00:00 | mutation-changed-final | 0 | 0.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-16T04:14:48+00:00 | stable-token-test | 0 | 1.52 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_assigning_previously_signed_candidate_redirects_to_details` | `7bc5776d19eed069` |  |  |
 | 2026-11-16T04:18:23+00:00 | mutation-path-verified-final | 0 | 210.74 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `153e1bd3d478c254` |  | gate=mutation score=0.903 threshold=0.8 killed=56 survived=6 files=1 base=explicit |
+| 2026-11-16T04:19:06+00:00 | build-compile-final | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T04:19:10+00:00 | django-check-final | 0 | 0.3 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T04:19:15+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T04:19:18+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T04:20:06+00:00 | behavior-final | 0 | 45.69 | `pytest -q` | `f562bcf1eda02561` |  |  |
+| 2026-11-16T04:20:54+00:00 | crap-coverage-final | 0 | 44.8 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `5889669d87e99675` |  |  |
+| 2026-11-16T04:20:57+00:00 | crap-lizard-final | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T04:21:00+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-16T04:21:03+00:00 | mutation-changed-final | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
