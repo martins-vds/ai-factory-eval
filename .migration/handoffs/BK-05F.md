@@ -25,3 +25,39 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-16T20:37:30Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-classify-survivors-yet-again` / https://github.com/martins-vds/ai-factory-pilot-target/pull/394 · **Last commit:** a936629f
+
+### Done
+- Setup passed; source SHA is `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`.
+- Ran the required profile mutation command first via `afs-run`; command exited 0 but reported `score=n/a reason=no-mutable-code-changed base=origin/main`. Journal: `.migration/evidence/runs/BK-05F.md`; raw log: `.migration/runs/BK-05F/20261116T203635119787Z-mutation-changed.log`.
+- Confirmed the checkout is not the stated base branch (`copilot/bk-05f-build-route-selection-itinerary-screens`). `git diff origin/main...HEAD` has no files, so the BK-05F implementation and tests are already in the mutation baseline and this session cannot reproduce the historical 0.790 run.
+- Classified every survivor listed in `.migration/evidence/mutants/BK-05F.md` (diffs remain in that file):
+  - Mutants #1 and #2 (candidate signing salt changed): equivalent within the rendered-and-submitted candidate flow; signing and verification use the same salt.
+  - Mutants #5 and #20 (HTTP-method decorators removed): non-equivalent; unsupported methods can render a page instead of returning 405. Existing interface test `test_route_screens_reject_unsupported_http_methods` asserts PUT/POST return 405, so the old survivor result conflicts with the checked-in test and needs reproduction on the specified base.
+  - Mutants #10, #13, #27, #44, and #46 (Http404 message text changed): equivalent at the UI boundary; the 404 response is unchanged and the exception detail is not rendered.
+  - Mutant #14 (`quote(..., safe="")` changed to `safe="XXXX"`): equivalent; `X` is unreserved and is not percent-encoded by `quote` regardless of `safe`.
+  - Mutants #16 and #21 (empty-route guidance changed): non-equivalent visible copy. Existing interface test `test_route_screens_explain_when_no_candidates_satisfy_the_deadline` asserts both messages, so the historical survivors conflict with the checked-in assertions and need reproduction on the specified base.
+  - Mutant #40 (missing-token default changed from empty string to `XXXX`): equivalent; either value fails signature validation and produces the same 404.
+
+### Remaining
+- [ ] Resume on the specified PR base (or provide that branch's files/history in this checkout) and rerun the exact profile mutation command.
+- [ ] Reproduce the four non-equivalent HTTP-method and visible-guidance mutants despite existing assertions; add an interface test only if reproduction shows a missing assertion.
+- [ ] Run all profile gates through `afs-run`, update the return and validate migration outputs.
+
+### Decisions made
+- No application or test files were changed: the required mutation gate had no changed production code to analyze in this checkout, and changing code without the specified base would not establish the reported shortfall.
+
+### Blockers / questions
+- The specified base branch is unavailable in this repository checkout; current branch and baseline do not contain a mutable BK-05F code diff. The migration contract stop rule for a real setup/context limit applies.
+- The stored survivor report and existing interface assertions disagree for mutants #5, #20, #16, and #21; the correct base is needed to reproduce before changing tests.
+- The task requests role `afs-migrator` and return `.migration/returns/BK-05F.afs-migrator.yaml`, but the approved plan assigns BK-05F to `afs-specialist-migrator`. `validate.py` rejects a second role's return for the same ticket. The plan is out of this ticket's file scope, so a valid role return needs a coordinator decision.
+- `afs-finish-check` likewise expects this session to update `.migration/returns/BK-05F.afs-specialist-migrator.yaml`; doing so would attribute this `afs-migrator` session to another role. A coordinator must resolve the role/return attribution.
+
+### Failing commands
+- `.migration/harness/tools/afs-finish-check` → exit 1: it requires updating the specialist-migrator return; see the role conflict above.
+- Mutation command exited 0 with `n/a`, not a passing numeric mutation score; see `.migration/runs/BK-05F/20261116T203635119787Z-mutation-changed.log`.
+
+### Next step for the next session
+Ask the coordinator to reconcile BK-05F's role in the approved plan with this continuation's requested `afs-migrator` role, then resume on `copilot/bk-05f-build-route-selection-itinerary-screens` (or obtain its exact diff) and rerun mutation triage.
