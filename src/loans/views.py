@@ -18,8 +18,9 @@ def loan_catalog(request):
     return render(request, 'loans/list.html', {'loans': Loan.objects.all()})
 
 
+@require_http_methods(['GET', 'POST'])
 def loan_catalog_new(request):
-    form = LoanForm(request.POST or None)
+    form = LoanForm(request.POST if request.method == 'POST' else None)
     if request.method == 'POST':
         if form.is_valid():
             lend_loan(**form.cleaned_data, lent_on=timezone.localdate())

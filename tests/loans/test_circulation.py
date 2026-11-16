@@ -102,8 +102,9 @@ def test_browser_can_lend_a_book_from_the_reading_room_form(client, monkeypatch)
 
 
 @pytest.mark.django_db
-def test_browser_lending_shows_field_errors_for_blank_values(client):
-    response = client.post('/ui/loans/new/', {'member': ' ', 'isbn': ''})
+@pytest.mark.parametrize('data', [{'member': ' ', 'isbn': ''}, {}])
+def test_browser_lending_shows_field_errors_for_blank_values(client, data):
+    response = client.post('/ui/loans/new/', data)
 
     assert response.status_code == 400
     assert b'Member name' in response.content
