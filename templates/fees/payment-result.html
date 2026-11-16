@@ -1,0 +1,5 @@
+<div id="payment-status" class="mt-6">
+  <p role="{% if payment_result.status_code == 200 %}status{% else %}alert{% endif %}">
+    {{ payment_result.body }}
+  </p>
+</div>
