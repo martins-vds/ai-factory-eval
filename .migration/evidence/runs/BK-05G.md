@@ -50,3 +50,14 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-15T23:45:19+00:00 | setup-probe | 0 | 0.01 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-15T23:50:15+00:00 | verifier-unknown-dialog-404 | 0 | 4.48 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_returns_not_found` | `096bed1199660eaa` |  |  |
+| 2026-11-15T23:50:35+00:00 | verifier-build-compileall | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T23:50:39+00:00 | verifier-build-django-check | 0 | 0.3 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-15T23:50:42+00:00 | verifier-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-15T23:50:45+00:00 | verifier-idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `e1331f43a5e567eb` |  |  |
+| 2026-11-15T23:51:49+00:00 | verifier-behavior-tests | 0 | 47.07 | `pytest -q` | `d1b6b5b2d3c5960a` |  |  |
+| 2026-11-15T23:53:04+00:00 | verifier-crap-coverage | 0 | 45.24 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `107af138fbc7eec2` |  |  |
+| 2026-11-15T23:53:09+00:00 | verifier-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-15T23:53:12+00:00 | verifier-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-15T23:55:05+00:00 | verifier-mutation-changed | 0 | 108.6 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
+| 2026-11-15T23:55:13+00:00 | verifier-idiom-changed-file-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-15T23:56:03+00:00 | verifier-regression | 0 | 45.52 | `pytest -q` | `e9e02dc8a4e30e47` |  |  |
