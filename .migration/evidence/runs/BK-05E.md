@@ -18,3 +18,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
+| 2026-11-16T02:00:25+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:03:00+00:00 | verify-build-compileall | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:03:01+00:00 | verify-build-check | 0 | 1.45 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T02:04:02+00:00 | verify-behavior | 0 | 60.99 | `pytest -q` | `20665bc46dffd2cd` |  |  |
+| 2026-11-16T02:04:02+00:00 | verify-idiom-ruff | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T02:04:03+00:00 | verify-idiom-format | 0 | 0.03 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-16T02:05:05+00:00 | verify-crap-coverage | 0 | 57.93 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `0195cf337b25ee53` |  |  |
+| 2026-11-16T02:05:05+00:00 | verify-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:05:06+00:00 | verify-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-16T02:14:35+00:00 | verify-mutation-changed | 0 | 569.32 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
