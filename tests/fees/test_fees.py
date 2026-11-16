@@ -151,6 +151,7 @@ def test_payment_endpoint_forwards_the_gateway_request(client, monkeypatch, capl
         response = client.post('/payments/L1')
 
     assert response.status_code == source_result['status']
+    assert response['Content-Type'] == source_result['content_type']
     assert response.content.decode() == source_result['body']
     assert requests == [('POST', '/charge?loan=L1', b'')]
     assert 'Payment gateway call interrupted' not in caplog.text
@@ -198,6 +199,7 @@ def test_non_200_gateway_responses_become_bad_gateway(client, monkeypatch, statu
         response = client.post('/payments/L3')
 
     assert response.status_code == 502
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'declined\n'
     assert requests == [('POST', '/charge?loan=L3', b'')]
 
