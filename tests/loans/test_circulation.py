@@ -18,9 +18,7 @@ from django.utils import timezone
 )
 def test_lend_api_rejects_blank_member_and_isbn(client, member, isbn):
     data = {
-        key: value
-        for key, value in {'member': member, 'isbn': isbn}.items()
-        if value is not None
+        key: value for key, value in {'member': member, 'isbn': isbn}.items() if value is not None
     }
     response = client.post('/loans', data)
 
@@ -40,9 +38,7 @@ def test_lend_api_creates_loan_with_fourteen_day_due_date(client, monkeypatch):
 
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        'L4;reader;9780134685991;2026-03-01;2026-03-15;\n'
-    )
+    assert response.content.decode() == ('L4;reader;9780134685991;2026-03-01;2026-03-15;\n')
     assert client.get('/loans/L4').content.decode() == (
         'L4;reader;9780134685991;2026-03-01;2026-03-15;\n'
     )
