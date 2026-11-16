@@ -9,9 +9,26 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+target:
+  components: [src.fees.gateway.PaymentGateway, src.fees.views.payment, src.fees.views.payment_page]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_payments.py::test_payment_api_posts_to_the_gateway_and_forwards_success
+  - tests/fees/test_payments.py::test_payment_api_maps_gateway_failure_to_bad_gateway
+  - tests/fees/test_payments.py::test_payment_api_does_not_follow_gateway_redirects
+  - tests/fees/test_payments.py::test_payment_api_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_payments.py::test_payment_api_rejects_non_post_methods
+  - tests/fees/test_payments.py::test_htmx_payment_uses_the_ui_path_and_returns_a_status_fragment
+  - tests/fees/test_payments.py::test_htmx_payment_shows_gateway_failure
+  - tests/fees/test_payments.py::test_regular_fee_payment_renders_a_full_page_result
+  - tests/fees/test_payments.py::test_payment_api_returns_gateway_failure_when_connection_fails
+  - tests/fees/test_payments.py::test_payment_api_logs_and_maps_interrupted_gateway_calls
+notes: "Approved fix (#40): Python has no Java-style per-thread interrupt flag; interruption exceptions are retained in the exception log before returning the characterized 502 failure."

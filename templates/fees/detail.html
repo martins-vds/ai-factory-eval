@@ -23,8 +23,11 @@
     <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
       <div class="card-body">
         <h2 class="card-title">Settle this fee</h2>
-        <p class="text-sm text-[#66705b]">Payment is securely sent to the library payment gateway.</p>
+        <p class="text-sm text-[#66705b]">Send this fee to the library payment gateway.</p>
         <div id="payment-status" aria-live="polite">
+          {% if payment_result %}
+          {% include "fees/payment-status.html" %}
+          {% else %}
           <form method="post" action="/ui/payments/{{ loan.id }}/"
                 hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="innerHTML">
             {% csrf_token %}
@@ -32,6 +35,7 @@
               Pay {{ amount }}
             </button>
           </form>
+          {% endif %}
         </div>
       </div>
     </aside>
