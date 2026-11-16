@@ -1,7 +1,13 @@
 import csv
 from io import StringIO
 
+from django.utils import timezone
+
 from .repository import LoanRepository
+
+
+def lend_loan(member, isbn):
+    return LoanRepository().lend(member, isbn, timezone.localdate())
 
 
 def loan_line(loan):
