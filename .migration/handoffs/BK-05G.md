@@ -16,3 +16,22 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-16T21:00:31Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-continue-dialogs-routing` / https://github.com/martins-vds/ai-factory-eval/pull/732  ·  **Last commit:** `f6399bf5`
+### Done
+- Implemented destination/deadline dialog views and templates, application-use-case updates, and the not-routed table triggers. Focused UI/dashboard tests passed: 13/13; `.migration/evidence/runs/BK-05G.md`.
+- Full regression passed: 471 tests. Build, idiom, and CRAP gates passed; CRAP max was 26.0. Changed-code mutation passed at 0.923 against 0.8. See `.migration/evidence/runs/BK-05G.md` and `.migration/evidence/mutants/BK-05G.md`.
+- Updated the three BK-05G ledger entries.
+### Remaining
+- [ ] Resolve the current role/plan conflict so a schema-valid `.migration/returns/BK-05G.afs-migrator.yaml` can be committed.
+- [ ] BK-05H must register the destination/deadline endpoints; that ticket owns `src/cargotracker/urls.py` and `src/cargotracker/booking/urls.py`.
+### Decisions made
+- Did not edit the plan or replace the prior specialist-migrator return because neither is in BK-05G's allowed file scope.
+### Blockers / questions
+- The current task requires role `afs-migrator` and return path `.migration/returns/BK-05G.afs-migrator.yaml`, but `.migration/plan/booking.tickets.yaml` still assigns BK-05G to retired role `afs-specialist-migrator`, and `.migration/returns/BK-05G.afs-specialist-migrator.yaml` already exists. `validate.py` rejects both role returns for one ticket ID. Operator approval is needed to update the plan/retire the prior return or otherwise resolve this conflict.
+- Until BK-05H registers the routes, the new dashboard triggers target paths not yet registered in the application URL configuration.
+### Failing commands
+- `rtk python .migration/harness/tools/validate.py .migration` → exit 1: `.migration/plan/booking.tickets.yaml: ticket id BK-05G is already used by afs-migrator (.migration/returns/): pick a new id`.
+### Next step for the next session
+Ask the operator to resolve BK-05G's role/return conflict without widening this ticket's scope; then create the requested migrator return and run migration validation. Coordinate endpoint registration with BK-05H.
