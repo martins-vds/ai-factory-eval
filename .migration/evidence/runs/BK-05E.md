@@ -30,3 +30,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T17:33:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
 | 2026-11-16T17:42:55+00:00 | mutation-changed | 0 | 550.89 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
 | 2026-11-16T17:44:18+00:00 | verifier-targeted | 0 | 4.22 | `pytest -q tests/booking/interfaces/test_dashboard.py tests/booking/interfaces/test_cargo_details.py` | `8ab668493afe54c6` |  |  |
+| 2026-11-16T17:44:39+00:00 | build-compileall-final | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:44:40+00:00 | build-django-check-final | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T17:44:40+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T17:44:40+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-16T17:45:35+00:00 | behavior-final | 0 | 55.39 | `pytest -q` | `7c265ab6d81e5509` |  |  |
+| 2026-11-16T17:46:33+00:00 | regression-final | 0 | 57.8 | `pytest -q` | `a3e0e444a5fa367f` |  |  |
+| 2026-11-16T17:47:30+00:00 | crap-coverage-final | 0 | 56.97 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `7b6698b94fd40116` |  |  |
+| 2026-11-16T17:47:30+00:00 | crap-lizard-final | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:47:31+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-16T17:57:07+00:00 | mutation-changed-final | 0 | 569.13 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
