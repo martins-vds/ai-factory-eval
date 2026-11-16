@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee · Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-8 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+  <h1 class="mt-3 mb-8 text-5xl">Late fees</h1>
+  <div class="grid gap-8 md:grid-cols-[1fr_18rem]">
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body p-7">
+        <p class="text-[#66705b]">{{ loan.member }} · {{ loan.id }}</p>
+        <h2 class="mt-2 text-3xl">Loan {{ loan.id }}</h2>
+        <p class="mt-5">
+          Due {{ loan.due_on|date:"M j, Y" }}{% if loan.returned_on %} · returned {{ loan.returned_on|date:"M j, Y" }}{% endif %}
+        </p>
+        <p class="mt-2">{{ fee.days_late }} late days · first two days waived</p>
+        <p class="mt-7 text-6xl font-bold">{{ amount }}</p>
+        <p class="mt-2 text-[#66705b]">25¢ per day after the grace period, capped at $10.00.</p>
+      </div>
+    </article>
+    <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title">Settle this fee</h2>
+        <p class="text-sm text-[#66705b]">Send this fee to the library payment gateway.</p>
+        <div id="payment-status" aria-live="polite">
+          {% if payment_result %}
+          {% include "fees/payment-status.html" %}
+          {% else %}
+          <form method="post" action="/ui/payments/{{ loan.id }}/"
+                hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button class="btn mt-3 w-full bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">
+              Pay {{ amount }}
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
