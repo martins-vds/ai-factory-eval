@@ -14,6 +14,6 @@
 - `.migration/plan/data-migration.tickets.yaml` lists DM-05D files as only `src/cargotracker/data_migration/management/commands/export_data_snapshot.py` and `tests/data_migration/test_export.py`. The migration contract limits work to this list plus explicit `AFS-SCOPE:` lines; none is present in the ticket. The required exporter module would be outside that scope.
 - The handoff file and return are durable stop outputs; the referenced live `ai-factory-pilot-target` tracker was read-only for this run.
 ### Failing commands
-- None.
+- `.migration/harness/tools/afs-finish-check --ticket DM-05D --role afs-specialist-migrator` → exit 1: the return omitted the required `mutation_changed` N/A reason. Updated the return; rerun finish check before stopping.
 ### Next step for the next session
 Ask the operator to add the exporter module to the DM-05D allowlist or provide an explicit `AFS-SCOPE:` extension, then restart setup and implement the approved ticket.
