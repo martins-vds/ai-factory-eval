@@ -4,6 +4,7 @@ from types import SimpleNamespace
 
 import pytest
 from django.core.management import call_command
+from django.http import Http404
 from django.template.loader import render_to_string
 from django.test import RequestFactory
 
@@ -79,6 +80,13 @@ def test_destination_dialog_shows_current_values_and_filters_options_without_mut
     assert cargo.route_specification.destination.name in content
     assert cargo.route_specification.origin.unlocode.value not in options.group(1)
     assert cargo.route_specification.destination.unlocode.value not in options.group(1)
+    remaining_location = next(
+        location
+        for location in location_repository.find_all()
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
+    assert f'value="{remaining_location.unlocode.value}"' in options.group(1)
+    assert 'destination-error' not in content
 
     subsequent = change_destination(
         _request(RequestFactory(), 'get', '/admin/cargo/DEF789/destination/'),
@@ -94,8 +102,15 @@ def test_destination_dialog_shows_current_values_and_filters_options_without_mut
     ] == location_codes
 
 
+@pytest.mark.parametrize(
+    ('deadline_data', 'retained_value'),
+    [({}, ''), ({'deadline': 'not-a-date'}, 'not-a-date')],
+    ids=('missing', 'malformed'),
+)
 @pytest.mark.django_db
-def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(booking_dialogs):
+def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(
+    booking_dialogs, deadline_data, retained_value
+):
     (_, change_deadline), cargo_repository, _ = booking_dialogs
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
@@ -106,7 +121,7 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(booking_dialog
             RequestFactory(),
             'post',
             '/admin/cargo/DEF789/deadline/',
-            {'deadline': 'not-a-date'},
+            deadline_data,
         ),
         'DEF789',
     )
@@ -116,6 +131,7 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(booking_dialog
     assert 'Enter a valid date.' in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
+    assert f'value="{retained_value}"' in content
     assert cargo_repository.find(TrackingId('DEF789')).route_specification.arrival_deadline == (
         previous_deadline
     )
@@ -123,20 +139,136 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(booking_dialog
 
 
 @pytest.mark.django_db
-def test_deadline_dialog_shows_current_date(booking_dialogs):
-    (_, change_deadline), cargo_repository, _ = booking_dialogs
+def test_invalid_destination_shows_field_error_without_updating_cargo(booking_dialogs):
+    (change_destination, _), cargo_repository, _ = booking_dialogs
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
+    previous_specification = cargo.route_specification
 
-    response = change_deadline(
+    response = change_destination(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/destination/',
+            {'destination': cargo.route_specification.origin.unlocode.value},
+        ),
+        'DEF789',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in content
+    assert 'role="alert"' in content
+    assert cargo_repository.find(TrackingId('DEF789')).route_specification == (
+        previous_specification
+    )
+
+
+@pytest.mark.django_db
+def test_dialog_views_cover_initial_values_and_all_update_paths(booking_dialogs):
+    (change_destination, change_deadline), cargo_repository, location_repository = booking_dialogs
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    origin = cargo.route_specification.origin
+    previous_destination = cargo.route_specification.destination
+    previous_deadline = cargo.route_specification.arrival_deadline
+    other_destination = next(
+        location
+        for location in location_repository.find_all()
+        if location not in (origin, previous_destination)
+    )
+
+    destination_form = change_destination(
+        _request(RequestFactory(), 'get', '/admin/cargo/DEF789/destination/'),
+        'DEF789',
+    )
+    destination_content = destination_form.content.decode()
+    assert origin.name in destination_content
+    assert previous_destination.name in destination_content
+    assert other_destination.unlocode.value in destination_content
+    assert 'destination-error' not in destination_content
+
+    invalid_destination = change_destination(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/destination/',
+            {'destination': origin.unlocode.value},
+        ),
+        'DEF789',
+    )
+    assert 'Select a valid destination.' in invalid_destination.content.decode()
+
+    updated_destination = change_destination(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/destination/',
+            {'destination': other_destination.unlocode.value},
+        ),
+        'DEF789',
+    )
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo.route_specification.origin == origin
+    assert cargo.route_specification.destination == other_destination
+    assert cargo.route_specification.arrival_deadline == previous_deadline
+    assert 'id="not-routed-cargo"' in updated_destination.content.decode()
+    assert updated_destination['HX-Retarget'] == '#not-routed-cargo'
+    assert updated_destination['HX-Reswap'] == 'outerHTML'
+    assert updated_destination['HX-Trigger'] == 'booking-dialog-complete'
+
+    deadline_form = change_deadline(
         _request(RequestFactory(), 'get', '/admin/cargo/DEF789/deadline/'),
         'DEF789',
     )
+    deadline_content = deadline_form.content.decode()
+    assert f'value="{previous_deadline.date().isoformat()}"' in deadline_content
+    assert origin.name in deadline_content
+    assert other_destination.name in deadline_content
+    assert 'deadline-error' not in deadline_content
 
-    assert response.status_code == 200
-    assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in (
-        response.content.decode()
+    invalid_deadline = change_deadline(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/deadline/',
+            {'deadline': 'not-a-date'},
+        ),
+        'DEF789',
     )
+    assert 'Enter a valid date.' in invalid_deadline.content.decode()
+
+    updated_deadline = change_deadline(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/deadline/',
+            {'deadline': '2027-01-15'},
+        ),
+        'DEF789',
+    )
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo.route_specification.origin == origin
+    assert cargo.route_specification.destination == other_destination
+    assert cargo.route_specification.arrival_deadline == datetime(2027, 1, 15, tzinfo=UTC)
+    assert 'id="not-routed-cargo"' in updated_deadline.content.decode()
+    assert updated_deadline['HX-Retarget'] == '#not-routed-cargo'
+    assert updated_deadline['HX-Reswap'] == 'outerHTML'
+    assert updated_deadline['HX-Trigger'] == 'booking-dialog-complete'
+
+    for dialog, path in (
+        (change_destination, '/admin/cargo/DEF789/destination/'),
+        (change_deadline, '/admin/cargo/DEF789/deadline/'),
+    ):
+        response = dialog(_request(RequestFactory(), 'put', path), 'DEF789')
+        assert response.status_code == 405
+        assert response['Allow'] == 'GET, POST'
+
+    with pytest.raises(Http404, match='Cargo with tracking ID MISSING not found.'):
+        change_destination(
+            _request(RequestFactory(), 'get', '/admin/cargo/MISSING/destination/'),
+            'MISSING',
+        )
 
 
 @pytest.mark.django_db
@@ -173,6 +305,8 @@ def test_destination_dialog_updates_cargo_and_returns_refreshed_table_without_wa
     assert 'id="not-routed-cargo"' in content
     assert other_destination.name in content
     assert response['HX-Trigger'] == 'booking-dialog-complete'
+    assert response['HX-Retarget'] == '#not-routed-cargo'
+    assert response['HX-Reswap'] == 'outerHTML'
     assert 'Widget for var' not in content
 
 
@@ -203,4 +337,39 @@ def test_deadline_dialog_updates_cargo_and_returns_refreshed_table_without_warni
     assert updated.route_specification.destination == destination
     assert 'id="not-routed-cargo"' in response.content.decode()
     assert response['HX-Trigger'] == 'booking-dialog-complete'
+    assert response['HX-Retarget'] == '#not-routed-cargo'
+    assert response['HX-Reswap'] == 'outerHTML'
     assert 'Widget for var' not in response.content.decode()
+
+
+@pytest.mark.parametrize(
+    ('dialog_index', 'path'),
+    [
+        (0, '/admin/cargo/DEF789/destination/'),
+        (1, '/admin/cargo/DEF789/deadline/'),
+    ],
+)
+@pytest.mark.django_db
+def test_dialogs_reject_unsupported_methods_with_allowed_methods_header(
+    booking_dialogs, dialog_index, path
+):
+    dialogs, _, _ = booking_dialogs
+
+    response = dialogs[dialog_index](
+        _request(RequestFactory(), 'put', path),
+        'DEF789',
+    )
+
+    assert response.status_code == 405
+    assert response['Allow'] == 'GET, POST'
+
+
+@pytest.mark.django_db
+def test_dialogs_return_not_found_for_unknown_cargo(booking_dialogs):
+    (change_destination, _), _, _ = booking_dialogs
+
+    with pytest.raises(Http404, match='Cargo with tracking ID MISSING not found.'):
+        change_destination(
+            _request(RequestFactory(), 'get', '/admin/cargo/MISSING/destination/'),
+            'MISSING',
+        )

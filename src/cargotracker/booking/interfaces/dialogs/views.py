@@ -47,10 +47,9 @@ def create_booking_dialog_views(
             if location
             not in (cargo.route_specification.origin, cargo.route_specification.destination)
         ]
-        selected_destination = None
         error = ''
         if request.method == 'POST':
-            selected_destination = next(
+            destination = next(
                 (
                     location
                     for location in available_locations
@@ -58,13 +57,11 @@ def create_booking_dialog_views(
                 ),
                 None,
             )
-            if selected_destination is None:
+            if destination is None:
                 error = 'Select a valid destination.'
             else:
                 try:
-                    cargo_specification.change_destination(
-                        TrackingId(tracking_id), selected_destination
-                    )
+                    cargo_specification.change_destination(TrackingId(tracking_id), destination)
                 except LookupError as exception:
                     raise Http404(str(exception)) from exception
                 return _not_routed_table(request, cargo_dashboard)
@@ -75,7 +72,6 @@ def create_booking_dialog_views(
             {
                 'cargo': cargo,
                 'locations': available_locations,
-                'selected_destination': selected_destination,
                 'destination_error': error,
             },
         )

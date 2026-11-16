@@ -24,6 +24,6 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_returns_refreshed_table_without_warning"
-  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_and_returns_refreshed_table_without_warning"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialog_views_cover_initial_values_and_all_update_paths"
   - ".migration/evidence/runs/BK-05G.md"
 notes: "The Django dialog views invoke CargoSpecification, complete by replacing the not-routed table, and omit the unavailable-widget warning per #251."

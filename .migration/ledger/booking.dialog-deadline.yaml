@@ -20,7 +20,7 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_date"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialog_views_cover_initial_values_and_all_update_paths"
   - "tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_and_returns_refreshed_table_without_warning"
   - ".migration/evidence/runs/BK-05G.md"
