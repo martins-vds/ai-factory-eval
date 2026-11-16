@@ -47,7 +47,7 @@ class FeeApplication:
 
         end_date = loan.returned_on or self.clock.today()
         late_days = max(0, (end_date - loan.due_on).days)
-        amount_cents = min(max(late_days - 2, 0) * 25, 1000)
+        amount_cents = min(late_days * 25, 1000) if late_days > 2 else 0
         return FeeQuote(loan, late_days, amount_cents)
 
     def pay(self, loan_id: str) -> PaymentResult | None:

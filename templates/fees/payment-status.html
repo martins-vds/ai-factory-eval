@@ -1,0 +1,5 @@
+{% if succeeded %}
+<p id="payment-status" class="text-[#66705b]" role="status">Payment received. {{ message }}</p>
+{% else %}
+<p id="payment-status" class="text-[#a94e37]" role="alert">Payment could not be completed. {{ message }}</p>
+{% endif %}
