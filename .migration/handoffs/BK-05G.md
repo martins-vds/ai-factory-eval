@@ -33,6 +33,7 @@ Resume BK-05G after the ticket scope explicitly includes `templates/booking/dash
 - The operator scope extension authorizes only `templates/booking/dashboard/not_routed_table.html`, while the current checkout lacks the backend and template endpoints needed to make its dialog openers work. The out-of-scope rule requires stopping until the correct implementation base is checked out or scope is expanded.
 - The requested `.migration/returns/BK-05G.afs-migrator.yaml` is rejected as a duplicate: `.migration/returns/BK-05G.afs-specialist-migrator.yaml` already occupies the normalized Migrator return for BK-05G. Keep the existing valid return unless the operator resolves supersession/path handling.
 ### Failing commands
-- None. The dialog-symbol search returned no matches (exit 1), confirming the blocker.
+- `afs-finish-check --ticket BK-05G --role afs-migrator` → exit 1; it reports the required return is missing. Creating that exact file is currently rejected by `validate.py` because the existing BK-05G specialist return already occupies the normalized Migrator role.
+- The dialog-symbol search returned no matches (exit 1), confirming the missing-endpoint blocker; this was an inspection search, not a gate.
 ### Next step for the next session
 Resume only after the operator aligns the checkout with the BK-05G dialog implementation or approves scope for the missing dialog views/templates/routes/tests, and resolves how the return file should be superseded without creating a duplicate; then wire the table controls and run the required gates.
