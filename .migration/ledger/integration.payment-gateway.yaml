@@ -8,10 +8,24 @@ source:
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#667]
+target:
+  components:
+    - src.fees.services.pay_late_fee
+    - src.fees.views.payment_endpoint
+    - src.fees.views.payment_page
+    - templates/fees/payment-result.html
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - tests/fees/test_fees.py::test_payment_endpoint_forwards_the_gateway_request
+  - tests/fees/test_fees.py::test_non_200_gateway_responses_become_bad_gateway
+  - tests/fees/test_fees.py::test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_fees.py::test_interrupted_payment_is_a_gateway_failure_and_remains_visible
+  - tests/fees/test_fees.py::test_fee_page_payment_returns_an_htmx_status
+  - tests/fees/test_fees.py::test_fee_page_payment_shows_gateway_failure_in_htmx
+  - tests/fees/test_fees.py::test_real_browser_can_pay_a_late_fee
+  - .migration/evidence/runs/LL-03.md
+notes: "Decision #40 fixes the swallowed interruption: the target returns 502 and logs the interruption type."
 quirks: [martins-vds/ai-factory-synthetic-target#40]

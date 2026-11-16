@@ -1,9 +1,9 @@
 import logging
 
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.utils import timezone
 from django.utils.html import format_html
-from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from src.loans.models import Loan
@@ -80,6 +80,5 @@ def payment_page(request, loan_id):
             request,
             'fees/payment-result.html',
             context,
-            status=result.status_code,
         )
-    return render(request, 'fees/page.html', context, status=result.status_code)
+    return render(request, 'fees/page.html', context)

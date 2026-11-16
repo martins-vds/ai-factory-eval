@@ -182,6 +182,22 @@ def test_fee_page_payment_returns_an_htmx_status(client, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_fee_page_payment_shows_gateway_failure_in_htmx(client, monkeypatch):
+    with local_gateway(503, b'<p>declined</p>') as (gateway_url, requests):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+        response = client.post(
+            '/ui/payments/L3/',
+            HTTP_HX_REQUEST='true',
+        )
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'&lt;p&gt;declined&lt;/p&gt;' in response.content
+    assert requests == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
 def test_real_browser_can_pay_a_late_fee(live_server, monkeypatch):
     with local_gateway(200, b'charged\n') as (gateway_url, requests):
         monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
