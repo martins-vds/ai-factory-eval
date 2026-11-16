@@ -1,0 +1,55 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/553
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: null
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:1,63-67
+    what: "Application use case imports and raises Django Http404, coupling application policy to the web framework contrary to ADR-0001."
+  - severity: major
+    where: src/cargotracker/booking/interfaces/route_selection/views.py:36-38
+    what: "Route eligibility is checked in the view before assign_route reloads cargo; the use case does not enforce the deadline/specification against the state it assigns."
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+mutation_status: "Verifier mutation rerun was stopped before producing an AFS-RESULT; no fresh score is claimed."
+mutation_survivor_classifications:
+  - >-
+    #1, views.py:22, changing the candidate salt to a different string is equivalent
+    for current behavior because creation and verification use the same salt.
+  - >-
+    #2, views.py:22, setting the salt to None does not change current behavior:
+    this is the application's only signing use. It does remove purpose isolation,
+    a latent concern if another signer is added.
+  - >-
+    #10, views.py:34, wrapping unknown-cargo 404 text in XX changes only diagnostics;
+    the HTTP response remains 404.
+  - >-
+    #13, views.py:37, wrapping route-specification 404 text in XX changes only
+    diagnostics; the HTTP response remains 404.
+  - >-
+    #14, views.py:39, changing quote's safe value to XXXX leaves the redirect URL
+    unchanged because X is an unreserved character.
+  - >-
+    #27, views.py:70, wrapping unknown-cargo 404 text in XX changes only diagnostics;
+    the HTTP response remains 404.
+  - >-
+    #40, views.py:95, changing the missing-candidate fallback to XXXX still fails
+    signature validation and yields the same 404.
+  - >-
+    #44, views.py:97, wrapping BadSignature text in XX changes only a caught
+    diagnostic; the HTTP response remains 404.
+  - >-
+    #46, views.py:100, wrapping invalid-route 404 text in XX changes only
+    diagnostics; the HTTP response remains 404.
