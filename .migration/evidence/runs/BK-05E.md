@@ -18,3 +18,26 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
+| 2026-11-16T13:31:49+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T13:33:04+00:00 | verify-build-compileall | 0 | 0.08 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T13:33:05+00:00 | verify-build-django-check | 0 | 0.98 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T13:34:04+00:00 | verify-behavior | 0 | 58.87 | `pytest -q` | `d8cbc5c21e6e7610` |  |  |
+| 2026-11-16T13:34:04+00:00 | verify-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T13:34:04+00:00 | verify-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-16T13:35:02+00:00 | verify-crap-coverage | 0 | 57.45 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `abe29c266e537af5` |  |  |
+| 2026-11-16T13:35:02+00:00 | verify-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T13:35:02+00:00 | verify-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-16T13:44:25+00:00 | verify-mutation-changed | 0 | 562.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
+| 2026-11-16T13:45:22+00:00 | verify-regression | 0 | 56.83 | `pytest -q` | `607c8d3e14f7a432` |  |  |
+| 2026-11-16T13:47:57+00:00 | verifier-details-branches | 0 | 3.57 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `c5828736dcac68f1` |  |  |
+| 2026-11-16T13:48:57+00:00 | final-build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T13:48:57+00:00 | final-build-django-check | 0 | 0.42 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T13:49:57+00:00 | final-behavior | 0 | 59.38 | `pytest -q` | `37f7f8c7cc3ee27c` |  |  |
+| 2026-11-16T13:49:57+00:00 | final-idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T13:49:57+00:00 | final-idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-16T13:51:06+00:00 | final-crap-coverage | 0 | 68.48 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `c4ec9ce7c47f4576` |  |  |
+| 2026-11-16T13:51:06+00:00 | final-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T13:51:06+00:00 | final-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-16T14:00:28+00:00 | final-mutation-changed | 0 | 561.45 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
+| 2026-11-16T14:01:26+00:00 | final-regression | 0 | 58.55 | `pytest -q` | `bafb694d9f2404e8` |  |  |
+| 2026-11-16T14:11:15+00:00 | completion-regression | 0 | 58.94 | `pytest -q` | `041e5a18f74a0d27` |  |  |

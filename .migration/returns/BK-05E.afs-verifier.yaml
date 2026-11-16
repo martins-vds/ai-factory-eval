@@ -1,0 +1,40 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/594
+verdict: blocked
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: .source/src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ListCargo.java:69-88
+    what: "Source independently filters not-routed and claimed rows, allowing claimed cargo with no itinerary to appear twice; target preserves this but no human ruling covers it."
+  - severity: minor
+    where: templates/booking/dashboard/routed_table.html:20
+    what: "Possible duplicated origin/destination markup across table/detail templates; a judgment-call smell only, with no documented standards breach."
+  - severity: minor
+    where: src/cargotracker/booking/interfaces/wizard/views.py:31-176
+    what: "19 surviving wizard mutants (#8, #10, #12, #25, #53, #55, #63, #67, #73, #89, #92, #104, #106, #107, #109, #121, #127, #146, #148) alter visible validation, defaults, duration or navigation; meaningful BK-05D gaps, outside this ticket."
+  - severity: minor
+    where: src/cargotracker/data_migration/exporter.py:59
+    what: "Mutant #45 renames key_fields metadata and may break export ordering; meaningful DM-05D gap, outside this ticket."
+  - severity: minor
+    where: src/cargotracker/data_migration/exporter.py:95
+    what: "Mutant #72 changes only iterator chunk size (1000 to 1001); no export-content change, outside this ticket."
+  - severity: minor
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:38
+    what: "Mutant #12 changes only the internal Http404 message; with DEBUG false it does not change the generic 404 response, so it is non-material."
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_unrouted_cargo_details_link_to_routing_page
+  - tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_offer_reroute_action
+ledger_issues:
+  - "Link .migration/quirks/booking-dashboard-overlap.md to booking.dashboard-filters, booking.screen-not-routed-table, and booking.screen-claimed-table after ruling."
+quirk_tickets:
+  - .migration/quirks/booking-dashboard-overlap.md
