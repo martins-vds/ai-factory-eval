@@ -8,10 +8,22 @@ source:
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#752]
+target:
+  components: [src.fees.payments.HttpPaymentGateway, src.fees.payments.PaymentApplication, src.fees.views.payment]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-03.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - tests/fees/test_fees.py::test_payment_api_sends_the_characterized_request_and_returns_success
+  - tests/fees/test_fees.py::test_payment_api_maps_gateway_failure_to_bad_gateway
+  - tests/fees/test_fees.py::test_payment_api_does_not_contact_gateway_for_unknown_loan
+  - tests/fees/test_fees.py::test_interrupted_payment_is_a_gateway_failure_and_remains_observable
+  - tests/fees/test_fees.py::test_reading_room_payment_action_shows_gateway_success
+  - tests/fees/test_fees.py::test_reading_room_payment_action_shows_gateway_failure
+notes: "Decision martins-vds/ai-factory-synthetic-target#40 fixes swallowed interruptions: InterruptedError is retained as a chained cause and logged while the endpoint returns 502."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
