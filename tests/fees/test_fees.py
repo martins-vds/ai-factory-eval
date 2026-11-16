@@ -5,6 +5,7 @@ from pathlib import Path
 from threading import Thread
 
 import pytest
+from django.urls import reverse
 from playwright.sync_api import sync_playwright
 
 from src.fees import gateway
@@ -289,6 +290,15 @@ def test_htmx_payment_action_returns_success_status(client, gateway_server):
     assert b'<!doctype html>' not in response.content
     assert b'role="status"' in response.content
     assert b'Payment received for loan L1.' in response.content
+    assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_non_htmx_payment_redirects_to_the_local_fee_page(client, gateway_server):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 302
+    assert response['Location'] == reverse('fee-page', kwargs={'loan_id': 'L1'})
     assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
 
 
