@@ -12,6 +12,7 @@ target:
   components:
     - src/cargotracker/booking/interfaces/dialogs/views.py::create_destination_dialog_view
     - templates/booking/dialogs/destination.html
+    - templates/booking/dialogs/page.html
     - templates/booking/dashboard/not_routed_table.html
 status: migrated
 verification: spec-derived
@@ -22,6 +23,7 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_have_a_native_no_javascript_fallback"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_rejects_origin_and_leaves_cargo_unchanged"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_refreshes_table"
   - ".migration/evidence/runs/BK-05G.md"

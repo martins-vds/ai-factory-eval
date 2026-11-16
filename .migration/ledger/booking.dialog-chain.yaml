@@ -12,6 +12,7 @@ target:
   components:
     - templates/booking/dashboard/not_routed_table.html
     - src/cargotracker/booking/interfaces/dialogs/views.py
+    - templates/booking/dialogs/page.html
 status: migrated
 verification: spec-derived
 characterization_tier: A
@@ -22,6 +23,7 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_offers_destination_and_deadline_dialog_openers"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_have_a_native_no_javascript_fallback"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_refreshes_table"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_refreshes_table"
   - ".migration/evidence/runs/BK-05G.md"

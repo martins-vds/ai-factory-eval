@@ -34,3 +34,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T13:58:27+00:00 | no-js-fallback-red | 1 | 2.43 | `pytest -q tests/booking/interfaces/test_dialogs.py -k 'not_routed_table_offers or native_no_javascript'` | `7539cfb1b11cfca5` | assert response.status_code == 200 |  |
 | 2026-11-16T14:00:28+00:00 | no-js-fallback | 0 | 5.73 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `2d6b2c83d242f666` |  |  |
 | 2026-11-16T14:01:27+00:00 | no-js-fallback | 0 | 6.36 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `70ca729620fcf127` |  |  |
+| 2026-11-16T14:02:47+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T14:02:50+00:00 | build-django-check | 0 | 0.33 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T14:02:52+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T14:02:55+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T14:03:45+00:00 | behavior-tests | 0 | 47.71 | `pytest -q` | `0718abf27507a672` |  |  |
+| 2026-11-16T14:04:36+00:00 | crap-coverage | 0 | 47.65 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `5305c65afe8dbb71` |  |  |
+| 2026-11-16T14:04:39+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T14:04:41+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `e8a24bedc7973b35` |  | gate=crap max=26.0 threshold=30 over=0 methods=207 |
