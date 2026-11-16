@@ -53,9 +53,11 @@ Resume BK-05F by reproducing and resolving the mutation-score shortfall first; t
 - The specified base branch is unavailable in this repository checkout; current branch and baseline do not contain a mutable BK-05F code diff. The migration contract stop rule for a real setup/context limit applies.
 - The stored survivor report and existing interface assertions disagree for mutants #5, #20, #16, and #21; the correct base is needed to reproduce before changing tests.
 - The task requests role `afs-migrator` and return `.migration/returns/BK-05F.afs-migrator.yaml`, but the approved plan assigns BK-05F to `afs-specialist-migrator`. `validate.py` rejects a second role's return for the same ticket. The plan is out of this ticket's file scope, so a valid role return needs a coordinator decision.
+- `afs-finish-check` likewise expects this session to update `.migration/returns/BK-05F.afs-specialist-migrator.yaml`; doing so would attribute this `afs-migrator` session to another role. A coordinator must resolve the role/return attribution.
 
 ### Failing commands
-- None in this session. Mutation command exited 0 with `n/a`, not a passing numeric mutation score; see `.migration/runs/BK-05F/20261116T203635119787Z-mutation-changed.log`.
+- `.migration/harness/tools/afs-finish-check` → exit 1: it requires updating the specialist-migrator return; see the role conflict above.
+- Mutation command exited 0 with `n/a`, not a passing numeric mutation score; see `.migration/runs/BK-05F/20261116T203635119787Z-mutation-changed.log`.
 
 ### Next step for the next session
 Ask the coordinator to reconcile BK-05F's role in the approved plan with this continuation's requested `afs-migrator` role, then resume on `copilot/bk-05f-build-route-selection-itinerary-screens` (or obtain its exact diff) and rerun mutation triage.
