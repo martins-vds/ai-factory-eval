@@ -10,6 +10,7 @@ from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -91,8 +92,39 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize(
+    ('dialog', 'method', 'data'),
+    [
+        ('destination', 'get', None),
+        ('deadline', 'get', None),
+        ('destination', 'post', {'destination': 'NLAMS'}),
+        ('deadline', 'post', {'deadline': '2027-01-15'}),
+    ],
+)
+def test_unknown_cargo_dialog_returns_not_found(client, dialog, method, data):
+    url = f'/admin/cargo/MISSING1/{dialog}/'
+    response = (
+        client.get(url, HTTP_HX_REQUEST='true')
+        if method == 'get'
+        else client.post(url, data, HTTP_HX_REQUEST='true')
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    ('dialog', 'data'),
+    [
+        ('destination', {'destination': 'NLAMS'}),
+        ('deadline', {'deadline': '2027-01-15'}),
+    ],
+)
+def test_stale_cargo_dialog_submission_returns_not_found(client, dialog, data):
+    url = f'/admin/cargo/DEF789/{dialog}/'
+    assert client.get(url, HTTP_HX_REQUEST='true').status_code == 200
+    CargoRecord.objects.filter(tracking_id='DEF789').delete()
+
+    response = client.post(url, data, HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
 
