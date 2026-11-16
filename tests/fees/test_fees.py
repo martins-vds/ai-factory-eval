@@ -244,7 +244,8 @@ def test_payment_api_keeps_interruption_as_gateway_failure(client, caplog):
     failure_logs = [
         record
         for record in caplog.records
-        if record.getMessage() == 'Payment gateway request was interrupted'
+        if record.getMessage()
+        == 'Payment gateway request was interrupted: InterruptedError: request interrupted'
     ]
     assert len(failure_logs) == 1
-    assert isinstance(failure_logs[0].exc_info[1].__cause__, InterruptedError)
+    assert failure_logs[0].exc_info is None

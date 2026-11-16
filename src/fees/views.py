@@ -30,7 +30,11 @@ def _late_fee_context(loan):
 
 def _log_interruption(error):
     if isinstance(error.__cause__, InterruptedError):
-        logger.exception('Payment gateway request was interrupted')
+        logger.warning(
+            'Payment gateway request was interrupted: %s: %s',
+            type(error.__cause__).__name__,
+            error.__cause__,
+        )
 
 
 @require_GET
