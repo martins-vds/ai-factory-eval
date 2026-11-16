@@ -1,8 +1,9 @@
 # Legacy characterization — tier A
 
 Source: `martins-vds/ai-factory-synthetic-target@563c316ed51462b08fd6e58f3781a3c8b2890453`, path `legacy/`.
-The tracked files in the local `legacy/` directory were checked against the pinned commit's Git blob hashes.
-The source was not modified.
+The local source/config files were checked against the pinned commit's Git blob hashes. The workspace also
+contains pre-existing `legacy/target/` build outputs that are not in the pinned source tree; they were restored
+after the run. The source was not modified.
 
 ## Build and start
 
