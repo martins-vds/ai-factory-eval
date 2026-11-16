@@ -1,0 +1,37 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/537
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: tests/loans/test_catalog.py:408
+    what: "Full regression fails on the previously reported loan-catalog Playwright timeout; 74 tests pass and this remains blocking."
+  - severity: minor
+    where: src/fees/services.py:49-57
+    what: "FeeApplication.fee_for combines fee-policy calculation with repository and clock orchestration; consider extracting the domain rule."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:3
+    what: "Known module-level route, request-branch, and form-model survivors were checked against direct passing route, method, and form behavior tests."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_disallowed_methods
+  - tests/fees/test_endpoints.py::test_fee_page_formats_capped_fee_as_ten_dollars
+  - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_payment_page_rejects_unknown_loan_without_gateway_request
+  - tests/fees/test_endpoints.py::test_payment_page_fallback_renders_gateway_failure
+  - tests/fees/test_endpoints.py::test_payment_gateway_uses_characterized_default_url
+  - tests/fees/test_endpoints.py::test_real_browser_displays_gateway_failure
+  - tests/fees/test_fee_calculation.py::test_payment_uses_injected_gateway_for_known_loan
+  - tests/fees/test_fee_calculation.py::test_payment_does_not_call_gateway_for_unknown_loan
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
