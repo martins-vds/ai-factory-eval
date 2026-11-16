@@ -83,6 +83,22 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_displays_current_route_fields_and_deadline(client):
+    _seed_booking_data()
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    response = client.get(f'/admin/cargo/{cargo.tracking_id.value}/deadline/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
+    assert cargo.route_specification.origin.name in content
+    assert cargo.route_specification.destination.name in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_reports_invalid_dates_without_losing_current_fields(client):
     _seed_booking_data()
 
