@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk · Lending</p>
+      <h1 class="mb-4 mt-3 text-5xl md:text-6xl">A new loan, carefully noted.</h1>
+      <p class="mb-6 text-[#66705b]">Record the member and the book joining our collection.</p>
+      <form action="/ui/loans/" method="post" hx-post="/ui/loans/">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-5">
+          <label class="label" for="{{ field.id_for_label }}"><span class="label-text">{{ field.label }}</span></label>
+          {{ field }}
+          {% for error in field.errors %}
+          <p class="mt-1 text-sm text-[#a94e37]">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary" type="submit">Lend this book</button>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}
