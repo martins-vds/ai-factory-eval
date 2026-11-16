@@ -76,13 +76,21 @@ def test_not_routed_table_offers_destination_and_deadline_dialog_openers(client)
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_destination_dialog_has_a_native_no_javascript_fallback(client):
-    response = client.get('/admin/cargo/DEF789/destination-dialog/')
+@pytest.mark.parametrize(
+    ('dialog_type', 'form_id'),
+    [
+        ('destination', 'destination-update-form'),
+        ('deadline', 'deadline-update-form'),
+    ],
+)
+def test_dialogs_have_a_native_no_javascript_fallback(client, dialog_type, form_id):
+    response = client.get(f'/admin/cargo/DEF789/{dialog_type}-dialog/')
     content = response.content.decode()
 
     assert response.status_code == 200
     assert '<!doctype html>' in content
     assert re.search(r'<dialog\b[^>]*\bopen(?:\s|>)', content)
+    assert f'id="{form_id}"' in content
     assert 'method="dialog"' in content
     assert '<noscript>' in content
     assert 'href="/admin/dashboard/"' in content

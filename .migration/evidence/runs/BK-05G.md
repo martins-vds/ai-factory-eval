@@ -33,3 +33,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T13:55:32+00:00 | regression-tests | 0 | 52.04 | `pytest -q` | `52a14281771b5849` |  |  |
 | 2026-11-16T13:58:27+00:00 | no-js-fallback-red | 1 | 2.43 | `pytest -q tests/booking/interfaces/test_dialogs.py -k 'not_routed_table_offers or native_no_javascript'` | `7539cfb1b11cfca5` | assert response.status_code == 200 |  |
 | 2026-11-16T14:00:28+00:00 | no-js-fallback | 0 | 5.73 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `2d6b2c83d242f666` |  |  |
+| 2026-11-16T14:01:27+00:00 | no-js-fallback | 0 | 6.36 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `70ca729620fcf127` |  |  |
