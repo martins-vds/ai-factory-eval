@@ -29,6 +29,10 @@ def test_lending_creates_a_14_day_loan(client, monkeypatch):
             'member: This field is required.\n',
         ),
         (
+            {'member': 'reader', 'isbn': ' '},
+            'isbn: This field is required.\n',
+        ),
+        (
             {'member': 'reader', 'isbn': ''},
             'isbn: This field is required.\n',
         ),
