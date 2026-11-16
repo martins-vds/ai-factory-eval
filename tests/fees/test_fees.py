@@ -1,9 +1,10 @@
+from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from datetime import date
 from threading import Thread
 
 import pytest
 from django.test import override_settings
+from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
 from src.fees.gateway import HttpPaymentGateway, PaymentGatewayUnavailable
@@ -53,8 +54,7 @@ def test_fee_endpoint_charges_each_late_day_after_grace_period(client):
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == (
-        '<h1>Late fee for F1</h1><p>Due 2026-01-01, 3 day(s) late.</p>'
-        '<p class="fee">Fee: $0.75</p>'
+        '<h1>Late fee for F1</h1><p>Due 2026-01-01, 3 day(s) late.</p><p class="fee">Fee: $0.75</p>'
     )
 
 
@@ -109,6 +109,48 @@ def test_fee_endpoint_returns_characterized_not_found_response(client):
 
 
 @pytest.mark.django_db
+def test_fee_endpoint_uses_today_and_clamps_unreturned_early_loan(client):
+    due_on = timezone.localdate() + timedelta(days=1)
+    Loan.objects.create(
+        id='FUTURE',
+        member='reader',
+        isbn='123',
+        lent_on=due_on - timedelta(days=14),
+    )
+
+    response = client.get('/fees/FUTURE')
+
+    assert response.status_code == 200
+    assert f'Due {due_on.isoformat()}, 0 day(s) late.'.encode() in response.content
+    assert b'Fee: $0.00' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_formats_capped_amount(client):
+    Loan.objects.create(
+        id='CAP',
+        member='reader',
+        isbn='123',
+        lent_on=date(2025, 12, 18),
+        returned_on=date(2026, 4, 11),
+    )
+
+    response = client.get('/ui/fees/CAP/')
+
+    assert response.status_code == 200
+    assert b'Fee: $10.00' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
 def test_fee_page_shows_quote_and_htmx_payment_action(client):
     response = client.get('/ui/fees/L3/')
 
@@ -151,6 +193,38 @@ def test_htmx_payment_failure_shows_alert_fragment(client, payment_gateway):
 
 
 @pytest.mark.django_db
+def test_htmx_payment_io_failure_shows_gateway_unavailable(client):
+    with override_settings(PAYMENT_GATEWAY_URL='http://127.0.0.1:1'):
+        response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'payment gateway unavailable' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_unknown_loan_does_not_call_gateway(client, payment_gateway):
+    with override_settings(PAYMENT_GATEWAY_URL=payment_gateway.url):
+        response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_htmx_payment_replaces_invalid_gateway_bytes(client, payment_gateway):
+    payment_gateway.response_body = b'\xff'
+
+    with override_settings(PAYMENT_GATEWAY_URL=payment_gateway.url):
+        response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'\xef\xbf\xbd' in response.content
+
+
+@pytest.mark.django_db
 def test_non_htmx_payment_returns_complete_result_page(client, payment_gateway):
     with override_settings(PAYMENT_GATEWAY_URL=payment_gateway.url):
         response = client.post('/ui/payments/L1/')
@@ -160,6 +234,19 @@ def test_non_htmx_payment_returns_complete_result_page(client, payment_gateway):
     assert b'<title>Payment result' in response.content
     assert b'role="status"' in response.content
     assert b'href="/ui/fees/L1/"' in response.content
+
+
+@pytest.mark.django_db
+def test_non_htmx_payment_failure_preserves_gateway_status(client, payment_gateway):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    with override_settings(PAYMENT_GATEWAY_URL=payment_gateway.url):
+        response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 502
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
 
 
 @pytest.mark.django_db
@@ -241,3 +328,19 @@ def test_payment_gateway_preserves_interruption_as_failure_cause(monkeypatch):
         HttpPaymentGateway().charge('L1')
 
     assert failure.value.__cause__ is interruption
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/fees/L1/', 'post'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405

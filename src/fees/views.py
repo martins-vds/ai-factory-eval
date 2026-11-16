@@ -31,11 +31,7 @@ def fee_detail(request, loan_id):
 def fee_page(request, loan_id):
     quote = fee_application.quote(loan_id)
     loan = quote.loan if quote else None
-    amount = (
-        f'${quote.amount_cents // 100}.{quote.amount_cents % 100:02d}'
-        if quote
-        else None
-    )
+    amount = f'${quote.amount_cents // 100}.{quote.amount_cents % 100:02d}' if quote else None
     return render(
         request,
         'fees/detail.html',
@@ -67,15 +63,14 @@ def payment_page(request, loan_id):
         result = PaymentResult(502, b'payment gateway unavailable\n')
 
     succeeded = result is not None and result.status_code == 200
-    message = (
-        result.body.decode('utf-8', errors='replace').strip()
-        if result
-        else 'No such loan.'
-    )
+    message = result.body.decode('utf-8', errors='replace').strip() if result else 'No such loan.'
     is_htmx = request.headers.get('HX-Request') == 'true'
-    status_code = (200 if is_htmx else 200 if succeeded else 502) if result else (
-        200 if is_htmx else 404
-    )
+    if result is None:
+        status_code = 200 if is_htmx else 404
+    elif is_htmx or succeeded:
+        status_code = 200
+    else:
+        status_code = result.status_code
     template = 'fees/payment-status.html' if is_htmx else 'fees/payment-result.html'
     return render(
         request,
