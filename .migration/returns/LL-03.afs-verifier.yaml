@@ -1,0 +1,41 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/451
+verdict: blocked
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.972
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+  - .migration/evidence/mutants/LL-03.md
+findings:
+  - severity: major
+    where: tests/loans/test_catalog.py:395
+    what: "Behavior and regression fail: the pre-existing browser test times out waiting for /ui/loans/L4/; the same full-suite failure has repeated past the stop threshold and is outside LL-03 scope."
+  - severity: major
+    where: tests/conftest.py:6
+    what: "The repository-wide format gate fails on this out-of-scope file; the changed fee tests pass targeted lint and format checks."
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "The HTMX payment action returns gateway failures with HTTP 502, which htmx 2.0.11 does not swap by default; no response-error override is present, so the failure alert is not surfaced in an HTMX browser flow. The CDN asset was unavailable in this session, so only the full-page fallback could be exercised."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:5
+    what: "Mutation score 0.972 meets threshold; 3 survivors remain (two HTMX header literals and frozen GatewayResponse). The known module-level route/method/LoanForm.Meta.model selection limitation is noted; all four LL-03 routes are tested for supported and unsupported methods, and no fee form is in scope."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_page_formats_capped_fee_and_returns_not_found_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_ui_payment_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_non_htmx_payment_renders_the_complete_fee_page
+  - tests/fees/test_endpoints.py::test_gateway_uses_the_default_url_when_no_gateway_is_configured
+  - tests/fees/test_endpoints.py::test_fee_page_payment_returns_gateway_status_fragment
+  - tests/fees/test_fee_calculation.py::test_pay_uses_injected_gateway_for_an_existing_loan
+  - tests/fees/test_fee_calculation.py::test_pay_does_not_call_gateway_for_an_unknown_loan
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+handoff: .migration/handoffs/LL-03.md
