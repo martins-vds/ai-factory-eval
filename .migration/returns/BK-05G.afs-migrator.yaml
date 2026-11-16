@@ -28,4 +28,4 @@ ledger_updated:
   - booking.screen-not-routed-table
 quirk_tickets: []
 new_tickets: []
-handoff: none
+handoff: .migration/handoffs/BK-05G.md
