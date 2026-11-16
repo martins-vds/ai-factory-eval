@@ -57,3 +57,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T23:33:57+00:00 | mutation-changed-security-fix | 1 | 61.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
 | 2026-11-07T23:35:56+00:00 | unknown-route-404-test | 0 | 1.41 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `a558b8376cd28466` |  |  |
 | 2026-11-07T23:37:02+00:00 | mutation-changed-after-404-test | 1 | 61.99 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
+| 2026-11-16T20:36:22+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:36:37+00:00 | mutation_changed | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T20:39:56+00:00 | no-route-copy-test | 0 | 2.34 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `263c94f24c6bf4b6` |  |  |
+| 2026-11-16T20:40:19+00:00 | no-route-copy-refactor | 0 | 1.52 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `e953d66aa32df0e1` |  |  |
+| 2026-11-16T20:40:24+00:00 | mutation_changed | 0 | 0.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T20:44:31+00:00 | mutation_changed | 0 | 231.17 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `8cc085c8a5ae437d` |  | gate=mutation score=0.859 threshold=0.8 killed=55 survived=9 files=1 base=origin/main |
+| 2026-11-16T20:45:45+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:45:45+00:00 | build-django-check | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T20:45:46+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T20:45:46+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T20:46:35+00:00 | behavior | 0 | 44.6 | `pytest -q` | `6baf35079a551ee9` |  |  |
+| 2026-11-16T20:47:24+00:00 | crap-coverage | 0 | 43.34 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `6a2577da8b2bb474` |  |  |
+| 2026-11-16T20:47:24+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:47:24+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
