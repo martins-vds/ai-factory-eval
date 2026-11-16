@@ -21,3 +21,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T17:33:59+00:00 | data-load | 0 | 0.44 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
 | 2026-11-16T17:34:00+00:00 | data-export | 0 | 0.43 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export` | `ba754ea10ff616fb` |  |  |
 | 2026-11-16T17:34:00+00:00 | data-reconcile | 0 | 0.08 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target .migration/data/target-export --mapping .migration/data/mapping.yaml --report /tmp/DM-05D-reconciliation.md` | `0e5f155ede36068f` |  | gate=data-reconcile tables=6 rows=54 mismatched_tables=0 |
+| 2026-11-16T17:35:20+00:00 | full-tests | 0 | 51.58 | `pytest -q` | `92544ca58fac4e5f` |  |  |
+| 2026-11-16T17:36:14+00:00 | crap-coverage | 0 | 47.41 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `d748b8aaae2dbe07` |  |  |
+| 2026-11-16T17:36:14+00:00 | crap-lizard | 0 | 0.15 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:36:14+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `94fe777c58d65eab` |  | gate=crap max=26.0 threshold=30 over=0 methods=185 |
