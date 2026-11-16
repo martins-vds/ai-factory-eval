@@ -62,4 +62,4 @@ rtk:
   version: 1.1.0
 services:
   compose: compose.yaml
-  test: ["pytest -q"]
+  test: [postgres]
