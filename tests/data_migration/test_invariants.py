@@ -2,6 +2,7 @@ import csv
 import hashlib
 import json
 import shutil
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -148,16 +149,14 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(loaded_invaria
 @pytest.mark.django_db(transaction=True)
 def test_loaded_itinerary_legs_connect(loaded_invariant_snapshot):
     itineraries = [
-        cargo.itinerary
-        for cargo in DjangoCargoRepository().find_all()
-        if cargo.itinerary.legs
+        cargo.itinerary for cargo in DjangoCargoRepository().find_all() if cargo.itinerary.legs
     ]
 
     assert any(len(itinerary.legs) > 1 for itinerary in itineraries)
     for itinerary in itineraries:
         assert all(
             current.unload_location == following.load_location
-            for current, following in zip(itinerary.legs, itinerary.legs[1:])
+            for current, following in pairwise(itinerary.legs)
         )
 
 
@@ -177,16 +176,14 @@ def test_loaded_carrier_movement_schedules_are_in_order(loaded_invariant_snapsho
     voyages_with_schedules = 0
     for voyage in VoyageRecord.objects.order_by('pk'):
         movements = list(
-            CarrierMovementRecord.objects.filter(voyage=voyage).order_by(
-                'departure_time', 'pk'
-            )
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
         if movements:
             voyages_with_schedules += 1
         assert all(movement.departure_time <= movement.arrival_time for movement in movements)
         assert all(
             current.arrival_time <= following.departure_time
-            for current, following in zip(movements, movements[1:])
+            for current, following in pairwise(movements)
         )
 
     assert voyages_with_schedules
