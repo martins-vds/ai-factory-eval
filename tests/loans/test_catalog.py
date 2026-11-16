@@ -45,9 +45,7 @@ def test_due_date_and_export_escape_delimiters(client):
     response = client.get('/loans/L4')
 
     assert response.status_code == 200
-    assert response.content.decode() == (
-        'L4;"Reader; One";9780000000000;2024-02-20;2024-03-05;\n'
-    )
+    assert response.content.decode() == 'L4;"Reader; One";9780000000000;2024-02-20;2024-03-05;\n'
 
 
 @pytest.mark.django_db(transaction=True, serialized_rollback=True)
@@ -63,7 +61,5 @@ def test_loan_survives_database_connection_restart(client):
     response = client.get('/loans/PERSISTED')
 
     assert response.status_code == 200
-    assert response.content.decode() == (
-        'PERSISTED;Reader;9780000000000;2026-11-01;2026-11-15;\n'
-    )
+    assert response.content.decode() == 'PERSISTED;Reader;9780000000000;2026-11-01;2026-11-15;\n'
     assert Loan.objects.filter(pk='PERSISTED').exists()

@@ -25,9 +25,9 @@ def load_seed_loans(apps, schema_editor):
 class Migration(migrations.Migration):
     initial = True
 
-    dependencies = []
+    dependencies = ()
 
-    operations = [
+    operations = (
         migrations.CreateModel(
             name='Loan',
             fields=[
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ('lent_on', models.DateField()),
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],
-            options={'ordering': ['pk']},
+            options={'ordering': ('pk',)},
         ),
         migrations.RunPython(load_seed_loans, migrations.RunPython.noop),
-    ]
+    )

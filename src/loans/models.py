@@ -11,7 +11,7 @@ class Loan(models.Model):
     returned_on = models.DateField(blank=True, null=True)
 
     class Meta:
-        ordering = ['pk']
+        ordering = ('pk',)
 
     @property
     def due_on(self):
