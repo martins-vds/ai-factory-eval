@@ -48,3 +48,19 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:54+00:00 | mutation-changed | 0 | 139.12 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `c97ad74d6bf2528b` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
+| 2026-11-16T02:00:08+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:01:32+00:00 | build | 0 | 0.48 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T02:02:31+00:00 | behavior | 0 | 48.74 | `pytest -q` | `dde7475f1aec5b47` |  |  |
+| 2026-11-16T02:04:52+00:00 | stale-dialogs | 0 | 2.1 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_stale_cargo_dialog_returns_not_found` | `825826ec75aed015` |  |  |
+| 2026-11-16T02:05:30+00:00 | build | 0 | 0.32 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T02:06:20+00:00 | behavior | 0 | 46.19 | `pytest -q` | `53b8bbabaa07823a` |  |  |
+| 2026-11-16T02:06:25+00:00 | idiom | 0 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
+| 2026-11-16T02:07:16+00:00 | crap | 0 | 47.2 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `c2b6127f1494febd` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-16T02:09:09+00:00 | mutation-changed | 0 | 109.55 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
+| 2026-11-16T02:09:53+00:00 | validation-errors | 0 | 2.17 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo` | `74cb6b47473bfcdc` |  |  |
+| 2026-11-16T02:09:58+00:00 | build | 0 | 0.33 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T02:10:01+00:00 | idiom | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
+| 2026-11-16T02:10:52+00:00 | behavior | 0 | 46.99 | `pytest -q` | `833a368eb10e6a7b` |  |  |
+| 2026-11-16T02:11:43+00:00 | crap | 0 | 45.79 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `ed0a5a99dd2e5a61` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-16T02:13:34+00:00 | mutation-changed | 0 | 107.01 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `57831e3ade7c009a` |  | gate=mutation score=0.926 threshold=0.8 killed=50 survived=4 files=1 base=origin/main |
+| 2026-11-16T02:14:36+00:00 | regression | 0 | 47.82 | `pytest -q` | `f37b18d560432294` |  |  |
