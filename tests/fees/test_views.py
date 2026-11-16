@@ -48,6 +48,14 @@ def test_fee_endpoint_returns_the_characterized_not_found_fragment(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize('path', ['/fees/unknown', '/ui/fees/unknown/'])
+def test_fee_routes_reject_unsupported_methods(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
 def test_fee_page_shows_calculation_and_htmx_payment_action(client):
     response = client.get('/ui/fees/L3/')
 

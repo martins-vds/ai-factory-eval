@@ -2,7 +2,7 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from src.loans.models import Loan
 
@@ -21,6 +21,7 @@ def _find_loan(loan_id):
     return Loan.objects.filter(pk=loan_id).first()
 
 
+@require_GET
 def fee_detail(request, loan_id):
     loan = _find_loan(loan_id)
     if loan is None:
@@ -35,6 +36,7 @@ def fee_detail(request, loan_id):
     )
 
 
+@require_GET
 def fee_page(request, loan_id):
     loan = _find_loan(loan_id)
     if loan is None:
