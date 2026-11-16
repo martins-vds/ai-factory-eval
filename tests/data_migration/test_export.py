@@ -1,6 +1,4 @@
 import csv
-import subprocess
-import sys
 from pathlib import Path
 
 import pytest
@@ -33,27 +31,71 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
         f'{table["target"]}.csv' for table in mapping['tables']
     }
 
-    report = tmp_path / 'reconciliation.md'
-    result = subprocess.run(
-        [
-            sys.executable,
-            '.migration/harness/tools/data_reconcile.py',
-            'reconcile',
-            '--snapshot',
-            str(FIXTURE_SNAPSHOT),
-            '--target',
-            str(output),
-            '--mapping',
-            str(MAPPING),
-            '--report',
-            str(report),
+    expected = {
+        'location': [
+            {'id': '101', 'unlocode': 'USNYC', 'name': 'New York'},
+            {'id': '102', 'unlocode': 'NLRTM', 'name': 'Rotterdam'},
         ],
-        cwd=ROOT,
-        capture_output=True,
-        check=True,
-        text=True,
-    )
-    assert 'AFS-RESULT gate=data-reconcile tables=6 rows=7 mismatched_tables=0' in result.stdout
+        'voyage': [{'id': '900', 'voyage_number': ''}],
+        'cargo': [
+            {
+                'id': '13',
+                'tracking_id': 'FIDELITY-0001',
+                'origin_id': '101',
+                'spec_origin_id': '101',
+                'spec_destination_id': '102',
+                'spec_arrival_deadline': '2026-12-30',
+                'transport_status': 'NOT_RECEIVED',
+                'last_known_location_id': r'\N',
+                'current_voyage_id': '900',
+                'misdirected': 'true',
+                'eta': '2026-12-29',
+                'next_expected_handling_event_type': 'LOAD',
+                'next_expected_location_id': r'\N',
+                'next_expected_voyage_id': r'\N',
+                'unloaded_at_dest': 'false',
+                'routing_status': 'ROUTED',
+                'calculated_at': '2026-11-07T10:11:12Z',
+                'last_event_id': '71',
+            }
+        ],
+        'HandlingEvent': [
+            {
+                'id': '71',
+                'type': 'RECEIVE',
+                'voyage_id': '900',
+                'location_id': '102',
+                'completionTime': '2026-11-07T08:12:13Z',
+                'registration': '2026-11-07T10:13:14Z',
+                'cargo_id': '13',
+            }
+        ],
+        'leg': [
+            {
+                'id': '81',
+                'load_time': '2026-11-08T08:00:00Z',
+                'unload_time': '2026-11-09T11:00:00Z',
+                'load_location_id': '101',
+                'unload_location_id': '102',
+                'voyage_id': '900',
+                'cargo_id': '13',
+            }
+        ],
+        'carrier_movement': [
+            {
+                'id': '91',
+                'arrival_time': '2026-11-09T10:00:00Z',
+                'departure_time': '2026-11-08T12:00:00Z',
+                'arrival_location_id': '102',
+                'departure_location_id': '101',
+                'voyage_id': '900',
+            }
+        ],
+    }
+    assert set(expected) == {table['target'] for table in mapping['tables']}
+    for table, rows in expected.items():
+        with (output / f'{table}.csv').open(newline='', encoding='utf-8') as stream:
+            assert list(csv.DictReader(stream)) == rows
 
 
 @pytest.mark.django_db(transaction=True)
