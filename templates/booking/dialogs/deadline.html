@@ -1,0 +1,36 @@
+<dialog open class="modal modal-open" aria-labelledby="change-deadline-title">
+  <div class="modal-box">
+    <button
+      type="button"
+      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      aria-label="Close dialog"
+      onclick="this.closest('dialog').remove()"
+    >×</button>
+    <h2 id="change-deadline-title" class="mb-4 text-xl font-semibold">Change arrival deadline</h2>
+    <p class="mb-4">
+      Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}
+      ({{ cargo.route_specification.origin.unlocode.value }}) is bound for
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }}).
+    </p>
+    <form method="post" action="{{ form_url }}" hx-post="{{ form_url }}" hx-target="#booking-dialog">
+      {% csrf_token %}
+      <label class="label mb-1 block font-medium" for="arrival-deadline">Arrival deadline</label>
+      <input
+        id="arrival-deadline"
+        name="arrival_deadline"
+        type="date"
+        value="{{ deadline_value }}"
+        required
+        {% if error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+      >
+      {% if error %}
+        <p id="deadline-error" class="mt-2 text-red-700" role="alert">{{ error }}</p>
+      {% endif %}
+      <div class="modal-action">
+        <button type="button" class="btn" onclick="this.closest('dialog').remove()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update deadline</button>
+      </div>
+    </form>
+  </div>
+</dialog>
