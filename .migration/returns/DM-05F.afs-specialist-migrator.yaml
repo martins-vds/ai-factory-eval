@@ -1,0 +1,21 @@
+role: afs-specialist-migrator
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#653
+specialty: data
+pr: martins-vds/ai-factory-eval#657
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+specialty_evidence:
+  - tests/data_migration/test_invariants.py::test_loaded_cargo_delivery_matches_its_handling_history
+  - tests/data_migration/test_invariants.py::test_loaded_itinerary_legs_connect
+  - tests/data_migration/test_invariants.py::test_loaded_handling_events_reference_existing_voyages_and_locations
+  - tests/data_migration/test_invariants.py::test_loaded_carrier_movement_schedules_are_in_order
+  - .migration/evidence/runs/DM-05F.md
+ledger_updated: []
+quirk_tickets: []
+handoff: none
