@@ -1,0 +1,104 @@
+harness_version: 0.2.0
+checked_at: "2026-11-16T16:15:44Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    `legacy/run.sh` built and started the source; live HTTP probes covered loans,
+    fees, payments, and about routes. See references/characterization.md.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: maven }
+      - { kind: tool, name: java, version: "17" }
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: The Django target and its build gate are not scaffolded yet.
+  - id: characterization-harness
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: The live probes are recorded, but no repeatable characterization harness exists yet.
+  - id: unit-integration-tests
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: The source has no tests and the target test runner has not yet been scaffolded.
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: No source coverage runner is configured; source coverage is best-effort.
+  - id: coverage
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target coverage dependencies and test infrastructure are not scaffolded yet.
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard, version: "1.24.3" }
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: Source CRAP cannot be calculated until source coverage is available; best-effort only.
+  - id: crap
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target coverage and test infrastructure are not scaffolded yet.
+  - id: mutation-testing
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: No source or target mutation-testing runner is currently configured.
+  - id: lint-format
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: Neither source nor target has a configured lint/format gate.
+  - id: stack-idioms
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: java-docs }
+      - { kind: skill, name: java-junit }
+      - { kind: skill, name: django-patterns }
+      - { kind: skill, name: django-security }
+      - { kind: skill, name: django-tdd }
+      - { kind: skill, name: django-verification }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: The source uses H2; the stack pack's database migration skills cover Oracle-to-PostgreSQL, not H2-to-PostgreSQL.
+  - id: ui-end-to-end
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: No repeatable browser end-to-end test runner is configured.
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+    notes: ADR-0020; Java EE and Django enrichers are required by the pinned stack pack.
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
