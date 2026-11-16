@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.pk }} · The Lending Library{% endblock %}
+
+{% block content %}
+<article class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="{% url 'loan-catalog' %}">← Back to the collection</a>
+  <p class="mt-10 text-xs uppercase tracking-[.2em] text-[#746e60]">Loan {{ loan.pk }}</p>
+  <h1 class="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">{{ loan.member }}</h1>
+  <dl class="mt-10 divide-y divide-[#d8cdbb] border-y border-[#d8cdbb]">
+    <div class="flex justify-between gap-4 py-4">
+      <dt class="text-[#746e60]">ISBN</dt>
+      <dd>{{ loan.isbn }}</dd>
+    </div>
+    <div class="flex justify-between gap-4 py-4">
+      <dt class="text-[#746e60]">Lent</dt>
+      <dd>{{ loan.lent_on|date:"Y-m-d" }}</dd>
+    </div>
+    <div class="flex justify-between gap-4 py-4">
+      <dt class="text-[#746e60]">Due</dt>
+      <dd>{{ loan.due_on|date:"Y-m-d" }}</dd>
+    </div>
+    {% if loan.returned_on %}
+      <div class="flex justify-between gap-4 py-4">
+        <dt class="text-[#746e60]">Returned</dt>
+        <dd>{{ loan.returned_on|date:"Y-m-d" }}</dd>
+      </div>
+    {% endif %}
+  </dl>
+</article>
+{% endblock %}
