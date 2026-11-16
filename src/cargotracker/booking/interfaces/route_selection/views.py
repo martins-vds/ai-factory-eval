@@ -19,6 +19,7 @@ from cargotracker.voyage.domain.schedule import Schedule
 from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
 
+
 def create_route_selection_views(
     cargo_routing: CargoRouting,
     cargo_dashboard: CargoDashboard,

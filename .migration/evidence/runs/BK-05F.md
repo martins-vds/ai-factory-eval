@@ -66,3 +66,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-15T23:54:46+00:00 | inspect-mutated-guidance-response | 0 | 1.94 | `pytest -s -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `271a63d65b34bb1a` |  |  |
 | 2026-11-15T23:55:21+00:00 | no-route-guidance-exact-assertion-red | 1 | 1.96 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `496a76502198ec4a` | assert route_response.status_code == 200 |  |
 | 2026-11-15T23:55:33+00:00 | no-route-guidance-exact-assertion-green | 0 | 1.86 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `407df310e417114f` |  |  |
+| 2026-11-16T00:00:40+00:00 | mutation-changed-exact-guidance | 0 | 290.99 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `118157c51a379b97` |  | gate=mutation score=0.887 threshold=0.8 killed=55 survived=7 files=1 base=origin/main |
+| 2026-11-16T00:01:37+00:00 | build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T00:01:37+00:00 | build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T00:01:37+00:00 | idiom-ruff-check | 1 | 0.03 | `ruff check` | `7461c2b9e811fe6e` | Found 1 error. |  |
+| 2026-11-16T00:01:53+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T00:01:53+00:00 | idiom-ruff-format-final | 1 | 0.03 | `ruff format --check` | `e1331f43a5e567eb` |  |  |
