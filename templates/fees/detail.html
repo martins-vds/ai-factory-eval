@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee · Loan {{ loan.id }}{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The lending ledger · Loan {{ loan.id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ loan.id }}</h1>
+      <p class="mt-2">A little more time for a book that stayed longer.</p>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">Days late</dt><dd>{{ days_late }}</dd></div>
+      </dl>
+      <p class="mt-6 text-3xl font-semibold">Fee: ${{ amount }}</p>
+      {% if fee_due %}
+      <div id="payment-status" class="mt-6">
+        <form method="post" action="/ui/payments/{{ loan.id }}/"
+              hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+          {% csrf_token %}
+          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </article>
+</section>
+{% endblock %}
