@@ -96,6 +96,5 @@ def test_monthly_report_csv_escapes_member_ids(monkeypatch):
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,late_fees_cents\n'
-        '"reader, ""one""",1,0,0\n'
+        'member_id,loans_started,late_returns,late_fees_cents\n"reader, ""one""",1,0,0\n'
     )
