@@ -6,9 +6,19 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#543
+target:
+  components:
+    - src.reports.management.commands.monthly_report
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_summarizes_previous_month_by_member
+  - tests/reports/test_monthly_report.py::test_monthly_report_uses_previous_month_across_year_boundary
+  - .migration/evidence/runs/LL-05.md
+notes: "Only the specification remains; the command summarizes loans started in the prior month and assesses fees through that month's end."
