@@ -15,6 +15,10 @@ def lend_loan(member, isbn):
     )
 
 
+def return_loan(loan_id):
+    return LoanRepository().mark_returned(loan_id, date.today())
+
+
 def loan_line(loan):
     output = StringIO(newline='')
     writer = csv.writer(output, delimiter=';', lineterminator='\n')
