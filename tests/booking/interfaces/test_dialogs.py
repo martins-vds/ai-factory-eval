@@ -33,8 +33,9 @@ def booking_dialogs():
     )
 
 
-def _request(factory, method, path, data=None):
-    request = getattr(factory, method)(path, data or {})
+def _request(factory, method, path, data=None, htmx=True):
+    headers = {'HTTP_HX_REQUEST': 'true'} if htmx else {}
+    request = getattr(factory, method)(path, data or {}, **headers)
     request.user = SimpleNamespace(is_authenticated=False)
     return request
 
@@ -52,6 +53,8 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs():
 
     assert 'Edit destination' in content
     assert 'Edit deadline' in content
+    assert 'href="/admin/cargo/DEF789/destination/"' in content
+    assert 'href="/admin/cargo/DEF789/deadline/"' in content
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in content
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
     assert 'showModal()' in content
@@ -340,6 +343,58 @@ def test_deadline_dialog_updates_cargo_and_returns_refreshed_table_without_warni
     assert response['HX-Retarget'] == '#not-routed-cargo'
     assert response['HX-Reswap'] == 'outerHTML'
     assert 'Widget for var' not in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_dialogs_support_full_page_forms_without_javascript(booking_dialogs):
+    (change_destination, change_deadline), cargo_repository, location_repository = booking_dialogs
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    other_destination = next(
+        location
+        for location in location_repository.find_all()
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
+
+    for view, path in (
+        (change_destination, '/admin/cargo/DEF789/destination/'),
+        (change_deadline, '/admin/cargo/DEF789/deadline/'),
+    ):
+        page = view(
+            _request(RequestFactory(), 'get', path, htmx=False),
+            'DEF789',
+        )
+        content = page.content.decode()
+        assert page.status_code == 200
+        assert '<!doctype html>' in content
+        assert '<form' in content
+        assert 'href="/admin/dashboard/"' in content
+
+    destination_update = change_destination(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/destination/',
+            {'destination': other_destination.unlocode.value},
+            htmx=False,
+        ),
+        'DEF789',
+    )
+    assert destination_update.status_code == 302
+    assert destination_update['Location'] == '/admin/dashboard/'
+
+    deadline_update = change_deadline(
+        _request(
+            RequestFactory(),
+            'post',
+            '/admin/cargo/DEF789/deadline/',
+            {'deadline': '2027-01-15'},
+            htmx=False,
+        ),
+        'DEF789',
+    )
+    assert deadline_update.status_code == 302
+    assert deadline_update['Location'] == '/admin/dashboard/'
 
 
 @pytest.mark.parametrize(

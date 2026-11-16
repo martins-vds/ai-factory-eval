@@ -32,22 +32,22 @@
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
             <td class="p-3">
-              <button
+              <a
                 class="min-h-11 rounded-md px-3 py-2 text-blue-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                type="button"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-target="#cargo-edit-dialog"
                 onclick="document.getElementById('cargo-edit-dialog').showModal()"
                 aria-label="Edit destination for cargo {{ cargo.tracking_id.value }}"
-              >Edit destination</button>
-              <button
+              >Edit destination</a>
+              <a
                 class="min-h-11 rounded-md px-3 py-2 text-blue-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                type="button"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-target="#cargo-edit-dialog"
                 onclick="document.getElementById('cargo-edit-dialog').showModal()"
                 aria-label="Edit deadline for cargo {{ cargo.tracking_id.value }}"
-              >Edit deadline</button>
+              >Edit deadline</a>
             </td>
           </tr>
         {% endfor %}

@@ -2,7 +2,7 @@ from collections.abc import Callable
 from datetime import date, datetime, time
 
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -20,6 +20,8 @@ def _find_cargo(dashboard: CargoDashboard, tracking_id: str) -> Cargo:
 
 
 def _not_routed_table(request: HttpRequest, dashboard: CargoDashboard) -> HttpResponse:
+    if request.headers.get('HX-Request') != 'true':
+        return redirect('/admin/dashboard/')
     response = render(
         request,
         'booking/dashboard/not_routed_table.html',
@@ -29,6 +31,18 @@ def _not_routed_table(request: HttpRequest, dashboard: CargoDashboard) -> HttpRe
     response['HX-Reswap'] = 'outerHTML'
     response['HX-Trigger'] = 'booking-dialog-complete'
     return response
+
+
+def _dialog_form(
+    request: HttpRequest, template: str, page_title: str, context: dict[str, object]
+) -> HttpResponse:
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, template, context)
+    return render(
+        request,
+        'booking/dialogs/page.html',
+        {**context, 'page_title': page_title, 'form_template': template},
+    )
 
 
 def create_booking_dialog_views(
@@ -66,9 +80,10 @@ def create_booking_dialog_views(
                     raise Http404(str(exception)) from exception
                 return _not_routed_table(request, cargo_dashboard)
 
-        return render(
+        return _dialog_form(
             request,
             'booking/dialogs/destination.html',
+            'Change cargo destination',
             {
                 'cargo': cargo,
                 'locations': available_locations,
@@ -99,9 +114,10 @@ def create_booking_dialog_views(
                     raise Http404(str(exception)) from exception
                 return _not_routed_table(request, cargo_dashboard)
 
-        return render(
+        return _dialog_form(
             request,
             'booking/dialogs/deadline.html',
+            'Change cargo deadline',
             {
                 'cargo': cargo,
                 'deadline_value': deadline_value,

@@ -5,16 +5,16 @@ specialty: ui
 pr: https://github.com/martins-vds/ai-factory-eval/pull/655
 gates:
   build: 0
-  behavior: 0
+  behavior: null
   idiom: 0
   crap: 0
-  mutation_changed: 0.917
-  regression: 0
+  mutation_changed: null
+  regression: null
 specialty_evidence:
   - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
   - tests/booking/interfaces/test_dialogs.py::test_dialog_views_cover_initial_values_and_all_update_paths
+  - tests/booking/interfaces/test_dialogs.py::test_dialogs_support_full_page_forms_without_javascript
   - .migration/evidence/runs/BK-05G.md
-  - .migration/evidence/mutants/BK-05G.md
 ledger_updated:
   - booking.dialog-chain
   - booking.dialog-deadline
@@ -23,4 +23,4 @@ quirk_tickets:
   - martins-vds/ai-factory-pilot-target#234
   - martins-vds/ai-factory-pilot-target#235
   - martins-vds/ai-factory-pilot-target#251
-handoff: none
+handoff: .migration/handoffs/BK-05G.md

@@ -22,6 +22,7 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_filters_options_without_mutation"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_returns_refreshed_table_without_warning"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_support_full_page_forms_without_javascript"
   - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
 notes: "Destination choices exclude origin and current destination without mutating the location list per #235; successful updates refresh the table without the unavailable-widget warning per #251."
