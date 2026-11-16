@@ -1,0 +1,37 @@
+[
+  {
+    "at": "2026-11-16T17:51:10Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18119,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05D",
+    "role": "afs-specialist-migrator",
+    "changed": [
+      ".migration/costs/914114f2-8644-48c8-8dad-97530322aede.json",
+      ".migration/evidence/runs/DM-05D.md",
+      "src/cargotracker/data_migration/exporter.py",
+      "src/cargotracker/data_migration/management/commands/export_data_snapshot.py",
+      "tests/data_migration/test_export.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/DM-05D.afs-specialist-migrator.yaml` with `role: afs-specialist-migrator`, `ticket: DM-05D`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/DM-05D.md`). See afs-migration-contract \u2192 Return files.",
+      "[scope] These files are outside ticket DM-05D's planned files: `src/cargotracker/data_migration/exporter.py`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides."
+    ],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "self_heal.enabled is off; would have blocked"
+  }
+]
