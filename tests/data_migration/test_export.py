@@ -1,10 +1,14 @@
 import csv
+import datetime
+from io import StringIO
 from pathlib import Path
 
 import pytest
 import yaml
 from django.core.management import call_command
+from django.core.management.base import CommandError
 
+from cargotracker.data_migration.exporter import _format_value
 from cargotracker.voyage.infrastructure.models import VoyageRecord
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -13,13 +17,20 @@ MAPPING = ROOT / '.migration' / 'data' / 'mapping.yaml'
 
 
 def _export_fixture(tmp_path):
-    output = tmp_path / 'export'
+    output = tmp_path / 'nested' / 'export'
     call_command(
         'load_data_snapshot',
         snapshot=str(FIXTURE_SNAPSHOT),
         mapping=str(MAPPING),
     )
-    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+    command_output = StringIO()
+    call_command(
+        'export_data_snapshot',
+        mapping=str(MAPPING),
+        out=str(output),
+        stdout=command_output,
+    )
+    assert command_output.getvalue() == 'Exported 7 rows across 6 mapped tables.\n'
     return output
 
 
@@ -127,3 +138,67 @@ def test_export_snapshot_orders_rows_by_primary_key(tmp_path):
     with (output / 'voyage.csv').open(newline='', encoding='utf-8') as stream:
         rows = list(csv.DictReader(stream))
     assert [row['id'] for row in rows] == ['10', '20']
+
+
+@pytest.mark.django_db(transaction=True)
+def test_export_snapshot_can_replace_an_existing_export(tmp_path):
+    output = _export_fixture(tmp_path)
+    original = {path.name: path.read_bytes() for path in output.glob('*.csv')}
+
+    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+
+    assert {path.name: path.read_bytes() for path in output.glob('*.csv')} == original
+
+
+def test_export_snapshot_requires_both_arguments(tmp_path):
+    with pytest.raises(CommandError, match='the following arguments are required: --mapping'):
+        call_command('export_data_snapshot', '--out', str(tmp_path))
+    with pytest.raises(CommandError, match='the following arguments are required: --out'):
+        call_command('export_data_snapshot', '--mapping', str(MAPPING))
+
+
+def test_export_snapshot_reports_invalid_mapping(tmp_path):
+    mapping = tmp_path / 'mapping.yaml'
+    mapping.write_text('- invalid', encoding='utf-8')
+
+    with pytest.raises(CommandError, match='mapping must be an object'):
+        call_command(
+            'export_data_snapshot',
+            mapping=str(mapping),
+            out=str(tmp_path / 'export'),
+        )
+
+
+def test_export_snapshot_reports_unreadable_mapping(tmp_path):
+    mapping = tmp_path / 'missing.yaml'
+
+    with pytest.raises(CommandError, match='unable to read mapping'):
+        call_command(
+            'export_data_snapshot',
+            mapping=str(mapping),
+            out=str(tmp_path / 'export'),
+        )
+
+
+def test_export_snapshot_reports_output_write_errors(tmp_path):
+    output = tmp_path / 'not-a-directory'
+    output.write_text('file', encoding='utf-8')
+
+    with pytest.raises(CommandError, match='unable to write export'):
+        call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+
+
+def test_export_formats_naive_and_offset_timestamps_as_utc():
+    assert _format_value(datetime.datetime(2026, 11, 7, 10, 11, 12)) == (
+        '2026-11-07T10:11:12Z'
+    )
+    offset_timestamp = datetime.datetime(
+        2026,
+        11,
+        7,
+        10,
+        11,
+        12,
+        tzinfo=datetime.timezone(datetime.timedelta(hours=2)),
+    )
+    assert _format_value(offset_timestamp) == '2026-11-07T08:11:12Z'
