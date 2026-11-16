@@ -25,7 +25,8 @@ def loan_catalog_new(request):
         if form.is_valid():
             lend_loan(**form.cleaned_data, lent_on=timezone.localdate())
             return redirect('/ui/loans/')
-        return render(request, 'loans/new.html', {'form': form}, status=400)
+        status = 200 if request.headers.get('HX-Request') == 'true' else 400
+        return render(request, 'loans/new.html', {'form': form}, status=status)
     return render(request, 'loans/new.html', {'form': form})
 
 
@@ -79,10 +80,11 @@ def loan_catalog_return(request, loan_id):
     if loan is None:
         raise Http404
     if not updated:
+        status = 200 if request.headers.get('HX-Request') == 'true' else 409
         return render(
             request,
             'loans/list.html',
             {'loans': Loan.objects.all(), 'feedback': 'This loan has already been returned.'},
-            status=409,
+            status=status,
         )
     return redirect('/ui/loans/')

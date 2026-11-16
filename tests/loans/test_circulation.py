@@ -116,6 +116,20 @@ def test_browser_lending_shows_field_errors_for_blank_values(client, data):
 
 
 @pytest.mark.django_db
+def test_htmx_lending_displays_field_errors_for_blank_values(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': ' ', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'Member name' in response.content
+    assert b'This field is required.' in response.content
+    assert client.get('/loans/L4').status_code == 404
+
+
+@pytest.mark.django_db
 def test_browser_can_return_a_loan_without_overwriting_its_return_date(client, monkeypatch):
     monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 3, 1))
 
@@ -132,9 +146,9 @@ def test_browser_can_return_a_loan_without_overwriting_its_return_date(client, m
     assert saved_loan.content.decode() == expected_loan
 
     monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 3, 2))
-    repeated = client.post('/ui/loans/L1/return/')
+    repeated = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
 
-    assert repeated.status_code == 409
+    assert repeated.status_code == 200
     assert b'This loan has already been returned.' in repeated.content
     assert b'Return L1' not in repeated.content
     assert client.get('/loans/L1').content.decode() == expected_loan
