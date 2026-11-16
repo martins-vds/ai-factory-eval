@@ -2,9 +2,9 @@ role: afs-bootstrapper
 ticket: SY-01
 issue: null
 setup_pr: null
-characterization_tier: null
-tier_evidence: null
+characterization_tier: A
+tier_evidence: "Tier A: legacy/run.sh packaged and started the full app; live endpoint probes exercised /about, /loans, /fees, loan return, and missing-payment behavior."
 capabilities: null
 gap_tickets: null
-validation: "blocked: source checkout SHA mismatch; .migration/source.lock is absent; see .migration/handoffs/SY-01.md"
+validation: "incomplete: required setup check, source.lock, capabilities.yaml, profile.yaml and tier selection remain; see .migration/handoffs/SY-01.md"
 handoff: .migration/handoffs/SY-01.md
