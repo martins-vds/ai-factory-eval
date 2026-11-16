@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan {{ loan.id }} · Lending Library{% endblock %}
+
+{% block content %}
+  <a class="link link-hover mb-8 inline-block" href="{% url 'loans:ui-list' %}">← All loans</a>
+  <section class="card max-w-2xl border border-stone-200 bg-white shadow-sm">
+    <div class="card-body">
+      <p class="text-sm font-semibold uppercase tracking-[0.2em] text-amber-900">Loan record</p>
+      <h1 class="card-title font-serif text-4xl">{{ loan.id }}</h1>
+      <dl class="mt-4 grid grid-cols-2 gap-6">
+        <dt class="text-stone-600">Member</dt><dd>{{ loan.member }}</dd>
+        <dt class="text-stone-600">ISBN</dt><dd>{{ loan.isbn }}</dd>
+        <dt class="text-stone-600">Lent</dt><dd>{{ loan.lent_on|date:'Y-m-d' }}</dd>
+        <dt class="text-stone-600">Due</dt><dd>{{ loan.due_on|date:'Y-m-d' }}</dd>
+        <dt class="text-stone-600">Returned</dt>
+        <dd>{% if loan.returned_on %}{{ loan.returned_on|date:'Y-m-d' }}{% else %}Not yet returned{% endif %}</dd>
+      </dl>
+    </div>
+  </section>
+{% endblock %}
