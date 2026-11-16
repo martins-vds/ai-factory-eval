@@ -1,9 +1,11 @@
 import csv
 from datetime import UTC, datetime
+from io import StringIO
 from pathlib import Path
 
 import pytest
 from django.core.management import call_command
+from django.core.management.base import CommandError
 
 from cargotracker.location.infrastructure.models import LocationRecord
 
@@ -22,7 +24,18 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     LocationRecord.objects.create(pk=200, unlocode='ZZ200', name='Later')
     LocationRecord.objects.create(pk=150, unlocode='ZZ150', name='Earlier')
 
-    output = tmp_path / 'target'
+    for options in (
+        {'out': str(tmp_path / 'missing-mapping')},
+        {'mapping': str(MAPPING)},
+    ):
+        with pytest.raises(CommandError, match='required'):
+            call_command('export_data_snapshot', **options)
+
+    output = tmp_path / 'nested' / 'target'
+    stdout = StringIO()
+    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output), stdout=stdout)
+    assert stdout.getvalue() == 'Exported 9 rows across 6 mapped tables.\n'
+
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
 
     assert {path.name for path in output.glob('*.csv')} == {
@@ -64,3 +77,19 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     assert datetime.fromisoformat(cargo['calculated_at']) == datetime(
         2026, 11, 7, 10, 11, 12, tzinfo=UTC
     )
+
+    blocked_directory = tmp_path / 'not-a-directory'
+    blocked_directory.write_text('occupied', encoding='utf-8')
+    with pytest.raises(CommandError) as error:
+        call_command(
+            'export_data_snapshot',
+            mapping=str(MAPPING),
+            out=str(blocked_directory),
+        )
+    assert f'{blocked_directory}: unable to create output directory:' in str(error.value)
+
+    blocked_csv = tmp_path / 'blocked-export'
+    (blocked_csv / 'location.csv').mkdir(parents=True)
+    with pytest.raises(CommandError) as error:
+        call_command('export_data_snapshot', mapping=str(MAPPING), out=str(blocked_csv))
+    assert f'{blocked_csv}/location.csv: unable to write export:' in str(error.value)
