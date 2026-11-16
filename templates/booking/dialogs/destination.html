@@ -1,0 +1,39 @@
+<dialog open class="modal modal-open" aria-labelledby="change-destination-title">
+  <div class="modal-box">
+    <button
+      type="button"
+      class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+      aria-label="Close dialog"
+      onclick="this.closest('dialog').remove()"
+    >×</button>
+    <h2 id="change-destination-title" class="mb-4 text-xl font-semibold">Change destination</h2>
+    <p class="mb-4">
+      Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}
+      ({{ cargo.route_specification.origin.unlocode.value }}) is currently bound for
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }}).
+    </p>
+    <form method="post" action="{{ form_url }}" hx-post="{{ form_url }}" hx-target="#booking-dialog">
+      {% csrf_token %}
+      <label class="label mb-1 block font-medium" for="destination">New destination</label>
+      <select
+        id="destination"
+        name="destination"
+        required
+        {% if error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+      >
+        <option value="">Select a destination</option>
+        {% for location in destinations %}
+          <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+        {% endfor %}
+      </select>
+      {% if error %}
+        <p id="destination-error" class="mt-2 text-red-700" role="alert">{{ error }}</p>
+      {% endif %}
+      <div class="modal-action">
+        <button type="button" class="btn" onclick="this.closest('dialog').remove()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update destination</button>
+      </div>
+    </form>
+  </div>
+</dialog>
