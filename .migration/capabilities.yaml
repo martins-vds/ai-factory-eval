@@ -1,0 +1,101 @@
+harness_version: 0.2.0
+checked_at: "2026-11-16T02:20:59Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    `PORT=18080 ./legacy/run.sh` built and started the source; GET and POST endpoints returned
+    application responses. See references/characterization.md for commands and observations.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: maven, version: "3.10.0" }
+      - { kind: tool, name: "OpenJDK", version: "17.0.21" }
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: The Django target and its build gate have not been scaffolded.
+  - id: characterization-harness
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: The source is runnable but has no characterization test suite.
+  - id: unit-integration-tests
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: The source has no tests and the target test runner has not been scaffolded.
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: The source has no configured coverage instrumentation or tests.
+  - id: coverage
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target coverage dependencies and test infrastructure are not scaffolded.
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: Source CRAP is best-effort; no source coverage data is configured.
+  - id: crap
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target coverage and test infrastructure are not scaffolded.
+  - id: mutation-testing
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: Source and target mutation-testing runners are not configured.
+  - id: lint-format
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: The source has no lint/format gate and the target tooling is not scaffolded.
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: django-patterns }
+  - id: data-migration
+    applies_to: both
+    status: waived
+    waiver:
+      reason: >-
+        The synthetic legacy data is only a seed script and no planted scenario needs data migration;
+        the pilot exercises data migration end to end.
+      approved_by: martins-vds
+  - id: ui-end-to-end
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: No repeatable browser end-to-end test runner is configured.
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "2.9.8" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
