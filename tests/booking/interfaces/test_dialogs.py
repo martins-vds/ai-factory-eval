@@ -3,7 +3,8 @@ from datetime import date
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -74,9 +75,11 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
 
     assert first_response.status_code == 200
     assert 'Hong Kong' in first_content and 'Melbourne' in first_content
+    assert 'role="alert"' not in first_content
     assert first_options is not None and second_options is not None
     assert 'CNHKG' not in first_options.group(1)
     assert 'AUMEL' not in first_options.group(1)
+    assert 'USNYC' in first_options.group(1)
     assert first_options.group(1) == second_options.group(1)
     assert available_locations == initial_location_list
 
@@ -95,16 +98,18 @@ def test_deadline_dialog_displays_current_route_fields_and_deadline(client):
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
+    assert 'role="alert"' not in content
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_deadline_dialog_reports_invalid_dates_without_losing_current_fields(client):
+@pytest.mark.parametrize('deadline', ['not-a-date', ''])
+def test_deadline_dialog_reports_invalid_dates_without_losing_current_fields(client, deadline):
     _seed_booking_data()
 
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
-        {'deadline': 'not-a-date'},
+        {'deadline': deadline},
     )
     content = response.content.decode()
 
@@ -113,6 +118,7 @@ def test_deadline_dialog_reports_invalid_dates_without_losing_current_fields(cli
     assert 'aria-invalid="true"' in content
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
+    assert f'value="{deadline}"' in content
 
 
 @pytest.mark.django_db
@@ -179,7 +185,7 @@ def test_dialog_forms_include_cancel_and_invalid_destinations_do_not_update(clie
     dialog = client.get(f'/admin/cargo/{cargo.tracking_id.value}/destination/').content.decode()
     response = client.post(
         f'/admin/cargo/{cargo.tracking_id.value}/destination/',
-        {'destination': 'CNHKG'},
+        {'destination': 'NOT-A-LOCATION'},
     )
 
     updated_cargo = cargo_repository.find(cargo.tracking_id)
@@ -189,3 +195,28 @@ def test_dialog_forms_include_cancel_and_invalid_destinations_do_not_update(clie
     assert 'Select a valid destination.' in response.content.decode()
     assert updated_cargo is not None
     assert updated_cargo.route_specification.destination == original_destination
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/admin/cargo/DEF789/destination/', 'put'),
+        ('/admin/cargo/DEF789/deadline/', 'delete'),
+    ],
+)
+def test_dialog_views_reject_unsupported_methods(client, path, method):
+    _seed_booking_data()
+
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_dialog_view_reports_unknown_cargo():
+    request = RequestFactory().get('/admin/cargo/MISSING1/destination/')
+
+    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found.'):
+        destination_dialog_view(request, 'MISSING1')

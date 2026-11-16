@@ -19,3 +19,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T02:07:47+00:00 | idiom-format-fix | 0 | 0.01 | `ruff format src/cargotracker/booking/interfaces/dialogs/views.py` | `413a709001976657` |  |  |
 | 2026-11-16T02:07:47+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-16T02:08:37+00:00 | behavior | 0 | 46.94 | `pytest -q` | `f8be1f3ff7b4d649` |  |  |
+| 2026-11-16T02:09:44+00:00 | crap-coverage | 0 | 47.12 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `b95ed3d0d13748a8` |  |  |
+| 2026-11-16T02:09:45+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:09:45+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `715365ebb2f10522` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-16T02:14:23+00:00 | mutation-changed | 1 | 274.73 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `eea87539f9910475` | afs-mutation: FAILED score=0.760 threshold=0.8 killed=38 survived=12 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.760 threshold=0.8 killed=38 survived=12 files=1 base=origin/main |
+| 2026-11-16T02:15:45+00:00 | behavior-dialogs-mutation-cases | 0 | 5.42 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `a7eb7dcb1403e203` |  |  |
