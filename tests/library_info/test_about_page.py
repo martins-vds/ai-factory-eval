@@ -25,6 +25,12 @@ def test_about_page_only_allows_get(client):
     assert response.status_code == 405
 
 
+def test_about_ui_only_allows_get(client):
+    response = client.post('/ui/about/')
+
+    assert response.status_code == 405
+
+
 def test_about_ui_uses_the_library_information_template_and_assets(client):
     response = client.get('/ui/about/')
 
