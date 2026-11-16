@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, GatewayResponse
 
 
 @dataclass
@@ -66,7 +66,43 @@ def test_fee_for_returned_loan_uses_return_date_instead_of_today():
     assert fee.amount_cents == 75
 
 
+def test_fee_for_early_return_has_no_late_fee():
+    application = FeeApplication(
+        LoanRepository(Loan('L1', date(2026, 1, 10), date(2026, 1, 7))),
+        Clock(date(2026, 4, 1)),
+        PaymentGateway(),
+    )
+
+    fee = application.fee_for('L1')
+
+    assert fee.days_late == 0
+    assert fee.amount_cents == 0
+
+
 def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_payment_use_case_uses_in_memory_repository_and_gateway():
+    class RecordingGateway:
+        def __init__(self):
+            self.charges = []
+            self.response = GatewayResponse(200, 'charged\n')
+
+        def charge(self, loan_id):
+            self.charges.append(loan_id)
+            return self.response
+
+    gateway = RecordingGateway()
+    application = FeeApplication(
+        LoanRepository(Loan('L1', date(2026, 1, 10))),
+        Clock(date(2026, 1, 13)),
+        gateway,
+    )
+
+    assert application.pay('missing') is None
+    assert gateway.charges == []
+    assert application.pay('L1') is gateway.response
+    assert gateway.charges == ['L1']

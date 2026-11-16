@@ -1,0 +1,37 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/671
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.971
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:5
+    what: "Known module-level loan catalog route/template and LoanForm.Meta.model survivors are behavior-covered by tests/test_ui_smoke.py and tests/loans/test_catalog.py; LL-03 fee paths/methods are covered by tests/fees/test_endpoints.py, including unsupported methods."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:25
+    what: "The unrelated LL-02 @transaction.atomic survivor is not killed by the mutation test selection; it merits separate concurrency-focused verification but does not affect LL-03 fee/payment behavior."
+  - severity: minor
+    where: src/fees/views.py:26
+    what: "fee_detail and fee_page repeat loan lookup/not-found handling; a possible duplication smell only, with distinct API/UI rendering boundaries."
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_fee_for_early_return_has_no_late_fee
+  - tests/fees/test_fee_calculation.py::test_payment_use_case_uses_in_memory_repository_and_gateway
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_fee_page_formats_the_capped_fee_as_ten_dollars
+  - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_for_an_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_page_payment_returns_gateway_status_fragment
+  - tests/fees/test_endpoints.py::test_fee_page_payment_returns_full_page_for_a_regular_post
+  - tests/fees/test_endpoints.py::test_fee_page_payment_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_payment_gateway_uses_the_default_url_when_unconfigured
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
