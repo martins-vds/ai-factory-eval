@@ -100,4 +100,4 @@ def test_lending_page_creates_a_loan_and_returns_to_its_reading_room_detail(clie
 
     assert detail.status_code == 200
     assert b'Loan record \xc2\xb7 L4' in detail.content
-    assert b'hx-post="/ui/loans/L4/return/"' in detail.content
+    assert b'dee \xc2\xb7 ISBN 123' in detail.content

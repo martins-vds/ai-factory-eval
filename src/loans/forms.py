@@ -3,8 +3,16 @@ from django.core.exceptions import ValidationError
 
 
 class LoanLendForm(forms.Form):
-    member = forms.CharField(max_length=255, strip=False)
-    isbn = forms.CharField(max_length=255, strip=False)
+    member = forms.CharField(
+        max_length=255,
+        strip=False,
+        error_messages={'required': 'Enter a member name; blank values are not accepted.'},
+    )
+    isbn = forms.CharField(
+        max_length=255,
+        strip=False,
+        error_messages={'required': 'Enter an ISBN; blank values are not accepted.'},
+    )
 
     def clean_member(self):
         member = self.cleaned_data['member']

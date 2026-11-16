@@ -1,9 +1,9 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
-from .models import Loan
 from .forms import LoanLendForm
+from .models import Loan
 from .services import (
     get_loan_text,
     lend_loan,
@@ -15,6 +15,14 @@ from .services import (
 
 def loan_catalog(request):
     return render(request, 'loans/list.html', {'loans': Loan.objects.all()})
+
+
+def loan_lend_page(request):
+    form = LoanLendForm(request.POST if request.method == 'POST' else None)
+    if request.method == 'POST' and form.is_valid():
+        loan = lend_loan(form.cleaned_data['member'], form.cleaned_data['isbn'])
+        return redirect('loan_catalog_detail', loan_id=loan.id)
+    return render(request, 'loans/new.html', {'form': form})
 
 
 def loan_catalog_detail(request, loan_id):
