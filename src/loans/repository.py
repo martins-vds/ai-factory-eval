@@ -7,6 +7,10 @@ def list_loans():
     return Loan.objects.order_by('pk')
 
 
+def get_loan(loan_id):
+    return Loan.objects.filter(pk=loan_id).first()
+
+
 @transaction.atomic
 def save_loan(loan):
     loan.save()
