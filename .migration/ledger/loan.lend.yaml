@@ -25,8 +25,11 @@ evidence:
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_lend_api_rejects_blank_member_and_isbn
   - tests/loans/test_circulation.py::test_lend_api_creates_loan_with_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lend_api_preserves_surrounding_whitespace
   - tests/loans/test_circulation.py::test_lend_form_reports_blank_field_errors
   - tests/loans/test_circulation.py::test_lend_form_redirects_to_collection_after_creating_loan
+  - tests/loans/test_circulation.py::test_lend_and_return_match_characterized_source_http_goldens
+  - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
   - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]

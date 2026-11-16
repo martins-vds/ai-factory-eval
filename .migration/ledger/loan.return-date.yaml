@@ -23,6 +23,9 @@ evidence:
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_return_api_persists_date_and_rejects_a_repeat
   - tests/loans/test_circulation.py::test_htmx_return_updates_row_and_rejects_repeated_return
+  - tests/loans/test_circulation.py::test_non_htmx_return_redirects_and_shows_repeat_error
+  - tests/loans/test_circulation.py::test_lend_and_return_match_characterized_source_http_goldens
+  - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
 status: migrated
 notes: "The human ruling in martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
