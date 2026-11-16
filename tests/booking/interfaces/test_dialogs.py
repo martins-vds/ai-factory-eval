@@ -3,8 +3,6 @@ from datetime import UTC, date, datetime
 
 import pytest
 from django.core.management import call_command
-from django.http import Http404
-from django.test import RequestFactory
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -161,7 +159,8 @@ def test_dialog_update_recalculates_route_state(client, dialog):
         destination = next(
             location
             for location in shipping_locations
-            if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
         )
         data = {'destination': destination.unlocode.value}
     else:
