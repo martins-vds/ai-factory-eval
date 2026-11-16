@@ -18,18 +18,11 @@ class MonthlyReportRow:
 
 def month_bounds(month: str | None = None) -> tuple[date, date]:
     if month is None:
-        current_month = timezone.localdate(
-            timezone=timezone.get_default_timezone()
-        ).replace(day=1)
+        current_month = timezone.localdate(timezone=timezone.get_default_timezone()).replace(day=1)
         previous_month = current_month - timedelta(days=1)
         start = previous_month.replace(day=1)
     else:
-        if (
-            len(month) != 7
-            or month[4] != '-'
-            or not month[:4].isdigit()
-            or not month[5:].isdigit()
-        ):
+        if len(month) != 7 or month[4] != '-' or not month[:4].isdigit() or not month[5:].isdigit():
             raise ValueError('month must use YYYY-MM format')
         start = date(int(month[:4]), int(month[5:]), 1)
         if start.strftime('%Y-%m') != month:
@@ -45,8 +38,7 @@ def month_bounds(month: str | None = None) -> tuple[date, date]:
 def build_monthly_report(start: date, end: date) -> list[MonthlyReportRow]:
     totals = defaultdict(lambda: [0, 0, 0])
     loans = Loan.objects.filter(
-        Q(lent_on__gte=start, lent_on__lt=end)
-        | Q(returned_on__gte=start, returned_on__lt=end)
+        Q(lent_on__gte=start, lent_on__lt=end) | Q(returned_on__gte=start, returned_on__lt=end)
     ).only('member', 'lent_on', 'returned_on')
 
     for loan in loans.iterator():
