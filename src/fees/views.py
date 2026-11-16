@@ -27,8 +27,7 @@ def fee_api(request, loan_id):
 
     fee = _late_fee(loan)
     body = format_html(
-        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-        '<p class="fee">Fee: {}</p>',
+        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: {}</p>',
         loan.id,
         loan.due_on.isoformat(),
         fee.late_days,

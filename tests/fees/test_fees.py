@@ -93,7 +93,9 @@ def test_fee_page_uses_the_reading_room_layout_and_ui_payment_path(client):
 
 
 @pytest.mark.django_db
-def test_payment_api_posts_to_the_gateway_and_forwards_success(client, monkeypatch, payment_gateway):
+def test_payment_api_posts_to_the_gateway_and_forwards_success(
+    client, monkeypatch, payment_gateway
+):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', payment_gateway.url)
 
     response = client.post('/payments/L1')
@@ -126,9 +128,7 @@ def test_payment_api_maps_gateway_connection_failure_to_bad_gateway(client, monk
 
 
 @pytest.mark.django_db
-def test_payment_for_unknown_loan_does_not_call_the_gateway(
-    monkeypatch, payment_gateway
-):
+def test_payment_for_unknown_loan_does_not_call_the_gateway(monkeypatch, payment_gateway):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', payment_gateway.url)
 
     response = Client(enforce_csrf_checks=True).post('/payments/unknown')

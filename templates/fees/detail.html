@@ -13,7 +13,7 @@
         <p class="text-[#66705b]">{{ loan.id }} · {{ loan.member }}</p>
         <h2 class="card-title mt-2 text-3xl">Loan {{ loan.id }}</h2>
         <p class="mt-5">Due {{ loan.due_on|date:"M j, Y" }}{% if loan.returned_on %} · returned {{ loan.returned_on|date:"M j, Y" }}{% endif %}</p>
-        <p class="mt-2">{{ fee.late_days }} late days · first two days waived</p>
+        <p class="mt-2">{{ fee.late_days }} late days · no fee through two days</p>
         <p class="mt-7 text-6xl font-bold">{{ fee.amount }}</p>
         <p class="mt-2 text-[#66705b]">If more than two days late, each late day adds 25¢, up to $10.00.</p>
         {% if payment_status %}
