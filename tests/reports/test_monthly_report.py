@@ -33,3 +33,24 @@ def test_monthly_report_summarizes_the_previous_month(monkeypatch):
         'aardvark,1,1,0\n'
         'zoe,1,1,0\n'
     )
+
+
+@pytest.mark.django_db
+def test_monthly_report_handles_january_and_limits_fees_to_month_end(monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 1, 1))
+    Loan.objects.create(
+        id='L18',
+        member='december',
+        isbn='9',
+        lent_on=date(2025, 12, 31),
+        returned_on=date(2026, 1, 20),
+    )
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert output.getvalue() == (
+        'member,loans_started,late_returns,late_fees_cents\n'
+        'cy,1,0,400\n'
+        'december,1,0,0\n'
+    )
