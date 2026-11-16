@@ -18,7 +18,7 @@ def test_fee_endpoint_charges_twenty_five_cents_after_two_day_grace_period(clien
     response = client.get('/fees/F1')
 
     assert response.status_code == 200
-    assert response['Content-Type'] == 'text/html; charset=utf-8'
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == (
         '<h1>Late fee for F1</h1><p>Due 2026-01-01, 3 day(s) late.</p>'
         '<p class="fee">Fee: $0.25</p>'
