@@ -16,22 +16,19 @@ capabilities:
       - { kind: tool, name: java, version: "17" }
   - id: build-run
     applies_to: target
-    status: met
-    provided_by:
-      - { kind: tool, name: python, version: "3.13" }
-      - { kind: tool, name: django, version: "5" }
-    notes: The target stack and build gates are pinned in profile.yaml; scaffolding follows bootstrap.
+    status: gap
+    ticket: new
+    notes: The Django target and its build gate are not scaffolded yet.
   - id: characterization-harness
     applies_to: source
     status: gap
     ticket: new
     notes: The live probes are recorded, but no repeatable characterization harness exists yet.
   - id: unit-integration-tests
-    applies_to: target
-    status: met
-    provided_by:
-      - { kind: tool, name: pytest }
-      - { kind: skill, name: django-tdd }
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: The source has no tests and the target test runner has not yet been scaffolded.
   - id: coverage
     applies_to: source
     status: gap
@@ -40,9 +37,9 @@ capabilities:
     notes: No source coverage runner is configured; source coverage is best-effort.
   - id: coverage
     applies_to: target
-    status: met
-    provided_by:
-      - { kind: skill, name: pytest-coverage }
+    status: gap
+    ticket: new
+    notes: Target coverage dependencies and test infrastructure are not scaffolded yet.
   - id: complexity
     applies_to: both
     status: met
@@ -56,60 +53,44 @@ capabilities:
     notes: Source CRAP cannot be calculated until source coverage is available; best-effort only.
   - id: crap
     applies_to: target
-    status: met
-    provided_by:
-      - { kind: tool, name: crap.py }
-      - { kind: tool, name: coverage.py }
-      - { kind: tool, name: lizard, version: "1.24.3" }
+    status: gap
+    ticket: new
+    notes: Target coverage and test infrastructure are not scaffolded yet.
   - id: mutation-testing
-    applies_to: source
-    status: not-applicable
-    notes: The legacy source is pinned and read-only; mutation testing applies to target changes.
-  - id: mutation-testing
-    applies_to: target
-    status: met
-    provided_by:
-      - { kind: tool, name: mutmut }
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: No source or target mutation-testing runner is currently configured.
   - id: lint-format
-    applies_to: source
-    status: not-applicable
-    notes: The pinned legacy source is read-only and is not subject to target formatting gates.
-  - id: lint-format
-    applies_to: target
-    status: met
-    provided_by:
-      - { kind: tool, name: ruff }
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: Neither source nor target has a configured lint/format gate.
   - id: stack-idioms
-    applies_to: source
+    applies_to: both
     status: met
     provided_by:
       - { kind: skill, name: java-docs }
-      - { kind: skill, name: patterns-of-enterprise-application-architecture }
-  - id: stack-idioms
-    applies_to: target
-    status: met
-    provided_by:
+      - { kind: skill, name: java-junit }
       - { kind: skill, name: django-patterns }
+      - { kind: skill, name: django-security }
+      - { kind: skill, name: django-tdd }
+      - { kind: skill, name: django-verification }
   - id: data-migration
     applies_to: both
-    status: met
-    provided_by:
-      - { kind: skill, name: afs-data-pipeline }
-      - { kind: tool, name: data_snapshot.py }
-      - { kind: tool, name: data_reconcile.py }
-    notes: >-
-      The source currently has an in-memory H2 database and a small seed script;
-      the harness supports snapshot-based transfer and reconciliation.
+    status: gap
+    ticket: new
+    notes: The source uses H2; the stack pack's database migration skills cover Oracle-to-PostgreSQL, not H2-to-PostgreSQL.
   - id: ui-end-to-end
     applies_to: both
-    status: met
-    provided_by:
-      - { kind: skill, name: agent-browser }
+    status: gap
+    ticket: new
+    notes: No repeatable browser end-to-end test runner is configured.
   - id: code-graph
     applies_to: both
     status: met
     provided_by:
-      - { kind: tool, name: understand-anything, version: "2.9.8" }
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
   - id: graph-data-links
     applies_to: both
     status: met

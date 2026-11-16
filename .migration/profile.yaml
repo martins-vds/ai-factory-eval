@@ -3,7 +3,7 @@ source:
   repo: martins-vds/ai-factory-synthetic-target
   sha: 563c316ed51462b08fd6e58f3781a3c8b2890453
   path: legacy
-  stacks: [java-17, jax-rs-3.1-jersey, jpa-3.1-hibernate-6.4, h2-2.2, maven]
+  stacks: [java-17, java-ee, maven, jax-rs-3.1, hibernate-orm-6.4, h2-2.2]
   encoding: UTF-8
 target:
   repo: martins-vds/ai-factory-synthetic-target
@@ -34,7 +34,7 @@ graph:
       edges: [reads_from, writes_to, routes, calls]
   target_paths: [src, templates]
 risk_map:
-  exclude: ["*.min.js", "**/generated/**", "**/vendor/**", "legacy/target/**"]
+  exclude: ["*.min.js", "**/generated/**", "**/target/**"]
 skills:
   source:
     read: [java-docs]
@@ -44,9 +44,17 @@ skills:
     security: [django-security]
     tdd: [django-tdd]
     verify: [django-verification]
+    async: [django-celery]
     coverage: [pytest-coverage]
+    performance: [python-performance-optimization]
   specialists:
-    data: [postgresql-code-review, postgresql-optimization]
+    data:
+      - reviewing-oracle-to-postgres-migration
+      - migrating-oracle-to-postgres-stored-procedures
+      - planning-oracle-to-postgres-migration-integration-testing
+      - creating-oracle-to-postgres-migration-bug-report
+      - postgresql-code-review
+      - postgresql-optimization
 gates:
   build: ["python -m compileall -q src", "python manage.py check"]
   idiom: ["ruff check", "ruff format --check"]
