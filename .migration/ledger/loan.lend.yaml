@@ -9,9 +9,20 @@ source:
   risk: {crap: 3, complexity: 3, coverage: 0.67}
 boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lend_endpoint_escapes_field_and_record_delimiters
+  - tests/loans/test_circulation.py::test_lend_endpoint_creates_a_loan_with_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_circulation.py::test_ui_lend_form_shows_field_errors_for_blank_values
+notes: "The blank-field behavior is fixed per the human ruling in martins-vds/ai-factory-synthetic-target#39; delimiter escaping is fixed per #43 and verified through lending and export."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+target:
+  components: [src.loans.forms.LoanForm, src.loans.repository.LoanRepository.lend, src.loans.services.lend_loan, src.loans.views.loan_list, src.loans.views.loan_catalog]
