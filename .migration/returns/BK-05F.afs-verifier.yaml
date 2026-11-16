@@ -8,7 +8,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: null
+  mutation_changed: 0.855
   regression: 0
 evidence_logs:
   - .migration/evidence/runs/BK-05F.md
