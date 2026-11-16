@@ -1,6 +1,7 @@
 role: afs-bootstrapper
 ticket: SY-01
 issue: martins-vds/ai-factory-synthetic-target#3
+handoff: .migration/handoffs/SY-01.md
 setup_pr: null
 characterization_tier: A
 tier_evidence: >-
