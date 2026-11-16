@@ -2,7 +2,6 @@ import os
 from urllib.error import HTTPError
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
@@ -25,4 +24,4 @@ def charge_loan(loan_id):
         with response:
             return response.code, response.read().decode('utf-8', errors='replace')
     except OSError as error:
-        raise PaymentGatewayError('payment gateway unavailable') from error
+        raise PaymentGatewayError from error

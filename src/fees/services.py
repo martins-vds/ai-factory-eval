@@ -1,11 +1,10 @@
-from dataclasses import dataclass
 from datetime import date
+from typing import NamedTuple
 
 from django.utils import timezone
 
 
-@dataclass(frozen=True)
-class LateFee:
+class LateFee(NamedTuple):
     days_late: int
     amount_cents: int
 

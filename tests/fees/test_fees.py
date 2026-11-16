@@ -7,8 +7,9 @@ from threading import Thread
 import pytest
 from playwright.sync_api import sync_playwright
 
-from src.fees.services import calculate_late_fee
+from src.fees import gateway
 from src.fees.gateway import PaymentGatewayError, charge_loan
+from src.fees.services import calculate_late_fee
 from src.loans.models import Loan
 
 HTTP_GOLDEN_PATH = (
@@ -76,6 +77,14 @@ def test_fee_api_matches_characterized_page(client):
     assert response.content.decode() == golden['response']['body']
 
 
+@pytest.mark.django_db
+def test_fee_api_formats_capped_amount_with_two_decimal_places(client):
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert b'Fee: $10.00' in response.content
+
+
 @pytest.mark.parametrize(
     ('as_of', 'days_late', 'amount_cents'),
     [
@@ -104,6 +113,42 @@ def test_fee_api_returns_characterized_not_found_for_unknown_loan(client):
     assert response.status_code == golden['status']
     assert response['Content-Type'] == golden['content_type']
     assert response.content.decode() == golden['body']
+
+
+@pytest.mark.django_db
+def test_fee_page_omits_payment_for_zero_balance(client):
+    loan = Loan.objects.get(pk='L2')
+    loan.returned_on = loan.due_on + date.resolution * 2
+    loan.save(update_fields=['returned_on'])
+
+    response = client.get('/ui/fees/L2/')
+
+    assert response.status_code == 200
+    assert b'Days late</dt><dd>2</dd>' in response.content
+    assert b'Fee: $0.00' in response.content
+    assert b'Pay late fee' not in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_shows_payment_for_three_days_late(client):
+    loan = Loan.objects.get(pk='L2')
+    loan.returned_on = loan.due_on + date.resolution * 3
+    loan.save(update_fields=['returned_on'])
+
+    response = client.get('/ui/fees/L2/')
+
+    assert response.status_code == 200
+    assert b'Days late</dt><dd>3</dd>' in response.content
+    assert b'Fee: $0.75' in response.content
+    assert b'hx-post="/ui/payments/L2/"' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response.content == b'<p>No such loan.</p>'
 
 
 @pytest.mark.django_db
@@ -152,12 +197,55 @@ def test_payment_api_does_not_follow_gateway_redirect(client, gateway_server):
     assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
 
 
+@pytest.mark.parametrize(
+    ('gateway_status', 'expected_status'),
+    [(200, 200), (503, 502)],
+)
+@pytest.mark.django_db
+def test_payment_api_replaces_invalid_utf8_from_gateway(
+    client, gateway_server, gateway_status, expected_status
+):
+    gateway_server.response_status = gateway_status
+    gateway_server.response_body = b'\xff'
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == expected_status
+    assert response.content == '\ufffd'.encode()
+
+
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/ui/fees/L3/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+@pytest.mark.django_db
+def test_fee_and_payment_routes_reject_unsupported_methods(client, gateway_server, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert gateway_server.requests == []
+
+
+@pytest.mark.django_db
+def test_payment_page_returns_not_found_for_unknown_loan(client, gateway_server):
+    response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert response.content == b'no such loan\n'
+    assert gateway_server.requests == []
+
+
 def test_payment_gateway_preserves_interrupted_call_as_cause(monkeypatch):
     class InterruptedOpener:
         def open(self, request):
             raise InterruptedError('cancelled')
 
-    monkeypatch.setattr('src.fees.gateway.build_opener', lambda *handlers: InterruptedOpener())
+    monkeypatch.setattr(gateway, 'build_opener', lambda *handlers: InterruptedOpener())
 
     with pytest.raises(PaymentGatewayError) as error:
         charge_loan('L1')
@@ -166,18 +254,20 @@ def test_payment_gateway_preserves_interrupted_call_as_cause(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_payment_api_surfaces_interrupted_call_as_gateway_failure(client, monkeypatch):
+def test_payment_api_surfaces_interrupted_call_as_gateway_failure(client, monkeypatch, caplog):
     class InterruptedOpener:
         def open(self, request):
             raise InterruptedError('cancelled')
 
-    monkeypatch.setattr('src.fees.gateway.build_opener', lambda *handlers: InterruptedOpener())
+    monkeypatch.setattr(gateway, 'build_opener', lambda *handlers: InterruptedOpener())
 
     response = client.post('/payments/L1')
 
     assert response.status_code == 502
     assert response['Content-Type'] == 'text/plain'
     assert response.content == b'payment gateway unavailable\n'
+    assert 'Payment gateway call interrupted' in caplog.text
+    assert 'InterruptedError: cancelled' in caplog.text
 
 
 @pytest.mark.django_db
@@ -200,6 +290,60 @@ def test_htmx_payment_action_returns_success_status(client, gateway_server):
     assert b'role="status"' in response.content
     assert b'Payment received for loan L1.' in response.content
     assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_surfaces_gateway_decline(client, gateway_server):
+    gateway_server.response_status = 503
+    gateway_server.response_body = b'declined\n'
+
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 502
+    assert response.content == b'declined\n'
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_surfaces_interruption(client, monkeypatch):
+    class InterruptedOpener:
+        def open(self, request):
+            raise InterruptedError('cancelled')
+
+    monkeypatch.setattr(gateway, 'build_opener', lambda *handlers: InterruptedOpener())
+
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+def test_payment_gateway_uses_the_source_default_url(monkeypatch):
+    requests = []
+
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exception_type, exception, traceback):
+            return False
+
+        def read(self):
+            return b'charged\n'
+
+    class CapturingOpener:
+        def open(self, request):
+            requests.append((request.full_url, request.get_method(), request.data))
+            return Response()
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    monkeypatch.setattr(gateway, 'build_opener', lambda *handlers: CapturingOpener())
+
+    result = charge_loan('L1')
+
+    assert result == (200, 'charged\n')
+    assert requests == [('https://payments.lending-library.invalid/charge?loan=L1', 'POST', None)]
 
 
 @pytest.mark.django_db
