@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from django.test import Client
 
 from src.fees.services import calculate_late_fee
 
@@ -115,15 +116,27 @@ def test_payment_api_maps_gateway_declines_to_bad_gateway(client, monkeypatch, p
 
 
 @pytest.mark.django_db
+def test_payment_api_maps_gateway_connection_failure_to_bad_gateway(client, monkeypatch):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
 def test_payment_for_unknown_loan_does_not_call_the_gateway(
-    client, monkeypatch, payment_gateway
+    monkeypatch, payment_gateway
 ):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', payment_gateway.url)
 
-    response = client.post('/payments/unknown')
+    response = Client(enforce_csrf_checks=True).post('/payments/unknown')
+    ui_response = Client(enforce_csrf_checks=True).post('/ui/payments/L1/')
 
     assert response.status_code == 404
     assert response.content == b'no such loan\n'
+    assert ui_response.status_code == 403
     assert payment_gateway.requests == []
 
 
@@ -156,3 +169,14 @@ def test_htmx_payment_action_uses_the_gateway_and_returns_status_fragment(
     assert b'role="status"' in response.content
     assert b'Payment received for L1.' in response.content
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_htmx_payment_failure_displays_a_gateway_error(client, monkeypatch):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'payment gateway unavailable' in response.content

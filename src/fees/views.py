@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.html import format_html
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from src.loans.models import Loan
@@ -65,6 +66,7 @@ def _charge(loan_id):
 
 
 @require_POST
+@csrf_exempt
 def payment_api(request, loan_id):
     if not Loan.objects.filter(pk=loan_id).exists():
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
