@@ -16,6 +16,5 @@ ledger_updated:
   - booking.dialog-chain
   - booking.dialog-deadline
   - booking.dialog-destination
-  - booking.screen-not-routed-table
 quirk_tickets: []
 handoff: none
