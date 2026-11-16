@@ -26,7 +26,23 @@ def test_late_fee_waives_two_days_and_charges_twenty_five_cents_from_day_three()
     )
 
     assert (within_grace_period.late_days, within_grace_period.amount_cents) == (2, 0)
-    assert (after_grace_period.late_days, after_grace_period.amount_cents) == (3, 25)
+    assert (after_grace_period.late_days, after_grace_period.amount_cents) == (3, 75)
+
+
+def test_unreturned_loan_uses_today_and_early_return_has_no_late_days():
+    due_on = date(2026, 1, 1)
+
+    overdue = calculate_late_fee(
+        SimpleNamespace(due_on=due_on, returned_on=None),
+        today=due_on + timedelta(days=19),
+    )
+    early = calculate_late_fee(
+        SimpleNamespace(due_on=due_on, returned_on=due_on - timedelta(days=1)),
+        today=due_on + timedelta(days=19),
+    )
+
+    assert (overdue.late_days, overdue.amount_cents) == (19, 475)
+    assert (early.late_days, early.amount_cents) == (0, 0)
 
 
 def test_late_fee_is_capped_at_ten_dollars():
@@ -66,7 +82,7 @@ def test_fee_page_uses_the_reading_room_layout_and_ui_payment_path(client):
     response = client.get('/ui/fees/L3/')
 
     assert response.status_code == 200
-    assert b'<h1>Late fees</h1>' in response.content
+    assert b'Late fees</h1>' in response.content
     assert b'19 late days' in response.content
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content

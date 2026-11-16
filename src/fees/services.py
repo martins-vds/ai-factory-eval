@@ -15,5 +15,5 @@ class LateFee:
 def calculate_late_fee(loan, *, today: date) -> LateFee:
     charged_through = loan.returned_on or today
     late_days = max(0, (charged_through - loan.due_on).days)
-    amount_cents = min(max(late_days - 2, 0) * 25, 1000)
+    amount_cents = 0 if late_days <= 2 else min(late_days * 25, 1000)
     return LateFee(late_days=late_days, amount_cents=amount_cents)
