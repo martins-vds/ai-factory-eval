@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -32,6 +33,15 @@ def test_list_endpoint_returns_seeded_records(client):
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
+
+
+@pytest.mark.django_db
+def test_browser_catalog_page_lists_seeded_loans(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'ana \xc2\xb7 ISBN 9780134685991' in response.content
 
 
 @pytest.mark.django_db
@@ -318,8 +328,15 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
+
+
+def test_lend_form_exposes_member_and_isbn_fields():
+    form = LoanForm()
+
+    assert tuple(form.fields) == ('member', 'isbn')
 
 
 @pytest.mark.django_db
@@ -424,7 +441,17 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_form_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db
