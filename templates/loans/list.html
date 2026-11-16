@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+<section aria-labelledby="catalog-title">
+  <div class="mb-10 flex flex-wrap items-end justify-between gap-4 border-b border-[#d8cdbb] pb-6">
+    <div>
+      <p class="mb-3 text-xs uppercase tracking-[.2em] text-[#746e60]">The collection · {{ loans|length }} loans</p>
+      <h1 id="catalog-title" class="text-4xl font-semibold tracking-tight md:text-6xl">The Lending Library</h1>
+    </div>
+    <p class="max-w-sm text-base leading-relaxed text-[#746e60]">Books to borrow, share, and return to the neighborhood collection.</p>
+  </div>
+  <div class="grid gap-5 md:grid-cols-2">
+    {% for loan in loans %}
+      <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+        <div class="card-body">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-widest text-[#746e60]">Loan {{ loan.pk }}</p>
+              <h2 class="card-title mt-2 text-2xl">{{ loan.member }}</h2>
+              <p class="mt-1 text-sm text-[#746e60]">ISBN {{ loan.isbn }}</p>
+            </div>
+            {% if loan.returned_on %}
+              <span class="badge badge-outline">Returned</span>
+            {% else %}
+              <span class="badge bg-[#e8d8c5] text-[#2f3428]">On loan</span>
+            {% endif %}
+          </div>
+          <p class="mt-4">Due {{ loan.due_on|date:"M j, Y" }}</p>
+          <div class="card-actions mt-3 justify-end">
+            <a class="link link-hover text-[#a94e37]" href="{% url 'loan-catalog-detail' loan.pk %}">View loan {{ loan.pk }}</a>
+          </div>
+        </div>
+      </article>
+    {% empty %}
+      <p class="text-[#746e60]">There are no loans in the collection yet.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

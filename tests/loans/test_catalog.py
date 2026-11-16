@@ -50,7 +50,7 @@ def test_due_date_and_export_escape_delimiters(client):
     )
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
 def test_loan_survives_database_connection_restart(client):
     create_loan(
         loan_id='PERSISTED',
