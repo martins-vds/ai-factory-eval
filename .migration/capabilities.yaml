@@ -1,0 +1,97 @@
+harness_version: 0.2.0
+checked_at: "2026-11-16T14:01:36Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: "Ran legacy/run.sh and probed its HTTP endpoints; see .migration/references/characterization.md."
+capabilities:
+  - id: build-run
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh (Maven, Java 17)" }
+      - { kind: tool, name: "Python 3.13 and Django 5" }
+  - id: characterization-harness
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "The source runs and was manually probed, but has no repeatable characterization test harness."
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "Django test runner" }
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source coverage instrumentation or test suite is configured."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "coverage.py / pytest-cov" }
+      - { kind: skill, name: pytest-coverage }
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "Source CRAP has no coverage data; best-effort only."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "lizard and coverage.py" }
+      - { kind: tool, name: ".migration/harness/tools/crap.py" }
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: mutmut, version: "3.8.1" }
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: ruff }
+  - id: stack-idioms
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: java-docs }
+      - { kind: skill, name: java-junit }
+      - { kind: skill, name: django-patterns }
+      - { kind: skill, name: django-security }
+  - id: data-migration
+    applies_to: both
+    status: waived
+    waiver:
+      reason: "The legacy data is seed-only; the operator waived production-record migration in martins-vds/ai-factory-synthetic-target#20."
+      approved_by: martins-vds
+  - id: ui-end-to-end
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: "No repeatable browser end-to-end runner is configured; agent-browser is a skill, not a configured test runner."
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
