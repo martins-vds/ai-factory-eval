@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | Cargo Tracker{% endblock %}
+
+{% block content %}
+  <main class="container mx-auto max-w-3xl p-4">
+    <h1 class="mb-6 text-3xl font-bold">{{ page_title }}</h1>
+    {% include form_template %}
+  </main>
+{% endblock %}
