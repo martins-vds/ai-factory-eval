@@ -55,9 +55,9 @@ def fee_page(request, loan_id):
 def _charge(loan_id):
     try:
         response = HttpPaymentGateway().charge(loan_id)
-    except PaymentGatewayUnavailable:
+    except PaymentGatewayUnavailable as error:
         logger.exception('Payment gateway request failed')
-        return GatewayResponse(502, 'payment gateway unavailable\n')
+        return GatewayResponse(502, f'{error}\n')
     return GatewayResponse(
         status_code=200 if response.status_code == 200 else 502,
         body=response.body,

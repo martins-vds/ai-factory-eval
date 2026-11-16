@@ -7,7 +7,7 @@ from urllib.request import Request, urlopen
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
-@dataclass(frozen=True)
+@dataclass
 class GatewayResponse:
     status_code: int
     body: str
@@ -18,12 +18,9 @@ class PaymentGatewayUnavailable(Exception):
 
 
 class HttpPaymentGateway:
-    def __init__(self, base_url=None):
-        self.base_url = base_url
-
     def charge(self, loan_id: str) -> GatewayResponse:
-        base_url = self.base_url or os.environ.get('PAYMENT_GATEWAY_URL', DEFAULT_GATEWAY_URL)
-        url = f'{base_url.rstrip("/")}/charge?{urlencode({"loan": loan_id})}'
+        base_url = os.environ.get('PAYMENT_GATEWAY_URL', DEFAULT_GATEWAY_URL)
+        url = f'{base_url}/charge?{urlencode({"loan": loan_id})}'
         request = Request(url, data=b'', method='POST')
 
         try:

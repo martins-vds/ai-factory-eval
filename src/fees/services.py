@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 
 
-@dataclass(frozen=True)
+@dataclass
 class LateFee:
     late_days: int
     amount_cents: int
