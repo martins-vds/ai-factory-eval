@@ -121,8 +121,10 @@ def loaded_invariant_snapshot(tmp_path):
 def test_loaded_cargo_delivery_state_matches_its_handling_history(loaded_invariant_snapshot):
     cargo_repository = DjangoCargoRepository()
     handling_repository = DjangoHandlingEventRepository()
+    cargos = list(CargoRecord.objects.order_by('pk'))
 
-    for record in CargoRecord.objects.order_by('pk'):
+    assert cargos
+    for record in cargos:
         cargo = cargo_repository.find(TrackingId(record.tracking_id))
         history = handling_repository.lookup_handling_history_of_cargo(cargo.tracking_id)
         derived = Delivery.derived_from(
@@ -164,7 +166,10 @@ def test_loaded_itinerary_legs_connect(loaded_invariant_snapshot):
 def test_loaded_handling_events_reference_existing_voyages_and_locations(
     loaded_invariant_snapshot,
 ):
-    for event in HandlingEventRecord.objects.all():
+    events = list(HandlingEventRecord.objects.all())
+
+    assert events
+    for event in events:
         assert event.voyage_id is not None
         assert VoyageRecord.objects.filter(pk=event.voyage_id).exists()
         assert event.location_id is not None
@@ -173,17 +178,17 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(
 
 @pytest.mark.django_db(transaction=True)
 def test_loaded_carrier_movement_schedules_are_in_order(loaded_invariant_snapshot):
-    voyages_with_schedules = 0
+    voyages_with_multiple_movements = 0
     for voyage in VoyageRecord.objects.order_by('pk'):
         movements = list(
             CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
-        if movements:
-            voyages_with_schedules += 1
+        if len(movements) > 1:
+            voyages_with_multiple_movements += 1
         assert all(movement.departure_time <= movement.arrival_time for movement in movements)
         assert all(
             current.arrival_time <= following.departure_time
             for current, following in pairwise(movements)
         )
 
-    assert voyages_with_schedules
+    assert voyages_with_multiple_movements

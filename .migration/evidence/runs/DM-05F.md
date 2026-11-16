@@ -15,3 +15,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T20:42:17+00:00 | idiom-format | 1 | 0.02 | `ruff format --check` | `035cf9fe4f3afe99` |  |  |
 | 2026-11-16T20:42:28+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `9eb349efea514fbe` |  |  |
 | 2026-11-16T20:42:32+00:00 | invariants | 0 | 1.61 | `pytest -q tests/data_migration/test_invariants.py` | `43885598a71d1469` |  |  |
+| 2026-11-16T20:43:26+00:00 | invariants | 0 | 1.68 | `pytest -q tests/data_migration/test_invariants.py` | `9bed9041f3a97041` |  |  |
+| 2026-11-16T20:43:29+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T20:43:33+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `9eb349efea514fbe` |  |  |
