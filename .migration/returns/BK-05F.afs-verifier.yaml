@@ -1,0 +1,27 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/646
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no-mutable-code-changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+mutation_survivor_assessment: >-
+  None of the nine survivors affects the required same-version flow. #1 and #2 alter the opaque
+  token signature because both render and assignment use the same salt; they could invalidate an
+  already-rendered form across a deployment, but tokens are not persisted and cross-deployment
+  form compatibility is not in this ticket. #10, #13, #27, and #46 alter Http404 exception text,
+  not the normal 404 response. #14 leaves the redirect unchanged because X is URL-unreserved.
+  #40 changes one invalid-token input to another that is caught as the same 404. #44 changes a
+  BadSignature diagnostic that is caught as the same 404.
