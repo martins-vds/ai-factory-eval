@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}{{ about.title }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl py-8">
+  <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A place for curious readers</p>
+  <h1 class="mb-8 mt-3 text-5xl md:text-6xl">{{ about.title }}</h1>
+  <p class="text-2xl leading-relaxed">A neighborhood collection, kept in motion by the people who read it.</p>
+  <div class="card mt-8 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body space-y-3">
+      <p>{{ about.opening_hours }}</p>
+      <p>{{ about.lending_policy }}</p>
+      <p>Contact: <a class="link link-hover" href="mailto:{{ about.contact_email }}">{{ about.contact_email }}</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}
