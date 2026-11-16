@@ -10,7 +10,7 @@ import pytest
 from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
-from cargotracker.cargo.infrastructure.models import CargoRecord, LegRecord
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -119,11 +119,14 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(tmp_path):
         )
 
         assert derived_delivery.eta.date() == cargo.delivery.eta.date()
-        assert replace(
-            derived_delivery,
-            eta=cargo.delivery.eta,
-            last_event_id=history.most_recent_event_id,
-        ) == cargo.delivery
+        assert (
+            replace(
+                derived_delivery,
+                eta=cargo.delivery.eta,
+                last_event_id=history.most_recent_event_id,
+            )
+            == cargo.delivery
+        )
 
 
 @pytest.mark.django_db(transaction=True)
@@ -149,9 +152,7 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(tmp_pat
     location_ids = set(LocationRecord.objects.values_list('id', flat=True))
 
     assert events
-    assert all(
-        event.voyage_id is None or event.voyage_id in voyage_ids for event in events
-    )
+    assert all(event.voyage_id is None or event.voyage_id in voyage_ids for event in events)
     assert all(event.location_id in location_ids for event in events)
 
 
