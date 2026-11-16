@@ -23,9 +23,11 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_returning_a_loan_sets_today_and_returns_its_api_record
+  - tests/loans/test_circulation.py::test_return_response_matches_the_characterized_http_golden
   - tests/loans/test_circulation.py::test_repeated_api_return_preserves_the_original_return_date
   - tests/loans/test_circulation.py::test_browser_return_updates_the_record_and_hides_the_return_action
   - tests/loans/test_circulation.py::test_browser_repeat_return_is_rejected_without_changing_the_date
+  - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
   - tests/loans/test_circulation.py::test_return_routes_reject_get_requests_without_mutating_the_loan
 notes: "Approved ruling in martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the first return date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

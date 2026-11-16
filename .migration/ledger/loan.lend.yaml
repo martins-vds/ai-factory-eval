@@ -27,10 +27,13 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_lending_creates_a_fourteen_day_loan_and_returns_its_api_record
+  - tests/loans/test_circulation.py::test_lending_response_matches_the_characterized_http_golden
   - tests/loans/test_circulation.py::test_lending_preserves_whitespace_around_nonblank_fields
   - tests/loans/test_circulation.py::test_api_lending_rejects_missing_and_blank_fields
+  - tests/loans/test_circulation.py::test_blank_lending_applies_the_approved_fix_to_characterized_success
   - tests/loans/test_circulation.py::test_browser_lending_creates_a_loan_and_redirects_to_its_record
   - tests/loans/test_circulation.py::test_browser_lending_shows_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
   - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
 notes: "Approved rulings: martins-vds/ai-factory-synthetic-target#39 rejects blank fields; #43 escapes delimiters in exported fields."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
