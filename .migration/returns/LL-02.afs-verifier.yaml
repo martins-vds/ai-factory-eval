@@ -1,0 +1,33 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/620
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.957
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-20
+    what: "At the assigned snapshot 9ba2f981d0be, use cases import Django's clock and instantiate the concrete ORM repository instead of depending on application-owned ports wired at the composition root."
+  - severity: minor
+    where: src/loans/repository.py:17
+    what: "Removing transaction.atomic remains a survivor despite the new PostgreSQL transaction-boundary test; keep row-locking mutation evidence unresolved. Other survivors are inherited catalog template/context and route mutants (#1/#2, #4) plus LoanForm.Meta.model (#9), not demonstrated LL-02 behavior defects."
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_htmx_get_of_new_loan_page_returns_the_complete_page
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_repository_return_locks_and_updates_within_a_transaction
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
