@@ -28,5 +28,6 @@ evidence:
   - tests/fees/test_fees.py::test_fee_page_uses_reading_room_layout_and_htmx_payment_action
   - tests/fees/test_fees.py::test_ui_routes_return_not_found_for_unknown_loans
   - tests/fees/test_fees.py::test_fee_and_payment_routes_restrict_http_methods
+  - tests/fees/test_fees.py::test_browser_payment_redirect_keeps_loan_id_in_the_path
   - tests/fees/test_fees.py::test_real_browser_can_view_and_pay_a_late_fee
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."

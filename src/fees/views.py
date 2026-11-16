@@ -66,7 +66,7 @@ def payment_page(request, loan_id):
             {'succeeded': succeeded, 'message': message},
         )
     if succeeded:
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect('ui-fee-page', loan_id=loan_id)
     fee = fee_application.fee(loan_id)
     return render(
         request,

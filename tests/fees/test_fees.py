@@ -3,6 +3,7 @@ from datetime import timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 from typing import ClassVar
+from urllib.parse import quote
 
 import pytest
 from django.utils import timezone
@@ -243,6 +244,22 @@ def test_browser_payment_form_redirects_after_successful_charge(client, payment_
     assert response.status_code == 302
     assert response['Location'] == '/ui/fees/L1/'
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_browser_payment_redirect_keeps_loan_id_in_the_path(client, payment_gateway):
+    loan_id = 'L1?next=evil.example'
+    Loan.objects.create(
+        id=loan_id,
+        member='reader',
+        isbn='123',
+        lent_on=timezone.localdate(),
+    )
+
+    response = client.post(f'/ui/payments/{quote(loan_id, safe="")}/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L1%3Fnext=evil.example/'
 
 
 @pytest.mark.django_db
