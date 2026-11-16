@@ -80,3 +80,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-16T05:54:32+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T05:55:21+00:00 | build-compile | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T05:55:22+00:00 | build-django-check | 0 | 0.53 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T05:56:24+00:00 | behavior | 0 | 62.37 | `pytest -q` | `616b35742452d205` |  |  |
+| 2026-11-16T05:56:24+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T05:56:24+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T05:57:25+00:00 | crap-coverage | 0 | 60.64 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `584160adfb8b3076` |  |  |
+| 2026-11-16T05:57:25+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T05:57:25+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-16T05:57:25+00:00 | mutation-changed | 0 | 0.08 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T05:58:37+00:00 | regression | 0 | 71.39 | `pytest -q` | `8724555f1476de94` |  |  |
