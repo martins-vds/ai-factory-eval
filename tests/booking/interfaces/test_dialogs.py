@@ -111,6 +111,26 @@ def test_deadline_dialog_shows_current_deadline_and_reports_invalid_input(client
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_invalid_destination_is_rejected_without_changing_cargo(client):
+    call_command('seed_sample_data')
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'CNHKG', 'action': 'update'},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert 'id="destination-error"' in response.content.decode()
+    assert updated == original
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_destination_update_completes_dialog_and_refreshes_not_routed_row(client):
     call_command('seed_sample_data')
     original = cargo_repository.find(TrackingId('DEF789'))
@@ -132,7 +152,10 @@ def test_destination_update_completes_dialog_and_refreshes_not_routed_row(client
     assert updated.route_specification.destination == DjangoLocationRepository().find(
         UnLocode('USNYC')
     )
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
 
     refreshed = client.get('/admin/dashboard/').content.decode()
     not_routed_table = refreshed.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
@@ -167,3 +190,32 @@ def test_deadline_update_keeps_other_route_fields_and_redirects_to_refreshed_das
     refreshed = client.get('/admin/dashboard/').content.decode()
     not_routed_table = refreshed.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
     assert '11/20/2030' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_cancel_closes_dialog_without_changing_cargo(client):
+    call_command('seed_sample_data')
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    for dialog in ('destination', 'deadline'):
+        response = client.post(
+            f'/admin/cargo/DEF789/{dialog}/',
+            {'action': 'cancel'},
+            HTTP_HX_REQUEST='true',
+        )
+        assert response.status_code == 200
+        assert response['HX-Redirect'] == '/admin/dashboard/'
+
+    assert cargo_repository.find(TrackingId('DEF789')) == original
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_return_not_found_for_unknown_cargo(client):
+    call_command('seed_sample_data')
+
+    for dialog in ('destination', 'deadline'):
+        response = client.get(f'/admin/cargo/MISSING1/{dialog}/')
+        assert response.status_code == 404

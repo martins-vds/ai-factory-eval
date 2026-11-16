@@ -75,11 +75,7 @@ def create_booking_dialog_views(
                 return _complete_dialog(request)
             destination_code = request.POST.get('destination', '')
             selected_destination = next(
-                (
-                    location
-                    for location in locations
-                    if location.unlocode.value == destination_code
-                ),
+                (location for location in locations if location.unlocode.value == destination_code),
                 None,
             )
             if selected_destination is None:
