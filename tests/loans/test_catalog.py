@@ -5,10 +5,11 @@ from pathlib import Path
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -22,6 +23,29 @@ HTTP_GOLDENS = json.loads(
         else Path(__file__).parent / 'fixtures/http.json'
     ).read_text(encoding='utf-8')
 )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_repository_owns_transaction_for_row_lock():
+    Loan.objects.create(
+        id='L11',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+
+    assert connection.get_autocommit()
+    assert not connection.in_atomic_block
+
+    def assert_atomic(execute, sql, params, many, context):
+        assert connection.in_atomic_block
+        return execute(sql, params, many, context)
+
+    with connection.execute_wrapper(assert_atomic):
+        loan, updated = LoanRepository().mark_returned('L11', date(2026, 3, 2))
+
+    assert updated
+    assert loan.returned_on == date(2026, 3, 2)
 
 
 @pytest.mark.django_db
@@ -101,6 +125,7 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'isbn': '123'}, 'member'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -112,6 +137,13 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, payload, field):
     assert response['Content-Type'] == 'text/plain'
     assert field.encode() in response.content
     assert Loan.objects.count() == 3
+
+
+def test_loan_form_requires_member_and_isbn_fields():
+    form = LoanForm(data={})
+
+    assert not form.is_valid()
+    assert set(form.errors) == {'member', 'isbn'}
 
 
 @pytest.mark.django_db
@@ -217,6 +249,25 @@ def test_detail_export_quotes_delimiters_quotes_and_line_breaks(client):
 
 
 @pytest.mark.django_db
+def test_list_export_quotes_delimiters_quotes_and_line_breaks(client):
+    Loan.objects.create(
+        id='L9',
+        member='Reader; Example\nSecond line',
+        isbn='978"xyz',
+        lent_on=date(2026, 3, 1),
+    )
+
+    response = client.get('/loans')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert (
+        'L9;"Reader; Example\nSecond line";"978""xyz";2026-03-01;2026-03-15;\n'
+        in response.content.decode()
+    )
+
+
+@pytest.mark.django_db
 def test_model_enforces_required_fields_and_source_string_limits():
     with pytest.raises(ValidationError) as missing_fields:
         Loan(id='L9', member='', isbn='', lent_on=date(2026, 3, 1)).full_clean()
@@ -318,6 +369,7 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -424,7 +476,18 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert 'Loan record · L2'.encode() in response.content
+    assert 'bo · ISBN 9780596007126'.encode() in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db

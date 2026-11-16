@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/665
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.974
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: "Survivors #1/#2 in src/loans/views.py:17 and #4 in src/loans/urls.py:9 affect only the prior /ui/loans/ catalog view; the full-suite browser smoke test covers that route, and no LL-02 survivor remains."
+tests_added:
+  - test_loan_form_requires_member_and_isbn_fields
+  - test_list_export_quotes_delimiters_quotes_and_line_breaks
+  - test_browser_return_page_returns_not_found_for_unknown_loan
+  - test_return_repository_owns_transaction_for_row_lock
+  - test_lend_endpoint_rejects_missing_or_blank_fields
+  - test_browser_lending_page_shows_errors_for_blank_fields
+  - test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
