@@ -32,3 +32,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T02:20:33+00:00 | verify-details-branches | 1 | 2.89 | `pytest -q tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_offer_reroute tests/booking/interfaces/test_cargo_details.py::test_unknown_and_stale_cargo_details_return_http_404` | `7aad5d9f1a708e10` | assert cargo.delivery.routing_status is RoutingStatus.MISROUTED |  |
 | 2026-11-16T02:21:42+00:00 | verify-behavior-final | 1 | 61.97 | `pytest -q` | `417d9448227475ac` | assert cargo.delivery.routing_status is RoutingStatus.MISROUTED |  |
 | 2026-11-16T02:22:52+00:00 | verify-regression-final | 1 | 70.0 | `pytest -q` | `1771176bc5c87c69` | assert cargo.delivery.routing_status is RoutingStatus.MISROUTED |  |
+| 2026-11-16T02:24:57+00:00 | verify-build-final-compileall | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:24:57+00:00 | verify-build-final-check | 0 | 0.39 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T02:24:57+00:00 | verify-idiom-final-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T02:24:58+00:00 | verify-idiom-final-format | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |

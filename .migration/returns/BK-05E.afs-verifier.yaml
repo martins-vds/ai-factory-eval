@@ -1,0 +1,39 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/467
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+  - .migration/evidence/mutants/BK-05E.md
+findings:
+  - severity: major
+    where: templates/booking/cargo_details.html:22
+    what: A route-specification mismatch has routing_status MISROUTED but misdirected false; the required reroute action is hidden.
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:38
+    what: Unknown and stale IDs return a generic 404 body, not the approved cargo-not-found message required by rulings #232 and #12.
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:14
+    what: Interface views query CargoRepository directly and partition cargo, bypassing the application layer required by ADR-0001.
+  - severity: minor
+    where: src/cargotracker/data_migration/loader.py:172
+    what: _prepare_tables has CRAP 26.0 and CCN 26; split table validation from reference resolution in a separate ticket, not BK-05E.
+  - severity: minor
+    where: templates/booking/dashboard/not_routed_table.html:24
+    what: Possible duplicate origin, destination, and deadline markup with claimed_table.html; consider a shared template fragment.
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_offer_reroute
+  - tests/booking/interfaces/test_cargo_details.py::test_unknown_and_stale_cargo_details_return_http_404
+ledger_issues:
+  - booking.screen-cargo-details is marked migrated although the misrouted-details reroute test fails.
+  - booking.cargo-not-found is marked migrated although the approved cargo-not-found message is absent from the 404 response.
+quirk_tickets: []
+handoff: none
