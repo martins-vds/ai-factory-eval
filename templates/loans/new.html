@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
+      <h1 class="card-title mt-2 text-4xl">Lend a book</h1>
+      <p class="mt-2 text-[#66705b]">Books are lent for 14 days.</p>
+      <form method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="body" hx-swap="innerHTML" hx-push-url="true" class="mt-6 space-y-4">
+        {% csrf_token %}
+        <label class="form-control">
+          <span class="label-text mb-1">Member name</span>
+          <input class="input input-bordered" name="member" value="{{ form.member.value|default_if_none:'' }}" autocomplete="name" required>
+          {% if form.member.errors %}<span class="text-sm text-red-700" role="alert">{{ form.member.errors|join:", " }}</span>{% endif %}
+        </label>
+        <label class="form-control">
+          <span class="label-text mb-1">ISBN</span>
+          <input class="input input-bordered" name="isbn" value="{{ form.isbn.value|default_if_none:'' }}" required>
+          {% if form.isbn.errors %}<span class="text-sm text-red-700" role="alert">{{ form.isbn.errors|join:", " }}</span>{% endif %}
+        </label>
+        <button class="btn bg-[#a94e37] text-white">Create 14-day loan</button>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}

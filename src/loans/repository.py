@@ -10,6 +10,19 @@ class LoanRepository:
     def find(self, loan_id):
         return Loan.objects.filter(pk=loan_id).first()
 
+    def lend(self, member, isbn, lent_on):
+        loan_id = f'L{self.all().count() + 1}'
+        return self.create(id=loan_id, member=member, isbn=isbn, lent_on=lent_on)
+
+    @transaction.atomic
+    def mark_returned(self, loan_id, returned_on):
+        loan = Loan.objects.select_for_update().filter(pk=loan_id).first()
+        if loan is None or loan.returned_on is not None:
+            return loan, False
+        loan.returned_on = returned_on
+        loan.save(update_fields=['returned_on'])
+        return loan, True
+
     @transaction.atomic
     def create(self, **fields):
         return Loan.objects.create(**fields)
