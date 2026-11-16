@@ -7,9 +7,11 @@ source:
   flow: View About Page
   location: legacy/src/main/resources/static/about.html:1-9
   risk: {crap: 1, complexity: 1, coverage: 1.0}
-boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "GET /about preserves the packaged static HTML response exactly; GET /ui/about/ renders the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#586]
+target:
+  components: [src.library_info.urls, src.library_info.views.public_about, src.library_info.views.about_page, templates/library_info/public_about.html, templates/library_info/about.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-04.md, tests/library_info/test_about_page.py::test_about_endpoint_matches_characterized_page, tests/library_info/test_about_page.py::test_about_page_presents_library_information, tests/library_info/test_about_page.py::test_about_routes_only_accept_get, tests/library_info/test_about_page.py::test_about_page_renders_in_a_browser]

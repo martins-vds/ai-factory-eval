@@ -4,10 +4,10 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import sync_playwright
 
-HTTP_GOLDEN_PATH = (
+ABOUT_HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )
-HTTP_GOLDENS = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))
+HTTP_GOLDENS = json.loads(ABOUT_HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))
 
 
 def test_about_endpoint_matches_characterized_page(client):
