@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -112,6 +113,13 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, payload, field):
     assert response['Content-Type'] == 'text/plain'
     assert field.encode() in response.content
     assert Loan.objects.count() == 3
+
+
+def test_loan_form_requires_member_and_isbn_fields():
+    form = LoanForm(data={})
+
+    assert not form.is_valid()
+    assert set(form.errors) == {'member', 'isbn'}
 
 
 @pytest.mark.django_db
@@ -318,6 +326,7 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -424,7 +433,18 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert 'Loan record · L2'.encode() in response.content
+    assert 'bo · ISBN 9780596007126'.encode() in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db
@@ -455,3 +475,18 @@ def test_repository_write_rolls_back_failed_transaction():
         )
 
     assert Loan.objects.get(pk='L1').member == 'ana'
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_repository_owns_transaction_for_row_lock():
+    Loan.objects.create(
+        id='L11',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+
+    loan, updated = LoanRepository().mark_returned('L11', date(2026, 3, 2))
+
+    assert updated
+    assert loan.returned_on == date(2026, 3, 2)
