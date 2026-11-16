@@ -38,3 +38,16 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T20:50:31+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-16T20:50:39+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `c7a0bcb17dd5241a` |  |  |
 | 2026-11-16T20:50:57+00:00 | export-tests-roundtrip | 0 | 1.28 | `python -m pytest -q tests/data_migration/test_export.py` | `f9d3ad9faf72bf2b` |  |  |
+| 2026-11-16T20:52:15+00:00 | build-compile | 0 | 0.02 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:52:20+00:00 | build-check | 0 | 0.24 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T20:52:23+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T20:52:27+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `c7a0bcb17dd5241a` |  |  |
+| 2026-11-16T20:52:58+00:00 | regression | 0 | 27.51 | `pytest -q` | `cb6efec6f33ff914` |  |  |
+| 2026-11-16T20:53:30+00:00 | crap-coverage | 0 | 27.47 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `691ee9be9ef31574` |  |  |
+| 2026-11-16T20:53:35+00:00 | crap-lizard | 0 | 0.08 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:53:39+00:00 | crap-report | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `468a2d2fb8a44d74` |  | gate=crap max=26.0 threshold=30 over=0 methods=184 |
+| 2026-11-16T21:06:44+00:00 | snapshot-check | 0 | 0.04 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-16T21:06:49+00:00 | snapshot-load | 0 | 0.24 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
+| 2026-11-16T21:06:53+00:00 | snapshot-export | 0 | 0.26 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out /tmp/dm05d-target-export` | `ba754ea10ff616fb` |  |  |
+| 2026-11-16T21:06:58+00:00 | snapshot-reconcile | 0 | 0.04 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target /tmp/dm05d-target-export --mapping .migration/data/mapping.yaml --report /tmp/dm05d-reconciliation.md` | `0e5f155ede36068f` |  | gate=data-reconcile tables=6 rows=54 mismatched_tables=0 |
+| 2026-11-16T21:07:03+00:00 | restore-db | 0 | 0.23 | `python manage.py flush --noinput` | `e3b0c44298fc1c14` |  |  |
