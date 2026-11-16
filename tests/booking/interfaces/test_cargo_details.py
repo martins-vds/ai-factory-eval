@@ -1,5 +1,6 @@
 import pytest
 from django.core.management import call_command
+from django.http import Http404, HttpRequest
 from django.test import override_settings
 from django.urls import path
 
@@ -65,6 +66,8 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
     assert 'Cargo with tracking ID UNKNOWN not found.' in unknown_response.content.decode()
     assert stale_response.status_code == 404
     assert 'Cargo with tracking ID MNO456 not found.' in stale_response.content.decode()
+    with pytest.raises(Http404, match='Cargo with tracking ID UNKNOWN not found\\.'):
+        cargo_details_view(HttpRequest(), 'UNKNOWN')
 
 
 @pytest.mark.django_db
