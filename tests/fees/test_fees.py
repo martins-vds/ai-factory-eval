@@ -5,6 +5,7 @@ from pathlib import Path
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.fees.services import calculate_late_fee
 from src.fees.gateway import PaymentGatewayError, charge_loan
@@ -29,6 +30,16 @@ def gateway_server(monkeypatch):
             request_body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
             self.server.requests.append((self.command, self.path, request_body))
             self.send_response(self.server.response_status)
+            if self.server.response_status == 302:
+                self.send_header('Location', '/redirect-target')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            body = b'redirected\n'
+            self.server.requests.append((self.command, self.path, b''))
+            self.send_response(200)
             self.send_header('Content-Length', str(len(body)))
             self.end_headers()
             self.wfile.write(body)
@@ -129,11 +140,24 @@ def test_payment_api_does_not_call_gateway_for_unknown_loan(client, gateway_serv
     assert gateway_server.requests == []
 
 
-def test_payment_gateway_preserves_interrupted_call_as_cause(monkeypatch):
-    def interrupt(request):
-        raise InterruptedError('cancelled')
+@pytest.mark.django_db
+def test_payment_api_does_not_follow_gateway_redirect(client, gateway_server):
+    gateway_server.response_status = 302
+    gateway_server.response_body = b'redirect body\n'
 
-    monkeypatch.setattr('src.fees.gateway.urlopen', interrupt)
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'redirect body\n'
+    assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+def test_payment_gateway_preserves_interrupted_call_as_cause(monkeypatch):
+    class InterruptedOpener:
+        def open(self, request):
+            raise InterruptedError('cancelled')
+
+    monkeypatch.setattr('src.fees.gateway.build_opener', lambda *handlers: InterruptedOpener())
 
     with pytest.raises(PaymentGatewayError) as error:
         charge_loan('L1')
@@ -143,10 +167,11 @@ def test_payment_gateway_preserves_interrupted_call_as_cause(monkeypatch):
 
 @pytest.mark.django_db
 def test_payment_api_surfaces_interrupted_call_as_gateway_failure(client, monkeypatch):
-    def interrupt(request):
-        raise InterruptedError('cancelled')
+    class InterruptedOpener:
+        def open(self, request):
+            raise InterruptedError('cancelled')
 
-    monkeypatch.setattr('src.fees.gateway.urlopen', interrupt)
+    monkeypatch.setattr('src.fees.gateway.build_opener', lambda *handlers: InterruptedOpener())
 
     response = client.post('/payments/L1')
 
@@ -175,3 +200,26 @@ def test_htmx_payment_action_returns_success_status(client, gateway_server):
     assert b'role="status"' in response.content
     assert b'Payment received for loan L1.' in response.content
     assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_real_browser_can_view_and_pay_late_fee(live_server, gateway_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            assert page.get_by_role('heading', name='Late fee for L3').is_visible()
+            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
+
+            page.get_by_role('button', name='Pay late fee').click()
+
+            if htmx_available:
+                page.get_by_role('status').wait_for()
+                assert page.get_by_role('status').inner_text() == 'Payment received for loan L3.'
+            else:
+                page.wait_for_url('**/ui/fees/L3/')
+                assert page.get_by_role('heading', name='Late fee for L3').is_visible()
+            assert gateway_server.requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()
