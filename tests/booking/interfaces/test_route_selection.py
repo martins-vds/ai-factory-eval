@@ -78,6 +78,14 @@ def _candidate_paths():
     )
 
 
+def _assert_no_route_guidance(content, guidance):
+    assert re.search(
+        rf'<p class="my-6" role="status">\s*'
+        rf'No routes found that satisfy the route specification\. {re.escape(guidance)}\s*</p>',
+        content,
+    )
+
+
 def _create_cargo(paths):
     for location in (ORIGIN, TRANSFER, DESTINATION):
         LocationRecord.objects.create(
@@ -125,14 +133,15 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert itinerary_response.status_code == 200
     route_content = route_response.content.decode()
     itinerary_content = itinerary_response.content.decode()
-    assert 'No routes found that satisfy the route specification.' in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
-    assert 'No routes found that satisfy the route specification.' in itinerary_content
-    assert (
-        'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
+    _assert_no_route_guidance(
+        route_content,
+        'Try setting an arrival deadline further into the future.',
+    )
+    _assert_no_route_guidance(
+        itinerary_content,
+        'Try setting the arrival deadline further into the future (a few weeks at least).',
     )
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
