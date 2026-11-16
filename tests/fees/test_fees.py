@@ -1,7 +1,8 @@
-from datetime import timedelta
 import urllib.request
+from datetime import timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+from typing import ClassVar
 
 import pytest
 from django.utils import timezone
@@ -13,7 +14,7 @@ from src.loans.models import Loan
 @pytest.fixture
 def payment_gateway(monkeypatch):
     class GatewayHandler(BaseHTTPRequestHandler):
-        requests = []
+        requests: ClassVar[list[tuple[str, str, bytes]]] = []
         status = 200
         response_body = b'charged\n'
 

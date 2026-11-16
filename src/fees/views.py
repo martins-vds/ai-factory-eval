@@ -5,28 +5,21 @@ from django.shortcuts import redirect, render
 from django.utils.html import format_html
 from django.views.decorators.http import require_GET, require_POST
 
-from src.loans.models import Loan
-
-from .gateway import (
-    PaymentGatewayInterrupted,
-    PaymentGatewayUnavailable,
-    charge_loan,
-)
-from .services import calculate_late_fee
+from .composition import fee_application
+from .services import PaymentGatewayInterrupted
 
 logger = logging.getLogger(__name__)
 
 
 @require_GET
 def late_fee(request, loan_id):
-    loan = Loan.objects.filter(pk=loan_id).first()
-    if loan is None:
+    fee = fee_application.fee(loan_id)
+    if fee is None:
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
-    fee = calculate_late_fee(loan)
     body = format_html(
         '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: ${}</p>',
-        loan.id,
+        fee.loan_id,
         fee.due_on.isoformat(),
         fee.days_late,
         format(fee.amount, '.2f'),
@@ -36,24 +29,11 @@ def late_fee(request, loan_id):
 
 @require_POST
 def payment(request, loan_id):
-    if not Loan.objects.filter(pk=loan_id).exists():
+    result = fee_application.pay(loan_id)
+    if result is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
 
-    try:
-        result = charge_loan(loan_id)
-    except PaymentGatewayInterrupted:
-        logger.exception('Payment gateway request was interrupted')
-        return HttpResponse(
-            'payment gateway unavailable\n',
-            status=502,
-            content_type='text/plain',
-        )
-    except PaymentGatewayUnavailable:
-        return HttpResponse(
-            'payment gateway unavailable\n',
-            status=502,
-            content_type='text/plain',
-        )
+    _log_interruption(result)
     return HttpResponse(
         result.body,
         status=result.status_code,
@@ -63,37 +43,22 @@ def payment(request, loan_id):
 
 @require_GET
 def late_fee_page(request, loan_id):
-    loan = Loan.objects.filter(pk=loan_id).first()
-    if loan is None:
+    fee = fee_application.fee(loan_id)
+    if fee is None:
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
-    return render(
-        request,
-        'fees/page.html',
-        {'loan': loan, 'fee': calculate_late_fee(loan)},
-    )
+    return render(request, 'fees/page.html', {'fee': fee})
 
 
 @require_POST
 def payment_page(request, loan_id):
-    loan = Loan.objects.filter(pk=loan_id).first()
-    if loan is None:
+    result = fee_application.pay(loan_id)
+    if result is None:
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
-    try:
-        result = charge_loan(loan_id)
-    except PaymentGatewayInterrupted:
-        logger.exception('Payment gateway request was interrupted')
-        result = None
-    except PaymentGatewayUnavailable:
-        result = None
-
-    succeeded = result is not None and result.status_code == 200
-    message = (
-        result.body.decode('utf-8', errors='replace').strip()
-        if result is not None
-        else 'payment gateway unavailable'
-    )
+    _log_interruption(result)
+    succeeded = result.status_code == 200
+    message = result.body.decode('utf-8', errors='replace').strip()
     if request.headers.get('HX-Request') == 'true':
         return render(
             request,
@@ -101,13 +66,22 @@ def payment_page(request, loan_id):
             {'succeeded': succeeded, 'message': message},
         )
     if succeeded:
-        return redirect(f'/ui/fees/{loan.id}/')
+        return redirect(f'/ui/fees/{loan_id}/')
+    fee = fee_application.fee(loan_id)
     return render(
         request,
         'fees/page.html',
         {
-            'loan': loan,
-            'fee': calculate_late_fee(loan),
+            'fee': fee,
             'payment_status': {'succeeded': False, 'message': message},
         },
     )
+
+
+def _log_interruption(result):
+    failure = result.failure
+    if isinstance(failure, PaymentGatewayInterrupted):
+        logger.error(
+            'Payment gateway request was interrupted',
+            exc_info=(type(failure), failure, failure.__traceback__),
+        )
