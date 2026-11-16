@@ -47,6 +47,13 @@ def test_monthly_report_handles_january_and_limits_fees_to_month_end(monkeypatch
         lent_on=date(2025, 12, 31),
         returned_on=date(2026, 1, 20),
     )
+    Loan.objects.create(
+        id='L20',
+        member='old-year',
+        isbn='10',
+        lent_on=date(2024, 12, 1),
+        returned_on=date(2024, 12, 16),
+    )
     output = StringIO()
 
     call_command('monthly_report', stdout=output)
