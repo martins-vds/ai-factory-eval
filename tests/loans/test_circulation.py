@@ -160,12 +160,19 @@ def test_browser_lending_creates_a_loan_and_redirects_to_its_record(client):
 
 
 @pytest.mark.django_db
-def test_browser_lending_shows_field_errors_for_blank_values(client):
-    response = client.post('/ui/loans/', {'member': ' ', 'isbn': '123'})
+@pytest.mark.parametrize(
+    ('fields', 'invalid_field'),
+    [
+        ({'member': ' ', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': '\t'}, 'isbn'),
+    ],
+)
+def test_browser_lending_shows_field_errors_for_blank_values(client, fields, invalid_field):
+    response = client.post('/ui/loans/', fields)
 
     assert response.status_code == 400
-    assert b'name="member"' in response.content
     assert b'This field is required.' in response.content
+    assert set(response.context['form'].errors) == {invalid_field}
 
 
 @pytest.mark.django_db
