@@ -1,0 +1,29 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: martins-vds/ai-factory-eval#432
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.889
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: minor
+    where: tests/conftest.py:6
+    what: Full ruff format --check fails on this pre-existing blank line; the changed BK-05G test file passes its targeted format check.
+  - severity: major
+    where: .github/workflows/afs-harness-check.yml (run 42439236304)
+    what: The target PR's latest AFS harness check failed because its head did not contain the current stacked base; the failure is a branch-base blocker, not a dialog behavior defect.
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_returns_not_found
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-pilot-target#232
+  - martins-vds/ai-factory-pilot-target#234
+  - martins-vds/ai-factory-pilot-target#235
+  - martins-vds/ai-factory-pilot-target#251

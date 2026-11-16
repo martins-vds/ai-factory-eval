@@ -1,0 +1,27 @@
+[
+  {
+    "at": "2026-11-15T23:59:06Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 0,
+    "prompt_from": "none",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05G-spec-review",
+    "role": null,
+    "changed": [
+      ".migration/evidence/runs/BK-05G-spec-review.md",
+      ".migration/evidence/runs/BK-05G.md",
+      "tests/booking/interfaces/test_dialogs.py"
+    ],
+    "decision": "allow",
+    "why": "no ticket/role for this session"
+  }
+]
