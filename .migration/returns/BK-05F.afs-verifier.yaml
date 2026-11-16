@@ -1,0 +1,22 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/514
+verdict: blocked
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: blocker
+    where: /home/runner/work/ai-factory-pilot-target/ai-factory-pilot-target
+    what: Target checkout is absent; the required profile gates could not be rerun on BK-05F code.
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+handoff: .migration/handoffs/BK-05F.md
