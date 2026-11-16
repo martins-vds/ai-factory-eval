@@ -25,3 +25,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T04:25:22+00:00 | export-survivor-tests | 0 | 2.03 | `python -m pytest -q tests/data_migration/test_export.py` | `7edfb975894be936` |  |  |
 | 2026-11-16T04:25:31+00:00 | survivor-tests-lint | 0 | 0.01 | `ruff check src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-16T04:25:31+00:00 | survivor-tests-format | 0 | 0.01 | `ruff format --check src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-16T04:26:48+00:00 | mutation-changed-final | 0 | 60.77 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `87d10758bc49d1c5` |  | gate=mutation score=0.836 threshold=0.8 killed=46 survived=9 files=1 base=origin/main |
+| 2026-11-16T04:28:09+00:00 | behavior-final | 0 | 58.5 | `pytest -q` | `d4857502e08a91db` |  |  |
+| 2026-11-16T04:29:20+00:00 | regression | 0 | 66.1 | `pytest -q` | `07be86d797daacd6` |  |  |
