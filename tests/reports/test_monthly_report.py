@@ -43,7 +43,27 @@ def test_monthly_report_summarizes_prior_month_returns_and_orders_by_fees_then_m
         ['member_id', 'loans_started', 'loans_returned_late', 'total_late_fees_cents'],
         ['alpha', '1', '1', '675'],
         ['bravo', '1', '1', '575'],
-        ['beta', '1', '0', '0'],
+        ['beta', '1', '1', '0'],
         ['delta', '1', '0', '0'],
         ['echo', '1', '0', '0'],
+    ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_handles_year_boundary_and_caps_late_fees(monkeypatch):
+    monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 1, 1))
+    create_loan('old-capped', 'capped', date(2025, 11, 1), date(2025, 12, 30))
+    create_loan('start-capped', 'capped', date(2025, 12, 31))
+    create_loan('old-boundary', 'boundary', date(2025, 11, 1), date(2026, 1, 1))
+    create_loan('start-boundary', 'boundary', date(2025, 12, 1))
+    create_loan('old-only', 'excluded', date(2025, 11, 1), date(2025, 12, 30))
+
+    output = StringIO()
+    call_command('monthly_report', stdout=output)
+
+    assert list(csv.reader(StringIO(output.getvalue()))) == [
+        ['member_id', 'loans_started', 'loans_returned_late', 'total_late_fees_cents'],
+        ['capped', '1', '1', '1000'],
+        ['boundary', '1', '0', '0'],
+        ['cy', '1', '0', '0'],
     ]
