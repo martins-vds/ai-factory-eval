@@ -61,4 +61,3 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.907, thr
        def add_arguments(self, parser):
            parser.add_argument('--mapping', required=True)
   ```
-
