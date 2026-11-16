@@ -233,9 +233,7 @@ def test_payment_gateway_uses_the_default_url_when_unconfigured(monkeypatch):
     response = HttpPaymentGateway().charge('L1')
 
     assert response.body == 'charged\n'
-    assert requests == [
-        ('POST', 'https://payments.lending-library.invalid/charge?loan=L1')
-    ]
+    assert requests == [('POST', 'https://payments.lending-library.invalid/charge?loan=L1')]
 
 
 @pytest.mark.django_db
