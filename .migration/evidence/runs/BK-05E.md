@@ -29,3 +29,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T05:58:32+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
 | 2026-11-16T06:07:45+00:00 | mutation-changed | 0 | 553.64 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
 | 2026-11-16T06:08:44+00:00 | regression | 0 | 59.17 | `pytest -q` | `260b539e3f05f73a` |  |  |
+| 2026-11-16T06:12:32+00:00 | verifier-details-404 | 0 | 1.52 | `pytest -q tests/booking/interfaces/test_cargo_details.py::test_unknown_cargo_details_raise_the_existing_not_found_error` | `a960fa6c12c4514f` |  |  |
+| 2026-11-16T06:12:32+00:00 | verifier-ruff-check | 1 | 0.01 | `ruff check` | `2cf6ba5b09623b29` | Found 1 error. |  |
+| 2026-11-16T06:12:49+00:00 | verifier-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T06:12:49+00:00 | verifier-ruff-format | 0 | 0.02 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-16T06:13:48+00:00 | behavior-after-verifier-test | 0 | 58.85 | `pytest -q` | `fa83975a37df47b6` |  |  |
+| 2026-11-16T06:23:02+00:00 | mutation-changed-after-verifier-test | 0 | 553.3 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `9a01a6f1f3dc65dd` |  | gate=mutation score=0.922 threshold=0.8 killed=249 survived=21 files=4 base=origin/main |
+| 2026-11-16T06:23:57+00:00 | regression-after-verifier-test | 0 | 55.57 | `pytest -q` | `e9dc6628498c7942` |  |  |

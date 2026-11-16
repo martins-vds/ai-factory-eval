@@ -1,6 +1,7 @@
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
@@ -63,3 +64,13 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+
+
+def test_unknown_cargo_details_raise_the_existing_not_found_error():
+    repository.missing_tracking_ids.add('UNKNOWN')
+
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        cargo_details_view(
+            RequestFactory().get('/admin/cargo/UNKNOWN/'),
+            'UNKNOWN',
+        )
