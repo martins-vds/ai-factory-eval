@@ -78,3 +78,13 @@ def test_saved_loan_is_available_to_later_api_requests(client):
 @pytest.mark.django_db
 def test_admin_login_route_is_not_available(client):
     assert client.get('/admin/login/').status_code == 404
+
+
+@pytest.mark.django_db
+def test_ui_loan_page_displays_the_catalog_record(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'Loan L1' in response.content
+    assert b'ana' in response.content
+    assert b'9780134685991' in response.content

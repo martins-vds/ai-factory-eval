@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog | The Lending Library{% endblock %}
+
+{% block content %}
+<main class="mx-auto max-w-6xl px-6 pb-20 pt-10">
+  <section class="grid gap-8 border-b border-[#d8cdbb] pb-10 md:grid-cols-[1fr_16rem] md:items-end">
+    <div>
+      <p class="text-xs uppercase tracking-[.2em] text-[#626858]">The collection · {{ loans|length }} loans in view</p>
+      <h1 class="mb-4 mt-3 text-5xl leading-tight tracking-tight sm:text-6xl">Books in good company.</h1>
+      <p class="max-w-2xl text-lg leading-relaxed text-[#626858]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    </div>
+    <aside class="border-l-2 border-[#a94e37] pl-5">
+      <p class="text-xs uppercase tracking-widest text-[#626858]">A lending note</p>
+      <p class="mt-2 text-2xl">Fourteen days</p>
+      <p class="mt-1 text-sm text-[#626858]">Every book finds its way back.</p>
+    </aside>
+  </section>
+
+  <section id="loan-list" class="pt-8" aria-labelledby="catalog-heading">
+    <div class="mb-2 flex flex-wrap items-center justify-between gap-3">
+      <h2 id="catalog-heading" class="text-2xl">On the shelves</h2>
+      <button class="btn btn-ghost btn-sm text-[#a94e37]" type="button" hx-get="/ui/loans/" hx-select="#loan-list" hx-target="#loan-list" hx-swap="outerHTML">
+        Refresh catalog
+      </button>
+    </div>
+    {% for loan in loans %}
+      <article class="grid gap-4 border-b border-[#d8cdbb] py-6 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <p class="mb-1 text-xs uppercase tracking-widest text-[#626858]">Catalog record {{ loan.pk }}</p>
+          <h3 class="text-2xl font-semibold">
+            <a class="text-[#2f3428] underline decoration-[#d8cdbb] underline-offset-4 hover:text-[#a94e37]" href="{% url 'ui-loan-detail' loan.pk %}">
+              Loan {{ loan.pk }}
+            </a>
+          </h3>
+          <p class="mt-2 text-[#626858]">{{ loan.member }} <span aria-hidden="true">·</span> ISBN {{ loan.isbn }}</p>
+        </div>
+        <div class="sm:text-right">
+          <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+          {% if loan.returned_on %}
+            <p class="mt-1 text-sm text-[#626858]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+          {% else %}
+            <p class="mt-1 text-sm text-[#a94e37]">Currently on loan</p>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <p class="border-b border-[#d8cdbb] py-8 text-[#626858]">The catalog is waiting for its first book.</p>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}
