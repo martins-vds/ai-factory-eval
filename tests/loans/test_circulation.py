@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 import pytest
+from django.test import Client
 from django.utils import timezone
 
 from src.loans.models import Loan
@@ -19,6 +20,30 @@ def test_lending_creates_a_durable_fourteen_day_loan(client):
     )
     assert client.get('/loans/L4').content == response.content
     assert Loan.objects.get(pk='L4').lent_on == today
+
+
+@pytest.mark.django_db
+def test_characterized_api_posts_work_without_browser_csrf_tokens():
+    api_client = Client(enforce_csrf_checks=True)
+
+    lending = api_client.post('/loans', {'member': 'dee', 'isbn': '123'})
+    returning = api_client.post('/loans/L1/return')
+
+    assert lending.status_code == 201
+    assert returning.status_code == 200
+
+
+@pytest.mark.parametrize(
+    ('path', 'data'),
+    [('/ui/loans/new/', {'member': 'dee', 'isbn': '123'}), ('/ui/loans/L1/return/', {})],
+)
+@pytest.mark.django_db
+def test_browser_actions_require_csrf_tokens(path, data):
+    browser_client = Client(enforce_csrf_checks=True)
+
+    response = browser_client.post(path, data)
+
+    assert response.status_code == 403
 
 
 @pytest.mark.parametrize(

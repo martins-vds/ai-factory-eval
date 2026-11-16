@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
 from .forms import LoanLendingForm
@@ -52,6 +53,8 @@ def loan_catalog_detail(request, loan_id):
     return render(request, 'loans/detail.html', {'loan': loan})
 
 
+# Keep the characterized public API usable without browser CSRF tokens.
+@csrf_exempt
 @require_http_methods(['GET', 'POST'])
 def loan_list(request):
     if request.method == 'POST':
@@ -72,13 +75,12 @@ def loan_detail(request, loan_id):
     return HttpResponse(body, content_type='text/plain')
 
 
+@csrf_exempt
 @require_POST
 def loan_return(request, loan_id):
     loan, marked_returned = return_loan(loan_id)
     if loan is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
     if not marked_returned:
-        return HttpResponse(
-            'loan already returned\n', status=409, content_type='text/plain'
-        )
+        return HttpResponse('loan already returned\n', status=409, content_type='text/plain')
     return HttpResponse(loan_line(loan), content_type='text/plain')
