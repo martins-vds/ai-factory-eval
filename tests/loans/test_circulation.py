@@ -26,8 +26,7 @@ def test_lending_preserves_whitespace_around_nonblank_fields(client):
 
     assert response.status_code == 201
     assert response.content.decode() == (
-        f'L4; dee ; 123 ;{lent_on.isoformat()};'
-        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+        f'L4; dee ; 123 ;{lent_on.isoformat()};{(lent_on + timedelta(days=14)).isoformat()};\n'
     )
 
 
@@ -158,9 +157,7 @@ def test_api_return_of_unknown_loan_preserves_the_characterized_response(client)
     ['/loans/L1/return', '/ui/loans/L1/return/'],
 )
 @pytest.mark.django_db
-def test_return_routes_reject_get_requests_without_mutating_the_loan(
-    client, return_path
-):
+def test_return_routes_reject_get_requests_without_mutating_the_loan(client, return_path):
     response = client.get(return_path)
 
     assert response.status_code == 405

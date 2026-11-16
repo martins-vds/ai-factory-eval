@@ -7,11 +7,25 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "A first successful return assigns today's date and persists the changed loan; a repeated return is rejected and retains the original date."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#662]
+target:
+  components:
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.services.return_loan
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_returning_a_loan_sets_today_and_returns_its_api_record
+  - tests/loans/test_circulation.py::test_repeated_api_return_preserves_the_original_return_date
+  - tests/loans/test_circulation.py::test_browser_return_updates_the_record_and_hides_the_return_action
+  - tests/loans/test_circulation.py::test_browser_repeat_return_is_rejected_without_changing_the_date
+  - tests/loans/test_circulation.py::test_return_routes_reject_get_requests_without_mutating_the_loan
+notes: "Approved ruling in martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the first return date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
