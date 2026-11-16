@@ -46,6 +46,7 @@
                   type="button"
                   hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                   hx-target="#booking-dialog-content"
+                  hx-select="unset"
                   hx-swap="innerHTML"
                 >Change destination</button>
                 <button
@@ -53,6 +54,7 @@
                   type="button"
                   hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                   hx-target="#booking-dialog-content"
+                  hx-select="unset"
                   hx-swap="innerHTML"
                 >Change deadline</button>
               </div>

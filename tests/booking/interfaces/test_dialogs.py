@@ -53,6 +53,7 @@ def test_not_routed_table_opens_dialogs_and_refreshes_after_dialog_completion(cl
     assert response.status_code == 200
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in content
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
+    assert content.count('hx-select="unset"') == 2
     assert 'id="booking-dialog-content"' in content
     assert 'hx-trigger="bookingCargoUpdated from:body"' in content
 

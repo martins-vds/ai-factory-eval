@@ -31,3 +31,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T02:27:40+00:00 | behavior-final | 0 | 50.05 | `pytest -q` | `9bf9500c8a9cfb48` |  |  |
 | 2026-11-16T02:28:29+00:00 | regression | 0 | 48.6 | `pytest -q` | `88b3bc189031fd26` |  |  |
 | 2026-11-16T02:32:31+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T02:34:30+00:00 | behavior-inherited-select-red | 1 | 1.96 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_dialogs_and_refreshes_after_dialog_completion` | `7cb20516bd4da060` | assert response.status_code == 200 |  |
+| 2026-11-16T02:34:44+00:00 | behavior-inherited-select-green | 0 | 1.97 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_dialogs_and_refreshes_after_dialog_completion` | `7edfb975894be936` |  |  |
