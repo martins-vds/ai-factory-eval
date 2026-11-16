@@ -67,8 +67,10 @@ def _prepare_tables(mapping, models):
 def _write_table(output_dir, target, model, columns, fields):
     path = output_dir / f'{target}.csv'
     values = [field.attname for field in fields]
-    rows = model._base_manager.order_by(model._meta.pk.name).values_list(*values).iterator(
-        chunk_size=1000
+    rows = (
+        model._base_manager.order_by(model._meta.pk.name)
+        .values_list(*values)
+        .iterator(chunk_size=1000)
     )
     count = 0
     try:
