@@ -7,11 +7,10 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from src.loans.services import LoanRecord
 
-
 DEFAULT_PAYMENT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
-@dataclass(frozen=True)
+@dataclass
 class GatewayResponse:
     status_code: int
     body: str
@@ -47,8 +46,10 @@ class HttpPaymentGateway:
                     status_code = response.status
                     body = response.read()
             except HTTPError as response:
-                status_code = response.code
-                body = response.read()
+                return GatewayResponse(
+                    status_code=502,
+                    body=response.read().decode('utf-8', errors='replace'),
+                )
         except (OSError, URLError) as error:
             raise PaymentGatewayUnavailable from error
 

@@ -2,8 +2,8 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.utils.html import format_html
 from django.utils import timezone
+from django.utils.html import format_html
 from django.views.decorators.http import require_GET, require_POST
 
 from src.loans.models import Loan
@@ -24,8 +24,7 @@ def fee_detail(request, loan_id):
     fee = calculate_late_fee(loan, timezone.localdate())
     amount = f'{fee.cents // 100}.{fee.cents % 100:02d}'
     body = format_html(
-        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-        '<p class="fee">Fee: ${}</p>',
+        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: ${}</p>',
         loan.id,
         loan.due_on.isoformat(),
         fee.days_late,
@@ -48,7 +47,6 @@ def fee_page(request, loan_id):
             'loan': loan,
             'fee': fee,
             'fee_amount': f'${fee.cents // 100}.{fee.cents % 100:02d}',
-            'payment_error': None,
         },
     )
 

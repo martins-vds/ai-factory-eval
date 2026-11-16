@@ -21,3 +21,4 @@ evidence:
   - tests/fees/test_fees.py::test_late_fee_observes_grace_period_and_cap
   - tests/fees/test_fees.py::test_late_fee_uses_return_date_instead_of_today
   - tests/fees/test_fees.py::test_late_fee_is_zero_when_due_date_has_not_passed
+  - tests/fees/test_fees.py::test_fee_pages_display_exact_amount_for_large_fee

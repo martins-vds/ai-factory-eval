@@ -10,7 +10,8 @@ source:
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-eval#752]
 target:
-  components: [src.fees.payments.HttpPaymentGateway, src.fees.payments.PaymentApplication, src.fees.views.payment]
+  components:
+    [src.fees.composition.payment_application, src.fees.payments.HttpPaymentGateway, src.fees.payments.PaymentApplication, src.fees.views.payment, src.fees.views.payment_page]
 status: migrated
 verification: differential
 characterization_tier: A
@@ -25,5 +26,6 @@ evidence:
   - tests/fees/test_fees.py::test_interrupted_payment_is_a_gateway_failure_and_remains_observable
   - tests/fees/test_fees.py::test_reading_room_payment_action_shows_gateway_success
   - tests/fees/test_fees.py::test_reading_room_payment_action_shows_gateway_failure
+  - tests/fees/test_fees.py::test_browser_can_view_and_pay_a_late_fee
 notes: "Decision martins-vds/ai-factory-synthetic-target#40 fixes swallowed interruptions: InterruptedError is retained as a chained cause and logged while the endpoint returns 502."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
