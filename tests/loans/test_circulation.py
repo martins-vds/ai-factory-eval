@@ -71,3 +71,33 @@ def test_return_api_returns_not_found_for_an_unknown_loan(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_lending_page_shows_field_errors_for_blank_values(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'reader', 'isbn': '   '},
+    )
+
+    assert response.status_code == 200
+    assert b'Enter an ISBN; blank values are not accepted.' in response.content
+    assert b'aria-invalid="true"' in response.content
+    assert b'hx-post="/ui/loans/new/"' in response.content
+    assert not Loan.objects.filter(pk='L4').exists()
+
+
+@pytest.mark.django_db
+def test_lending_page_creates_a_loan_and_returns_to_its_reading_room_detail(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'dee', 'isbn': '123'},
+    )
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L4/'
+    detail = client.get(response['Location'])
+
+    assert detail.status_code == 200
+    assert b'Loan record \xc2\xb7 L4' in detail.content
+    assert b'hx-post="/ui/loans/L4/return/"' in detail.content
