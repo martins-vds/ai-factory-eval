@@ -16,7 +16,7 @@ def test_lending_api_creates_and_formats_a_loan(client):
     assert response.content.decode() == f'L4;dee;123;{today};{due_on};\n'
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_return_api_records_and_formats_today(client):
     response = client.post('/loans/L1/return')
 
@@ -63,6 +63,9 @@ def test_reading_room_lists_lending_and_return_actions(client):
     assert b'action="/ui/loans/new/"' in response.content
     assert b'action="/ui/loans/L1/return/"' in response.content
     assert b'hx-boost="true"' in response.content
+    assert response.content.count(b'aria-invalid="false"') == 2
+    assert b'value=""' in response.content
+    assert b'role="status"' not in response.content
 
 
 @pytest.mark.django_db
@@ -85,6 +88,18 @@ def test_lending_api_rejects_blank_values_without_creating_a_loan(client):
     response = client.post('/loans', {'member': '  ', 'isbn': '123'})
 
     assert response.status_code == 400
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'member and isbn are required\n'
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.parametrize('form', [{'member': 'dee'}, {'isbn': '123'}])
+@pytest.mark.django_db
+def test_lending_api_rejects_missing_fields(client, form):
+    response = client.post('/loans', form)
+
+    assert response.status_code == 400
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'member and isbn are required\n'
     assert Loan.objects.count() == 3
 
@@ -118,6 +133,16 @@ def test_reading_room_lending_works_without_htmx(client):
 
 
 @pytest.mark.django_db
+def test_reading_room_shows_field_errors_for_missing_form_fields(client):
+    response = client.post('/ui/loans/new/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'Enter a member name; blank values are not accepted.' in response.content
+    assert b'Enter an ISBN; blank values are not accepted.' in response.content
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
 def test_reading_room_returns_once_and_keeps_the_original_date(client):
     response = client.post(
         '/ui/loans/L1/return/',
@@ -139,3 +164,35 @@ def test_reading_room_returns_once_and_keeps_the_original_date(client):
         f'L1 was already returned on {today}; repeat return rejected'.encode() in response.content
     )
     assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
+def test_reading_room_return_redirects_show_feedback(client):
+    response = client.post('/ui/loans/L1/return/', follow=True)
+
+    today = date.today()
+    assert response.status_code == 200
+    assert b'L1 marked returned today.' in response.content
+    assert Loan.objects.get(pk='L1').returned_on == today
+
+    response = client.post('/ui/loans/L1/return/', follow=True)
+
+    assert response.status_code == 200
+    assert (
+        f'L1 was already returned on {today}; repeat return rejected and original date retained.'.encode()
+        in response.content
+    )
+    assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
+def test_reading_room_rejects_get_return_and_unknown_loan(client):
+    get_response = client.get('/ui/loans/new/')
+    return_response = client.get('/ui/loans/L1/return/')
+    missing_response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert get_response.status_code == 405
+    assert return_response.status_code == 405
+    assert missing_response.status_code == 404
+    assert b'No such loan.' in missing_response.content
+    assert Loan.objects.get(pk='L1').returned_on is None

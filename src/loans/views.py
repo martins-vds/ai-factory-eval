@@ -18,10 +18,12 @@ def loan_catalog(request):
     elif returned:
         context['feedback'] = f'{returned} marked returned today.'
     elif already_returned:
-        context['feedback'] = (
-            f'{already_returned} was already returned; repeat return rejected '
-            'and original date retained.'
-        )
+        loan = Loan.objects.filter(pk=already_returned).first()
+        if loan is not None:
+            context['feedback'] = (
+                f'{loan.id} was already returned on {loan.returned_on}; '
+                'repeat return rejected and original date retained.'
+            )
     return render(request, 'loans/list.html', _loan_catalog_context(**context))
 
 
@@ -119,11 +121,6 @@ def loan_return_ui(request, loan_id):
 
 
 def _loan_catalog_context(**overrides):
-    context = {
-        'loans': Loan.objects.all(),
-        'form_values': {'member': '', 'isbn': ''},
-        'errors': {},
-        'feedback': '',
-    }
+    context = {'loans': Loan.objects.all()}
     context.update(overrides)
     return context
