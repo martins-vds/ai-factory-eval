@@ -1,0 +1,22 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/470
+verdict: blocked
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no-mutable-code-changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: blocker
+    where: .migration/evidence/runs/BK-05F.md
+    what: "Changed-code mutation could not be independently run: afs-mutation found no mutable code changed against origin/main; the target PR's gate check was skipped."
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
