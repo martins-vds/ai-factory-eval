@@ -53,7 +53,11 @@ def reset_repository():
 def test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_link(client):
     call_command('seed_sample_data')
     routed_cargo = repository.find(TrackingId('ABC123'))
+    not_routed_cargo = repository.find(TrackingId('DEF789'))
+    claimed_cargo = repository.find(TrackingId('MNO456'))
     assert routed_cargo is not None
+    assert not_routed_cargo is not None
+    assert claimed_cargo is not None
     cargo_with_unknown_last_location = replace(
         routed_cargo,
         delivery=replace(
@@ -62,11 +66,13 @@ def test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_
         ),
     )
     repository.ordered_cargos = [
-        repository.find(TrackingId(tracking_id)) for tracking_id in ('JKL567', 'DEF789')
+        replace(not_routed_cargo, tracking_id=TrackingId('DEF788')),
+        repository.find(TrackingId('JKL567')),
+        replace(claimed_cargo, tracking_id=TrackingId('MNO457')),
+        not_routed_cargo,
+        cargo_with_unknown_last_location,
+        claimed_cargo,
     ]
-    repository.ordered_cargos.extend(
-        (cargo_with_unknown_last_location, repository.find(TrackingId('MNO456')))
-    )
 
     response = client.get('/admin/dashboard/')
     content = response.content.decode()
@@ -81,8 +87,8 @@ def test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_
         < content.index('Claimed Cargo')
     )
     assert re.findall(r'data-tracking-id="([^"]+)"', routed_table) == ['JKL567', 'ABC123']
-    assert re.findall(r'data-tracking-id="([^"]+)"', not_routed_table) == ['DEF789']
-    assert re.findall(r'data-tracking-id="([^"]+)"', claimed_table) == ['MNO456']
+    assert re.findall(r'data-tracking-id="([^"]+)"', not_routed_table) == ['DEF788', 'DEF789']
+    assert re.findall(r'data-tracking-id="([^"]+)"', claimed_table) == ['MNO457', 'MNO456']
     assert routed_table.index('JKL567') < routed_table.index('ABC123')
     assert 'Origin' in routed_table and 'CNHKG' in routed_table
     assert 'Destination' in routed_table and 'FIHEL' in routed_table
@@ -90,9 +96,14 @@ def test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_
     assert 'XXXXX' not in routed_table
     assert 'Status' in routed_table and 'IN_PORT' in routed_table
     assert 'Deadline' in routed_table and re.search(r'\d{2}/\d{2}/\d{4}', routed_table)
+    assert not_routed_table.index('DEF788') < not_routed_table.index('DEF789')
     assert 'Hong Kong' in not_routed_table and 'Melbourne' in not_routed_table
     assert 'AUMEL' in not_routed_table and 'Deadline' in not_routed_table
+    assert re.search(r'\d{2}/\d{2}/\d{4}', not_routed_table)
+    assert claimed_table.index('MNO457') < claimed_table.index('MNO456')
     assert 'New York' in claimed_table and 'Dallas' in claimed_table
+    assert 'USNYC' in claimed_table and 'USDAL' in claimed_table
+    assert 'Deadline' in claimed_table and re.search(r'\d{2}/\d{2}/\d{4}', claimed_table)
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
     assert 'href="/admin/cargo/MNO456/"' in claimed_table
     assert 'title="Click to see details"' in claimed_table
