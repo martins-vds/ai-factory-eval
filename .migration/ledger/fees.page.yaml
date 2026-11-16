@@ -22,5 +22,11 @@ evidence:
   - .migration/characterization/source/goldens/browser.json
   - .migration/evidence/runs/LL-03.md
   - tests/fees/test_fees.py::test_fee_api_returns_the_characterized_html
+  - tests/fees/test_fees.py::test_fee_api_matches_the_source_golden_for_a_returned_loan
+  - tests/fees/test_fees.py::test_fee_api_matches_the_source_golden_for_a_capped_fee
   - tests/fees/test_fees.py::test_fee_api_returns_the_characterized_not_found_response
   - tests/fees/test_fees.py::test_reading_room_fee_page_shows_loan_fee_and_payment_action
+  - tests/fees/test_fees.py::test_reading_room_fee_page_shows_the_source_capped_amount
+  - tests/fees/test_fees.py::test_fee_api_rejects_non_get_methods
+  - tests/fees/test_fees.py::test_reading_room_fee_page_returns_not_found_for_an_unknown_loan
+  - tests/fees/test_fees.py::test_reading_room_fee_page_rejects_non_get_methods

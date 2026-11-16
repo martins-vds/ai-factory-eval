@@ -43,8 +43,7 @@ def fee_detail(request, loan_id):
     fee = calculate_late_fee(loan.due_on, loan.returned_on, timezone.localdate())
     return HttpResponse(
         format_html(
-            '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-            '<p class="fee">Fee: ${}</p>',
+            '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: ${}</p>',
             loan.id,
             loan.due_on.isoformat(),
             fee.days_late,

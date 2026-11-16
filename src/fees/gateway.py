@@ -2,7 +2,6 @@ import os
 from dataclasses import dataclass
 from urllib import error, request
 
-
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 

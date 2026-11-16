@@ -23,12 +23,16 @@ evidence:
   - .migration/evidence/runs/LL-03.md
   - tests/fees/test_payments.py::test_payment_api_posts_to_the_gateway_and_forwards_success
   - tests/fees/test_payments.py::test_payment_api_maps_gateway_failure_to_bad_gateway
+  - tests/fees/test_payments.py::test_payment_api_maps_successful_non_200_response_to_bad_gateway
   - tests/fees/test_payments.py::test_payment_api_does_not_follow_gateway_redirects
   - tests/fees/test_payments.py::test_payment_api_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_payments.py::test_ui_payment_does_not_call_gateway_for_an_unknown_loan
   - tests/fees/test_payments.py::test_payment_api_rejects_non_post_methods
   - tests/fees/test_payments.py::test_htmx_payment_uses_the_ui_path_and_returns_a_status_fragment
   - tests/fees/test_payments.py::test_htmx_payment_shows_gateway_failure
   - tests/fees/test_payments.py::test_regular_fee_payment_renders_a_full_page_result
   - tests/fees/test_payments.py::test_payment_api_returns_gateway_failure_when_connection_fails
+  - tests/fees/test_payments.py::test_payment_api_returns_gateway_failure_for_an_os_error
   - tests/fees/test_payments.py::test_payment_api_logs_and_maps_interrupted_gateway_calls
+  - tests/fees/test_payments.py::test_real_browser_can_view_and_pay_a_late_fee
 notes: "Approved fix (#40): Python has no Java-style per-thread interrupt flag; interruption exceptions are retained in the exception log before returning the characterized 502 failure."
