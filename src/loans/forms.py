@@ -2,8 +2,16 @@ from django import forms
 
 
 class LoanForm(forms.Form):
-    member = forms.CharField(strip=False)
-    isbn = forms.CharField(strip=False)
+    member = forms.CharField(
+        strip=False,
+        widget=forms.TextInput(
+            attrs={'class': 'input input-bordered w-full', 'autocomplete': 'name'}
+        ),
+    )
+    isbn = forms.CharField(
+        strip=False,
+        widget=forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
+    )
 
     def clean_member(self):
         member = self.cleaned_data['member']
