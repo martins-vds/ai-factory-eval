@@ -24,5 +24,5 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/browser.json
   - .migration/evidence/runs/LL-04.md
-  - tests/library_info/test_endpoints.py::test_about_endpoint_matches_characterized_html
-  - tests/library_info/test_endpoints.py::test_about_ui_renders_in_a_browser
+  - tests/library_info/test_about_page.py::test_about_endpoint_matches_characterized_html
+  - tests/library_info/test_about_page.py::test_about_ui_renders_in_a_browser
