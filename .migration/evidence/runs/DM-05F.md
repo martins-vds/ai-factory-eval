@@ -18,3 +18,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T20:43:26+00:00 | invariants | 0 | 1.68 | `pytest -q tests/data_migration/test_invariants.py` | `9bed9041f3a97041` |  |  |
 | 2026-11-16T20:43:29+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-16T20:43:33+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `9eb349efea514fbe` |  |  |
+| 2026-11-16T20:44:41+00:00 | crap-coverage | 0 | 43.53 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `62279c2d26d090f1` |  |  |
+| 2026-11-16T20:44:45+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T20:44:49+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
+| 2026-11-16T20:44:54+00:00 | mutation-changed | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-16T20:46:09+00:00 | regression | 0 | 40.58 | `pytest -q` | `cf4abf43d2395790` |  |  |
