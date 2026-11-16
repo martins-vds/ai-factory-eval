@@ -10,9 +10,6 @@ class Loan(models.Model):
     lent_on = models.DateField()
     returned_on = models.DateField(blank=True, null=True)
 
-    class Meta:
-        ordering = ('pk',)
-
     @property
     def due_on(self):
         return self.lent_on + timedelta(days=14)

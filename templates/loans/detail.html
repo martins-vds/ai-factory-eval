@@ -14,16 +14,16 @@
     </div>
     <div class="flex justify-between gap-4 py-4">
       <dt class="text-[#746e60]">Lent</dt>
-      <dd>{{ loan.lent_on|date:"M j, Y" }}</dd>
+      <dd>{{ loan.lent_on|date:"Y-m-d" }}</dd>
     </div>
     <div class="flex justify-between gap-4 py-4">
       <dt class="text-[#746e60]">Due</dt>
-      <dd>{{ loan.due_on|date:"M j, Y" }}</dd>
+      <dd>{{ loan.due_on|date:"Y-m-d" }}</dd>
     </div>
     {% if loan.returned_on %}
       <div class="flex justify-between gap-4 py-4">
         <dt class="text-[#746e60]">Returned</dt>
-        <dd>{{ loan.returned_on|date:"M j, Y" }}</dd>
+        <dd>{{ loan.returned_on|date:"Y-m-d" }}</dd>
       </div>
     {% endif %}
   </dl>

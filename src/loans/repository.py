@@ -6,7 +6,7 @@ from src.loans.models import Loan
 
 
 def list_loans():
-    return Loan.objects.all()
+    return Loan.objects.order_by('pk')
 
 
 def find_loan(loan_id):

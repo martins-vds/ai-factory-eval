@@ -11,7 +11,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/test_ui_smoke.py::test_loan_catalog_renders_in_browser]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/test_ui_smoke.py::test_loan_catalog_renders_in_browser, tests/loans/test_catalog.py::test_loan_survives_application_restart_without_overwriting_seed_records]
 notes: "Restart reset behavior is raised in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
 target:

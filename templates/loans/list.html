@@ -27,7 +27,7 @@
               <span class="badge bg-[#e8d8c5] text-[#2f3428]">On loan</span>
             {% endif %}
           </div>
-          <p class="mt-4">Due {{ loan.due_on|date:"M j, Y" }}</p>
+          <p class="mt-4">Due {{ loan.due_on|date:"Y-m-d" }}</p>
           <div class="card-actions mt-3 justify-end">
             <a class="link link-hover text-[#a94e37]" href="{% url 'loan-catalog-detail' loan.pk %}">View loan {{ loan.pk }}</a>
           </div>

@@ -37,7 +37,6 @@ class Migration(migrations.Migration):
                 ('lent_on', models.DateField()),
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],
-            options={'ordering': ('pk',)},
         ),
         migrations.RunPython(load_seed_loans, migrations.RunPython.noop),
     )
