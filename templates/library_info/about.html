@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}About · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+  <div>
+    <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The Lending Library · A neighborhood collection</p>
+    <h1 class="mb-4 mt-3 text-5xl md:text-6xl">About the Lending Library</h1>
+    <p class="mb-8 text-[#66705b]">A good library is built around the people who walk through its doors and the books they carry home.</p>
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-widest text-[#66705b]">A little time with a good book</p>
+        <h2 class="card-title text-2xl">Our lending policy</h2>
+        <p>Books are lent for 14 days. Choose a book from the collection and make yourself at home.</p>
+        <a class="btn mt-3 bg-[#a94e37] text-white hover:bg-[#873b2a]" href="/ui/loans/">Browse the collection</a>
+      </div>
+    </article>
+  </div>
+  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-widest text-[#66705b]">Plan your visit</p>
+      <h2 class="card-title text-2xl">Opening hours</h2>
+      <p>Monday to Saturday</p>
+      <p>9:00 to 18:00</p>
+      <div class="mt-4 border-t border-[#d8cdbb] pt-4">
+        <p class="text-xs uppercase tracking-widest text-[#66705b]">Contact</p>
+        <a class="link link-hover text-[#a94e37]" href="mailto:desk@lending-library.invalid">desk@lending-library.invalid</a>
+      </div>
+    </div>
+  </aside>
+</section>
+{% endblock %}
