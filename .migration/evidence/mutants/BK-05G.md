@@ -1,18 +1,6 @@
 # Surviving mutants: BK-05G
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.860, threshold 0.8, killed 43, survived 7. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:24 Mutant #8`
-
-  ```diff
-  @@ -21,7 +21,7 @@
-   def _cargo_context(cargo_dashboard: CargoDashboard, tracking_id: str):
-       cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
-       if cargo is None:
-  -        raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
-  +        raise Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')
-       return cargo
-  ```
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.940, threshold 0.8, killed 47, survived 3. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/dialogs/views.py:46 Mutant #17`
 
@@ -40,20 +28,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.860, thr
                        location
   ```
 
-- `src/cargotracker/booking/interfaces/dialogs/views.py:59 Mutant #26`
-
-  ```diff
-  @@ -56,7 +56,7 @@
-                   None,
-               )
-               if destination is None:
-  -                error = 'Select a valid destination.'
-  +                error = 'XXSelect a valid destination.XX'
-               else:
-                   cargo_specification.change_destination(cargo.tracking_id, destination)
-                   return _dialog_completion()
-  ```
-
 - `src/cargotracker/booking/interfaces/dialogs/views.py:78 Mutant #38`
 
   ```diff
@@ -65,32 +39,5 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.860, thr
   +        error = None
            if request.method == 'POST':
                deadline_value = request.POST.get('deadline', '')
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:81 Mutant #42`
-
-  ```diff
-  @@ -78,7 +78,7 @@
-           error = ''
-           if request.method == 'POST':
-  -            deadline_value = request.POST.get('deadline', '')
-  +            deadline_value = request.POST.get('deadline', 'XXXX')
-               try:
-                   deadline = date.fromisoformat(deadline_value)
-               except ValueError:
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:85 Mutant #45`
-
-  ```diff
-  @@ -82,7 +82,7 @@
-               try:
-                   deadline = date.fromisoformat(deadline_value)
-               except ValueError:
-  -                error = 'Enter a valid arrival deadline.'
-  +                error = 'XXEnter a valid arrival deadline.XX'
-               else:
-                   cargo_specification.change_deadline(
-                       cargo.tracking_id,
   ```
 

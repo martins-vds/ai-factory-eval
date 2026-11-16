@@ -16,7 +16,7 @@
     <div>
       <label class="mb-1 block font-medium text-slate-800" for="destination">New destination</label>
       <select
-        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
         id="destination"
         name="destination"
         aria-describedby="{% if error %}destination-error{% endif %}"
@@ -34,12 +34,12 @@
     </div>
     <div class="flex justify-end gap-3">
       <button
-        class="min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100"
+        class="min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
         type="submit"
         formmethod="dialog"
       >Cancel</button>
       <button
-        class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800"
+        class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
         type="submit"
       >Update</button>
     </div>
