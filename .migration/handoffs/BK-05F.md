@@ -25,3 +25,30 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-16T20:37:39Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-run-changed-code-mutation-another-one` (eval checkout; no target PR) / https://github.com/martins-vds/ai-factory-pilot-target/pull/394 (already merged) · **Last commit:** 97e3fd17
+
+### Done
+- Setup checks passed; pinned source SHA is `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`.
+- Ran the profile's changed-code mutation command through `afs-run`; command exit was 0, but its result was `score=n/a reason=no-mutable-code-changed` because this checkout has no mutable diff from `origin/main`. Journal: `.migration/evidence/runs/BK-05F.md`; raw log: `.migration/runs/BK-05F/20261116T203615238286Z-mutation-changed.log`.
+- Confirmed `origin` is `martins-vds/ai-factory-eval`; the requested target branch is not available in this checkout. Read-only GitHub lookup confirms target PR #394 and issue #293 are already closed/merged.
+
+### Remaining
+- [ ] Provide the correct target-repository checkout and an approved base for the requested follow-up; PR #394's head branch was merged and is not present in this checkout.
+- [ ] Resolve the ticket-role mismatch before creating a new return: the local approved plan still assigns retired `afs-specialist-migrator` and has its return, so adding `BK-05F.afs-migrator.yaml` fails plan validation as a duplicate ticket ID.
+- [ ] Rerun changed-code mutation on that checkout, classify every fresh survivor from its diff, then add focused interface assertions or simplify equivalent code.
+- [ ] Run all remaining profile gates, update the approved return, validate migration outputs, and run CodeQL.
+
+### Decisions made
+- Did not classify the historical survivor diffs or change code/tests because this checkout has no mutable BK-05F code diff; doing so here would not test the requested change.
+
+### Blockers / questions
+- The task's required base (`copilot/bk-05f-build-route-selection-itinerary-screens` in `martins-vds/ai-factory-pilot-target`) is unavailable: the local remote targets `martins-vds/ai-factory-eval`, and PR #394 is already merged. A human must confirm/provide the target checkout and follow-up base.
+- The required `afs-migrator` return path conflicts with the local plan's retired `afs-specialist-migrator` role and existing return. `validate.py` fails if both roles use BK-05F; do not change the plan or replace the historical return without approval.
+
+### Failing commands
+- None. The mutation command exited 0 but produced no mutation score because no mutable code changed.
+
+### Next step for the next session
+Resume only after the correct target checkout and approved base are supplied and the return-role conflict is resolved; rerun setup and the exact changed-code mutation gate before inspecting or classifying survivors.
