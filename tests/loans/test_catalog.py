@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -122,6 +123,22 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.parametrize(
+    ('payload', 'missing_fields'),
+    [
+        ({}, {'member', 'isbn'}),
+        ({'member': 'dee'}, {'isbn'}),
+        ({'isbn': '123'}, {'member'}),
+    ],
+)
+@pytest.mark.django_db
+def test_loan_form_requires_member_and_isbn(payload, missing_fields):
+    form = LoanForm(data=payload)
+
+    assert not form.is_valid()
+    assert set(form.errors) == missing_fields
 
 
 @pytest.mark.django_db
@@ -377,6 +394,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L1/'
     assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
 
 
 @pytest.mark.django_db
