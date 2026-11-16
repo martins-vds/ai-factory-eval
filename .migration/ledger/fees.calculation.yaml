@@ -7,9 +7,12 @@ source:
   flow: View Late Fee
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
-boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "Late days are max(0, days from due date to returnedOn or today); fees are waived through two late days, otherwise all late days cost 25 cents each, capped at $10."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#743]
+target:
+  components: [src.fees.services.calculate_late_fee, src.fees.views.fee_api, src.fees.views.fee_page]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/fees/test_fees.py::test_late_fee_waives_two_days_and_charges_twenty_five_cents_from_day_three, tests/fees/test_fees.py::test_unreturned_loan_uses_today_and_early_return_has_no_late_days, tests/fees/test_fees.py::test_late_fee_is_capped_at_ten_dollars, .migration/evidence/runs/LL-03.md]
+notes: "The waiver is a threshold: lateness through two days costs nothing; beyond that, all late days are charged at 25 cents each."
