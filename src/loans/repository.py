@@ -22,3 +22,14 @@ class LoanRepository:
             isbn=isbn,
             lent_on=lent_on,
         )
+
+    @transaction.atomic
+    def mark_returned(self, loan_id, returned_on):
+        loan = Loan.objects.select_for_update().filter(pk=loan_id).first()
+        if loan is None:
+            return None, False
+        if loan.returned_on is not None:
+            return loan, True
+        loan.returned_on = returned_on
+        loan.save(update_fields=['returned_on'])
+        return loan, False
