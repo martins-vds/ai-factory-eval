@@ -1,0 +1,148 @@
+harness_version: 0.2.0
+checked_at: "2026-11-16T06:21:00Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    ./legacy/run.sh built and started the Java/H2 application and direct HTTP probes succeeded.
+    The tracked legacy tree matches the supplied source SHA, but the mounted .source checkout HEAD
+    is not that SHA and must be corrected before installation.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "Java 17 + Maven" }
+      - { kind: tool, name: "legacy/run.sh" }
+    notes: "Built and started successfully in this session."
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "No Django project or manage.py exists yet; target scaffold is outside this ticket."
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh" }
+      - { kind: tool, name: ".github/workflows/legacy-smoke.yml" }
+    notes: "App ran and endpoint probes were executed; mounted .source pin mismatch remains a setup blocker."
+  - id: characterization-harness
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "No target app or characterization harness exists yet."
+  - id: unit-integration-tests
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: ".github/workflows/legacy-smoke.yml" }
+    notes: "The workflow runs HTTP integration smoke probes; no JUnit unit-test source tree was found."
+  - id: unit-integration-tests
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "No target test project exists yet."
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source coverage configuration or test suite; source coverage is best-effort."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: pytest-coverage }
+    notes: "Pinned in java-to-django.json; install and configure at bootstrap/scaffold time."
+  - id: complexity
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+    notes: "Provider selected from the harness profile gate; not run in this bootstrap session."
+  - id: complexity
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+    notes: "Provider selected from the harness profile gate; target code does not exist yet."
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "Source lacks coverage/test inputs for a meaningful CRAP calculation; source CRAP is best-effort."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "crap.py" }
+      - { kind: tool, name: lizard }
+      - { kind: skill, name: pytest-coverage }
+    notes: "Harness/profile providers selected; install and execution are deferred."
+  - id: mutation-testing
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No source mutation runner or test suite is configured."
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: afs-mutation }
+    notes: "Pinned harness gate provider; install and execution are deferred."
+  - id: lint-format
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No source lint/format provider or configuration was found."
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: ruff }
+    notes: "Provider selected in the harness profile gate; install/configuration is deferred."
+  - id: stack-idioms
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "The pinned pack has Java documentation/JUnit skills, but no Java idioms skill was identified."
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: django-patterns }
+    notes: "Pinned in java-to-django.json; install is deferred."
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: >-
+      Source is H2 and target is PostgreSQL. The pinned data skills address Oracle/PostgreSQL rather
+      than H2/PostgreSQL; the migration/reseed decision and a matching provider are unresolved.
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: agent-browser }
+    notes: "Provider is in the pinned built-in skill menu; installation and browser probes are deferred."
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+    notes: "Harness-pinned graph tool; graph generation is explicitly deferred to the dispatcher after setup merge."
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)", version: "f195ae3d25110bdcf4bd78cadd0676c25c614a5c" }
+    notes: "Uses the graph block from the pinned java-to-django.json stack pack."
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
+    notes: "Pinned in skills.lock.json; hook installation is deferred to step 5."

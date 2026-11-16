@@ -1,0 +1,22 @@
+role: afs-bootstrapper
+ticket: SY-01
+issue: "https://github.com/martins-vds/ai-factory-eval/issues/589"
+setup_pr: null
+characterization_tier: A
+tier_evidence: "legacy/run.sh built and started the Java 17/H2 app; GET/POST probes returned live endpoint responses, including the seeded $4.75 late fee. The tracked legacy tree matches the supplied SHA, but the mounted .source HEAD does not."
+capabilities:
+  met: 14
+  gap: 9
+  waived: 0
+  not_applicable: 0
+gap_tickets:
+  - "new: build-run (target)"
+  - "new: characterization-harness (target)"
+  - "new: unit-integration-tests (target)"
+  - "new: coverage (source, best_effort)"
+  - "new: crap (source, best_effort)"
+  - "new: mutation-testing (source)"
+  - "new: lint-format (source)"
+  - "new: stack-idioms (source)"
+  - "new: data-migration (H2 to PostgreSQL)"
+validation: "fail: pinned .source checkout is at ffa05e628142843a5afdbf742da1c58ac05304f8 rather than 563c316ed51462b08fd6e58f3781a3c8b2890453; compose.yaml is absent; .migration/harness/tools/validate.py is not installed."
