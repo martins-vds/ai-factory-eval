@@ -16,7 +16,7 @@ def test_lending_api_creates_and_formats_a_loan(client):
     assert response.content.decode() == f'L4;dee;123;{today};{due_on};\n'
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
 def test_return_api_records_and_formats_today(client):
     response = client.post('/loans/L1/return')
 
