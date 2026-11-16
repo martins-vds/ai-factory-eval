@@ -201,6 +201,7 @@ def test_loaded_carrier_movement_schedules_are_in_order(loaded_invariant_snapsho
         assert all(movement.departure_time <= movement.arrival_time for movement in movements)
         assert all(
             current.arrival_time <= following.departure_time
+            and current.arrival_location_id == following.departure_location_id
             for current, following in pairwise(movements)
         )
 
