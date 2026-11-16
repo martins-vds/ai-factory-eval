@@ -1,0 +1,41 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/626
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.971
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+  - .migration/evidence/mutants/LL-03.md
+findings:
+  - severity: major
+    where: .migration/ledger/fees.calculation.yaml:14
+    what: "All three LL-03 ledger entries remain in-progress although the current build, behavior, idiom, CRAP, mutation, and regression gates pass; reconcile their statuses and evidence before acceptance."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:37
+    what: "Known module-level route-literal and LoanForm.Meta.model survivors (LL-02 also reports method-guard survivors) are behavior-covered; fee routes now assert supported and unsupported methods. Two LL-03 survivors only toggle frozen dataclasses."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:25
+    what: "An out-of-scope LL-02 @transaction.atomic survivor remains; the decorator is present, but the current transactional test setup does not kill its mutant."
+  - severity: minor
+    where: src/fees/views.py:32
+    what: "fee_detail escapes loan_id while the pinned source interpolates it raw; generated L<n> IDs are unaffected, but arbitrary stored IDs would differ."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_endpoint_formats_whole_dollar_amounts
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_page_payment_without_htmx_renders_the_full_page
+  - tests/fees/test_endpoints.py::test_fee_page_payment_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_payment_gateway_uses_the_characterized_default_url
+  - tests/fees/test_fee_calculation.py::test_pay_charges_known_loan_through_injected_gateway
+  - tests/fees/test_fee_calculation.py::test_pay_does_not_charge_unknown_loan
+ledger_issues:
+  - "fees.calculation, fees.page, and integration.payment-gateway remain in-progress despite passing current per-PR gates."
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
