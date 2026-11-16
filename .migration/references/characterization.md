@@ -13,7 +13,38 @@ PORT=18080 ./legacy/run.sh
 
 The script completed `mvn -q -B package -DskipTests`, started Hibernate against `jdbc:h2:mem:library;DB_CLOSE_DELAY=-1`, and printed `Lending Library listening on 18080`. It remained running in the foreground. Startup logged warnings that the four registered resource instances were ignored; the endpoint requests below nevertheless returned the application responses.
 
-I then ran HTTP requests against `http://127.0.0.1:18080` using `curl -sS -i -X <method>`. For the successful loan creation, I also supplied `-d 'member=test&isbn=9780000000000'`; for the missing-form case, I supplied no body. The observed status and response bodies were:
+I first checked the root path with:
+
+```sh
+curl --max-time 2 -sS -o /tmp/sy01/root.body -w 'root HTTP %{http_code}\n' http://127.0.0.1:18080/
+```
+
+It returned `root HTTP 404`. I then ran these two probe loops:
+
+```sh
+for spec in 'GET /loans' 'GET /loans/L1' 'GET /about' 'GET /fees/L1' 'POST /loans' 'POST /loans/L1/return' 'POST /payments/NOPE'; do
+  method=${spec%% *}
+  path=${spec#* }
+  if [ "$method" = POST ] && [ "$path" = /loans ]; then
+    curl --max-time 5 -sS -i -X POST -d 'member=test&isbn=9780000000000' "http://127.0.0.1:18080$path"
+  else
+    curl --max-time 5 -sS -i -X "$method" "http://127.0.0.1:18080$path"
+  fi
+done
+```
+
+```sh
+for spec in 'GET /loans/NOPE' 'GET /fees/NOPE' 'POST /loans/NOPE/return' 'POST /loans missing form' 'POST /payments/L1'; do
+  method=${spec%% *}
+  path=$(printf '%s' "$spec" | cut -d' ' -f2)
+  case "$spec" in
+    'POST /loans missing form') curl --max-time 5 -sS -i -X POST http://127.0.0.1:18080/loans ;;
+    *) curl --max-time 6 -sS -i -X "$method" "http://127.0.0.1:18080$path" ;;
+  esac
+done
+```
+
+The observed status and response bodies were:
 
 | Request | Observed response |
 | --- | --- |
