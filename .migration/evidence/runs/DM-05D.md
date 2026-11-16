@@ -22,3 +22,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-16T02:06:50+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-16T02:06:50+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4309ddda1a3b8cc0` |  | gate=crap max=26.0 threshold=30 over=0 methods=185 |
 | 2026-11-16T02:08:06+00:00 | mutation-changed | 1 | 71.12 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `ecb04ecb4ea20cbd` | afs-mutation: FAILED score=0.620 threshold=0.8 killed=49 survived=30 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.620 threshold=0.8 killed=49 survived=30 files=1 base=origin/main |
+| 2026-11-16T02:09:45+00:00 | export-edge-tests | 1 | 1.67 | `pytest -q tests/data_migration/test_export.py` | `63c96f9786662397` | E           AssertionError: Regex pattern did not match. |  |
+| 2026-11-16T02:10:06+00:00 | export-edge-rerun | 0 | 1.66 | `pytest -q tests/data_migration/test_export.py` | `7bbfa9adac667373` |  |  |
