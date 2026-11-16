@@ -3,7 +3,6 @@ from pathlib import Path
 
 from django.test import TestCase
 
-
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )

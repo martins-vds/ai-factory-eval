@@ -15,8 +15,9 @@ def test_about_page_displays_library_information_in_browser(live_server):
             assert page.get_by_role('heading', name='About the Lending Library').is_visible()
             assert page.get_by_text('Open Monday to Saturday, 9:00 to 18:00.').is_visible()
             assert page.get_by_text('Books are lent for 14 days.').is_visible()
-            assert page.get_by_role(
-                'link', name='desk@lending-library.invalid'
-            ).get_attribute('href') == 'mailto:desk@lending-library.invalid'
+            assert (
+                page.get_by_role('link', name='desk@lending-library.invalid').get_attribute('href')
+                == 'mailto:desk@lending-library.invalid'
+            )
         finally:
             browser.close()
