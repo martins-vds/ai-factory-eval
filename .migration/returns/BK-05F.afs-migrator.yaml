@@ -1,0 +1,93 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: martins-vds/ai-factory-eval#750
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.859
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+mutation_classifications:
+  - diff: "_CANDIDATE_SALT: 'booking.route_selection' -> 'XXbooking.route_selectionXX'"
+    classification: equivalent
+    why: The salt is opaque to the route UI; signing and verification share the same constant, so the rendered route form and assignment flow are unchanged.
+  - diff: "_CANDIDATE_SALT: 'booking.route_selection' -> None"
+    classification: equivalent
+    why: This only changes the opaque signing namespace; this module is the only signing caller and the candidate is still signed and verified within the same flow.
+  - diff: "remove @require_http_methods(['GET', 'POST']) from route_selection"
+    classification: missing_test
+    outcome: killed
+    why: The interface method test asserts that PUT is rejected with HTTP 405.
+  - diff: "POST unknown-cargo Http404 message wrapped with XX"
+    classification: equivalent
+    why: The exception reason is not shown by the normal 404 page; the response remains HTTP 404.
+  - diff: "stale route-specification Http404 message wrapped with XX"
+    classification: equivalent
+    why: The exception reason is not shown by the normal 404 page; the response remains HTTP 404.
+  - diff: "quote(tracking_id, safe='') -> quote(tracking_id, safe='XXXX')"
+    classification: equivalent
+    why: X is always an unreserved URI character and is left unescaped by quote regardless of the safe argument.
+  - diff: "route no-candidate guidance wrapped with XX"
+    classification: missing_test
+    outcome: killed
+    why: The interface assertion now checks the complete visible status paragraph and exact guidance.
+  - diff: "remove @require_http_methods(['GET']) from select_itinerary"
+    classification: missing_test
+    outcome: killed
+    why: The interface method test asserts that POST is rejected with HTTP 405.
+  - diff: "itinerary no-candidate guidance wrapped with XX"
+    classification: missing_test
+    outcome: killed
+    why: The interface assertion now checks the complete visible status paragraph and exact guidance.
+  - diff: "GET unknown-cargo Http404 message wrapped with XX"
+    classification: equivalent
+    why: The exception reason is not shown by the normal 404 page; the response remains HTTP 404.
+  - diff: "missing candidate default '' -> 'XXXX'"
+    classification: equivalent
+    why: Both values fail signature validation and are converted to the same HTTP 404 response.
+  - diff: "BadSignature message 'Candidate belongs to another cargo.' wrapped with XX"
+    classification: equivalent
+    why: The caught BadSignature is converted to the same generic invalid-route HTTP 404 response.
+  - diff: "invalid-route Http404 message wrapped with XX"
+    classification: equivalent
+    why: The exception reason is not shown by the normal 404 page; the response remains HTTP 404.
+final_mutation_survivors:
+  - diff: "_CANDIDATE_SALT: 'booking.route_selection' -> 'XXbooking.route_selectionXX'"
+    classification: equivalent
+    why: Signing and verification use the same opaque salt; route rendering and assignment are unchanged.
+  - diff: "_CANDIDATE_SALT: 'booking.route_selection' -> None"
+    classification: equivalent
+    why: This changes only the opaque signing namespace in the same self-contained route flow.
+  - diff: "POST unknown-cargo Http404 message wrapped with XX"
+    classification: equivalent
+    why: The normal 404 page does not display the exception reason.
+  - diff: "stale route-specification Http404 message wrapped with XX"
+    classification: equivalent
+    why: The normal 404 page does not display the exception reason.
+  - diff: "quote(tracking_id, safe='') -> quote(tracking_id, safe='XXXX')"
+    classification: equivalent
+    why: X remains unescaped under both safe arguments because it is an unreserved URI character.
+  - diff: "GET unknown-cargo Http404 message wrapped with XX"
+    classification: equivalent
+    why: The normal 404 page does not display the exception reason.
+  - diff: "missing candidate default '' -> 'XXXX'"
+    classification: equivalent
+    why: Both malformed values are rejected and return the same HTTP 404 response.
+  - diff: "BadSignature message 'Candidate belongs to another cargo.' wrapped with XX"
+    classification: equivalent
+    why: The caught error detail is replaced by the same generic invalid-route HTTP 404 response.
+  - diff: "invalid-route Http404 message wrapped with XX"
+    classification: equivalent
+    why: The normal 404 page does not display the exception reason.
