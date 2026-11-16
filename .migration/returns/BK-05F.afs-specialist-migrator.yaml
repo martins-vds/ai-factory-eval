@@ -8,22 +8,49 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: 0.790
+  mutation_changed: 0.902
   regression: 0
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
   - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_candidate_is_signed_for_route_assignment
   - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_without_a_candidate_returns_not_found
   - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_reject_unsupported_http_methods
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
   - .migration/evidence/runs/BK-05F.md
   - .migration/evidence/mutants/BK-05F.md
+mutation_survivors:
+  - mutant: src/cargotracker/booking/interfaces/route_selection/views.py:34 Mutant #10
+    diff: "Http404(f'Cargo with tracking ID {tracking_id} not found.') -> Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')"
+    classification: equivalent
+    why: Changes only the Http404 reason for unknown cargo on POST; with DEBUG disabled, status and rendered 404 response do not change.
+  - mutant: src/cargotracker/booking/interfaces/route_selection/views.py:37 Mutant #13
+    diff: "Http404('The selected route no longer satisfies the route specification.') -> Http404('XXThe selected route no longer satisfies the route specification.XX')"
+    classification: equivalent
+    why: Changes only the Http404 reason; the selected-route rejection remains the same 404 response.
+  - mutant: src/cargotracker/booking/interfaces/route_selection/views.py:39 Mutant #14
+    diff: 'quote(tracking_id, safe="") -> quote(tracking_id, safe="XXXX")'
+    classification: equivalent
+    why: X is an unreserved URL character and is never escaped by quote, so adding it to safe does not change the redirect URL.
+  - mutant: src/cargotracker/booking/interfaces/route_selection/views.py:70 Mutant #27
+    diff: "Http404(f'Cargo with tracking ID {tracking_id} not found.') -> Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')"
+    classification: equivalent
+    why: Changes only the Http404 reason for unknown cargo on GET; with DEBUG disabled, status and rendered 404 response do not change.
+  - mutant: src/cargotracker/booking/interfaces/route_selection/views.py:97 Mutant #43
+    diff: "BadSignature('Candidate belongs to another cargo.') -> BadSignature('XXCandidate belongs to another cargo.XX')"
+    classification: equivalent
+    why: The exception is caught and converted to the same generic Http404, so the page response is unchanged.
+  - mutant: src/cargotracker/booking/interfaces/route_selection/views.py:100 Mutant #45
+    diff: "Http404('The selected route is invalid.') -> Http404('XXThe selected route is invalid.XX')"
+    classification: equivalent
+    why: Changes only the Http404 reason; the invalid-candidate status and rendered 404 response do not change.
 ledger_updated:
   - booking.routing-chain
   - booking.screen-route
   - booking.screen-select-itinerary
   - booking.routing-assign
 quirk_tickets: []
-handoff: .migration/handoffs/BK-05F.md
+handoff: none
