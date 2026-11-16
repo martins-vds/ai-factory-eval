@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from django.core.management import call_command
 from django.test import override_settings
@@ -50,6 +52,11 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
     assert 'Arrival deadline:' in content
     assert 'Itinerary' in content
     assert '0200T' in content
+    assert 'Load' in content and 'Unload' in content
+    assert content.count('USNYC') >= 2
+    assert content.count('USDAL') >= 2
+    assert len(re.findall(r'\d{2}/\d{2}/\d{4}', content)) >= 3
+    assert 'Handling history' not in content
 
 
 @pytest.mark.django_db
