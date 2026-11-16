@@ -49,3 +49,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-16T17:28:57+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:31:33+00:00 | verifier-idiom-ruff-check | 0 | 0.07 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-16T17:31:33+00:00 | verifier-build-compile | 0 | 0.19 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:31:33+00:00 | verifier-idiom-ruff-format | 0 | 0.06 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-16T17:31:34+00:00 | verifier-build-django | 0 | 0.62 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-16T17:31:40+00:00 | verifier-dialogs-focused | 0 | 6.69 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `e5610890fa27996e` |  |  |

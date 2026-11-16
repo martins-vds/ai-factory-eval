@@ -91,8 +91,9 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize('dialog', ('destination', 'deadline'))
+def test_unknown_cargo_dialog_returns_not_found(client, dialog):
+    response = client.get(f'/admin/cargo/MISSING1/{dialog}/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
 
