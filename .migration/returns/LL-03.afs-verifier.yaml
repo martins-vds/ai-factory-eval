@@ -1,0 +1,41 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/714
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.959
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+  - .migration/evidence/mutants/LL-03.md
+findings:
+  - severity: major
+    where: src/fees/views.py:65-71
+    what: "When htmx loads, its pinned 2.0.11 default 4xx/5xx handling is swap:false, so the 502 alert fragment will not replace the target; the local browser probe could not load htmx from its CDN to confirm the flow."
+  - severity: minor
+    where: src/fees/services.py:20-62
+    what: "FeeApplication combines fee calculation and payment gateway orchestration in the fees module, while decision-map #38 names fees and payments as separate bounded contexts; confirm this boundary or split it in a follow-up."
+  - severity: minor
+    where: .migration/ledger/fees.calculation.yaml:14
+    what: "All three LL-03 ledger entries remain in-progress although the handoff deferred promotion only until full regression and remaining gates passed; Migrator should reconcile their statuses."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md
+    what: "Mutation passes at 0.959 (threshold 0.8) with ten survivors; known selection false negatives include route literals and LoanForm.Meta.model, and method guards have direct tests; /ui/loans/ lacks a direct GET test (outside LL-03 scope)."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_page_renders_the_capped_fee_amount
+  - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_payment_page_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_fee_page_renders_payment_response_for_regular_form_submission
+  - tests/fees/test_endpoints.py::test_gateway_uses_the_configured_default_url
+  - tests/fees/test_fee_calculation.py::test_payment_use_case_uses_injected_gateway_for_an_existing_loan
+  - tests/fees/test_fee_calculation.py::test_payment_use_case_does_not_call_gateway_for_an_unknown_loan
+ledger_issues:
+  - "fees.calculation, fees.page, and integration.payment-gateway remain in-progress; Migrator should promote/reconcile them now that all per-PR gates pass."
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
