@@ -8,10 +8,24 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#705]
+target:
+  components:
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.services.return_book
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_api_persists_date_and_rejects_a_repeat
+  - tests/loans/test_circulation.py::test_htmx_return_updates_row_and_rejects_repeated_return
+  - tests/loans/test_circulation.py::test_non_htmx_return_redirects_and_shows_repeat_error
+  - tests/loans/test_circulation.py::test_lend_and_return_match_characterized_source_http_goldens
+  - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
+status: migrated
+notes: "The human ruling in martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

@@ -5,6 +5,7 @@
 {% block content %}
 <section class="mx-auto max-w-3xl">
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  {% if error %}<p class="mt-4 text-sm text-[#a94e37]" role="alert">{{ error }}</p>{% endif %}
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan record · {{ loan.id }}</p>
