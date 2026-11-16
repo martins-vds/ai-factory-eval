@@ -1,7 +1,16 @@
+from contextlib import contextmanager
+
+from django.db import transaction
+
 from src.loans.models import Loan
 
 
 class LoanRepository:
+    @contextmanager
+    def transaction(self):
+        with transaction.atomic():
+            yield self
+
     def all(self):
         return list(Loan.objects.order_by('pk'))
 

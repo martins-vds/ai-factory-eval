@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog · The Lending Library{% endblock %}
+
+{% block content %}
+<main class="mx-auto grid max-w-6xl gap-12 px-6 py-10 lg:grid-cols-[minmax(0,1fr)_18rem]" id="main-content">
+  <section aria-labelledby="catalog-heading">
+    <p class="text-xs uppercase tracking-[0.2em] text-muted">The collection · {{ loans|length }} loans in view</p>
+    <h1 class="mt-3 text-5xl font-bold tracking-tight md:text-6xl" id="catalog-heading">Books in good company.</h1>
+    <p class="mb-8 mt-4 max-w-2xl text-lg text-muted">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    <div aria-label="Loan catalog">
+      {% for loan in loans %}
+        <article class="grid gap-4 border-b border-line py-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <div>
+            <p class="text-xs uppercase tracking-[0.15em] text-muted">Loan {{ loan.pk }}</p>
+            <h2 class="mt-1 text-2xl font-semibold">ISBN {{ loan.isbn }}</h2>
+            <p class="mt-1 text-muted">With {{ loan.member }}</p>
+            <p class="mt-3 text-sm">Lent {{ loan.lent_on|date:"M j, Y" }} · Due {{ loan.due_on|date:"M j, Y" }}</p>
+            {% if loan.returned_on %}
+              <p class="mt-1 text-sm text-muted">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+            {% else %}
+              <p class="mt-1 text-sm font-medium text-accent">Still out</p>
+            {% endif %}
+          </div>
+          <a class="btn btn-ghost btn-sm text-ink" href="/ui/loans/{{ loan.pk }}/">Read record</a>
+        </article>
+      {% empty %}
+        <p class="border-y border-line py-8 text-muted">No loans are in the catalog.</p>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="h-fit border border-line bg-surface p-6">
+    <p class="text-xs uppercase tracking-[0.18em] text-muted">From the shelf</p>
+    <h2 class="mt-2 text-2xl font-semibold">A reading-room ledger</h2>
+    <p class="mt-3 leading-relaxed text-muted">Each book has a fourteen-day lending period. Dates are kept with the record, from the day it leaves to the day it comes home.</p>
+    <a class="btn btn-outline btn-sm mt-6 border-accent text-accent" href="/loans">Open text export</a>
+  </aside>
+</main>
+{% endblock %}

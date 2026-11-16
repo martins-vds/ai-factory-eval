@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.pk }} · The Lending Library{% endblock %}
+
+{% block content %}
+<main class="mx-auto max-w-3xl px-6 py-12">
+  <a class="link text-accent" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-10 text-xs uppercase tracking-[0.2em] text-muted">Loan {{ loan.pk }}</p>
+  <h1 class="mt-3 text-5xl font-bold tracking-tight">ISBN {{ loan.isbn }}</h1>
+  <section class="mt-8 border-y border-line py-6">
+    <h2 class="text-xl font-semibold">Borrowed by {{ loan.member }}</h2>
+    <p class="mt-4">Lent {{ loan.lent_on|date:"M j, Y" }}</p>
+    <p class="mt-1">Due {{ loan.due_on|date:"M j, Y" }}</p>
+    {% if loan.returned_on %}
+      <p class="mt-1">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+    {% else %}
+      <p class="mt-1 font-medium text-accent">Still out</p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

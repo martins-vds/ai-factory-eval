@@ -6,6 +6,7 @@ import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.loans.repository import LoanRepository
 
 
 @pytest.mark.django_db
@@ -69,3 +70,29 @@ def test_reapplying_migrations_does_not_replace_persisted_loan_data():
 @pytest.mark.django_db
 def test_django_admin_route_is_not_installed(client):
     assert client.get('/admin/login/').status_code == 404
+
+
+@pytest.mark.django_db
+def test_loan_detail_page_shows_characterized_due_date(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'ISBN 9780134685991' in response.content
+    assert b'Due Jan 16, 2026' in response.content
+
+
+@pytest.mark.django_db
+def test_repository_transaction_rolls_back_failed_work():
+    repository = LoanRepository()
+
+    with pytest.raises(RuntimeError):
+        with repository.transaction():
+            Loan.objects.create(
+                id='L99',
+                member='temporary',
+                isbn='999',
+                lent_on=datetime.date(2026, 1, 1),
+            )
+            raise RuntimeError('transaction failed')
+
+    assert not Loan.objects.filter(pk='L99').exists()
