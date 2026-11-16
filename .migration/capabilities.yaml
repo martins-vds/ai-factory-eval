@@ -1,0 +1,141 @@
+harness_version: 0.2.0
+checked_at: "2026-11-16T18:01:10Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    Existing recorded run packaged and started the full application; live HTTP requests returned
+    observed responses. No characterization probes were rerun for this update.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: "legacy/run.sh (Maven package and Grizzly startup)"}
+    notes: Existing Tier A run evidence is recorded in references/characterization.md.
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: "curl against the live HTTP application"}
+    notes: Existing endpoint probe results are recorded in references/characterization.md.
+  - id: unit-integration-tests
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: Source test inventory or runnable test evidence was not available in the transferred record.
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: No source coverage provider or coverage evidence was established.
+  - id: complexity
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: A Java source complexity provider has not been selected or run.
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: Source CRAP requires coverage and complexity inputs that are not established.
+  - id: mutation-testing
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: No source mutation-testing provider is identified.
+  - id: lint-format
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: No source lint/format provider is identified.
+  - id: stack-idioms
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: The Java stack pack provides Java reading/testing skills, but no Java idiom provider was established.
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: The target application and its executable build environment have not been scaffolded.
+  - id: characterization-harness
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: No target-side differential/replay harness exists yet.
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest}
+      - {kind: skill, name: django-tdd}
+    notes: Provider selection follows the pinned Java-to-Django pack and harness example; no target tests are claimed as run.
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: pytest-coverage}
+    notes: The pack supplies the target coverage skill; no coverage result is claimed.
+  - id: complexity
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard}
+    notes: Lizard is used by the harness profile's CRAP gate.
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard}
+      - {kind: tool, name: crap.py}
+    notes: Coverage input is supplied through the target pytest coverage provider.
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: afs-mutation}
+    notes: The pinned harness provides the mutation gate tool; no target mutation run is claimed.
+  - id: lint-format
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Ruff appears in the harness example gate, but is not pinned by the selected pack or identified as an installed provider here.
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: django-patterns}
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: >-
+      The source uses H2 and the target stack is PostgreSQL 17. No data migration/reconciliation
+      provider or decision on migration versus regeneration has been established.
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: skill, name: agent-browser}
+    notes: Pinned built-in E2E skill provider; this checklist does not claim that E2E runs have occurred.
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4"}
+    notes: Pinned harness plugin; graph construction is a later dispatcher action.
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: "enrich_graph.py (java-ee, django)"}
+    notes: The selected stack pack defines both enrichers and graph requirements; graph gates have not been run.
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: rtk-oss, version: "1.1.0"}
