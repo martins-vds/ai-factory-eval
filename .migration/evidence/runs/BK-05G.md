@@ -6,3 +6,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 |---|---|---|---|---|---|---|---|
 | 2026-11-07T23:07:55+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-16T17:29:01+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-16T17:31:53+00:00 | tests-red | 2 | 1.18 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `e6005f2ec8a65724` | __________ ERROR collecting tests/booking/interfaces/test_dialogs.py ___________ |  |
