@@ -57,12 +57,13 @@ install.
    dispatcher runs this step) with the harness's `tools/bootstrap.py` (from a harness checkout at the release being
    installed): `--target <clone> --profile <profile> --capabilities <checklist> --stack-pack
    stacks/<pack>.json --create-gap-issues`. Give a new gap `ticket: new` and bootstrap opens its operator
-   issue. It installs pinned role agents to `.github/agents/`, skills (built-in menu plus stack pack) to
+   issue. Keep `ticket` when the gap is later met or waived: the harness closes that issue from main. It installs pinned role agents to `.github/agents/`, skills (built-in menu plus stack pack) to
    `.github/skills/`, harness tools and schemas to `.migration/harness/` with an `installed.json`
    manifest, RTK's hook, both instruction blocks (harness first), `copilot-setup-steps.yml` and the
    `afs-harness-check.yml` CI. Never hand-edit those files; re-run bootstrap.
 6. **Scaffold the target** per the architecture ADRs: layout, CI running the gates, lint/format, test
-   runner, coverage, CRAP and mutation tooling, containers.
+   runner with project-wide test isolation (listed in `target.shared_test_files`), coverage, CRAP and
+   mutation tooling, containers.
    **Test services** (written in step 4 when there is a data stack): write the target's `compose.yaml` with `docker-compose-orchestration` (images with
    `docker-expert`, Dockerfiles with `multi-stage-dockerfile`; never by hand). It defines every real
    service the tests need — the database from `target.stacks.data`, brokers, stand-ins for external
