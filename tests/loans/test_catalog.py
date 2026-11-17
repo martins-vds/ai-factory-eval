@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -125,6 +126,35 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [
+        ('', '123'),
+        ('reader', ''),
+        (' ', '123'),
+        ('reader', ' '),
+    ],
+)
+def test_lend_use_case_rejects_blank_required_fields(member, isbn):
+    loan_count = Loan.objects.count()
+
+    with pytest.raises(ValueError):
+        lend_loan(member, isbn)
+
+    assert Loan.objects.count() == loan_count
+
+
+@pytest.mark.django_db
+def test_lend_use_case_sets_a_fourteen_day_due_date():
+    lent_on = timezone.localdate()
+
+    loan = lend_loan('reader', '123')
+
+    assert loan.lent_on == lent_on
+    assert loan.due_on == lent_on + timedelta(days=14)
+
+
+@pytest.mark.django_db
 def test_return_endpoint_records_the_return_date(client):
     returned_on = timezone.localdate()
     golden = HTTP_GOLDENS['POST /loans/{id}/return']
@@ -150,6 +180,25 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_preserves_the_original_date_on_repeat():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_does_not_update_an_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert not updated
 
 
 @pytest.mark.django_db
@@ -425,6 +474,14 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_htmx_return_for_unknown_loan_renders_an_error(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
 
 
 @pytest.mark.django_db
