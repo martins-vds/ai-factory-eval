@@ -8,10 +8,19 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1173]
+target:
+  components: [src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_endpoint_rejects_repeated_returns_without_replacing_the_date, tests/loans/test_circulation.py::test_return_endpoint_preserves_an_existing_return_date, tests/loans/test_circulation.py::test_return_endpoint_returns_not_found_for_unknown_loan, tests/loans/test_circulation.py::test_browser_return_uses_htmx_and_keeps_the_first_return_date]
+rules:
+  - id: existing-loan
+    rule: A return request for an unknown loan is rejected with HTTP 404 and the characterized response body.
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
+  - id: reject-repeat
+    rule: A return request for an already-returned loan is rejected and leaves its original return date unchanged.
+    source: martins-vds/ai-factory-synthetic-target#41
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
