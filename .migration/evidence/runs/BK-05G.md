@@ -39,3 +39,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T21:24:07+00:00 | format-targeted | 0 | 0.04 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
 | 2026-11-17T21:24:14+00:00 | dialogs-expanded | 0 | 7.1 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `7a018cab076c8003` |  |  |
 | 2026-11-17T21:24:41+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T21:28:02+00:00 | mutation-changed-expanded | 0 | 169.96 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `7e25745feae0cb8f` |  | gate=mutation score=0.923 threshold=0.8 killed=60 survived=5 files=1 base=origin/main |
+| 2026-11-17T21:28:34+00:00 | idiom-targeted | 0 | 0.07 | `bash -c 'ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py && ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py'` | `afa20b27dacc9bf0` |  |  |
+| 2026-11-17T21:28:41+00:00 | dialogs-survivor-coverage | 0 | 7.3 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `6619cd4412327690` |  |  |

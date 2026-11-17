@@ -87,6 +87,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     )
 
     assert first.status_code == 200
+    assert '<html' not in content
     fallback = client.get(url)
     assert fallback.status_code == 200
     assert '<html lang="en">' in fallback.content.decode()
@@ -152,8 +153,9 @@ def test_unknown_cargo_dialog_returns_not_found(client, sample_bookings, url):
     dialog = destination_dialog_view if url.endswith('/destination/') else deadline_dialog_view
 
     assert response.status_code == 404
-    with pytest.raises(Http404, match='Cargo with tracking ID UNKNOWN not found.'):
+    with pytest.raises(Http404) as exception:
         dialog(RequestFactory().get(url), 'UNKNOWN')
+    assert str(exception.value) == 'Cargo with tracking ID UNKNOWN not found.'
 
 
 @pytest.mark.django_db
@@ -186,7 +188,10 @@ def test_destination_dialog_rejects_unavailable_destination(client, sample_booki
     updated = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in response.content.decode()
+    assert (
+        '<p class="mb-2 text-red-700" id="destination-error" role="alert">'
+        'Select a valid destination.</p>'
+    ) in response.content.decode()
     assert updated is not None
     assert updated.route_specification == cargo.route_specification
 
@@ -206,7 +211,10 @@ def test_destination_dialog_rejects_missing_destination(client, sample_bookings)
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in content
+    assert (
+        '<p class="mb-2 text-red-700" id="destination-error" role="alert">'
+        'Select a valid destination.</p>'
+    ) in content
     assert '<option value="" disabled selected>Choose a destination</option>' in content
     assert updated is not None
     assert updated.route_specification == cargo.route_specification
@@ -287,7 +295,11 @@ def test_deadline_dialog_shows_initial_value_and_parse_error(client, sample_book
         f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in deadline_input.group()
     )
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert '<html' not in initial
+    assert (
+        '<p class="mb-2 text-red-700" id="deadline-error" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
     assert 'aria-invalid="true"' in content
     assert 'value="not-a-date"' in content
     assert updated is not None
@@ -335,7 +347,10 @@ def test_deadline_dialog_rejects_missing_deadline(client, sample_bookings):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert (
+        '<p class="mb-2 text-red-700" id="deadline-error" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
     assert 'value=""' in content
     assert updated is not None
     assert updated.route_specification == cargo.route_specification
