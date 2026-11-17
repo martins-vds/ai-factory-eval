@@ -49,3 +49,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-17T22:35:23+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T22:38:44+00:00 | verifier-route-state | 1 | 4.85 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_dialog_update_rederives_route_state` | `589c9167dfcf87de` | assert cargo is not None |  |
+| 2026-11-17T22:39:01+00:00 | verifier-route-state | 0 | 3.0 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_dialog_update_rederives_route_state` | `964995a51240e328` |  |  |
