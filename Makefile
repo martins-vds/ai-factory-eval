@@ -1,8 +1,12 @@
 TAILWINDCSS_VERSION ?= v4.3.3
 PYTAILWINDCSS_VERSION ?= 0.4.2
+PORT ?= 8080
 export TAILWINDCSS_VERSION
 
-.PHONY: tailwind-install tailwind-build
+.PHONY: run tailwind-install tailwind-build
+
+run:
+	python manage.py runserver 0.0.0.0:$(PORT)
 
 tailwind-install:
 	python -m pip install pytailwindcss==$(PYTAILWINDCSS_VERSION)
