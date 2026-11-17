@@ -6,10 +6,21 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1189]
+target:
+  components: [src.loans.models.Loan, src.loans.migrations.0001_initial]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_repository_create_does_not_overwrite_an_existing_loan
+  - tests/loans/test_catalog.py::test_saved_loan_survives_database_connection_reopen
+  - tests/test_database_smoke.py::test_postgresql_connection_executes_query
+notes: "Ruling martins-vds/ai-factory-synthetic-target#42 approves persistent PostgreSQL storage instead of the source's in-memory database."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+rules:
+  - id: unique-loan-id
+    rule: "A loan id identifies at most one persisted loan."
+    source: "Loan.java:11-26"

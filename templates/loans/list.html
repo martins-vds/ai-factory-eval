@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}The reading room — Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-4xl">
+  <p class="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-primary">The Lending Library</p>
+  <div class="mb-10 border-b border-base-300 pb-8">
+    <h1 class="font-serif text-5xl font-medium tracking-tight md:text-7xl">The reading room</h1>
+    <p class="mt-5 max-w-2xl text-lg leading-8 text-base-content/70">
+      Every book has a journey. Browse the volumes currently making their way through the community.
+    </p>
+  </div>
+  <div class="mb-5 flex items-end justify-between gap-4">
+    <h2 class="font-serif text-2xl">On loan</h2>
+    <p class="text-sm text-base-content/60">{{ loans|length }} volume{{ loans|length|pluralize }}</p>
+  </div>
+  <ul class="space-y-4">
+    {% for loan in loans %}
+    <li class="card border border-base-300 bg-base-100 shadow-sm">
+      <div class="card-body gap-5 p-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-base-content/55">ISBN</p>
+          <h3 class="mt-1 font-serif text-2xl">{{ loan.isbn }}</h3>
+          <p class="mt-2 text-sm text-base-content/70">Borrowed by {{ loan.member }}</p>
+        </div>
+        <div class="flex items-center gap-5">
+          <div class="text-sm">
+            <p class="text-base-content/55">Due</p>
+            <time datetime="{{ loan.due_on|date:'Y-m-d' }}">{{ loan.due_on|date:'Y-m-d' }}</time>
+          </div>
+          <a class="btn btn-outline btn-primary" href="/ui/loans/{{ loan.id }}/" aria-label="{{ loan.id }}">
+            View loan {{ loan.id }}
+          </a>
+        </div>
+      </div>
+    </li>
+    {% empty %}
+    <li class="rounded-box border border-dashed border-base-300 p-8 text-center text-base-content/70">
+      The reading room is quiet for now.
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

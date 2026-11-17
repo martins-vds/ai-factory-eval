@@ -8,10 +8,27 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:52-55
   risk: {crap: 2, complexity: 2, coverage: 1.0}
 boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. The docs state spreadsheet users rely on this format."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1189]
+target:
+  components: [src.loans.export.loan_line]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_seeded_loans_are_listed_in_id_order
+  - tests/loans/test_catalog.py::test_export_quotes_delimiters_and_line_breaks_in_values
+  - tests/loans/test_catalog.py::test_approved_quirk_43_escapes_the_characterized_delimiter_case
+notes: "Ruling martins-vds/ai-factory-synthetic-target#43 approves escaping delimiter-containing values."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - id: export-field-order
+    rule: "Export fields are id, member, ISBN, lent-on, due-on, returned-on, separated by semicolons."
+    source: "LoanResource.java:52-55"
+  - id: empty-return-date
+    rule: "An unreturned loan has an empty final field in its export line."
+    source: "LoanResource.java:52-55"
+  - id: quote-delimiter-values
+    rule: "Export values containing a semicolon, quote, or line break are quoted and embedded quotes are escaped."
+    source: "martins-vds/ai-factory-synthetic-target#43"
