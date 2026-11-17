@@ -1,0 +1,30 @@
+[
+  {
+    "at": "2026-11-17T03:43:58Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18351,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/faf7dfd0-07a3-49f4-bb41-db89e3b31a55.json",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/returns/BK-05F.afs-verifier.yaml",
+      "tests/booking/interfaces/test_route_selection.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
