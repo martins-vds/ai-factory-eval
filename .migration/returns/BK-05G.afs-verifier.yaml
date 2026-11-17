@@ -1,0 +1,18 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/402
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.889
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings: []
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
