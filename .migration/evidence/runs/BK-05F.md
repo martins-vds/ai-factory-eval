@@ -97,3 +97,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T23:07:24+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-17T23:14:10+00:00 | idiom-format-fix | 0 | 0.02 | `ruff format tests/booking/interfaces/test_route_selection.py` | `413a709001976657` |  |  |
 | 2026-11-17T23:14:19+00:00 | idiom-ruff-format-final | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T23:40:10+00:00 | mutation-changed | 2 | 1966.3 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `fe8a84c1f1730f03` | afs-mutation: mutmut failed on src/cargotracker/cargo/domain/delivery.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=3 files=81 base=origin/main |
