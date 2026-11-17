@@ -1,0 +1,57 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1073
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 1
+  mutation_changed: "n/a: mutmut-failed"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: lend_loan accepts empty and whitespace-only member/ISBN values when called directly, so the required-field rule is enforced by the form/view rather than the use case.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: the use-case module imports Django timezone and the repository, violating the ticket's target layering ADR and check_layers contract.
+    evidence: "run: idiom-verifier-final"
+  - severity: minor
+    where: src/loans/services.py:11
+    what: lending allocates IDs from count()+1 outside a concurrency-safe repository operation, which can collide for concurrent lends.
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_and_preserves_original_date
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_browser_return_page_reports_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_catalog_route_is_available
+ledger_issues:
+  - loan.lend evidence does not include direct use-case enforcement for the approved blank-field ruling.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+rules:
+  - capability: loan.lend
+    rule: Lending rejects missing, empty, and whitespace-only member and ISBN values.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+    enforced: false
+  - capability: loan.return-date
+    rule: A repeat return rejects the change and preserves the original returned-on date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_and_preserves_original_date
+    enforced: true
+  - capability: loan.return
+    rule: A repeat return is reported as HTTP 409 and does not replace the saved date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_and_preserves_original_date
+    enforced: true
+inherited: []
