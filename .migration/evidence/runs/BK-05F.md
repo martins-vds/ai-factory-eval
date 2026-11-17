@@ -80,3 +80,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-17T19:03:45+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:06:25+00:00 | verify-build-compile | 0 | 0.11 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:06:26+00:00 | verify-build-django | 0 | 1.34 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T19:06:26+00:00 | verify-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:06:26+00:00 | verify-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T19:06:27+00:00 | verify-idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T19:06:27+00:00 | verify-idiom-ui | 0 | 0.45 | `python .migration/harness/tools/check_ui.py` | `01b2bbfed811a08f` |  | gate=ui scope="templates changed since 586f1c7cb77c19706f6de281a3444534b2b6b3b4" templates=0 findings=0 |
+| 2026-11-17T19:07:40+00:00 | verify-behavior | 0 | 72.42 | `pytest -q` | `b50221c9830f2a6e` |  |  |
+| 2026-11-17T19:08:38+00:00 | verify-regression | 0 | 58.71 | `pytest -q` | `d15a03ff5de649cf` |  |  |
+| 2026-11-17T19:09:45+00:00 | verify-crap-coverage | 0 | 66.8 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `52700c50f3b9925e` |  |  |
+| 2026-11-17T19:09:46+00:00 | verify-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:09:46+00:00 | verify-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T19:43:29+00:00 | verify-added-stale-id | 0 | 4.25 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo` | `3d761e1e96b14cd0` |  |  |
+| 2026-11-17T19:43:57+00:00 | verify-added-test-ruff | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:43:57+00:00 | verify-added-test-format | 0 | 0.02 | `ruff format --check tests/booking/interfaces/test_route_selection.py` | `fd2299c9f1c6dc86` |  |  |
