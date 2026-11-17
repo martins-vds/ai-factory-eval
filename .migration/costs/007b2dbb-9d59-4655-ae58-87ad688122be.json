@@ -117,6 +117,15 @@
         "startTime",
         "version"
       ],
+      "session.usage_checkpoint": [
+        "accountingSnapshot",
+        "modelCacheState",
+        "promptCacheBreakState",
+        "providerModelMetrics",
+        "totalNanoAiu",
+        "totalPremiumRequests",
+        "usageAccountingWatermarks"
+      ],
       "session.usage_record": [
         "usage"
       ],
@@ -242,19 +251,20 @@
       ]
     },
     "event_types": {
-      "assistant.message": 211,
-      "assistant.turn_end": 133,
-      "assistant.turn_start": 133,
+      "assistant.message": 212,
+      "assistant.turn_end": 134,
+      "assistant.turn_start": 134,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 452,
-      "hook.start": 453,
+      "hook.end": 455,
+      "hook.start": 456,
       "permission.completed": 169,
       "permission.requested": 169,
       "session.compaction_complete": 1,
       "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 133,
+      "session.usage_checkpoint": 1,
+      "session.usage_record": 134,
       "skill.context_delivered_ref": 10,
       "skill.invoked": 8,
       "skill.invoked_ref": 2,
@@ -266,12 +276,12 @@
       "system.notification": 3,
       "tool.execution_complete": 257,
       "tool.execution_start": 257,
-      "user.message": 4
+      "user.message": 5
     },
-    "events": 2411,
+    "events": 2423,
     "usage_fields": []
   },
-  "ended_at": "2026-11-17T03:48:04.253Z",
+  "ended_at": "2026-11-17T03:48:37.297Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -324,11 +334,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 211
+      "requests": 212
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-17T03:48:24+00:00",
+  "recorded_at": "2026-11-17T03:48:57+00:00",
   "schema": "afs-cost/1",
   "session_id": "007b2dbb-9d59-4655-ae58-87ad688122be",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
