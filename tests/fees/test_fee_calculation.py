@@ -1,9 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import FrozenInstanceError, dataclass
 from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication, GatewayResponse
+from src.fees.services import Fee, FeeApplication, GatewayResponse
 
 
 @dataclass
@@ -92,3 +92,14 @@ def test_payment_use_case_uses_injected_repository_and_gateway():
     assert application.pay('L1') == GatewayResponse(200, 'charged\n')
     assert application.pay('missing') is None
     assert gateway.calls == ['L1']
+
+
+def test_fee_and_gateway_response_are_immutable_value_objects():
+    fee = Fee(date(2026, 1, 10), 3, 75)
+    response = GatewayResponse(200, 'charged\n')
+
+    with pytest.raises(FrozenInstanceError):
+        fee.amount_cents = 100
+
+    with pytest.raises(FrozenInstanceError):
+        response.status = 502

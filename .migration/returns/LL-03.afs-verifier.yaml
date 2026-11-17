@@ -8,14 +8,17 @@ gates:
   behavior: 0
   idiom: 0
   crap: 7.0
-  mutation_changed: 0.976
+  mutation_changed: 0.980
   regression: 0
 evidence_logs:
   - .migration/evidence/runs/LL-03.md
 findings:
   - severity: minor
     where: .migration/evidence/mutants/LL-03.md:1
-    what: "Six mutants survive at 0.976: known module-level LL-02 route, method-guard and LoanForm.Meta.model selection survivors are covered by behavior tests; Fee and GatewayResponse frozen-state mutations remain."
+    what: "Five mutants survive at 0.980; route/template and LoanForm.Meta.model survivors are the known module-level selection limitation, and the behavior suite exercises the routes and supported methods."
+  - severity: minor
+    where: src/loans/repository.py:20
+    what: "A surviving mutation removes the LL-02 repository's transaction.atomic decorator; this earlier-slice behavior is outside LL-03 scope and is not adjudicated here."
 tests_added:
   - tests/fees/test_fee_calculation.py::test_payment_use_case_uses_injected_repository_and_gateway
   - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_unsupported_methods
@@ -24,6 +27,7 @@ tests_added:
   - tests/fees/test_endpoints.py::test_fee_page_payment_renders_page_for_regular_post
   - tests/fees/test_endpoints.py::test_fee_page_payment_returns_not_found_for_unknown_loan
   - tests/fees/test_endpoints.py::test_payment_gateway_uses_characterized_default_url
+  - tests/fees/test_fee_calculation.py::test_fee_and_gateway_response_are_immutable_value_objects
 ledger_issues: []
 quirk_tickets:
   - martins-vds/ai-factory-synthetic-target#40
