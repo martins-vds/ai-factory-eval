@@ -1,10 +1,19 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST
 
 from .forms import LendLoanForm
 from .models import Loan
 from .services import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
+
+
+def _redirect_for_request(request, view_name, **kwargs):
+    if request.headers.get('HX-Request') == 'true':
+        response = HttpResponse(status=204)
+        response['HX-Redirect'] = reverse(view_name, kwargs=kwargs)
+        return response
+    return redirect(view_name, **kwargs)
 
 
 @require_http_methods(['GET', 'POST'])
@@ -19,7 +28,7 @@ def loan_lend(request):
         if not form.is_valid():
             return render(request, 'loans/new.html', {'form': form}, status=400)
         lend_loan(**form.cleaned_data)
-        return redirect('/ui/loans/')
+        return _redirect_for_request(request, 'loan-catalog')
     return render(request, 'loans/new.html', {'form': form})
 
 
@@ -74,4 +83,4 @@ def loan_catalog_return(request, loan_id):
             {'loan': loan, 'return_error': 'This book has already been returned.'},
             status=409,
         )
-    return redirect('loan-detail-page', loan_id=loan_id)
+    return _redirect_for_request(request, 'loan-detail-page', loan_id=loan_id)

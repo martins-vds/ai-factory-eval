@@ -15,3 +15,38 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+target:
+  components:
+    - src.loans.forms.LendLoanForm
+    - src.loans.services.lend_loan
+    - src.loans.services.loan_line
+    - src.loans.views.loan_list
+    - src.loans.views.loan_lend
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lending_endpoint_creates_a_loan_with_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lending_api_rejects_missing_and_blank_values
+  - tests/loans/test_circulation.py::test_browser_lending_displays_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_browser_lending_displays_errors_when_no_fields_are_submitted
+  - tests/loans/test_circulation.py::test_browser_can_lend_a_book_from_the_reading_room_form
+  - tests/loans/test_circulation.py::test_htmx_lending_redirects_to_the_catalog
+  - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
+  - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
+rules:
+  - id: member-and-isbn-required
+    rule: "Member and ISBN values are required; empty and whitespace-only values are rejected."
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: member-and-isbn-length
+    rule: "Member and ISBN values are limited to 255 characters."
+    source: legacy/src/main/java/lib/Loan.java:15-18
+  - id: loan-id
+    rule: "New loan identifiers are L followed by the current loan count plus one."
+    source: legacy/src/main/java/lib/LoanResource.java:37-43
+  - id: lend-and-due-date
+    rule: "A new loan is dated today and is due 14 calendar days later."
+    source: legacy/src/main/java/lib/Loan.java:44-46
+  - id: export-escaping
+    rule: "Exported member and ISBN values containing delimiters, quotes, or line breaks are escaped."
+    source: martins-vds/ai-factory-synthetic-target#43

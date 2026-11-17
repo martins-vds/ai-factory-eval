@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.utils import timezone
+from playwright.sync_api import sync_playwright
 
 
 @pytest.mark.django_db
@@ -14,9 +15,7 @@ def test_lending_endpoint_creates_a_loan_with_fourteen_day_due_date(client):
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == f'L4;dee;123;{today};{due_on};\n'
-    assert client.get('/loans/L4').content.decode() == (
-        f'L4;dee;123;{today};{due_on};\n'
-    )
+    assert client.get('/loans/L4').content.decode() == (f'L4;dee;123;{today};{due_on};\n')
 
 
 @pytest.mark.django_db
@@ -27,9 +26,7 @@ def test_return_endpoint_records_today_and_returns_the_updated_loan(client):
 
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today}\n'
-    )
+    assert response.content.decode() == (f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today}\n')
     assert client.get('/loans/L1').content.decode() == (
         f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today}\n'
     )
@@ -61,6 +58,18 @@ def test_browser_can_lend_a_book_from_the_reading_room_form(client):
     catalog = client.get(response['Location'])
     assert b'Loan L4' in catalog.content
     assert b'dee' in catalog.content
+
+
+@pytest.mark.django_db
+def test_htmx_lending_redirects_to_the_catalog(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'dee', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 204
+    assert response['HX-Redirect'] == '/ui/loans/'
 
 
 @pytest.mark.django_db
@@ -113,6 +122,17 @@ def test_browser_can_return_an_unreturned_book(client):
 
 
 @pytest.mark.django_db
+def test_htmx_return_redirects_to_the_updated_loan(client):
+    response = client.post(
+        '/ui/loans/L1/return/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 204
+    assert response['HX-Redirect'] == '/ui/loans/L1/'
+
+
+@pytest.mark.django_db
 def test_return_api_returns_not_found_for_an_unknown_loan(client):
     response = client.post('/loans/unknown/return')
 
@@ -129,3 +149,26 @@ def test_browser_repeat_return_shows_error_without_overwriting_date(client):
     assert b'This book has already been returned.' in response.content
     assert b'Jan 20, 2026' in response.content
     assert b'Record return' not in response.content
+
+
+@pytest.mark.django_db
+def test_browser_can_lend_and_return_a_book(client, live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/loans/')
+            page.get_by_role('link', name='Lend a book').click()
+            page.get_by_label('Member').fill('reader')
+            page.get_by_label('ISBN').fill('123')
+            page.get_by_role('button', name='Record this loan').click()
+            page.wait_for_url(f'{live_server.url}/ui/loans/')
+            assert page.get_by_text('reader · ISBN 123').is_visible()
+
+            page.get_by_role('link', name='Loan L4').click()
+            page.get_by_role('button', name='Record return').click()
+            page.wait_for_url(f'{live_server.url}/ui/loans/L4/')
+            assert page.get_by_text('Returned', exact=True).is_visible()
+            assert page.get_by_role('button', name='Record return').count() == 0
+        finally:
+            browser.close()
