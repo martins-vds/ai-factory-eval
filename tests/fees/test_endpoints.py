@@ -194,6 +194,8 @@ def test_fee_page_payment_without_htmx_renders_full_page(
 
     assert response.status_code == expected_status
     assert b'Late fee for L3' in response.content
+    assert b'2025-12-15' in response.content
+    assert b'19 day(s) late' in response.content
     assert b'Fee: $4.75' in response.content
     assert b'role="' + expected_role + b'"' in response.content
     assert gateway_body in response.content
