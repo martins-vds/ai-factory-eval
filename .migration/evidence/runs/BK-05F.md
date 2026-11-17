@@ -93,3 +93,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T05:22:36+00:00 | verifier-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T05:22:40+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-17T05:22:45+00:00 | verifier-mutation-changed | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T05:29:59+00:00 | inherited-route-reassignment | 1 | 1.66 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_diagnostic_reassigning_route_replaces_previous_itinerary` | `d726fed8c531e559` | assert 'CM003' in details |  |
+| 2026-11-17T05:30:15+00:00 | verifier-route-selection-final | 0 | 1.92 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `8b7a624d6b4f0d8f` |  |  |
