@@ -16,11 +16,7 @@ logger = logging.getLogger(__name__)
 def fee_detail(request, loan_id):
     result = fee_application.get(loan_id)
     if result is None:
-        return HttpResponse(
-            '<p>No such loan.</p>',
-            status=404,
-            content_type='text/html',
-        )
+        return _missing_fee_response()
 
     loan, fee = result
     body = (
@@ -35,11 +31,7 @@ def fee_detail(request, loan_id):
 def fee_page(request, loan_id):
     result = fee_application.get(loan_id)
     if result is None:
-        return HttpResponse(
-            '<p>No such loan.</p>',
-            status=404,
-            content_type='text/html',
-        )
+        return _missing_fee_response()
 
     loan, fee = result
     return render(request, 'fees/detail.html', _fee_page_context(loan, fee))
@@ -93,3 +85,11 @@ def fee_payment(request, loan_id):
 def _fee_page_context(loan, fee):
     fees = [{'loan': item_loan, 'fee': item_fee} for item_loan, item_fee in fee_application.all()]
     return {'loan': loan, 'fee': fee, 'fees': fees}
+
+
+def _missing_fee_response():
+    return HttpResponse(
+        '<p>No such loan.</p>',
+        status=404,
+        content_type='text/html',
+    )

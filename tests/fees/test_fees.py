@@ -104,6 +104,15 @@ def test_fee_page_uses_reading_room_layout_and_payment_action(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ('gateway_status', 'gateway_body', 'expected_status', 'expected_body'),
     [
