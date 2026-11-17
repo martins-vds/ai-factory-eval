@@ -78,3 +78,14 @@ def test_loan_detail_page_has_a_return_path_to_the_catalog(client):
     assert response.status_code == 200
     assert 'L1' in response.content.decode()
     assert 'href="/ui/loans/"' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_catalog_page_shows_seeded_records_and_count(client):
+    response = client.get('/ui/loans/')
+    body = response.content.decode()
+
+    assert response.status_code == 200
+    assert '3 loans in view' in body
+    assert 'ISBN 9780134685991' in body
+    assert 'href="/ui/loans/L1/"' in body

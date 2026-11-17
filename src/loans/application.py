@@ -1,15 +1,15 @@
 import csv
 from io import StringIO
 
-from .repository import LoanRepository
+from .repository import find_by_id, list_all
 
 
 def list_loans():
-    return LoanRepository.list_all()
+    return list_all()
 
 
 def get_loan(loan_id):
-    return LoanRepository.find_by_id(loan_id)
+    return find_by_id(loan_id)
 
 
 def format_loan(loan):
