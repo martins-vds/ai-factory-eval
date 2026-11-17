@@ -162,6 +162,14 @@ def test_return_endpoint_records_the_return_date(client):
     assert Loan.objects.get(pk='L1').returned_on == returned_on
 
 
+@pytest.mark.django_db(transaction=True)
+def test_return_endpoint_can_record_a_return_outside_testcase_transactions(client):
+    response = client.post('/loans/L1/return')
+
+    assert response.status_code == 200
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
 @pytest.mark.django_db
 def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     original_return_date = date(2026, 1, 20)
@@ -420,6 +428,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L1/'
     assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
 
 
 @pytest.mark.django_db
