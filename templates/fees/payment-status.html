@@ -1,0 +1,8 @@
+<div id="payment-status" aria-live="polite">
+  {% if payment_result.status_code == 200 %}
+  <p role="status">Payment complete: {{ payment_result.body }}</p>
+  {% else %}
+  <p role="alert">Payment could not be completed: {{ payment_result.body }}</p>
+  {% include "fees/payment-form.html" with loan=loan button_label="Try payment again" %}
+  {% endif %}
+</div>
