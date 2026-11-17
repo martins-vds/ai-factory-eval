@@ -1,22 +1,49 @@
+import re
+
+import pytest
 from django.core.management import call_command
 from django.test import override_settings
 from django.urls import path
-import pytest
 
 from cargotracker.booking.application.dashboard import CargoDashboard
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.booking.interfaces.dialogs.views import create_specification_dialog_views
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
+from cargotracker.location.infrastructure.repository import DjangoLocationRepository
+
+cargo_repository = DjangoCargoRepository()
+location_repository = DjangoLocationRepository()
+cargo_dashboard = CargoDashboard(cargo_repository)
+available_locations = []
+destination_dialog_view, deadline_dialog_view = create_specification_dialog_views(
+    CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
+    cargo_dashboard,
+    lambda: available_locations,
+)
+dashboard_view, _ = create_booking_views(cargo_dashboard)
+urlpatterns = [
+    path('admin/dashboard/', dashboard_view),
+    path('admin/cargo/<str:tracking_id>/destination/', destination_dialog_view),
+    path('admin/cargo/<str:tracking_id>/deadline/', deadline_dialog_view),
+]
 
 
-dashboard_view, _ = create_booking_views(CargoDashboard(DjangoCargoRepository()))
-urlpatterns = [path('admin/dashboard/', dashboard_view)]
+@pytest.fixture
+def sample_bookings():
+    call_command('seed_sample_data')
+    available_locations[:] = location_repository.find_all()
+    yield
+    available_locations.clear()
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_dashboard_opens_destination_and_deadline_dialogs_from_not_routed_rows(client):
-    call_command('seed_sample_data')
-
+def test_dashboard_opens_destination_and_deadline_dialogs_from_not_routed_rows(
+    client, sample_bookings
+):
     response = client.get('/admin/dashboard/')
     content = response.content.decode()
     not_routed_table = content.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
@@ -30,3 +57,137 @@ def test_dashboard_opens_destination_and_deadline_dialogs_from_not_routed_rows(c
     assert 'href="/admin/cargo/DEF789/deadline/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in not_routed_table
     assert 'id="cargo-edit-dialog"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_shows_current_values_and_stable_filtered_options(
+    client, sample_bookings
+):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    original_locations = list(available_locations)
+    url = '/admin/cargo/DEF789/destination/'
+
+    first = client.get(url, HTTP_HX_REQUEST='true')
+    second = client.get(url, HTTP_HX_REQUEST='true')
+    content = first.content.decode()
+    options = re.search(r'<select\b[^>]*>(.*?)</select>', content, re.DOTALL)
+    second_options = re.search(r'<select\b[^>]*>(.*?)</select>', second.content.decode(), re.DOTALL)
+    assert options is not None
+    assert second_options is not None
+
+    assert first.status_code == 200
+    assert cargo.route_specification.origin.name in content
+    assert cargo.route_specification.destination.name in content
+    assert cargo.route_specification.origin.unlocode.value not in options.group(1)
+    assert cargo.route_specification.destination.unlocode.value not in options.group(1)
+    assert options.group(1) == second_options.group(1)
+    assert available_locations == original_locations
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_unavailable_destination(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': cargo.route_specification.origin.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert updated is not None
+    assert updated.route_specification == cargo.route_specification
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_updates_cargo_and_refreshes_the_dashboard(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    new_destination = next(
+        location
+        for location in available_locations
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': new_destination.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    dashboard = client.get('/admin/dashboard/').content.decode()
+    not_routed_table = dashboard.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+
+    assert response.status_code == 204
+    assert response['HX-Redirect'] == '/admin/dashboard/'
+    assert updated is not None
+    assert updated.route_specification.origin == cargo.route_specification.origin
+    assert updated.route_specification.destination == new_destination
+    assert (
+        updated.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    )
+    assert new_destination.name in not_routed_table
+    assert new_destination.unlocode.value in not_routed_table
+    assert 'data-tracking-id="DEF789"' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_shows_initial_value_and_parse_error(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    url = '/admin/cargo/DEF789/deadline/'
+    initial = client.get(url, HTTP_HX_REQUEST='true').content.decode()
+
+    response = client.post(
+        url,
+        {'deadline': 'not-a-date'},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    deadline_input = re.search(r'<input\b[^>]*name="deadline"[^>]*>', initial, re.DOTALL)
+
+    assert deadline_input is not None
+    assert (
+        f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in deadline_input.group()
+    )
+    assert response.status_code == 200
+    assert 'Enter a valid arrival deadline.' in content
+    assert 'aria-invalid="true"' in content
+    assert 'value="not-a-date"' in content
+    assert updated is not None
+    assert updated.route_specification == cargo.route_specification
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_updates_cargo_and_refreshes_the_dashboard(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    new_deadline = '2030-11-12'
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': new_deadline},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    dashboard = client.get('/admin/dashboard/').content.decode()
+    not_routed_table = dashboard.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+
+    assert response.status_code == 204
+    assert response['HX-Redirect'] == '/admin/dashboard/'
+    assert updated is not None
+    assert updated.route_specification.origin == cargo.route_specification.origin
+    assert updated.route_specification.destination == cargo.route_specification.destination
+    assert updated.route_specification.arrival_deadline.date().isoformat() == new_deadline
+    assert '11/12/2030' in not_routed_table
+    assert 'data-tracking-id="DEF789"' in not_routed_table
