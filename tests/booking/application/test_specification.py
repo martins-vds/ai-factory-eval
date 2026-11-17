@@ -59,6 +59,17 @@ def test_change_destination_raises_lookup_error_for_unknown_cargo():
 
 
 @pytest.mark.django_db
+def test_change_destination_rejects_origin_as_destination():
+    repository, original = _persist_routed_cargo()
+    specification = CargoSpecification(repository, DjangoHandlingEventRepository())
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(original.tracking_id, ORIGIN)
+
+    assert repository.find(original.tracking_id) == original
+
+
+@pytest.mark.django_db
 def test_change_deadline_raises_lookup_error_for_unknown_cargo():
     specification = CargoSpecification(
         DjangoCargoRepository(),
