@@ -35,21 +35,23 @@ class PaymentGateway:
 
 
 @pytest.mark.parametrize(
-    ('days_late', 'expected_cents'),
-    [(0, 0), (1, 0), (2, 0), (3, 75), (11, 275), (100, 1000)],
+    ('days_after_due', 'expected_days_late', 'expected_cents'),
+    [(-3, 0, 0), (0, 0, 0), (1, 1, 0), (2, 2, 0), (3, 3, 75), (11, 11, 275), (100, 100, 1000)],
 )
-def test_fee_calculates_unreturned_loan_with_grace_period_and_cap(days_late, expected_cents):
+def test_fee_calculates_unreturned_loan_with_grace_period_and_cap(
+    days_after_due, expected_days_late, expected_cents
+):
     due_on = date(2026, 1, 10)
     application = FeeApplication(
         LoanRepository(Loan('L1', due_on)),
-        Clock(date(2026, 1, 10) + timedelta(days=days_late)),
+        Clock(date(2026, 1, 10) + timedelta(days=days_after_due)),
         PaymentGateway(),
     )
 
     fee = application.fee_for('L1')
 
     assert fee.due_on == due_on
-    assert fee.days_late == days_late
+    assert fee.days_late == expected_days_late
     assert fee.amount_cents == expected_cents
 
 
@@ -70,3 +72,9 @@ def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_payment_for_unknown_loan_does_not_call_gateway():
+    application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
+
+    assert application.pay('missing') is None

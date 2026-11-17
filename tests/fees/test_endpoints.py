@@ -180,3 +180,35 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
         finally:
             browser.close()
+
+
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L1'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L1/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+@pytest.mark.django_db
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_fee_page_configures_htmx_to_swap_gateway_errors(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    assert any(
+        handler in response.content
+        for handler in (
+            b'htmx.config.responseHandling',
+            b'htmx:beforeSwap',
+            b'response-targets',
+        )
+    )
