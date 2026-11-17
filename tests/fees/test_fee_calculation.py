@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, GatewayResponse
 
 
 @dataclass
@@ -32,6 +32,15 @@ class Clock:
 class PaymentGateway:
     def charge(self, loan_id):
         raise AssertionError('fee calculation must not charge the gateway')
+
+
+class RecordingPaymentGateway:
+    def __init__(self):
+        self.loan_ids = []
+
+    def charge(self, loan_id):
+        self.loan_ids.append(loan_id)
+        return GatewayResponse(200, 'charged\n')
 
 
 @pytest.mark.parametrize(
@@ -70,3 +79,27 @@ def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_payment_uses_the_gateway_port_for_an_existing_loan():
+    gateway = RecordingPaymentGateway()
+    application = FeeApplication(
+        LoanRepository(Loan('L1', date(2026, 1, 10))),
+        Clock(date(2026, 1, 1)),
+        gateway,
+    )
+
+    response = application.pay('L1')
+
+    assert response == GatewayResponse(200, 'charged\n')
+    assert gateway.loan_ids == ['L1']
+
+
+def test_payment_does_not_call_the_gateway_for_an_unknown_loan():
+    gateway = RecordingPaymentGateway()
+    application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), gateway)
+
+    response = application.pay('missing')
+
+    assert response is None
+    assert gateway.loan_ids == []
