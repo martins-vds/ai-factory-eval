@@ -1,0 +1,3 @@
+<p class="alert {% if successful %}alert-success{% else %}alert-error{% endif %}" role="{% if successful %}status{% else %}alert{% endif %}">
+  {% if successful %}Payment received: {% else %}Payment could not be completed: {% endif %}{{ body }}
+</p>

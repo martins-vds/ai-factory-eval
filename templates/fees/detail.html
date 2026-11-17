@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Late fees · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto">
+  <a class="link link-hover text-sm" href="/ui/loans/">← All loans</a>
+  <p class="uppercase tracking-[.2em] text-xs text-[#5b5e50] mt-7">A small nudge, never a surprise</p>
+  <h1 class="text-5xl mt-3 mb-8">Late fees</h1>
+  <div class="grid md:grid-cols-[1fr_18rem] gap-8">
+    <article class="bg-[#fffdf7] border border-[#d8cdbb] p-7">
+      <p class="text-[#5b5e50]">{{ loan.member }} · {{ loan.id }}</p>
+      <h2 class="text-3xl mt-2">Loan {{ loan.id }}</h2>
+      <p class="text-sm text-[#5b5e50] mt-1">ISBN {{ loan.isbn }}</p>
+      <p class="mt-5">
+        Due {{ loan.due_on|date:"M j, Y" }}
+        {% if loan.returned_on %} · returned {{ loan.returned_on|date:"M j, Y" }}{% endif %}
+      </p>
+      <p class="mt-2">{{ fee.late_days }} late days · first two days waived</p>
+      <p class="text-6xl mt-7 font-bold">{{ fee.amount }}</p>
+      <p class="text-[#5b5e50] mt-2">25¢ per day after the grace threshold, capped at $10.00.</p>
+      {% if fee.amount_cents %}
+      <form
+        method="post"
+        action="/ui/payments/{{ loan.id }}/"
+        hx-post="/ui/payments/{{ loan.id }}/"
+        hx-target="#payment-result"
+        hx-swap="innerHTML"
+        hx-indicator="#payment-loading"
+        hx-disabled-elt="this"
+        class="mt-6"
+      >
+        {% csrf_token %}
+        <button class="btn w-full bg-[#a94e37] text-white hover:bg-[#8f3f2d] transition-colors">
+          Pay {{ fee.amount }} late fee
+        </button>
+      </form>
+      <p id="payment-loading" class="htmx-indicator text-sm mt-3" role="status" aria-live="polite">
+        Contacting the payment gateway…
+      </p>
+      <div id="payment-result" aria-live="polite" class="mt-3">
+        {% if payment_result %}
+          {% include "fees/payment-result.html" with body=payment_result.body successful=payment_result.successful %}
+        {% endif %}
+      </div>
+      {% else %}
+      <p class="alert mt-6" role="status">There is no late fee to pay.</p>
+      {% endif %}
+    </article>
+    <nav aria-label="Choose a loan fee" class="space-y-2">
+      {% for item in fees %}
+      <a
+        class="block bg-[#fffdf7] border border-[#d8cdbb] p-3 text-[#2f3428] hover:border-[#a94e37] transition-colors"
+        href="/ui/fees/{{ item.loan.id }}/"
+        {% if item.loan.id == loan.id %}aria-current="page"{% endif %}
+      >
+        <strong>{{ item.loan.id }}</strong> · {{ item.loan.member }}
+        <span class="block text-sm text-[#5b5e50]">{{ item.fee.amount }}</span>
+      </a>
+      {% endfor %}
+    </nav>
+  </div>
+</section>
+{% endblock %}
