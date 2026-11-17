@@ -1,0 +1,59 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/863
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 'n/a: no mutable code changed by the verifier'
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: minor
+    where: src/cargotracker/booking/interfaces/route_selection/views.py:36
+    what: Route-specification acceptance is checked in the view instead of the CargoRouting use case, coupling the adapter to business policy.
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_tracking_ids
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/cargo/infrastructure/repository.py:60-69
+    what: Reassigning a longer itinerary to a shorter one leaves obsolete LegRecord rows; the cargo-details screen then displays stale legs alongside the selected route.
+    origin: TC-04 (martins-vds/ai-factory-pilot-target#24)
+    evidence: 'run: inherited-route-reassignment'
+  - where: src/cargotracker/booking/application/routing.py:1,63-66
+    what: The BK-05C use case imports and raises django.http.Http404; the layering gate reports this as known, not failing debt.
+    origin: BK-05C (martins-vds/ai-factory-pilot-target#290)
+    evidence: 'run: verifier-idiom-layers (gate passed; known, not failing)'
+survivor_assessment:
+  - mutant: 1
+    matters: false
+    reason: Signing and verification use the same salt; changing it only changes opaque tokens within the current application version.
+  - mutant: 2
+    matters: false
+    reason: Signing and verification share the same default salt; the current form flow remains intact.
+  - mutant: 10
+    matters: false
+    reason: The changed unknown-cargo diagnostic still produces the same HTTP 404 response.
+  - mutant: 13
+    matters: false
+    reason: The changed route-specification diagnostic still produces the same HTTP 404 response.
+  - mutant: 14
+    matters: false
+    reason: X is URL-unreserved, so the redirect location is unchanged.
+  - mutant: 27
+    matters: false
+    reason: The changed unknown-cargo diagnostic still produces the same HTTP 404 response.
+  - mutant: 40
+    matters: false
+    reason: Either missing-token fallback fails signature validation and maps to the same 404.
+  - mutant: 44
+    matters: false
+    reason: The BadSignature diagnostic is caught and mapped to the same HTTP 404 response.
+  - mutant: 46
+    matters: false
+    reason: The changed invalid-route diagnostic still produces the same HTTP 404 response.
