@@ -79,3 +79,18 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T03:30:12+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:33:07+00:00 | verifier-stale-404-test | 0 | 3.86 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo` | `8a5170c47238fc99` |  |  |
+| 2026-11-17T03:33:35+00:00 | verifier-build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:33:36+00:00 | verifier-build-check | 0 | 0.34 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T03:34:29+00:00 | verifier-behavior | 0 | 52.95 | `pytest -q` | `48309f438db8c626` |  |  |
+| 2026-11-17T03:34:29+00:00 | verifier-idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T03:34:29+00:00 | verifier-idiom-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T03:34:29+00:00 | verifier-idiom-layers | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T03:35:22+00:00 | verifier-crap-coverage | 0 | 52.81 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `3875b35d4962f13d` |  |  |
+| 2026-11-17T03:35:22+00:00 | verifier-crap-lizard | 0 | 0.15 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:35:22+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T03:35:22+00:00 | verifier-mutation-changed | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T03:36:14+00:00 | verifier-regression | 0 | 51.51 | `pytest -q` | `1018dcbd1d072b35` |  |  |
+| 2026-11-17T03:39:03+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:43:04+00:00 | verifier-final-regression | 0 | 52.84 | `pytest -q` | `92fdb9afe930e70f` |  |  |
