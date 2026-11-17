@@ -14,7 +14,7 @@ def loan_catalog(request):
 
 @require_http_methods(['GET', 'POST'])
 def loan_lend(request):
-    form = LendLoanForm(request.POST or None)
+    form = LendLoanForm(request.POST if request.method == 'POST' else None)
     if request.method == 'POST':
         if not form.is_valid():
             return render(request, 'loans/new.html', {'form': form}, status=400)

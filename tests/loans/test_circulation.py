@@ -93,6 +93,15 @@ def test_browser_lending_displays_field_errors_for_blank_values(client):
 
 
 @pytest.mark.django_db
+def test_browser_lending_displays_errors_when_no_fields_are_submitted(client):
+    response = client.post('/ui/loans/new/')
+
+    assert response.status_code == 400
+    assert response.context['form'].errors.keys() == {'member', 'isbn'}
+    assert response.content.count(b'This field is required.') == 2
+
+
+@pytest.mark.django_db
 def test_browser_can_return_an_unreturned_book(client):
     response = client.post('/ui/loans/L1/return/')
 
@@ -101,3 +110,22 @@ def test_browser_can_return_an_unreturned_book(client):
     detail = client.get(response['Location'])
     assert b'Returned' in detail.content
     assert b'Record return' not in detail.content
+
+
+@pytest.mark.django_db
+def test_return_api_returns_not_found_for_an_unknown_loan(client):
+    response = client.post('/loans/unknown/return')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_browser_repeat_return_shows_error_without_overwriting_date(client):
+    response = client.post('/ui/loans/L2/return/')
+
+    assert response.status_code == 409
+    assert b'This book has already been returned.' in response.content
+    assert b'Jan 20, 2026' in response.content
+    assert b'Record return' not in response.content
