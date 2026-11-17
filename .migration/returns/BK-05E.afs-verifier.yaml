@@ -1,0 +1,30 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/837
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:38
+    what: Unknown and stale cargo requests return a generic 404 page without the approved cargo-not-found message.
+    evidence: "run: behavior-notfound-message"
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:7
+    what: The web adapter imports CargoRepository from the domain layer, violating ADR-0001's inward dependency rule.
+    evidence: "run: idiom-layers"
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_unrouted_cargo_details_link_back_to_route_action
+  - tests/booking/interfaces/test_cargo_details.py::test_misdirected_cargo_details_offer_reroute_action
+  - tests/booking/interfaces/test_cargo_details.py::test_unknown_and_stale_cargo_details_show_not_found_message[UNKNOWN-False]
+  - tests/booking/interfaces/test_cargo_details.py::test_unknown_and_stale_cargo_details_show_not_found_message[MNO456-True]
+ledger_issues: []
+quirk_tickets: []
