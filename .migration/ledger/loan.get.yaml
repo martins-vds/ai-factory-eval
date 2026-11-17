@@ -18,6 +18,7 @@ evidence:
   - .migration/evidence/runs/LL-01.md
   - tests/loans/test_catalog.py::test_existing_loan_lookup_returns_one_formatted_line
   - tests/loans/test_catalog.py::test_missing_loan_lookup_returns_the_characterized_not_found_response
+  - tests/loans/test_catalog.py::test_list_and_lookup_match_the_source_http_goldens
 rules:
   - id: get-existing-loan
     rule: "An existing loan lookup returns its export line followed by a newline with HTTP 200."

@@ -17,7 +17,7 @@ evidence:
   - .migration/evidence/runs/LL-01.md
   - tests/loans/test_catalog.py::test_seeded_loans_are_listed_in_id_order
   - tests/loans/test_catalog.py::test_migration_does_not_replace_existing_seeded_loan_values
-notes: "Seed reload and reset-on-restart behavior are raised in martins-vds/ai-factory-synthetic-target#42."
+notes: "Ruling martins-vds/ai-factory-synthetic-target#42 approves inserting seeds only when absent and preserving persisted values."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
 rules:
   - id: seed-example-records

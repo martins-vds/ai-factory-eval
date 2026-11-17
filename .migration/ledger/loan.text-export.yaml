@@ -19,7 +19,8 @@ evidence:
   - .migration/evidence/runs/LL-01.md
   - tests/loans/test_catalog.py::test_seeded_loans_are_listed_in_id_order
   - tests/loans/test_catalog.py::test_export_quotes_delimiters_and_line_breaks_in_values
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+  - tests/loans/test_catalog.py::test_approved_quirk_43_escapes_the_characterized_delimiter_case
+notes: "Ruling martins-vds/ai-factory-synthetic-target#43 approves escaping delimiter-containing values."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
 rules:
   - id: export-field-order

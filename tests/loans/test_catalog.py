@@ -1,4 +1,6 @@
+import json
 from datetime import date
+from pathlib import Path
 
 import pytest
 from django.core.management import call_command
@@ -6,6 +8,8 @@ from django.db import IntegrityError, connection
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+
+GOLDENS = Path(__file__).resolve().parents[2] / '.migration' / 'characterization' / 'source' / 'goldens'
 
 
 @pytest.mark.django_db
@@ -19,6 +23,19 @@ def test_seeded_loans_are_listed_in_id_order(client):
         'L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\n'
         'L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03\n'
     )
+
+
+@pytest.mark.django_db
+def test_list_and_lookup_match_the_source_http_goldens(client):
+    golden = json.loads((GOLDENS / 'http.json').read_text())
+
+    for key, path in (('GET /loans', '/loans'), ('GET /loans/{id}', '/loans/L1')):
+        expected = golden[key]['response']
+        response = client.get(path)
+
+        assert response.status_code == expected['status']
+        assert response['Content-Type'] == expected['content_type']
+        assert response.content.decode() == expected['body']
 
 
 @pytest.mark.django_db
@@ -69,7 +86,7 @@ def test_export_quotes_delimiters_and_line_breaks_in_values(client):
     LoanRepository.save(
         Loan(
             id='L9',
-            member='a;b',
+            member='a;"b',
             isbn='123\n456',
             lent_on=date(2026, 1, 1),
         )
@@ -77,7 +94,28 @@ def test_export_quotes_delimiters_and_line_breaks_in_values(client):
 
     response = client.get('/loans/L9')
 
-    assert response.content.decode() == 'L9;"a;b";"123\n456";2026-01-01;2026-01-15;\n'
+    assert response.content.decode() == 'L9;"a;""b";"123\n456";2026-01-01;2026-01-15;\n'
+
+
+@pytest.mark.django_db
+def test_approved_quirk_43_escapes_the_characterized_delimiter_case(client):
+    """Ruling #43 replaces ambiguous raw semicolon fields with CSV-quoted target values."""
+    source_observation = json.loads((GOLDENS / 'edge-cases.json').read_text())[
+        'POST /loans/delimiter-fields'
+    ]['response']['body']
+    assert source_observation == 'L6;a;b;123;456;2026-11-08;2026-11-22;\n'
+
+    LoanRepository.create(
+        Loan(
+            id='L6',
+            member='a;b',
+            isbn='123;456',
+            lent_on=date(2026, 11, 8),
+        )
+    )
+    response = client.get('/loans/L6')
+
+    assert response.content.decode() == 'L6;"a;b";"123;456";2026-11-08;2026-11-22;\n'
 
 
 @pytest.mark.django_db(transaction=True)

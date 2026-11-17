@@ -19,6 +19,7 @@ evidence:
   - .migration/evidence/runs/LL-01.md
   - tests/loans/test_catalog.py::test_seeded_loans_are_listed_in_id_order
   - tests/loans/test_catalog.py::test_list_keeps_ids_ordered_when_records_are_inserted_out_of_order
+  - tests/loans/test_catalog.py::test_list_and_lookup_match_the_source_http_goldens
 rules:
   - id: list-in-id-order
     rule: "The loan list includes every loan in ascending id order."

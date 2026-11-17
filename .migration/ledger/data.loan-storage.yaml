@@ -17,7 +17,8 @@ evidence:
   - .migration/evidence/runs/LL-01.md
   - tests/loans/test_catalog.py::test_repository_create_does_not_overwrite_an_existing_loan
   - tests/loans/test_catalog.py::test_saved_loan_survives_database_connection_reopen
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+  - tests/test_database_smoke.py::test_postgresql_connection_executes_query
+notes: "Ruling martins-vds/ai-factory-synthetic-target#42 approves persistent PostgreSQL storage instead of the source's in-memory database."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
 rules:
   - id: unique-loan-id
