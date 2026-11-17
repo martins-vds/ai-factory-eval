@@ -4,7 +4,6 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
-
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 

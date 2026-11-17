@@ -71,9 +71,7 @@ def test_fee_api_matches_the_characterized_page_for_an_existing_loan(client):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(('days_late', 'amount'), [(2, '0.00'), (3, '0.75')])
-def test_fee_api_waives_only_two_days_and_charges_all_late_days_after(
-    client, days_late, amount
-):
+def test_fee_api_waives_only_two_days_and_charges_all_late_days_after(client, days_late, amount):
     loan = Loan.objects.create(
         id=f'F{days_late}',
         member='reader',
@@ -113,9 +111,7 @@ def test_fee_api_returns_the_characterized_not_found_response(client):
 
 
 @pytest.mark.django_db
-def test_payment_api_forwards_the_characterized_request_to_the_gateway(
-    client, monkeypatch
-):
+def test_payment_api_forwards_the_characterized_request_to_the_gateway(client, monkeypatch):
     with payment_gateway(200, 'charged\n') as (gateway_url, requests):
         monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
 
@@ -173,9 +169,7 @@ def test_interrupted_gateway_call_keeps_the_interruption_as_its_cause():
 @pytest.mark.django_db
 def test_payment_api_returns_gateway_failure_when_the_call_is_interrupted(client):
     with patch('src.fees.gateway.build_opener') as build_opener:
-        build_opener.return_value.open.side_effect = InterruptedError(
-            'gateway request interrupted'
-        )
+        build_opener.return_value.open.side_effect = InterruptedError('gateway request interrupted')
 
         response = client.post('/payments/L1')
 
