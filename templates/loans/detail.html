@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+  <section class="prototype-surface mx-auto max-w-3xl p-7">
+    <p class="prototype-muted text-xs uppercase tracking-[.2em]">The collection · loan record</p>
+    <h1 class="mb-8 mt-3 text-5xl">Loan {{ loan.id }}</h1>
+    <dl class="divide-y prototype-border">
+      <div class="flex flex-wrap justify-between gap-2 py-4">
+        <dt class="prototype-muted">Member</dt>
+        <dd>{{ loan.member }}</dd>
+      </div>
+      <div class="flex flex-wrap justify-between gap-2 py-4">
+        <dt class="prototype-muted">ISBN</dt>
+        <dd>{{ loan.isbn }}</dd>
+      </div>
+      <div class="flex flex-wrap justify-between gap-2 py-4">
+        <dt class="prototype-muted">Lent</dt>
+        <dd>{{ loan.lent_on|date:"M j, Y" }}</dd>
+      </div>
+      <div class="flex flex-wrap justify-between gap-2 py-4">
+        <dt class="prototype-muted">Due</dt>
+        <dd>{{ loan.due_on|date:"M j, Y" }}</dd>
+      </div>
+      {% if loan.returned_on %}
+        <div class="flex flex-wrap justify-between gap-2 py-4">
+          <dt class="prototype-muted">Returned</dt>
+          <dd>{{ loan.returned_on|date:"M j, Y" }}</dd>
+        </div>
+      {% endif %}
+    </dl>
+    <a class="btn btn-ghost mt-6 prototype-ink" href="/ui/loans/">← Back to the collection</a>
+  </section>
+{% endblock %}

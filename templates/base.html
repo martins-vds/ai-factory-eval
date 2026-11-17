@@ -1,0 +1,59 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}The Lending Library{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" defer></script>
+    <style>
+      :root { color-scheme: light; }
+      body.variant-reading-room {
+        --ink: #2f3428;
+        --paper: #f5f0e5;
+        --accent: #a94e37;
+        --line: #d8cdbb;
+        --surface: #fffdf7;
+        min-height: 100vh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Georgia, 'Times New Roman', serif;
+      }
+      .prototype-shell { max-width: 76rem; margin: auto; padding: 1.5rem; }
+      .prototype-surface { background: var(--surface); border: 1px solid var(--line); }
+      .prototype-accent { background: var(--accent); color: white; }
+      .prototype-ink { color: var(--ink); }
+      .prototype-muted { color: color-mix(in srgb, var(--ink) 70%, transparent); }
+      .prototype-border { border-color: var(--line); }
+      .prototype-control:focus-visible, a:focus-visible, button:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+      .loan-row { border-bottom: 1px solid var(--line); padding: 1.2rem 0; }
+      @media (max-width: 640px) {
+        .prototype-shell { padding: 1rem; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+      }
+    </style>
+  </head>
+  <body class="variant-reading-room">
+    <header class="prototype-shell pb-3">
+      <div class="flex flex-wrap items-center justify-between gap-4 border-b prototype-border pb-5">
+        <a class="text-2xl font-bold tracking-tight prototype-ink" href="/ui/loans/">
+          The Lending Library
+          <span class="text-sm font-normal">/ a neighborhood collection</span>
+        </a>
+        <nav aria-label="Library pages" class="flex gap-2 text-sm">
+          <a class="btn btn-ghost btn-sm prototype-ink" href="/ui/loans/">Loans</a>
+        </nav>
+      </div>
+    </header>
+    <main class="prototype-shell pt-2">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>
