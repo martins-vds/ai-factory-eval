@@ -193,6 +193,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
 
 
 @pytest.mark.django_db
+def test_return_use_case_records_today():
+    returned_on = timezone.localdate()
+
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
 def test_return_use_case_rejects_repeated_return_without_replacing_date():
     original_return_date = date(2026, 1, 20)
 
@@ -386,6 +397,7 @@ def test_browser_lending_page_shows_errors_for_empty_fields(client):
     response = client.post('/ui/loans/new/', {'member': '', 'isbn': ''})
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
