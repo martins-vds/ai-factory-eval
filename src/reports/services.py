@@ -1,7 +1,7 @@
 import csv
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import timedelta
 from typing import TextIO
 
 from django.db.models import Q
@@ -49,7 +49,9 @@ def monthly_report_rows() -> list[MonthlyReportRow]:
                 member_totals.late_fees_cents += min(1000, days_late * 25)
 
     rows = [
-        MonthlyReportRow(member_id, member.loans_started, member.late_returns, member.late_fees_cents)
+        MonthlyReportRow(
+            member_id, member.loans_started, member.late_returns, member.late_fees_cents
+        )
         for member_id, member in totals.items()
         if member.loans_started
     ]
