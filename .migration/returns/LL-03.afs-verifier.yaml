@@ -1,0 +1,37 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/802
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.894
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: src/fees/views.py:65-72
+    what: "HTMX gateway failures return a 502 with an alert fragment; htmx's default handling does not swap 4xx/5xx responses, so the member does not see the failure. Make the UI response swappable while preserving the API's characterized 502."
+    evidence: tests/fees/test_endpoints.py::test_htmx_gateway_failure_is_swappable
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md
+    what: "The known module-level route, method-guard, and LoanForm.Meta.model survivors were judged against valid-route and unsupported-method tests. The fee-cap and default-URL survivors are covered by verifier tests added after the 0.894 mutation run."
+tests_added:
+  - tests/fees/test_endpoints.py::test_fee_page_displays_characterized_capped_fee
+  - tests/fees/test_endpoints.py::test_fee_page_returns_characterized_not_found_response
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_htmx_gateway_failure_is_swappable
+  - tests/fees/test_endpoints.py::test_payment_page_returns_not_found_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_non_htmx_payment_page_renders_gateway_result_and_fee
+  - tests/fees/test_endpoints.py::test_payment_gateway_uses_characterized_default_url
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#40
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
