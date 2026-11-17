@@ -49,3 +49,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-17T03:15:51+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:19:56+00:00 | verifier-dialogs | 0 | 12.26 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `15068221c6f17c7f` |  |  |
+| 2026-11-17T03:20:17+00:00 | build-compileall | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:20:17+00:00 | build-django-check | 0 | 0.39 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T03:20:35+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T03:20:35+00:00 | idiom-ruff-format | 0 | 0.03 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T03:20:35+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T03:21:54+00:00 | behavior | 0 | 67.54 | `pytest -q` | `799659d991a29206` |  |  |
+| 2026-11-17T03:23:19+00:00 | crap-pytest-cov | 0 | 64.16 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `3f1afde3c7c4351e` |  |  |
+| 2026-11-17T03:23:19+00:00 | crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:23:19+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T03:26:21+00:00 | mutation-changed | 0 | 166.64 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `b0a3022fd8b8d310` |  | gate=mutation score=0.907 threshold=0.8 killed=49 survived=5 files=1 base=origin/main |
+| 2026-11-17T03:27:38+00:00 | regression | 0 | 66.81 | `pytest -q` | `a96486cba3e51eac` |  |  |
+| 2026-11-17T03:28:18+00:00 | verifier-alerts | 0 | 8.81 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `57167c6f77bf20e1` |  |  |
+| 2026-11-17T03:31:06+00:00 | mutation-changed | 0 | 161.61 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `f4b0d0c16c046169` |  | gate=mutation score=0.944 threshold=0.8 killed=51 survived=3 files=1 base=origin/main |
