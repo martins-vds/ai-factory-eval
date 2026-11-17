@@ -2,6 +2,7 @@ import csv
 import hashlib
 import json
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -9,13 +10,12 @@ from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
-from cargotracker.cargo.infrastructure.models import CargoRecord, LegRecord
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
-
 
 SNAPSHOT_TABLES = {
     'LOCATION': (
@@ -170,7 +170,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
         assert len(legs) >= 2
         assert all(
             previous.unload_location_id == following.load_location_id
-            for previous, following in zip(legs, legs[1:])
+            for previous, following in pairwise(legs)
         )
 
 
@@ -198,5 +198,5 @@ def test_loaded_carrier_movement_schedules_are_in_order(tmp_path):
         assert all(
             previous.arrival_time <= following.departure_time
             and previous.arrival_location_id == following.departure_location_id
-            for previous, following in zip(movements, movements[1:])
+            for previous, following in pairwise(movements)
         )
