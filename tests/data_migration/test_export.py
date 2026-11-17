@@ -2,6 +2,8 @@ import csv
 import hashlib
 import json
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -40,20 +42,24 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
         table['target'] for table in mapping['tables']
     }
 
-    location_rows = list(csv.DictReader((output / 'location.csv').open(newline='', encoding='utf-8')))
+    with (output / 'location.csv').open(newline='', encoding='utf-8') as stream:
+        location_rows = list(csv.DictReader(stream))
     assert [row['id'] for row in location_rows] == ['101', '102']
 
-    cargo_rows = list(csv.DictReader((output / 'cargo.csv').open(newline='', encoding='utf-8')))
+    with (output / 'cargo.csv').open(newline='', encoding='utf-8') as stream:
+        cargo_rows = list(csv.DictReader(stream))
     assert cargo_rows[0]['last_known_location_id'] == r'\N'
-    voyage_rows = list(csv.DictReader((output / 'voyage.csv').open(newline='', encoding='utf-8')))
+    with (output / 'voyage.csv').open(newline='', encoding='utf-8') as stream:
+        voyage_rows = list(csv.DictReader(stream))
     assert voyage_rows[0]['voyage_number'] == ''
 
-    leg_rows = list(csv.DictReader((output / 'leg.csv').open(newline='', encoding='utf-8')))
+    with (output / 'leg.csv').open(newline='', encoding='utf-8') as stream:
+        leg_rows = list(csv.DictReader(stream))
     assert leg_rows[0]['load_time'] == '2026-11-08T08:00:00+00:00'
 
-    result = __import__('subprocess').run(
+    result = subprocess.run(
         [
-            'python',
+            sys.executable,
             '.migration/harness/tools/data_reconcile.py',
             'reconcile',
             '--snapshot',
