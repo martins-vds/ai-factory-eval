@@ -1,0 +1,72 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/75
+verdict: changes-required
+gates:
+  setup: 0
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: pytest prerequisite failed on verifier tests exposing defects before lizard scoring"
+  mutation_changed: "n/a: mutmut could not test mutants because the verifier tests fail"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "The lending and return use cases depend on Django's clock and concrete ORM repository, violating the profile's ports-only layering contract."
+    evidence: "run: idiom-layers-final"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: "The direct lending use case accepts blank and whitespace member/ISBN values; required-field validation exists only in LoanForm."
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - severity: major
+    where: src/loans/views.py:79-81
+    what: "An HTMX return for an unknown loan returns plain-text 404 instead of an alert fragment, and no global HTMX error handling swaps 4xx responses."
+    evidence: tests/loans/test_catalog.py::test_browser_htmx_return_for_unknown_loan_renders_an_error
+  - severity: minor
+    where: templates/loans/new.html:6
+    what: "The changed reading-room templates use Tailwind utilities absent from static/css/tailwind.css, so the browser ignores layout and button styling classes."
+    evidence: "run: idiom-ui-final"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: "The prior 0.855 run's behavior-changing survivors #44, #68-70, #79 and repository #2 matter; the added full-page, unknown-return and transaction tests target these, but this session's mutation run stopped before scoring because baseline tests fail. Route-literal #2-#7, method-guard #8/#24/#54/#65 and LoanForm.Meta.model #9 have route, method and form behavior coverage and are not chased per the maintainer's mutation-runner ruling."
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_sets_a_fourteen_day_due_date
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_the_original_date_on_repeat
+  - tests/loans/test_catalog.py::test_return_use_case_does_not_update_an_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_htmx_return_for_unknown_loan_renders_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited: []
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN values must be nonblank before a loan is created.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: false
+  - capability: loan.lend
+    rule: A successful loan is due 14 calendar days after its lending date.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_sets_a_fourteen_day_due_date
+    enforced: true
+  - capability: loan.return-date
+    rule: Returning an already-returned loan must not replace its saved return date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_preserves_the_original_date_on_repeat
+    enforced: true
+  - capability: loan.return
+    rule: Returning an unknown loan must not update a record and reports no loan.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_does_not_update_an_unknown_loan
+    enforced: true
+no_rules: {}
