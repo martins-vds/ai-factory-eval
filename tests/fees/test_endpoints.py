@@ -103,6 +103,21 @@ def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
     assert b'hx-post="/ui/payments/L3/"' in response.content
 
 
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L3'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L3/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_fee_page_payment_returns_gateway_status_fragment(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
