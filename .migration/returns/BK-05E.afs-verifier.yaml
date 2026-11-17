@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/932
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: templates/booking/cargo_details.html:22
+    what: The details page checks delivery.misdirected instead of routing_status MISROUTED, so misrouted cargo gets no reroute action.
+    evidence: "run: details-misrouted"
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:7
+    what: The web adapter depends on and queries CargoRepository directly instead of calling a use case, violating ADR-0001.
+    evidence: "run: idiom-layers"
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_offer_reroute_action
+ledger_issues:
+  - booking.screen-cargo-details is marked migrated although its required misrouted-cargo reroute behavior is absent.
+quirk_tickets: []
+crap_note: "_prepare_tables(mapping, models) in src/cargotracker/data_migration/loader.py:172-226 has CRAP 26 and 100% coverage; it is below the limit, outside this ticket, and does not need splitting."
+mutation_notes:
+  - "The BK-05E survivor views.py:38 Mutant #12 changes only the Http404 message; it leaves the required 404 status unchanged and is not a contract gap."
+  - "The other 21 survivors in the successful changed-code run are in BK-05D wizard and DM-05D exporter files, outside BK-05E."

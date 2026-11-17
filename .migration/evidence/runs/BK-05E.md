@@ -33,3 +33,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T12:58:05+00:00 | details-misrouted | 1 | 1.88 | `pytest -q tests/booking/interfaces/test_cargo_details.py -k misrouted` | `94bb457fb35a6732` | assert cargo is not None |  |
 | 2026-11-17T12:58:05+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-17T12:58:05+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-17T12:59:09+00:00 | behavior-final | 1 | 45.2 | `pytest -q` | `09ff79aa153749b6` | assert cargo is not None |  |
+| 2026-11-17T12:59:59+00:00 | regression-final | 1 | 50.08 | `pytest -q` | `7aa7d6402058ccb2` | assert cargo is not None |  |
