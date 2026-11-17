@@ -1,11 +1,26 @@
 import csv
 from datetime import date
 from io import StringIO
+from unittest.mock import Mock
 
 import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.services import MonthlyReportApplication
+
+
+def test_monthly_report_application_omits_members_without_previous_month_loans():
+    loans = Mock()
+    loans.started_between.return_value = []
+    fees = Mock()
+    application = MonthlyReportApplication(loans, fees)
+
+    report = application.for_previous_month(date(2026, 3, 1))
+
+    assert report == []
+    loans.started_between.assert_called_once_with(date(2026, 2, 1), date(2026, 3, 1))
+    fees.fee_for.assert_not_called()
 
 
 @pytest.mark.django_db
