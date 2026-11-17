@@ -1,11 +1,13 @@
 import csv
 from datetime import date
 from io import StringIO
+from types import SimpleNamespace
 
 import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
 
 
 @pytest.mark.django_db
@@ -81,6 +83,12 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
                 isbn='6',
                 lent_on=date(2026, 3, 1),
             ),
+            Loan(
+                id='L-last-day',
+                member='last-day',
+                isbn='11',
+                lent_on=date(2026, 2, 28),
+            ),
         ]
     )
     monkeypatch.setattr(
@@ -97,6 +105,7 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
         ['alpha', '1', '1', '250'],
         ['beta', '1', '1', '250'],
         ['zeta', '5', '4', '150'],
+        ['last-day', '1', '0', '0'],
     ]
 
 
@@ -121,3 +130,73 @@ def test_monthly_report_uses_previous_calendar_year_for_january_run(monkeypatch)
         ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
         ['dee', '1', '0', '425'],
     ]
+
+
+def test_monthly_report_application_aggregates_and_sorts_previous_month():
+    class Loans:
+        def __init__(self):
+            self.requested_range = None
+
+        def started_between(self, start, end):
+            self.requested_range = (start, end)
+            return [
+                SimpleNamespace(
+                    id='L-alpha-late',
+                    member='alpha',
+                    due_on=date(2026, 2, 10),
+                    returned_on=date(2026, 2, 13),
+                ),
+                SimpleNamespace(
+                    id='L-alpha-on-time',
+                    member='alpha',
+                    due_on=date(2026, 2, 12),
+                    returned_on=date(2026, 2, 12),
+                ),
+                SimpleNamespace(
+                    id='L-beta-late',
+                    member='beta',
+                    due_on=date(2026, 2, 10),
+                    returned_on=date(2026, 2, 13),
+                ),
+                SimpleNamespace(
+                    id='L-charlie-late',
+                    member='charlie',
+                    due_on=date(2026, 2, 10),
+                    returned_on=date(2026, 2, 14),
+                ),
+            ]
+
+    class Fees:
+        amounts = {
+            'L-alpha-late': 75,
+            'L-alpha-on-time': 0,
+            'L-beta-late': 75,
+            'L-charlie-late': 100,
+        }
+
+        def fee_for(self, loan_id):
+            return SimpleNamespace(amount_cents=self.amounts[loan_id])
+
+    loans = Loans()
+    reports = MonthlyReportApplication(loans, Fees()).for_previous_month(date(2026, 3, 1))
+
+    assert loans.requested_range == (date(2026, 2, 1), date(2026, 3, 1))
+    assert reports == [
+        MemberMonthlyReport('charlie', 1, 1, 100),
+        MemberMonthlyReport('alpha', 2, 1, 75),
+        MemberMonthlyReport('beta', 1, 1, 75),
+    ]
+
+
+def test_monthly_report_application_returns_no_rows_without_loans():
+    class Loans:
+        def started_between(self, start, end):
+            return []
+
+    class Fees:
+        def fee_for(self, loan_id):
+            raise AssertionError('no fee should be calculated without loans')
+
+    reports = MonthlyReportApplication(Loans(), Fees()).for_previous_month(date(2026, 3, 1))
+
+    assert reports == []
