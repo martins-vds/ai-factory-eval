@@ -59,3 +59,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:19:27+00:00 | verifier-ruff-fixed | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-17T16:19:27+00:00 | verifier-format-fixed | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-17T16:19:37+00:00 | verifier-dialogs-final | 0 | 9.53 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `64581faa2202c139` |  |  |
+| 2026-11-17T16:21:25+00:00 | verifier-behavior | 0 | 60.81 | `pytest -q` | `86cdd3974463e4d6` |  |  |
+| 2026-11-17T16:22:28+00:00 | verifier-regression | 0 | 58.32 | `pytest -q` | `0650fe2af53428ad` |  |  |
+| 2026-11-17T16:23:32+00:00 | verifier-crap-tests | 0 | 58.04 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `a90445a964233bb8` |  |  |
+| 2026-11-17T16:23:32+00:00 | verifier-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:23:32+00:00 | verifier-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T16:26:10+00:00 | verifier-mutation-changed | 0 | 153.43 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
