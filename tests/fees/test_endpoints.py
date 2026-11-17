@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import sync_playwright
 
-from src.fees.gateway import DEFAULT_PAYMENT_GATEWAY_URL, HttpPaymentGateway
+from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import Fee, PaymentGatewayFailure
 
 HTTP_GOLDENS = json.loads(
@@ -156,6 +156,7 @@ def test_fee_page_payment_without_htmx_renders_full_page(client, payment_gateway
 
     assert response.status_code == 200
     assert b'Late fee for L1' in response.content
+    assert b'2026-01-16' in response.content
     assert b'Fee: $10.00' in response.content
     assert b'id="payment-status"' in response.content
     assert b'charged' in response.content
@@ -166,6 +167,7 @@ def test_fee_page_payment_rejects_unknown_loan(client, payment_gateway):
     response = client.post('/ui/payments/unknown/')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'no such loan\n'
     assert payment_gateway.requests == []
 
@@ -212,7 +214,7 @@ def test_payment_gateway_uses_the_characterized_default_url(monkeypatch):
     with pytest.raises(PaymentGatewayFailure):
         HttpPaymentGateway().charge('L1')
 
-    assert requested_urls == [f'{DEFAULT_PAYMENT_GATEWAY_URL}/charge?loan=L1']
+    assert requested_urls == ['https://payments.lending-library.invalid/charge?loan=L1']
 
 
 @pytest.mark.django_db
