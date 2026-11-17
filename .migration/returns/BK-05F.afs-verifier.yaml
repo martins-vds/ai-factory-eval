@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/936
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_screens_return_404_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "Known non-failing ADR-0001 layer exception: the BK-05C application use case imports django.http.Http404."
+    origin: BK-05C
+    evidence: "run: verifier-idiom-layers (known, not failing)"
+mutation_survivor_classifications:
+  - "#1: changing the signing salt is equivalent while token generation and verification share the same private constant."
+  - "#2: None uses Django's matching default salt for both signing and verification; no other default-salt signing use exists."
+  - "#10 and #27: changing cargo-not-found Http404 text preserves the normal HTTP 404 page."
+  - "#13 and #46: changing route/invalid-candidate Http404 text preserves the normal HTTP 404 page."
+  - '#14: safe="XXXX" does not change quote output because X is always unescaped.'
+  - "#40: changing the missing-token fallback still produces an invalid signature and the same 404."
+  - "#44: changing caught BadSignature diagnostic text does not change the resulting 404."
