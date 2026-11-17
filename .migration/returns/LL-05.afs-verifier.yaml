@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-synthetic-target#67
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1088
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings:
+  - severity: major
+    where: .migration/evidence/acceptance-runs/42938753426-1.json
+    what: The LL-05 diff deletes prior-slice acceptance and audit evidence unrelated to this ticket.
+    evidence: "run: prior-evidence-retention"
+tests_added:
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_includes_only_previous_month_loans
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: Only loans started in the preceding calendar month contribute; members without a loan that month are omitted.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_includes_only_previous_month_loans
+    enforced: true
+no_rules: {}
+inherited: []

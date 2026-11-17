@@ -6,6 +6,7 @@ import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.composition import monthly_report
 
 
 @pytest.mark.django_db
@@ -121,3 +122,47 @@ def test_monthly_report_uses_previous_calendar_year_for_january_run(monkeypatch)
         ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
         ['dee', '1', '0', '425'],
     ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_application_includes_only_previous_month_loans():
+    Loan.objects.all().delete()
+    Loan.objects.bulk_create(
+        [
+            Loan(
+                id='L-before',
+                member='before',
+                isbn='1',
+                lent_on=date(2026, 1, 31),
+                returned_on=date(2026, 2, 14),
+            ),
+            Loan(
+                id='L-start',
+                member='current',
+                isbn='2',
+                lent_on=date(2026, 2, 1),
+                returned_on=date(2026, 2, 15),
+            ),
+            Loan(
+                id='L-end',
+                member='current',
+                isbn='3',
+                lent_on=date(2026, 2, 28),
+                returned_on=date(2026, 3, 14),
+            ),
+            Loan(
+                id='L-after',
+                member='after',
+                isbn='4',
+                lent_on=date(2026, 3, 1),
+                returned_on=date(2026, 3, 15),
+            ),
+        ]
+    )
+
+    reports = monthly_report.for_previous_month(date(2026, 3, 1))
+
+    assert [
+        (report.member_id, report.loans_started, report.late_returns, report.total_late_fees_cents)
+        for report in reports
+    ] == [('current', 2, 0, 0)]
