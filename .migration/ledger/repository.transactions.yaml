@@ -7,8 +7,14 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:47-69
   risk: {crap: 2, complexity: 2, coverage: 0.88}
 boundary: "Each repository read closes its EntityManager; each write begins and commits a transaction, rolls back if still active after failure, and closes the EntityManager."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1153]
+target:
+  components: [src.loans.repositories.LoanRepository.create]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_repository_rolls_back_failed_writes_without_poisoning_reads]
+rules:
+  - id: rollback-failed-writes
+    rule: Failed repository writes roll back and leave the connection usable for subsequent operations.
+    source: legacy/src/main/java/lib/LoanRepository.java:47-69
