@@ -26,6 +26,12 @@ def test_about_pages_reject_non_get_requests(client, path):
     assert response.status_code == 405
 
 
+def test_about_page_stylesheet_is_available(client):
+    response = client.get('/static/css/tailwind.css')
+
+    assert response.status_code == 200
+
+
 @pytest.mark.django_db
 def test_modern_about_page_shows_library_information_in_browser(live_server):
     with sync_playwright() as playwright:
