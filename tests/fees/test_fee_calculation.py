@@ -70,3 +70,9 @@ def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_pay_for_unknown_loan_does_not_call_gateway():
+    application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
+
+    assert application.pay('missing') is None
