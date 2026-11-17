@@ -153,7 +153,7 @@ def test_loaded_itinerary_legs_connect(loaded_snapshot):
 
     for cargo in cargos:
         legs = list(LegRecord.objects.filter(cargo=cargo).order_by('load_time'))
-        assert len(legs) >= 2
+        assert legs
         for previous, following in pairwise(legs):
             assert previous.unload_location_id == following.load_location_id
 

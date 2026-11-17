@@ -19,3 +19,7 @@ ledger_updated: []
 quirk_tickets: []
 new_tickets: []
 handoff: none
+notes: >-
+  The final mutation rerun was stopped because `--changed-since origin/main` selected
+  source files outside this test-only ticket. The completed profile run recorded
+  `n/a: no mutable code changed`; no DM-05F source files changed.
