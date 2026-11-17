@@ -1,0 +1,304 @@
+{
+  "agent": "afs-verifier",
+  "branch": "copilot/martins-vds-verify-ll-02",
+  "diagnostics": {
+    "data_keys": {
+      "assistant.message": [
+        "apiCallId",
+        "content",
+        "encryptedContent",
+        "interactionId",
+        "messageId",
+        "model",
+        "originatingMessageId",
+        "parentToolCallId",
+        "phase",
+        "providerId",
+        "reasoningBlocks",
+        "reasoningOpaque",
+        "reasoningText",
+        "rte",
+        "serverTools",
+        "toolRequests",
+        "turnId"
+      ],
+      "assistant.turn_end": [
+        "parentToolCallId",
+        "turnId"
+      ],
+      "assistant.turn_start": [
+        "interactionId",
+        "parentToolCallId",
+        "turnId"
+      ],
+      "hook.end": [
+        "hookInvocationId",
+        "hookType",
+        "parentToolCallId",
+        "success"
+      ],
+      "hook.start": [
+        "hookInvocationId",
+        "hookType",
+        "input",
+        "parentToolCallId"
+      ],
+      "permission.completed": [
+        "requestId",
+        "result",
+        "toolCallId"
+      ],
+      "permission.requested": [
+        "agentMode",
+        "ownerSessionId",
+        "permissionMode",
+        "permissionRequest",
+        "promptRequest",
+        "requestId"
+      ],
+      "session.start": [
+        "alreadyInUse",
+        "context",
+        "contextTier",
+        "copilotVersion",
+        "producer",
+        "reasoningEffort",
+        "reasoningSummary",
+        "remoteSteerable",
+        "selectedModel",
+        "sessionId",
+        "startTime",
+        "version"
+      ],
+      "session.usage_record": [
+        "usage"
+      ],
+      "skill.context_delivered_ref": [
+        "contentId",
+        "interactionId",
+        "prefix",
+        "source",
+        "suffix"
+      ],
+      "skill.invoked": [
+        "allowedTools",
+        "content",
+        "description",
+        "invokedAtTurn",
+        "model",
+        "name",
+        "path",
+        "pluginName",
+        "pluginVersion",
+        "source",
+        "trigger"
+      ],
+      "skill.invoked_ref": [
+        "allowedTools",
+        "contentId",
+        "contentLength",
+        "description",
+        "invokedAtTurn",
+        "model",
+        "name",
+        "path",
+        "pluginName",
+        "pluginVersion",
+        "source",
+        "trigger"
+      ],
+      "subagent.configured": [
+        "model",
+        "multiTurn",
+        "reasoningEffort"
+      ],
+      "subagent.selected": [
+        "agentDisplayName",
+        "agentName",
+        "tools"
+      ],
+      "subagent.started": [
+        "agentDescription",
+        "agentDisplayName",
+        "agentName",
+        "agentType",
+        "executionMode",
+        "model",
+        "modelSelectionSource",
+        "resumable",
+        "taskModelSource",
+        "toolCallId"
+      ],
+      "system.message": [
+        "content",
+        "contentBlocks",
+        "interactionId",
+        "metadata",
+        "role"
+      ],
+      "tool.execution_complete": [
+        "fileEdits",
+        "interactionId",
+        "model",
+        "parentToolCallId",
+        "result",
+        "rte",
+        "shellExecution",
+        "success",
+        "toolCallId",
+        "toolTelemetry",
+        "turnId"
+      ],
+      "tool.execution_start": [
+        "arguments",
+        "mcpConfigServerName",
+        "mcpConfigSource",
+        "mcpServerName",
+        "mcpToolName",
+        "mcpTransport",
+        "model",
+        "parentToolCallId",
+        "shellToolInfo",
+        "toolCallId",
+        "toolName",
+        "toolTitle",
+        "turnId"
+      ],
+      "user.message": [
+        "content",
+        "delivery",
+        "interactionId",
+        "messageId",
+        "parentAgentTaskId",
+        "responsesReasoning",
+        "source",
+        "supportedNativeDocumentMimeTypes",
+        "transformedContent",
+        "turnId"
+      ]
+    },
+    "event_types": {
+      "assistant.message": 88,
+      "assistant.turn_end": 53,
+      "assistant.turn_start": 55,
+      "hook.end": 220,
+      "hook.start": 221,
+      "permission.completed": 105,
+      "permission.requested": 105,
+      "session.start": 1,
+      "session.usage_record": 53,
+      "skill.context_delivered_ref": 9,
+      "skill.invoked": 7,
+      "skill.invoked_ref": 2,
+      "subagent.configured": 2,
+      "subagent.selected": 3,
+      "subagent.started": 2,
+      "system.message": 3,
+      "tool.execution_complete": 136,
+      "tool.execution_start": 136,
+      "user.message": 3
+    },
+    "events": 1204,
+    "usage_fields": []
+  },
+  "ended_at": "2026-11-17T03:26:17.532Z",
+  "event": "agentStop",
+  "harness_tools": [
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 14,
+      "exit": 0,
+      "tool": "afs-run"
+    },
+    {
+      "count": 2,
+      "exit": 1,
+      "tool": "afs-run"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-services"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "check_inputs.py"
+    },
+    {
+      "count": 2,
+      "exit": 1,
+      "tool": "check_layers.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "check_plan.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "check_runtime.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "validate.py"
+    },
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-cost-hook"
+    }
+  ],
+  "log": "/home/runner/.copilot/session-state/89329479-de56-4a09-b9ec-1598fb9d290b/events.jsonl",
+  "models": {
+    "gpt-6-luna": {
+      "output": 0,
+      "requests": 88
+    }
+  },
+  "prompt_head": null,
+  "recorded_at": "2026-11-17T03:26:17+00:00",
+  "schema": "afs-cost/1",
+  "session_id": "89329479-de56-4a09-b9ec-1598fb9d290b",
+  "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
+  "skills_invoked": [
+    {
+      "count": 1,
+      "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-ledger"
+    },
+    {
+      "count": 1,
+      "skill": "afs-migration-contract"
+    },
+    {
+      "count": 1,
+      "skill": "afs-setup-check"
+    },
+    {
+      "count": 1,
+      "skill": "agent-browser"
+    },
+    {
+      "count": 1,
+      "skill": "code-review"
+    },
+    {
+      "count": 1,
+      "skill": "dispatching-parallel-agents"
+    }
+  ],
+  "started_at": "2026-11-17T03:16:05.415Z",
+  "surface": "coding-agent",
+  "trigger_id": "91de2e73-d1f8-4543-920b-5e4eab179f00",
+  "usage_source": "assistant.message (output only, partial)"
+}
