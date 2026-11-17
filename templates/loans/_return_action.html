@@ -1,0 +1,17 @@
+{% if error %}
+<p class="text-sm text-error" role="alert">{{ error }}</p>
+<p class="text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+{% elif loan.returned_on %}
+<p class="text-sm text-[#66705b]" role="status">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+{% else %}
+<form
+  method="post"
+  action="/ui/loans/{{ loan.id }}/return/"
+  hx-post="/ui/loans/{{ loan.id }}/return/"
+  hx-target="#return-action"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  <button class="btn btn-primary" type="submit">Mark returned</button>
+</form>
+{% endif %}
