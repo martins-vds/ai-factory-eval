@@ -20,6 +20,13 @@ def test_about_endpoint_matches_characterized_response(client):
     )
 
 
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_only_allow_get_requests(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_about_page_displays_library_information_in_the_reading_room(live_server):
     with sync_playwright() as playwright:
@@ -34,11 +41,13 @@ def test_about_page_displays_library_information_in_the_reading_room(live_server
             assert page.get_by_text('Monday—Saturday').is_visible()
             assert page.get_by_text('09:00 — 18:00').is_visible()
             assert page.get_by_text('14 days', exact=True).is_visible()
-            assert page.get_by_role('link', name='desk@lending-library.invalid').get_attribute(
-                'href'
-            ) == 'mailto:desk@lending-library.invalid'
-            assert page.get_by_role('link', name='Browse the collection').get_attribute(
-                'href'
-            ) == '/ui/loans/'
+            assert (
+                page.get_by_role('link', name='desk@lending-library.invalid').get_attribute('href')
+                == 'mailto:desk@lending-library.invalid'
+            )
+            assert (
+                page.get_by_role('link', name='Browse the collection').get_attribute('href')
+                == '/ui/loans/'
+            )
         finally:
             browser.close()
