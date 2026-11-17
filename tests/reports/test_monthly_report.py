@@ -178,23 +178,21 @@ def test_monthly_report_application_applies_previous_month_rules():
             self.window = (start, end)
             return [loan for loan in loans if start <= loan.lent_on < end]
 
-    class Fees:
-        amounts = {
-            'L-alpha-on-time': 125,
-            'L-alpha-late': 125,
-            'L-bravo-unreturned': 250,
-            'L-charlie-late': 500,
-            'L-november': 900,
-            'L-january': 900,
-        }
+    fee_amounts = {
+        'L-alpha-on-time': 125,
+        'L-alpha-late': 125,
+        'L-bravo-unreturned': 250,
+        'L-charlie-late': 500,
+        'L-november': 900,
+        'L-january': 900,
+    }
 
+    class Fees:
         def fee_for(self, loan_id):
-            return SimpleNamespace(amount_cents=self.amounts[loan_id])
+            return SimpleNamespace(amount_cents=fee_amounts[loan_id])
 
     repository = Loans()
-    reports = MonthlyReportApplication(repository, Fees()).for_previous_month(
-        date(2026, 1, 1)
-    )
+    reports = MonthlyReportApplication(repository, Fees()).for_previous_month(date(2026, 1, 1))
 
     assert repository.window == (date(2025, 12, 1), date(2026, 1, 1))
     assert reports == [
