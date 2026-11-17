@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} — Lending Library{% endblock %}
+
+{% block content %}
+<article class="mx-auto max-w-3xl">
+  <a class="link link-primary text-sm" href="/ui/loans/">← Back to the reading room</a>
+  <p class="mb-3 mt-10 text-sm font-semibold uppercase tracking-[0.2em] text-primary">Loan {{ loan.id }}</p>
+  <h1 class="font-serif text-5xl font-medium tracking-tight">{{ loan.isbn }}</h1>
+  <p class="mt-4 text-lg text-base-content/70">A volume borrowed by {{ loan.member }}.</p>
+  <dl class="mt-10 grid gap-6 border-y border-base-300 py-8 sm:grid-cols-2">
+    <div>
+      <dt class="text-sm text-base-content/55">ISBN</dt>
+      <dd class="mt-1 font-medium">{{ loan.isbn }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm text-base-content/55">Member</dt>
+      <dd class="mt-1 font-medium">{{ loan.member }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm text-base-content/55">Lent on</dt>
+      <dd class="mt-1 font-medium">{{ loan.lent_on|date:'Y-m-d' }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm text-base-content/55">Due on</dt>
+      <dd class="mt-1 font-medium">{{ loan.due_on|date:'Y-m-d' }}</dd>
+    </div>
+    <div>
+      <dt class="text-sm text-base-content/55">Returned on</dt>
+      <dd class="mt-1 font-medium">{{ loan.returned_on|date:'Y-m-d'|default:'Not yet returned' }}</dd>
+    </div>
+  </dl>
+</article>
+{% endblock %}

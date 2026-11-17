@@ -5,6 +5,12 @@ from src.loans.models import Loan
 
 class LoanRepository:
     @staticmethod
+    @transaction.atomic
+    def create(loan):
+        loan.save(force_insert=True)
+        return loan
+
+    @staticmethod
     def all():
         return list(Loan.objects.order_by('id'))
 
