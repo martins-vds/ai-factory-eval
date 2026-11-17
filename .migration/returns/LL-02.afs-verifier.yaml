@@ -1,0 +1,46 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/962
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: behavior tests failed before CRAP analysis"
+  mutation_changed: "n/a: baseline tests fail before mutant tests run"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4,6
+    what: Use-case layer imports Django time and the concrete repository, violating the profile's layer contract.
+    evidence: "run: verify-idiom-final"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: lend_loan accepts empty and whitespace-only member/ISBN values when called directly; the required-field rule only lives in the form/view boundary.
+    evidence: "run: verify-behavior-final"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: Prior survivors with meaningful behavior changes include repository.py #2, views.py #8/#24/#44/#54/#65/#68-#70/#79, urls.py #2-#7, and forms.py #9. New tests now assert these transaction, method, page, return-error, route, and form outcomes, but the fresh mutation run stopped on the direct-use-case failure, so mutant kills remain unverified.
+  - severity: minor
+    where: src/loans/views.py:78-80
+    what: Unknown UI returns produce a plain-text 404 with no htmx error-swap handler; the browser's htmx CDN script did not load, so presentation of this non-2xx response could not be confirmed end to end.
+tests_added:
+  - test_lend_endpoint_escapes_record_delimiters_in_loan_fields
+  - test_lend_endpoint_rejects_missing_or_blank_fields
+  - test_lend_use_case_rejects_blank_required_fields
+  - test_lend_use_case_sets_a_fourteen_day_due_date
+  - test_return_use_case_rejects_repeat_without_replacing_date
+  - test_return_use_case_records_the_first_return_date
+  - test_browser_lending_page_shows_errors_for_blank_fields
+  - test_browser_return_page_returns_not_found_for_missing_loan
+  - test_browser_regular_repeat_return_shows_an_error
+  - test_return_endpoint_locks_the_loan_inside_a_transaction
+ledger_issues:
+  - loan.lend evidence only verifies boundary validation; direct use-case tests show required-field enforcement is missing.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
