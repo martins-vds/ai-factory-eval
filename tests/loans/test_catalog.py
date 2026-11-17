@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans import services
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -101,6 +102,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -122,6 +125,35 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [
+        ('', '123'),
+        ('reader', ' '),
+    ],
+)
+def test_lend_use_case_rejects_blank_required_fields(member, isbn, monkeypatch):
+    class LoanCollection:
+        def count(self):
+            return 3
+
+    creates = []
+
+    class LoanRepository:
+        def all(self):
+            return LoanCollection()
+
+        def create(self, **fields):
+            creates.append(fields)
+
+    monkeypatch.setattr(services, 'LoanRepository', LoanRepository)
+
+    with pytest.raises(ValueError):
+        services.lend_loan(member, isbn)
+
+    assert creates == []
 
 
 @pytest.mark.django_db
@@ -149,6 +181,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response.status_code == 409
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeat_without_replacing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = services.return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
 
 
@@ -300,6 +343,7 @@ def test_browser_can_create_a_loan_from_the_new_loan_page(client):
     assert form_response.status_code == 200
     assert b'name="member"' in form_response.content
     assert b'name="isbn"' in form_response.content
+    assert client.get('/ui/loans/').status_code == 200
 
     response = client.post(
         '/ui/loans/new/',
@@ -315,7 +359,7 @@ def test_browser_can_create_a_loan_from_the_new_loan_page(client):
 
 @pytest.mark.django_db
 def test_browser_lending_page_shows_errors_for_blank_fields(client):
-    response = client.post('/ui/loans/new/')
+    response = client.post('/ui/loans/new/', {'member': '', 'isbn': ''})
 
     assert response.status_code == 200
     assert response.content.count(b'This field is required.') == 2
@@ -424,7 +468,33 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('headers', [{}, {'HTTP_HX_REQUEST': 'true'}])
+def test_browser_return_page_returns_not_found_for_unknown_loan(client, headers):
+    response = client.post('/ui/loans/unknown/return/', **headers)
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_return_form_configures_htmx_to_swap_error_responses(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert (
+        b'htmx.config.responseHandling' in response.content
+        and (b'404' in response.content or b'4..' in response.content)
+    ) or (
+        b'htmx:beforeSwap' in response.content
+        and b'shouldSwap' in response.content
+        and b'404' in response.content
+    )
 
 
 @pytest.mark.django_db
