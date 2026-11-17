@@ -51,3 +51,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T22:35:23+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T22:38:44+00:00 | verifier-route-state | 1 | 4.85 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_dialog_update_rederives_route_state` | `589c9167dfcf87de` | assert cargo is not None |  |
 | 2026-11-17T22:39:01+00:00 | verifier-route-state | 0 | 3.0 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_dialog_update_rederives_route_state` | `964995a51240e328` |  |  |
+| 2026-11-17T22:39:38+00:00 | build-compileall | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T22:39:39+00:00 | build-django-check | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T22:39:39+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T22:39:39+00:00 | idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `35c2652b73047318` |  |  |
+| 2026-11-17T22:39:39+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T22:39:40+00:00 | idiom-ui | 1 | 0.48 | `python .migration/harness/tools/check_ui.py` | `4981984314a51aa6` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since ae742b8c716870cf35050f1a8adf0feb9a4b0621" templates=3 findings=3 |
