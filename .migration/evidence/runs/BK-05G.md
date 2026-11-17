@@ -48,3 +48,30 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:54+00:00 | mutation-changed | 0 | 139.12 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `c97ad74d6bf2528b` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
+| 2026-11-17T16:40:32+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:44:12+00:00 | stale-dialogs | 0 | 4.62 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_stale_cargo_dialog_returns_not_found` | `f97303c18f20b70c` |  |  |
+| 2026-11-17T16:44:36+00:00 | build-compileall | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:44:37+00:00 | build-django-check | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:44:37+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:44:37+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T16:44:37+00:00 | idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T16:44:38+00:00 | idiom-ui | 1 | 0.34 | `python .migration/harness/tools/check_ui.py` | `4b11a65cd1e6a1e7` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 4017939181c6f5fecf59a3a035d3bb593d2dada9" templates=3 findings=3 |
+| 2026-11-17T16:47:55+00:00 | behavior | 0 | 47.28 | `pytest -q` | `68bafe23b4d4c27d` |  |  |
+| 2026-11-17T16:48:42+00:00 | regression | 0 | 47.02 | `pytest -q` | `04dbdce038dceb31` |  |  |
+| 2026-11-17T16:49:50+00:00 | crap-coverage | 0 | 48.23 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `72c3d1fd77602a12` |  |  |
+| 2026-11-17T16:49:50+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:49:50+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T16:51:46+00:00 | mutation-changed | 0 | 115.75 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
+| 2026-11-17T16:53:06+00:00 | exact-field-errors | 0 | 2.17 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo` | `538758f8f3923b57` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-build-compileall | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-build-django | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T16:53:24+00:00 | final-ui | 1 | 0.34 | `python .migration/harness/tools/check_ui.py` | `4b11a65cd1e6a1e7` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 4017939181c6f5fecf59a3a035d3bb593d2dada9" templates=3 findings=3 |
+| 2026-11-17T16:54:10+00:00 | final-behavior | 0 | 46.36 | `pytest -q` | `65d73f19044893cc` |  |  |
+| 2026-11-17T16:54:57+00:00 | final-regression | 0 | 46.7 | `pytest -q` | `7db43d528dc7d71f` |  |  |
+| 2026-11-17T16:55:43+00:00 | final-crap-coverage | 0 | 46.17 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `559946030721f2cf` |  |  |
+| 2026-11-17T16:55:44+00:00 | final-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:55:44+00:00 | final-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T16:57:34+00:00 | final-mutation-changed | 0 | 110.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `57831e3ade7c009a` |  | gate=mutation score=0.926 threshold=0.8 killed=50 survived=4 files=1 base=origin/main |
