@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-4xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-8 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+  <h1 class="mb-8 mt-3 text-5xl md:text-6xl">Late fees</h1>
+  <div class="grid gap-8 md:grid-cols-[1fr_18rem]">
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-[#66705b]">{{ loan.member }} · {{ loan.id }}</p>
+        <h2 class="card-title mt-2 text-3xl">Late fee for {{ loan.id }}</h2>
+        <p class="mt-5">
+          Due {{ loan.due_on|date:"M j, Y" }}{% if loan.returned_on %} · returned {{ loan.returned_on|date:"M j, Y" }}{% endif %}
+        </p>
+        <p class="mt-2 text-[#66705b]">{{ fee.days_late }} day(s) late · first two days waived</p>
+        <p class="mt-7 text-6xl font-bold">{{ fee.amount }}</p>
+      </div>
+    </article>
+    <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-widest text-[#66705b]">At the desk</p>
+        <h2 class="card-title text-2xl">Settle this fee</h2>
+        <p>Pay the late fee for loan {{ loan.id }} through the library payment gateway.</p>
+        <div id="payment-status" aria-live="polite">
+          {% if payment_result %}
+          {% include "fees/payment-status.html" %}
+          {% else %}
+          <form method="post" action="/ui/payments/{{ loan.id }}/"
+                hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+            {% csrf_token %}
+            <button class="btn mt-3 bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
