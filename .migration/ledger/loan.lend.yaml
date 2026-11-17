@@ -10,7 +10,8 @@ source:
 boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
 tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1173]
 target:
-  components: [src.loans.forms.LendLoanForm, src.loans.services.lend_loan, src.loans.views.loan_list]
+  components:
+    [src.loans.forms.LendLoanForm, src.loans.repository.LoanRepository.count, src.loans.repository.LoanRepository.create, src.loans.services.lend_loan, src.loans.views.loan_list]
 status: migrated
 verification: differential
 characterization_tier: A
@@ -24,7 +25,7 @@ rules:
     source: legacy/src/main/java/lib/LoanResource.java:37-43; legacy/src/main/java/lib/Loan.java:44-46
   - id: generated-id
     rule: New loans receive the next identifier in the L<count+1> sequence.
-    source: legacy/src/main/java/lib/LoanResource.java:42-43
+    source: legacy/src/main/java/lib/LoanRepository.java:27-32
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
 notes: "Blank-field rejection and delimiter escaping follow the approved fix rulings in #39 and #43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]

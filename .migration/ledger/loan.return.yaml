@@ -10,7 +10,8 @@ source:
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
 tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1173]
 target:
-  components: [src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+  components:
+    [src.loans.repository.LoanRepository.mark_returned, src.loans.services.return_loan, src.loans.views.loan_return, src.loans.views.loan_catalog_return]
 status: migrated
 verification: differential
 characterization_tier: A
@@ -22,5 +23,5 @@ rules:
   - id: reject-repeat
     rule: A return request for an already-returned loan is rejected and leaves its original return date unchanged.
     source: martins-vds/ai-factory-synthetic-target#41
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+notes: "Repeated-return rejection follows the human fix ruling in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

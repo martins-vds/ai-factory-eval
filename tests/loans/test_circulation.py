@@ -46,8 +46,7 @@ def test_lending_endpoint_escapes_delimiters_in_the_export(client):
 
     assert response.status_code == 201
     assert response.content.decode() == (
-        f'L4;"a;b";"123;456";{lent_on.isoformat()};'
-        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+        f'L4;"a;b";"123;456";{lent_on.isoformat()};{(lent_on + timedelta(days=14)).isoformat()};\n'
     )
 
 
@@ -58,14 +57,14 @@ def test_return_endpoint_rejects_repeated_returns_without_replacing_the_date(cli
     response = client.post('/loans/L1/return')
 
     assert response.status_code == 200
-    expected_record = (
-        f'L1;ana;9780134685991;2026-01-02;2026-01-16;{returned_on.isoformat()}\n'
-    )
+    assert response['Content-Type'] == 'text/plain'
+    expected_record = f'L1;ana;9780134685991;2026-01-02;2026-01-16;{returned_on.isoformat()}\n'
     assert response.content.decode() == expected_record
 
     repeated = client.post('/loans/L1/return')
 
     assert repeated.status_code == 409
+    assert repeated['Content-Type'] == 'text/plain'
     assert repeated.content.decode() == 'loan has already been returned\n'
     assert client.get('/loans/L1').content.decode() == expected_record
 
@@ -75,6 +74,7 @@ def test_return_endpoint_preserves_an_existing_return_date(client):
     response = client.post('/loans/L2/return')
 
     assert response.status_code == 409
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'loan has already been returned\n'
     assert client.get('/loans/L2').content.decode() == (
         'L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\n'
@@ -86,7 +86,16 @@ def test_return_endpoint_returns_not_found_for_unknown_loan(client):
     response = client.post('/loans/unknown/return')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_loan_write_endpoints_reject_unsupported_methods_without_mutation(client):
+    assert client.put('/loans').status_code == 405
+    assert client.get('/loans/L1/return').status_code == 405
+    assert client.get('/ui/loans/L1/return/').status_code == 405
+    assert client.get('/loans/L1').content.decode().endswith(';\n')
 
 
 @pytest.mark.django_db
@@ -128,6 +137,14 @@ def test_browser_lending_form_returns_htmx_success_for_a_new_loan(client):
 
 
 @pytest.mark.django_db
+def test_browser_lending_form_redirects_to_collection_without_htmx(client):
+    response = client.post('/ui/loans/new/', {'member': 'dee', 'isbn': '123'})
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+
+
+@pytest.mark.django_db
 def test_browser_return_uses_htmx_and_keeps_the_first_return_date(client):
     detail = client.get('/ui/loans/L1/')
 
@@ -145,13 +162,30 @@ def test_browser_return_uses_htmx_and_keeps_the_first_return_date(client):
     assert repeated.status_code == 200
     assert b'role="alert"' in repeated.content
     assert b'already been returned' in repeated.content
-    assert client.get('/loans/L1').content.decode().endswith(
-        f'{timezone.localdate().isoformat()}\n'
+    assert (
+        client.get('/loans/L1').content.decode().endswith(f'{timezone.localdate().isoformat()}\n')
     )
 
     existing = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
 
     assert existing.status_code == 200
-    assert b'already been returned' in existing.content
+    assert b'>This loan has already been returned.</p>' in existing.content
     assert b'Returned Jan 20, 2026' in existing.content
     assert client.get('/loans/L2').content.decode().endswith('2026-01-20\n')
+
+
+@pytest.mark.django_db
+def test_browser_return_redirects_to_detail_without_htmx(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+
+
+@pytest.mark.django_db
+def test_browser_return_unknown_loan_uses_not_found_response(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
