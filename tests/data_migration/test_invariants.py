@@ -3,6 +3,7 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -10,7 +11,7 @@ from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
-from cargotracker.cargo.infrastructure.models import CargoRecord, LegRecord
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -169,7 +170,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
     for cargo in CargoRecord.objects.all():
         legs = list(cargo.legs.order_by('load_time'))
         assert len(legs) > 1
-        for current, following in zip(legs, legs[1:], strict=False):
+        for current, following in pairwise(legs):
             assert current.unload_location_id == following.load_location_id
 
 
@@ -199,6 +200,6 @@ def test_loaded_carrier_movement_schedules_are_ordered(tmp_path):
         assert len(movements) > 1
         for movement in movements:
             assert movement.departure_time <= movement.arrival_time
-        for current, following in zip(movements, movements[1:], strict=False):
+        for current, following in pairwise(movements):
             assert current.arrival_time <= following.departure_time
             assert current.arrival_location_id == following.departure_location_id
