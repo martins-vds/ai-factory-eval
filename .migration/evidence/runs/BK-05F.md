@@ -112,3 +112,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T23:51:30+00:00 | crap-lizard-final | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T23:51:30+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-17T23:51:30+00:00 | mutation-changed-final | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T23:52:31+00:00 | candidate-salt-tests | 0 | 2.43 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_candidate_token_uses_a_route_selection_specific_salt tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_for_another_cargo tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_after_deadline_changes tests/booking/interfaces/test_route_selection.py::test_route_` | `838997e7763e5564` |  |  |
+| 2026-11-17T23:53:02+00:00 | idiom-ruff-check-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T23:53:02+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T23:54:04+00:00 | behavior-final | 1 | 61.49 | `pytest -q` | `55122fcef5de8d4c` | assert stored is not None |  |
+| 2026-11-17T23:55:05+00:00 | regression-final | 1 | 61.13 | `pytest -q` | `5f6b9c9f614f8cf5` | assert stored is not None |  |
+| 2026-11-17T23:56:06+00:00 | crap-coverage-final | 1 | 61.13 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `36f605628bdbce3f` | assert stored is not None |  |
+| 2026-11-17T23:56:06+00:00 | crap-lizard-final | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:56:06+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T23:56:07+00:00 | mutation-changed-final | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |

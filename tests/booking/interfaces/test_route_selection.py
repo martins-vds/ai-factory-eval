@@ -2,6 +2,8 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
+from django.core.signing import BadSignature
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -218,6 +220,20 @@ def test_route_assignment_rejects_candidate_for_another_cargo(client):
     assert (
         CargoRecord.objects.get(tracking_id=other_tracking_id.value).routing_status == 'NOT_ROUTED'
     )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_candidate_token_uses_a_route_selection_specific_salt(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_response = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_response.content.decode(),
+    ).group(1)
+
+    with pytest.raises(BadSignature):
+        signing.loads(candidate_token, salt='django.core.signing')
 
 
 @pytest.mark.django_db
