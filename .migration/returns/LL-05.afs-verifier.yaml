@@ -1,0 +1,25 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-synthetic-target#67
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1227
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.96
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings:
+  - severity: minor
+    where: tests/reports/test_monthly_report.py:90
+    what: "Both report tests repeat CSV invocation and output assertion setup; this is low-impact duplication."
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+inherited: []
+rules: []
+no_rules:
+  reports.monthly-spec: "The capability defines report selection and output calculations, but has no eligibility, limit, or state-transition rule that refuses a use-case input; the specification's output requirements are covered by command tests."
