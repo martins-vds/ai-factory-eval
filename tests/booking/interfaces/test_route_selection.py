@@ -11,6 +11,9 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.domain.itinerary import Itinerary
+from cargotracker.cargo.domain.leg import Leg
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -19,6 +22,7 @@ from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
+from cargotracker.voyage.domain.voyage_number import VoyageNumber
 from cargotracker.voyage.infrastructure.models import VoyageRecord
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
@@ -220,3 +224,51 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize('screen', ('route', 'itineraries'))
+def test_route_screens_return_not_found_for_stale_cargo(client, screen):
+    tracking_id = _create_cargo(())
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+
+    response = client.get(f'/admin/cargo/{tracking_id.value}/{screen}/')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_returns_not_found_for_stale_cargo(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+
+    response = client.post(route_url, {'candidate': candidate_token})
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_assign_route_rejects_itinerary_outside_the_route_specification():
+    tracking_id = _create_cargo(())
+    invalid_itinerary = Itinerary(
+        (
+            Leg(
+                DjangoVoyageRepository().find(VoyageNumber('CM001')),
+                TRANSFER,
+                DESTINATION,
+                datetime(2030, 11, 1, tzinfo=UTC),
+                datetime(2030, 11, 2, tzinfo=UTC),
+            ),
+        )
+    )
+
+    with pytest.raises(ValueError):
+        routing.assign_route(tracking_id, invalid_itinerary)

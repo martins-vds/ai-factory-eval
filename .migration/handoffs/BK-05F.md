@@ -25,3 +25,27 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-verifier · 2026-11-17T13:15Z
+**State:** blocked · **Branch / PR:** `copilot/martins-vds-ai-factory-pilot-target-293` / https://github.com/martins-vds/ai-factory-eval/pull/912 · **Last commit:** c9aec589
+
+### Done
+- Independently verified BK-05F against the characterization, plan, approved rulings and all four ledger entries.
+- Added stale-tracking-ID tests for the route-selection and assignment screens; both verify the cargo-not-found 404.
+- Added a direct `CargoRouting.assign_route()` eligibility test. It fails because the use case accepts an itinerary that violates the cargo's route specification; the view currently performs the check. This is the evidence for the major finding in `.migration/returns/BK-05F.afs-verifier.yaml`.
+- Setup, build, idiom, and ledger validation passed; CRAP was 26.0 (threshold 30). Behavior and regression each ran 471 tests and failed on the direct-use-case eligibility test.
+- Reviewed the last complete mutation survivor evidence in `.migration/evidence/mutants/BK-05F.md`; the new changed-code run produced no score or survivor output.
+
+### Remaining
+- [ ] Resolve the mutation scope/baseline mismatch and obtain a complete `mutation_changed` result.
+- [ ] Update the verifier return with the complete mutation result, then rerun migration validation and commit the final evidence.
+
+### Blockers / questions
+- The profile command uses `--changed-since origin/main`. In this evaluation checkout, that base expands mutation scope to the full target tree rather than the BK-05F change. The run lasted more than 16 minutes without output; it was stopped to avoid continuing an unbounded whole-tree mutation run. Its raw log, `.migration/runs/BK-05F/20261117T124756259755Z-verifier-mutation-changed-scope.log`, is 0 bytes, and no completion/journal row exists. Do not treat the earlier `n/a: no mutable code changed` run as the result for this attempt.
+
+### Failing / incomplete commands
+- `pytest -q` → exit 1 because the direct-use-case eligibility test fails; run `verifier-behavior-final-scope` is recorded in `.migration/evidence/runs/BK-05F.md`.
+- `python .migration/harness/tools/afs-mutation --changed-since origin/main` → interrupted without a result; raw log `.migration/runs/BK-05F/20261117T124756259755Z-verifier-mutation-changed-scope.log`.
+
+### Next step for the next session
+Confirm the intended target comparison base for changed-code mutation in this evaluation checkout, then rerun mutation through `afs-run` with the correct ticket scope. Preserve the eligibility finding unless a direct-use-case test passes without changing the contract. Update the verifier return with the exact gate result and complete final validation.

@@ -1,0 +1,46 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/912
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 'n/a: afs-mutation did not finish; origin/main diff spans the full target tree'
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/route_selection/views.py:36
+    what: >-
+      Route-spec eligibility is enforced only by the view; CargoRouting.assign_route
+      accepts and persists an out-of-spec itinerary when called directly.
+    evidence: tests/booking/interfaces/test_route_selection.py::test_assign_route_rejects_itinerary_outside_the_route_specification
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_assign_route_rejects_itinerary_outside_the_route_specification
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_stale_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_returns_not_found_for_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: >-
+      BK-05C use case imports django.http.Http404, a known ADR-0001 dependency-direction
+      violation that this ticket relies on but did not introduce.
+    origin: martins-vds/ai-factory-pilot-target#290
+    evidence: 'run: inherited-layer-diagnostic'
+mutation_survivors:
+  evidence: .migration/evidence/mutants/BK-05F.md
+  assessment: >-
+    The last complete BK-05F mutation run recorded mutants #1 and #2 altering the
+    signing salt; these are equivalent within one deployed version but could
+    invalidate a form token across mixed-version deployments (not established by
+    characterization). Mutants #10, #13, #14, #27, #40, #44, and #46 do not alter
+    normal user-visible behavior: wrapped Http404 or BadSignature text is hidden by
+    the standard 404 response, quote's unreserved X is unchanged, and both
+    missing-token defaults map to 404. This session's profile mutation run was
+    interrupted before producing a score or survivor file.
+handoff: .migration/handoffs/BK-05F.md
