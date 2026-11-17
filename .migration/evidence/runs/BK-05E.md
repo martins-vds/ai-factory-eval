@@ -30,3 +30,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T19:08:34+00:00 | crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T19:08:39+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
 | 2026-11-17T19:15:54+00:00 | mutation-changed | 0 | 420.79 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
+| 2026-11-17T19:17:58+00:00 | verifier-cargo-details | 1 | 2.19 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `0cbdb987be74aeae` | assert unknown_response.status_code == 404 |  |
+| 2026-11-17T19:18:23+00:00 | verifier-cargo-not-found | 1 | 2.85 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `5482441249149660` | assert response.status_code == 404 |  |
+| 2026-11-17T19:19:43+00:00 | verifier-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:19:46+00:00 | verifier-ruff-format | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-17T19:20:33+00:00 | behavior | 1 | 42.92 | `pytest -q` | `2409944fe00082b4` | assert response.status_code == 404 |  |
+| 2026-11-17T19:21:21+00:00 | regression | 1 | 44.93 | `pytest -q` | `f97add87ff7c2b5a` | assert response.status_code == 404 |  |
