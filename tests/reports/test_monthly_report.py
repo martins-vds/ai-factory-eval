@@ -35,11 +35,24 @@ def test_monthly_report_aggregates_previous_month_and_omits_members_without_acti
                 returned_on=date(2026, 10, 18),
             ),
             Loan(
+                id='LL05-Z2',
+                member='zeta',
+                isbn='10',
+                lent_on=date(2026, 10, 31),
+            ),
+            Loan(
                 id='LL05-B1',
                 member='beta',
                 isbn='4',
                 lent_on=date(2026, 10, 1),
                 returned_on=date(2026, 10, 16),
+            ),
+            Loan(
+                id='LL05-C1',
+                member='cap',
+                isbn='11',
+                lent_on=date(2026, 7, 1),
+                returned_on=date(2026, 10, 1),
             ),
             Loan(
                 id='LL05-G1',
@@ -77,8 +90,9 @@ def test_monthly_report_aggregates_previous_month_and_omits_members_without_acti
 
     assert output.getvalue() == (
         'member_id,loans_started,late_returns,total_late_fees_cents\n'
+        'cap,0,1,1000\n'
         'alpha,1,2,75\n'
-        'zeta,1,1,75\n'
+        'zeta,2,1,75\n'
         'beta,1,1,0\n'
         'gamma,0,0,0\n'
     )
