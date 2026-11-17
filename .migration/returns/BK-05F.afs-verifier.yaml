@@ -1,0 +1,34 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/985
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "BK-05C's use case imports django.http.Http404, a known ADR-0001 layering debt; left unchanged."
+    origin: BK-05C (martins-vds/ai-factory-pilot-target#290)
+    evidence: "run: verifier-idiom-layers (known, not failing)"
+mutation_survivor_classifications:
+  - "#1: Equivalent; changing the salt changes the opaque token, but the same constant signs and verifies it."
+  - "#2: Equivalent in this application; signing has no other consumers, and the same default salt is used both ways."
+  - "#10: Equivalent at the normal HTTP boundary; the 404 reason text is not part of the generic production 404 page."
+  - "#13: Equivalent at the normal HTTP boundary; the route-specification rejection remains HTTP 404."
+  - "#14: Equivalent; X is URL-unreserved, so safe=\"XXXX\" does not change the redirect URL."
+  - "#27: Equivalent at the normal HTTP boundary; the 404 reason text is not part of the generic production 404 page."
+  - "#40: Equivalent; both missing-candidate fallback values fail signature validation and produce HTTP 404."
+  - "#44: Equivalent; the changed BadSignature diagnostic is caught and mapped to HTTP 404."
+  - "#46: Equivalent at the normal HTTP boundary; the invalid-candidate rejection remains HTTP 404."
