@@ -215,20 +215,42 @@ def test_route_assignment_rejects_candidate_for_another_cargo(client):
     )
 
     assert response.status_code == 404
-    assert CargoRecord.objects.get(tracking_id=other_tracking_id.value).routing_status == 'NOT_ROUTED'
+    assert (
+        CargoRecord.objects.get(tracking_id=other_tracking_id.value).routing_status == 'NOT_ROUTED'
+    )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_candidate_after_deadline_changes(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).update(
+        spec_arrival_deadline=datetime(2030, 11, 3, tzinfo=UTC).date()
+    )
+
+    response = client.post(route_url, {'candidate': candidate_token})
+
+    assert response.status_code == 404
+    assert CargoRecord.objects.get(tracking_id=tracking_id.value).routing_status == 'NOT_ROUTED'
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 @pytest.mark.parametrize('stale', [False, True])
 def test_route_selection_returns_not_found_for_unknown_or_stale_cargo(client, stale):
-    tracking_id = _create_cargo(()) if stale else None
     if stale:
-        CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+        tracking_id = _create_cargo(()).value
+        CargoRecord.objects.filter(tracking_id=tracking_id).delete()
     else:
         tracking_id = 'MISSING1'
 
-    response = client.get(f'/admin/cargo/{tracking_id.value if stale else tracking_id}/route/')
+    response = client.get(f'/admin/cargo/{tracking_id}/route/')
 
     assert response.status_code == 404
 

@@ -81,3 +81,34 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-17T23:34:48+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T23:38:08+00:00 | verifier-focused-tests | 1 | 2.69 | `pytest -q tests/booking/application/test_routing.py::test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_for_another_cargo tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_not_found_for_unknown_or_stale_cargo` | `f7f1360b98d333f4` | assert stored is not None |  |
+| 2026-11-17T23:38:40+00:00 | build-compile | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:38:40+00:00 | build-django-check | 0 | 0.39 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T23:38:40+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T23:38:40+00:00 | idiom-ruff-format | 1 | 0.03 | `ruff format --check` | `4946142b75aaf394` | 217 \|     assert response.status_code == 404 |  |
+| 2026-11-17T23:38:41+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T23:38:41+00:00 | idiom-ui | 0 | 0.5 | `python .migration/harness/tools/check_ui.py` | `763395511563d8fb` |  | gate=ui scope="templates changed since 848f9430702ae34079cf1506f5a413db758b56d6" templates=0 findings=0 |
+| 2026-11-17T23:39:44+00:00 | behavior | 1 | 62.33 | `pytest -q` | `5106710e6ff9adba` | assert stored is not None |  |
+| 2026-11-17T23:40:44+00:00 | crap-coverage | 1 | 60.62 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f3e43e38c7e0e7ca` | assert stored is not None |  |
+| 2026-11-17T23:40:44+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:40:45+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T23:40:45+00:00 | mutation-changed | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T23:41:45+00:00 | regression | 1 | 59.94 | `pytest -q` | `f107da2d3b4b0c49` | assert stored is not None |  |
+| 2026-11-17T23:42:16+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T23:43:56+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T23:43:56+00:00 | idiom-ruff-check-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T23:44:08+00:00 | focused-final-tests | 0 | 2.31 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_for_another_cargo tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_after_deadline_changes tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_not_found_for_unknown_or_stale_cargo tests/booking/interfaces/test_route_selection.py::tes` | `461651f8841ffc07` |  |  |
+| 2026-11-17T23:45:12+00:00 | behavior-final | 0 | 58.17 | `pytest -q` | `506705d4b12e612e` |  |  |
+| 2026-11-17T23:46:11+00:00 | regression-final | 0 | 58.76 | `pytest -q` | `c7e2049773e0d907` |  |  |
+| 2026-11-17T23:47:11+00:00 | crap-coverage-final | 0 | 59.96 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `d0a6d0d4a27a08ed` |  |  |
+| 2026-11-17T23:47:11+00:00 | crap-lizard-final | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:47:12+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T23:47:12+00:00 | mutation-changed-final | 0 | 0.1 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T23:48:21+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T23:48:21+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T23:48:23+00:00 | routing-usecase-deadline-red | 1 | 2.07 | `pytest -q tests/booking/application/test_routing.py::test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline` | `898e22a0ddb54d85` | assert stored is not None |  |
+| 2026-11-17T23:49:30+00:00 | behavior-final | 1 | 60.36 | `pytest -q` | `d73fe8d2d89870c9` | assert stored is not None |  |
+| 2026-11-17T23:50:30+00:00 | regression-final | 1 | 59.22 | `pytest -q` | `1b8f74cbc3851065` | assert stored is not None |  |
+| 2026-11-17T23:51:30+00:00 | crap-coverage-final | 1 | 59.87 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `ef43a417bfe1c9c6` | assert stored is not None |  |
+| 2026-11-17T23:51:30+00:00 | crap-lizard-final | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:51:30+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T23:51:30+00:00 | mutation-changed-final | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
