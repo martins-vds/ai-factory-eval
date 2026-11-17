@@ -1,0 +1,46 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1074
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 1
+  mutation_changed: 0.944
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/specification.py:54
+    what: A stale cargo deleted after the dialog lookup raises LookupError instead of mapping to the required cargo-not-found HTTP 404.
+    evidence: tests/booking/interfaces/test_dialogs.py::test_stale_cargo_race_during_destination_post_returns_not_found
+  - severity: major
+    where: templates/booking/dashboard/not_routed_table.html:32
+    what: HTMX GET/POST calls do not configure 4xx or 5xx response handling, so cargo-not-found and other dialog errors cannot render in the dialog.
+    evidence: tests/booking/interfaces/test_dialogs.py::test_dashboard_configures_htmx_error_response_handling
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_raises_exact_not_found_message
+  - tests/booking/interfaces/test_dialogs.py::test_stale_cargo_dialog_returns_not_found
+  - tests/booking/interfaces/test_dialogs.py::test_stale_cargo_race_during_destination_post_returns_not_found
+  - tests/booking/interfaces/test_dialogs.py::test_dashboard_configures_htmx_error_response_handling
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: booking.dialog-destination
+    rule: A valid destination update preserves the route origin and deadline and resets derived route state.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/application/test_specification.py::test_change_destination_preserves_other_specification_fields_and_resets_route_state
+    enforced: true
+  - capability: booking.dialog-deadline
+    rule: A valid deadline update preserves the route origin and destination and resets derived route state.
+    use_case: CargoSpecification.change_deadline
+    test: tests/booking/application/test_specification.py::test_change_deadline_preserves_other_specification_fields_and_resets_route_state
+    enforced: true
+  - capability: booking.dialog-chain
+    rule: A stale tracking id or a cargo deleted during update is returned as cargo-not-found HTTP 404.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/interfaces/test_dialogs.py::test_stale_cargo_race_during_destination_post_returns_not_found
+    enforced: false

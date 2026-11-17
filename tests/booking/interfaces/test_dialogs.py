@@ -3,6 +3,8 @@ from datetime import date
 
 import pytest
 from django.core.management import call_command
+from django.http import Http404
+from django.test import RequestFactory
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -10,6 +12,7 @@ from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -97,6 +100,58 @@ def test_unknown_cargo_dialog_returns_not_found(client):
     assert response.status_code == 404
 
 
+def test_unknown_cargo_dialog_raises_exact_not_found_message():
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID MISSING1 not found\.$'):
+        destination_dialog_view(
+            RequestFactory().get('/admin/cargo/MISSING1/destination/'),
+            'MISSING1',
+        )
+
+
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+def test_stale_cargo_dialog_returns_not_found(client, dialog):
+    CargoRecord.objects.filter(tracking_id='DEF789').delete()
+
+    response = client.get(
+        f'/admin/cargo/DEF789/{dialog}/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+
+
+def test_stale_cargo_race_during_destination_post_returns_not_found(monkeypatch):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    destination = next(
+        location
+        for location in shipping_locations
+        if location
+        not in (
+            cargo.route_specification.origin,
+            cargo.route_specification.destination,
+        )
+    )
+    CargoRecord.objects.filter(tracking_id='DEF789').delete()
+    monkeypatch.setattr(cargo_dashboard, 'get_cargo_details', lambda _: cargo)
+
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID DEF789 not found\.$'):
+        destination_dialog_view(
+            RequestFactory().post(
+                '/admin/cargo/DEF789/destination/',
+                {'destination': destination.unlocode.value},
+            ),
+            'DEF789',
+        )
+
+
+def test_dashboard_configures_htmx_error_response_handling(client):
+    response = client.get('/admin/dashboard/')
+    content = response.content.decode()
+
+    assert 'htmx.config.responseHandling' in content or 'htmx:beforeSwap' in content
+
+
 def test_deadline_dialog_shows_current_route_and_deadline(client):
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
@@ -121,6 +176,7 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(client):
 
     assert response.status_code == 200
     assert 'Enter a valid arrival deadline.' in content
+    assert 'XXEnter a valid arrival deadline.XX' not in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
 
@@ -152,6 +208,7 @@ def test_invalid_destination_shows_field_error_without_updating_cargo(client):
 
     assert response.status_code == 200
     assert 'Select a valid destination.' in content
+    assert 'XXSelect a valid destination.XX' not in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
