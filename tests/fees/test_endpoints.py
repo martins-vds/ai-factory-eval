@@ -41,6 +41,14 @@ def test_fee_endpoint_returns_characterized_not_found_response(client):
 
 
 @pytest.mark.django_db
+def test_fee_endpoint_formats_the_capped_amount(client):
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert b'Fee: $10.00' in response.content
+
+
+@pytest.mark.django_db
 def test_payment_endpoint_forwards_the_characterized_gateway_request(client, payment_gateway):
     expected = GATEWAY_GOLDENS['responses']['POST /payments/L1 via test gateway']['response']
 
@@ -104,6 +112,15 @@ def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_returns_not_found_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
 def test_fee_page_payment_returns_gateway_status_fragment(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
@@ -124,6 +141,28 @@ def test_fee_page_payment_shows_gateway_failure_fragment(client, payment_gateway
     assert response.status_code == 502
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_payment_returns_full_page_without_htmx(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'Late fee for L1' in response.content
+    assert b'Fee: $10.00' in response.content
+    assert b'role="status"' in response.content
+    assert b'charged' in response.content
+    assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_fee_page_payment_does_not_call_gateway_for_an_unknown_loan(client, payment_gateway):
+    response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert payment_gateway.requests == []
 
 
 @pytest.mark.parametrize(
