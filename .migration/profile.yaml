@@ -51,11 +51,37 @@ skills:
     data: [postgresql-code-review, postgresql-optimization]
 gates:
   build: ["python -m compileall -q src", "python manage.py check"]
-  idiom: ["ruff check", "ruff format --check"]
+  idiom: ["ruff check", "ruff format --check", "python .migration/harness/tools/check_layers.py"]
   tests: ["pytest -q"]
   crap: ["pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov", "lizard --csv src > .migration/runs/lizard.csv", "python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30"]
   mutation_changed: ["python .migration/harness/tools/afs-mutation --changed-since origin/main"]
   mutation_full: ["python .migration/harness/tools/afs-mutation --all"]
+layering:                    # ADR-0001's layers as import contracts, checked in the idiom gate (harness ADR-0043)
+  source_root: src
+  contracts:
+    - name: the domain is plain Python
+      adr: ADR-0001
+      files: ["src/cargotracker/*/domain/**/*.py"]
+      forbid: ["django", "cargotracker.*.application", "cargotracker.*.infrastructure", "cargotracker.*.interfaces"]
+    - name: use cases don't depend on web adapters or persistence
+      adr: ADR-0001
+      files: ["src/cargotracker/*/application/**/*.py"]
+      forbid: ["django.http", "django.shortcuts", "django.urls", "django.template", "django.views", "django.db",
+               "django.utils.timezone", "cargotracker.*.infrastructure", "cargotracker.*.interfaces"]
+    - name: web adapters call use cases, not repositories
+      adr: ADR-0001
+      files: ["src/cargotracker/*/interfaces/**/*.py"]
+      forbid: ["cargotracker.*.infrastructure", "cargotracker.*.domain.repository"]
+  known:                       # existing debt: reported, not failing; each names what removes it
+    - file: src/cargotracker/booking/application/routing.py
+      module: django.http
+      reason: BK-05C raises Http404 in the use case (found in the BK-05F eval verify, operator ruling 2026-11-16); a ticket is to raise a domain error the view maps to 404
+    - file: src/cargotracker/cargo/interfaces/admin_map/views.py
+      module: cargotracker.cargo.domain.repository
+      reason: AM-04C's view receives the repository and passes it to build_admin_map_data; to wire a use case instead
+    - file: src/cargotracker/handling/interfaces/rest.py
+      module: cargotracker.handling.domain.repository
+      reason: the handling report view receives the repository and passes it to accept_registration; to wire a use case instead
 thresholds:
   crap_max_per_method: 30
   mutation_score_min: 0.8
