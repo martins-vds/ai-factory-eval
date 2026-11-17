@@ -2,19 +2,21 @@ role: afs-verifier
 ticket: BK-05F
 issue: martins-vds/ai-factory-pilot-target#293
 pr: https://github.com/martins-vds/ai-factory-eval/pull/1121
-verdict: pass
+verdict: blocked
 gates:
   build: 0
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: "n/a: profile command found no mutable code changed relative to origin/main"
+  mutation_changed: "n/a: interrupted before the changed-code mutation gate completed"
   regression: 0
+blocked_reason: "mutation_changed: interrupted to meet the session time limit; no completed score is available"
 evidence_logs:
   - .migration/evidence/runs/BK-05F.md
 findings: []
 tests_added:
   - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_404_for_unknown_and_stale_tracking_ids
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_candidate_after_the_deadline_changes
 ledger_issues: []
 quirk_tickets: []
 inherited:

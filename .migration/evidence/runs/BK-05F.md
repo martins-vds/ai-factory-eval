@@ -96,3 +96,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T19:37:21+00:00 | verifier-mutation-route-selection-diagno | 0 | 243.46 | `bash -c 'AFS_TICKET=adhoc python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py'` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
 | 2026-11-17T19:37:50+00:00 | verifier-current-missing-id-test | 0 | 1.51 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `f51873a8b2568bb4` |  |  |
 | 2026-11-17T19:41:50+00:00 | verifier-inherited-layer-diagnostic | 1 | 0.12 | `python .migration/harness/tools/check_layers.py --profile /tmp/bk05f-strict-layering-profile.yaml` | `fb67e0ff3ad46e51` | Move the code to the layer the contract allows (a use case raises a domain error and the view maps it to a response; a v | gate=layering contracts=3 violations=1 known=2 |
+| 2026-11-17T19:49:47+00:00 | verifier-stale-candidate-rejects-after-d | 0 | 1.75 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_candidate_after_the_deadline_changes` | `bbf52dfe48927472` |  |  |
+| 2026-11-17T19:50:07+00:00 | verifier-final-build-compile | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:50:07+00:00 | verifier-final-django-check | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T19:50:07+00:00 | verifier-final-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:50:07+00:00 | verifier-final-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T19:50:08+00:00 | verifier-final-layering | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T19:50:08+00:00 | verifier-final-ui | 0 | 0.37 | `python .migration/harness/tools/check_ui.py` | `5abdde1252e45f5f` |  | gate=ui scope="templates changed since 10510a3861e16b0c4ed2afab5d75882d97bc000c" templates=0 findings=0 |
+| 2026-11-17T19:50:54+00:00 | verifier-final-behavior | 0 | 46.4 | `pytest -q` | `ee14d1a3b2ee3ae3` |  |  |
+| 2026-11-17T19:51:48+00:00 | verifier-final-regression | 0 | 53.17 | `pytest -q` | `613c03b1c4cd1608` |  |  |
+| 2026-11-17T19:52:33+00:00 | verifier-final-crap-coverage | 0 | 45.36 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `ec8b6eccf367d0af` |  |  |
+| 2026-11-17T19:52:33+00:00 | verifier-final-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:52:33+00:00 | verifier-final-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |

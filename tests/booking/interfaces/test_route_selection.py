@@ -9,6 +9,7 @@ from django.urls import path
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
 from cargotracker.cargo.infrastructure.models import CargoRecord
@@ -192,6 +193,28 @@ def test_route_assignment_rejects_a_modified_candidate(client):
     ).group(1)
 
     response = client.post(route_url, {'candidate': f'{candidate_token}tampered'})
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_candidate_after_the_deadline_changes(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    CargoSpecification(repository, DjangoHandlingEventRepository()).change_deadline(
+        tracking_id,
+        datetime(2030, 11, 3, tzinfo=UTC),
+    )
+
+    response = client.post(route_url, {'candidate': candidate_token})
 
     assert response.status_code == 404
     details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
