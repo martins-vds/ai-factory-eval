@@ -6,9 +6,34 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#1161
+target:
+  components:
+    - config.settings.INSTALLED_APPS
+    - src.reports.services.monthly_report_rows
+    - src.reports.management.commands.monthly_report.Command
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - tests/reports/test_monthly_report.py::test_monthly_report_summarizes_the_previous_month
+  - .migration/evidence/runs/LL-05.md
+rules:
+  - id: prior-month-window
+    rule: "The report covers the previous calendar month, including its first day and excluding the first day of the current month."
+    source: "legacy/docs/reports-spec.md:5; .migration/plan/monthly-report.md:5"
+  - id: member-inclusion
+    rule: "Include a member only when at least one of their loans started during the report month, and report that month's start count."
+    source: ".migration/plan/monthly-report.md:5"
+  - id: late-return-window
+    rule: "Count returns that occur in the report month only when the return date is after the loan due date."
+    source: "legacy/docs/reports-spec.md:6; .migration/plan/monthly-report.md:5"
+  - id: late-fee-cents
+    rule: "Sum monthly late-return fees in integer cents, using the established two-day waiver, 25-cents-per-day rate, and $10 cap."
+    source: "legacy/docs/reports-spec.md:6; legacy/src/main/java/lib/LateFeeView.java:31-37"
+  - id: report-order
+    rule: "Sort rows by total late fees descending, then member id ascending."
+    source: "legacy/docs/reports-spec.md:7"
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
