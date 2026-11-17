@@ -1,0 +1,53 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/993
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: afs-mutation produced no score because mutant test runs stop on failing verifier tests"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/views.py:35-38
+    what: "Missing member or ISBN response differs from the edge-case golden: target returns Django field messages instead of `member and isbn are required\\n`."
+    evidence: test_lend_endpoint_preserves_characterized_missing_field_response
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: "lend_loan accepts and persists empty or whitespace-only member/ISBN values when called directly; the required-field rule exists only in LoanForm."
+    evidence: test_lend_use_case_rejects_blank_fields
+  - severity: major
+    where: src/loans/services.py:4,6
+    what: "The use-case layer imports Django time and the concrete LoanRepository, violating its ports-only architecture contract."
+    evidence: "run: idiom-layers-review"
+  - severity: major
+    where: src/loans/views.py:80-81
+    what: "An unknown UI return returns plain-text 404; htmx does not swap the error by default, so the reading-room user sees no error."
+    evidence: test_browser_unknown_return_shows_an_error_for_htmx
+  - severity: major
+    where: templates/loans/loan-form.html:2
+    what: "Changed reading-room templates use Tailwind utilities absent from the committed CSS; the UI gate reports 16 missing-style/error-handling findings."
+    evidence: "run: idiom-ui-review"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:5-226
+    what: "Prior survivors are behavior-changing: method guards #8/#24/#54/#65, form selection #44, UI 404 #68-70, repeat context #79, transaction #2, routes #2-#7, and LoanForm model #9. New assertions cover #44/#79/transaction #2; the rest remain unverified because fresh mutation stopped on failing tests."
+tests_added:
+  - test_lend_endpoint_preserves_characterized_missing_field_response
+  - test_lend_use_case_rejects_blank_fields
+  - test_return_use_case_preserves_the_original_date_for_repeated_returns
+  - test_browser_unknown_return_shows_an_error_for_htmx
+  - test_return_use_case_wraps_row_lock_in_a_transaction
+  - test_lend_endpoint_rejects_missing_or_blank_fields
+  - test_browser_lending_page_shows_errors_for_blank_fields
+  - test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43

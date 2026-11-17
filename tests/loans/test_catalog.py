@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -22,6 +23,11 @@ HTTP_GOLDENS = json.loads(
         else Path(__file__).parent / 'fixtures/http.json'
     ).read_text(encoding='utf-8')
 )
+EDGE_CASE_GOLDEN_PATH = (
+    Path(__file__).resolve().parents[2]
+    / '.migration/characterization/source/goldens/edge-cases.json'
+)
+EDGE_CASE_GOLDENS = json.loads(EDGE_CASE_GOLDEN_PATH.read_text(encoding='utf-8'))
 
 
 @pytest.mark.django_db
@@ -101,6 +107,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -122,6 +130,42 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'case',
+    ['POST /loans/missing-isbn', 'POST /loans/missing-member'],
+)
+def test_lend_endpoint_preserves_characterized_missing_field_response(client, case):
+    expected = EDGE_CASE_GOLDENS[case]
+
+    response = client.post(
+        expected['request']['path'],
+        expected['request']['form'],
+    )
+
+    assert response.status_code == expected['response']['status']
+    assert response['Content-Type'] == expected['response']['content_type']
+    assert response.content.decode() == expected['response']['body']
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('payload', 'field'),
+    [
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'reader', 'isbn': ''}, 'isbn'),
+        ({'member': ' ', 'isbn': '123'}, 'member'),
+        ({'member': 'reader', 'isbn': ' '}, 'isbn'),
+    ],
+)
+def test_lend_use_case_rejects_blank_fields(payload, field):
+    with pytest.raises(ValidationError) as error:
+        lend_loan(**payload)
+
+    assert field in error.value.message_dict
+    assert Loan.objects.count() == 3
 
 
 @pytest.mark.django_db
@@ -149,6 +193,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response.status_code == 409
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_preserves_the_original_date_for_repeated_returns():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
 
 
@@ -318,6 +373,7 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -422,9 +478,27 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     response = client.post('/ui/loans/L2/return/')
 
     assert response.status_code == 409
+    assert b'Loan record \xc2\xb7 L2' in response.content
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_unknown_return_shows_an_error_for_htmx(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert response['Content-Type'].startswith('text/html')
+    assert b'role="alert"' in response.content
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_use_case_wraps_row_lock_in_a_transaction():
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db
