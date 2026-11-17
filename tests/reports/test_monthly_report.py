@@ -70,6 +70,13 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
                 returned_on=date(2026, 3, 30),
             ),
             Loan(
+                id='L-last-day',
+                member='last-day',
+                isbn='11',
+                lent_on=date(2026, 2, 28),
+                returned_on=date(2026, 3, 14),
+            ),
+            Loan(
                 id='L-before',
                 member='before',
                 isbn='5',
@@ -97,6 +104,7 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
         ['alpha', '1', '1', '250'],
         ['beta', '1', '1', '250'],
         ['zeta', '5', '4', '150'],
+        ['last-day', '1', '0', '0'],
     ]
 
 
