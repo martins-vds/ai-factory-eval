@@ -1,11 +1,13 @@
 import csv
 from datetime import date
 from io import StringIO
+from types import SimpleNamespace
 
 import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
 
 
 @pytest.mark.django_db
@@ -120,4 +122,83 @@ def test_monthly_report_uses_previous_calendar_year_for_january_run(monkeypatch)
     assert list(csv.reader(StringIO(output.getvalue()))) == [
         ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
         ['dee', '1', '0', '425'],
+    ]
+
+
+def test_monthly_report_application_applies_previous_month_rules():
+    loans = [
+        SimpleNamespace(
+            id='L-alpha-on-time',
+            member='alpha',
+            lent_on=date(2025, 12, 1),
+            due_on=date(2025, 12, 10),
+            returned_on=date(2025, 12, 10),
+        ),
+        SimpleNamespace(
+            id='L-alpha-late',
+            member='alpha',
+            lent_on=date(2025, 12, 31),
+            due_on=date(2025, 12, 31),
+            returned_on=date(2026, 1, 1),
+        ),
+        SimpleNamespace(
+            id='L-bravo-unreturned',
+            member='bravo',
+            lent_on=date(2025, 12, 30),
+            due_on=date(2026, 1, 13),
+            returned_on=None,
+        ),
+        SimpleNamespace(
+            id='L-charlie-late',
+            member='charlie',
+            lent_on=date(2025, 12, 15),
+            due_on=date(2025, 12, 22),
+            returned_on=date(2026, 1, 2),
+        ),
+        SimpleNamespace(
+            id='L-november',
+            member='outside',
+            lent_on=date(2025, 11, 30),
+            due_on=date(2025, 12, 14),
+            returned_on=None,
+        ),
+        SimpleNamespace(
+            id='L-january',
+            member='outside',
+            lent_on=date(2026, 1, 1),
+            due_on=date(2026, 1, 15),
+            returned_on=None,
+        ),
+    ]
+
+    class Loans:
+        window = None
+
+        def started_between(self, start, end):
+            self.window = (start, end)
+            return [loan for loan in loans if start <= loan.lent_on < end]
+
+    class Fees:
+        amounts = {
+            'L-alpha-on-time': 125,
+            'L-alpha-late': 125,
+            'L-bravo-unreturned': 250,
+            'L-charlie-late': 500,
+            'L-november': 900,
+            'L-january': 900,
+        }
+
+        def fee_for(self, loan_id):
+            return SimpleNamespace(amount_cents=self.amounts[loan_id])
+
+    repository = Loans()
+    reports = MonthlyReportApplication(repository, Fees()).for_previous_month(
+        date(2026, 1, 1)
+    )
+
+    assert repository.window == (date(2025, 12, 1), date(2026, 1, 1))
+    assert reports == [
+        MemberMonthlyReport('charlie', 1, 1, 500),
+        MemberMonthlyReport('alpha', 2, 1, 250),
+        MemberMonthlyReport('bravo', 1, 0, 250),
     ]
