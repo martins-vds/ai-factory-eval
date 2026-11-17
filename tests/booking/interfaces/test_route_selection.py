@@ -11,6 +11,7 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -220,3 +221,17 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_screens_return_404_for_unknown_and_stale_tracking_ids(client):
+    tracking_id = _create_cargo(())
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+
+    for screen in ('route', 'itineraries'):
+        unknown_response = client.get(f'/admin/cargo/UNKNOWN/{screen}/')
+        stale_response = client.get(f'/admin/cargo/{tracking_id.value}/{screen}/')
+
+        assert unknown_response.status_code == 404
+        assert stale_response.status_code == 404

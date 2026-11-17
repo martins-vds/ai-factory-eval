@@ -80,3 +80,18 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-17T19:25:20+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:29:06+00:00 | verifier-route-not-found-tests | 0 | 3.98 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_404_for_unknown_and_stale_tracking_ids` | `7eb11104642b7dc0` |  |  |
+| 2026-11-17T19:29:13+00:00 | verifier-build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:29:16+00:00 | verifier-build-django-check | 0 | 0.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T19:29:20+00:00 | verifier-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:29:23+00:00 | verifier-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T19:29:28+00:00 | verifier-idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T19:29:36+00:00 | verifier-idiom-ui | 0 | 0.36 | `python .migration/harness/tools/check_ui.py` | `5abdde1252e45f5f` |  | gate=ui scope="templates changed since 10510a3861e16b0c4ed2afab5d75882d97bc000c" templates=0 findings=0 |
+| 2026-11-17T19:30:28+00:00 | verifier-behavior | 0 | 48.08 | `pytest -q` | `7e0c805829808198` |  |  |
+| 2026-11-17T19:31:18+00:00 | verifier-regression | 0 | 46.04 | `pytest -q` | `6604d0165a30a523` |  |  |
+| 2026-11-17T19:32:12+00:00 | verifier-crap-coverage | 0 | 49.67 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f12e3b861ba1251e` |  |  |
+| 2026-11-17T19:32:16+00:00 | verifier-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:32:20+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T19:32:25+00:00 | verifier-mutation-changed | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T19:37:21+00:00 | verifier-mutation-route-selection-diagno | 0 | 243.46 | `bash -c 'AFS_TICKET=adhoc python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py'` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
+| 2026-11-17T19:37:50+00:00 | verifier-current-missing-id-test | 0 | 1.51 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `f51873a8b2568bb4` |  |  |
