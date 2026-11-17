@@ -12,7 +12,7 @@ def loan_detail(request, loan_id):
     loan = get_loan(loan_id)
     if loan is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-    return HttpResponse(f'{export_loans([loan])}', content_type='text/plain')
+    return HttpResponse(export_loans([loan]), content_type='text/plain')
 
 
 def ui_loan_list(request):
