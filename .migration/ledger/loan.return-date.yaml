@@ -7,11 +7,29 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "The first return persists the server's default-zone current date. A repeated return is rejected and leaves the original date unchanged per the approved ruling."
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#1191
+target:
+  components:
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.services.return_loan
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_endpoint_persists_today_and_rejects_a_second_return
+rules:
+  - id: return-once
+    rule: "A loan can be returned only once; a repeated return is rejected without replacing the persisted return date."
+    source: "legacy/src/main/java/lib/LoanRepository.java:36-44; approved ruling martins-vds/ai-factory-synthetic-target#41"
+  - id: return-date
+    rule: "The first return date is the current date in the server's default time zone."
+    source: "legacy/src/main/java/lib/LoanRepository.java:36-44; approved plan .migration/plan/loan-circulation.md"
 quirks: [martins-vds/ai-factory-synthetic-target#41]

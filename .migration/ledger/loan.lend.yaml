@@ -7,11 +7,34 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans rejects missing, empty or whitespace-only member and ISBN fields with HTTP 400; valid submissions create a loan dated today with id L<count+1>, due 14 days later, and return HTTP 201 with the formatted record."
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#1191
+target:
+  components:
+    - src.loans.forms.LoanForm
+    - src.loans.services.lend_loan
+    - src.loans.views.loan_list
+    - templates/loans/new.html
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lend_endpoint_creates_a_loan_with_a_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_circulation.py::test_lending_page_renders_field_errors
+notes: "The approved ruling in martins-vds/ai-factory-synthetic-target#39 rejects empty and whitespace-only fields. Delimiter escaping was implemented in LL-01 per the approved ruling in #43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - id: member-and-isbn-required
+    rule: "Member and ISBN must be provided and nonblank; whitespace-only values produce field errors."
+    source: "legacy/src/main/java/lib/LoanResource.java:37-43; approved ruling martins-vds/ai-factory-synthetic-target#39"
+  - id: loan-dates
+    rule: "A new loan is dated with the server's default-zone current date and is due 14 calendar days later."
+    source: "legacy/src/main/java/lib/Loan.java:44-46; approved plan .migration/plan/loan-circulation.md"
