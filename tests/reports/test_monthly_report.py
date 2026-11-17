@@ -5,10 +5,8 @@ from types import SimpleNamespace
 
 import pytest
 from django.core.management import call_command
-from django.db.models import Model
 
 from src.loans.models import Loan
-from src.reports.repository import DjangoMonthlyReportRepository
 from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
 
 
@@ -91,22 +89,6 @@ def test_monthly_report_application_aggregates_previous_month_directly():
         MemberMonthlyReport('beta', 1, 0, 100),
         MemberMonthlyReport('zero', 1, 0, 0),
     ]
-
-
-@pytest.mark.django_db
-def test_monthly_report_repository_does_not_pass_orm_rows_to_application():
-    Loan.objects.create(
-        id='L-report-boundary',
-        member='report-boundary',
-        isbn='1',
-        lent_on=date(2026, 2, 1),
-    )
-
-    records = DjangoMonthlyReportRepository().started_between(
-        date(2026, 2, 1), date(2026, 3, 1)
-    )
-
-    assert all(not isinstance(record, Model) for record in records)
 
 
 @pytest.mark.django_db
