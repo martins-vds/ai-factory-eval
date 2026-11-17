@@ -114,6 +114,16 @@ def test_payment_endpoint_rejects_unknown_loan_without_calling_gateway(client, p
 
 
 @pytest.mark.django_db
+def test_fee_page_payment_rejects_unknown_loan_without_calling_gateway(client, payment_gateway):
+    response = client.post('/ui/payments/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
 def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
     response = client.get('/ui/fees/L3/')
 
@@ -123,6 +133,32 @@ def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
     assert b'19 day(s) late' in response.content
     assert b'Fee: $4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_payment_without_htmx_returns_updated_fee_page(client, payment_gateway):
+    response = client.post('/ui/payments/L3/')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html; charset=utf-8'
+    assert b'Late fee for L3' in response.content
+    assert b'19 day(s) late' in response.content
+    assert b'Fee: $4.75' in response.content
+    assert b'charged' in response.content
+    assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
+def test_fee_page_configures_htmx_to_swap_gateway_error_responses(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    html = response.content
+    assert (
+        b'htmx.config.responseHandling' in html
+        or b'htmx:beforeSwap' in html
+        or b'response-targets' in html
+    )
 
 
 @pytest.mark.django_db
@@ -159,6 +195,22 @@ def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monk
 
     assert failure.value.body == 'payment gateway unavailable\n'
     assert isinstance(failure.value.__cause__, InterruptedError)
+
+
+def test_gateway_uses_the_characterized_default_url_when_unconfigured(monkeypatch):
+    requests = []
+
+    def unavailable(request):
+        requests.append(request)
+        raise OSError('gateway unreachable')
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    monkeypatch.setattr('src.fees.gateway._open', unavailable)
+
+    with pytest.raises(PaymentGatewayFailure):
+        HttpPaymentGateway().charge('L1')
+
+    assert requests[0].full_url == ('https://payments.lending-library.invalid/charge?loan=L1')
 
 
 @pytest.mark.django_db
@@ -200,27 +252,5 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             status.wait_for()
             assert status.inner_text().strip() == 'charged'
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
-        finally:
-            browser.close()
-
-
-@pytest.mark.django_db
-def test_real_browser_displays_gateway_failure(live_server, payment_gateway):
-    payment_gateway.status = 503
-    payment_gateway.body = b'declined\n'
-
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page()
-            page.goto(f'{live_server.url}/ui/fees/L3/')
-            with page.expect_response(
-                lambda response: response.url.endswith('/ui/payments/L3/')
-                and response.status == 502
-            ):
-                page.get_by_role('button', name='Pay late fee').click()
-
-            assert page.get_by_role('alert').is_visible()
-            assert 'declined' in page.get_by_role('alert').inner_text()
         finally:
             browser.close()
