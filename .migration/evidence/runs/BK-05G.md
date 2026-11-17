@@ -63,3 +63,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T03:27:38+00:00 | regression | 0 | 66.81 | `pytest -q` | `a96486cba3e51eac` |  |  |
 | 2026-11-17T03:28:18+00:00 | verifier-alerts | 0 | 8.81 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `57167c6f77bf20e1` |  |  |
 | 2026-11-17T03:31:06+00:00 | mutation-changed | 0 | 161.61 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `f4b0d0c16c046169` |  | gate=mutation score=0.944 threshold=0.8 killed=51 survived=3 files=1 base=origin/main |
+| 2026-11-17T03:37:29+00:00 | build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:37:30+00:00 | build-django-check | 0 | 0.38 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T03:37:30+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T03:37:30+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T03:37:30+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T03:38:52+00:00 | behavior | 0 | 76.4 | `pytest -q` | `9024d4ecd3bca1eb` |  |  |
+| 2026-11-17T03:39:59+00:00 | crap-pytest-cov | 0 | 66.9 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `167c5df5ff494978` |  |  |
+| 2026-11-17T03:39:59+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:39:59+00:00 | crap-report | 0 | 0.05 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T03:41:03+00:00 | regression | 0 | 63.97 | `pytest -q` | `28026932ad440e1d` |  |  |
