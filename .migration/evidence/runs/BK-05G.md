@@ -58,3 +58,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:44:38+00:00 | idiom-ui | 1 | 0.34 | `python .migration/harness/tools/check_ui.py` | `4b11a65cd1e6a1e7` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 4017939181c6f5fecf59a3a035d3bb593d2dada9" templates=3 findings=3 |
 | 2026-11-17T16:47:55+00:00 | behavior | 0 | 47.28 | `pytest -q` | `68bafe23b4d4c27d` |  |  |
 | 2026-11-17T16:48:42+00:00 | regression | 0 | 47.02 | `pytest -q` | `04dbdce038dceb31` |  |  |
+| 2026-11-17T16:49:50+00:00 | crap-coverage | 0 | 48.23 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `72c3d1fd77602a12` |  |  |
+| 2026-11-17T16:49:50+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:49:50+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T16:51:46+00:00 | mutation-changed | 0 | 115.75 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
