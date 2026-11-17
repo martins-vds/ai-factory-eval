@@ -116,8 +116,11 @@ def test_payment_endpoint_calls_gateway_and_returns_success(client, gateway_serv
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_maps_gateway_failure_to_bad_gateway(client, gateway_server):
-    gateway_server.response_status = 503
+@pytest.mark.parametrize('gateway_status', [302, 503])
+def test_payment_endpoint_maps_gateway_failure_to_bad_gateway(
+    client, gateway_server, gateway_status
+):
+    gateway_server.response_status = gateway_status
     gateway_server.response_body = b'declined\n'
 
     response = client.post('/payments/L2')
@@ -174,3 +177,16 @@ def test_browser_payment_action_uses_htmx_partial(client, gateway_server):
     assert b'charged' in response.content
     assert b'<!doctype html>' not in response.content
     assert gateway_server.requests == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
+def test_browser_payment_failure_is_visible_to_htmx(client, gateway_server):
+    gateway_server.response_status = 503
+    gateway_server.response_body = b'declined\n'
+
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
+    assert b'<!doctype html>' not in response.content

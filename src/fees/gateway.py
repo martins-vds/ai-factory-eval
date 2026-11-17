@@ -45,10 +45,9 @@ class HttpPaymentGateway:
                     body=response.read().decode('utf-8', errors='replace'),
                 )
         except HTTPError as response:
-            return GatewayResponse(
-                status_code=response.code,
-                body=response.read().decode('utf-8', errors='replace'),
-            )
+            with response:
+                body = response.read().decode('utf-8', errors='replace')
+            return GatewayResponse(status_code=response.code, body=body)
         except InterruptedError as error:
             raise GatewayUnavailable('payment gateway unavailable') from error
         except (URLError, OSError) as error:
