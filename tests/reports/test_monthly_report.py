@@ -20,6 +20,13 @@ def test_monthly_report_summarizes_the_previous_month(monkeypatch):
             ),
             Loan(id='R2', member='alpha', isbn='2', lent_on=date(2026, 2, 10)),
             Loan(
+                id='R8',
+                member='alpha',
+                isbn='8',
+                lent_on=date(2026, 1, 30),
+                returned_on=date(2026, 2, 20),
+            ),
+            Loan(
                 id='R3',
                 member='amy',
                 isbn='3',
@@ -57,7 +64,7 @@ def test_monthly_report_summarizes_the_previous_month(monkeypatch):
 
     assert output.getvalue() == (
         'member_id,loans_started,late_returns,late_fees_cents\n'
-        'alpha,2,1,175\n'
+        'alpha,2,2,250\n'
         'amy,1,0,0\n'
         'beta,1,0,0\n'
         'mike,1,0,0\n'
