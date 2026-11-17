@@ -68,6 +68,19 @@ def test_late_fee_uses_two_day_grace_period_and_ten_dollar_cap(days_late, expect
     assert fee.cents == expected_cents
 
 
+def test_fee_clock_uses_server_local_date(monkeypatch):
+    from src.fees.clock import ServerLocalClock
+
+    class LocalDate:
+        @classmethod
+        def today(cls):
+            return date(2026, 11, 17)
+
+    monkeypatch.setattr('src.fees.clock.date', LocalDate)
+
+    assert ServerLocalClock().today() == date(2026, 11, 17)
+
+
 @pytest.mark.django_db
 def test_fee_endpoint_matches_characterized_html(client):
     response = client.get('/fees/L3')
