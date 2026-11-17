@@ -1,0 +1,21 @@
+role: afs-migrator
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#1169
+pr: martins-vds/ai-factory-eval#1174
+specialty: data
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: "n/a: test-only changes; no production code changed"
+  mutation_changed: "n/a: test-only changes; no production code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty_evidence:
+  - .migration/evidence/runs/DM-05F.md
+  - tests/data_migration/test_invariants.py
