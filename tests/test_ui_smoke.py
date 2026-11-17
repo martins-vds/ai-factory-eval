@@ -11,7 +11,10 @@ def test_loan_catalog_and_detail_render_in_browser(live_server):
             response = page.goto(f'{live_server.url}/ui/loans/')
             assert response is not None
             assert response.status == 200
-            assert page.locator('link[href*="tailwind.css"]').count() == 1
+            stylesheet = page.locator('link[href*="tailwind.css"]')
+            assert stylesheet.count() == 1
+            stylesheet_url = stylesheet.get_attribute('href')
+            assert stylesheet_url == '/static/css/tailwind.css'
             assert (
                 page.locator(
                     'script[src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"]'
