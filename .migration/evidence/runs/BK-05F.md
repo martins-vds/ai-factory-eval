@@ -79,3 +79,27 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T18:47:34+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T18:48:15+00:00 | build-compile | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T18:48:16+00:00 | build-check | 0 | 1.04 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T18:48:16+00:00 | idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T18:48:16+00:00 | idiom-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T18:48:16+00:00 | idiom-layers | 0 | 0.1 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T18:48:17+00:00 | idiom-ui | 0 | 0.31 | `python .migration/harness/tools/check_ui.py` | `536cc789b0cef803` |  | gate=ui scope="templates changed since d51cad8381378b02e9dcdb93d1ca50c7dd801baf" templates=0 findings=0 |
+| 2026-11-17T18:48:55+00:00 | behavior | 0 | 38.27 | `pytest -q` | `fa52f638eb939a66` |  |  |
+| 2026-11-17T18:49:48+00:00 | crap-coverage | 0 | 35.61 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f3b90092cee91d8a` |  |  |
+| 2026-11-17T18:49:49+00:00 | crap-lizard | 0 | 0.1 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T18:49:49+00:00 | crap | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T18:49:49+00:00 | mutation-changed | 0 | 0.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T18:50:23+00:00 | regression | 0 | 33.93 | `pytest -q` | `1ee9878acdb01131` |  |  |
+| 2026-11-17T18:50:51+00:00 | verifier-route-tests | 1 | 1.84 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `59007bda09a88c92` | E       Failed: DID NOT RAISE Http404 |  |
+| 2026-11-17T18:51:04+00:00 | verifier-route-tests-final | 0 | 1.79 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `75910219907df959` |  |  |
+| 2026-11-17T18:54:12+00:00 | mutation-route-selection | 0 | 187.5 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
+| 2026-11-17T18:54:41+00:00 | verifier-cargo-not-found-page | 1 | 1.32 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_unknown_cargo_404_identifies_cargo` | `9deb1c454c1c42e8` | assert response.status_code == 404 |  |
+| 2026-11-17T18:54:59+00:00 | verifier-final-targeted | 0 | 1.79 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `2f9a63cd81112eb1` |  |  |
+| 2026-11-17T18:54:59+00:00 | final-build-compile | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T18:54:59+00:00 | final-build-check | 0 | 0.25 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T18:54:59+00:00 | final-idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T18:54:59+00:00 | final-idiom-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T18:55:00+00:00 | final-idiom-layers | 0 | 0.1 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T18:55:00+00:00 | final-idiom-ui | 0 | 0.27 | `python .migration/harness/tools/check_ui.py` | `536cc789b0cef803` |  | gate=ui scope="templates changed since d51cad8381378b02e9dcdb93d1ca50c7dd801baf" templates=0 findings=0 |
