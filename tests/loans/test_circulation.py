@@ -45,3 +45,59 @@ def test_repeat_return_is_rejected_without_changing_the_original_date(client):
     assert client.get('/loans/L2').content.decode() == (
         'L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\n'
     )
+
+
+@pytest.mark.django_db
+def test_browser_can_lend_a_book_from_the_reading_room_form(client):
+    page = client.get('/ui/loans/new/')
+
+    assert page.status_code == 200
+    assert b'Lend a book' in page.content
+
+    response = client.post('/ui/loans/new/', {'member': 'dee', 'isbn': '123'})
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    catalog = client.get(response['Location'])
+    assert b'Loan L4' in catalog.content
+    assert b'dee' in catalog.content
+
+
+@pytest.mark.django_db
+def test_lending_api_rejects_missing_and_blank_values(client):
+    invalid_forms = (
+        {},
+        {'member': 'dee'},
+        {'isbn': '123'},
+        {'member': ' ', 'isbn': '123'},
+        {'member': 'dee', 'isbn': '  '},
+    )
+
+    for form in invalid_forms:
+        response = client.post('/loans', form)
+
+        assert response.status_code == 400
+        assert response.content.decode() == 'member and isbn are required\n'
+
+    assert len(client.get('/loans').content.decode().splitlines()) == 3
+
+
+@pytest.mark.django_db
+def test_browser_lending_displays_field_errors_for_blank_values(client):
+    response = client.post('/ui/loans/new/', {'member': ' ', 'isbn': ''})
+
+    assert response.status_code == 400
+    assert b'This field is required.' in response.content
+    assert response.context['form'].errors.keys() == {'member', 'isbn'}
+    assert len(client.get('/loans').content.decode().splitlines()) == 3
+
+
+@pytest.mark.django_db
+def test_browser_can_return_an_unreturned_book(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+    detail = client.get(response['Location'])
+    assert b'Returned' in detail.content
+    assert b'Record return' not in detail.content
