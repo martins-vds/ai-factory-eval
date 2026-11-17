@@ -24,6 +24,17 @@ def test_list_returns_seed_loans_as_characterized_text(client):
 
 
 @pytest.mark.django_db
+def test_list_orders_loans_by_id_not_insertion_order(client):
+    Loan.objects.create(id='L10', member='member', isbn='isbn', lent_on=date(2026, 2, 1))
+    Loan.objects.create(id='L4', member='member', isbn='isbn', lent_on=date(2026, 2, 1))
+
+    response = client.get('/loans')
+    records = list(csv.reader(StringIO(response.content.decode()), delimiter=';'))
+
+    assert [record[0] for record in records] == ['L1', 'L10', 'L2', 'L3', 'L4']
+
+
+@pytest.mark.django_db
 def test_get_returns_one_loan_as_characterized_text(client):
     response = client.get('/loans/L1')
 
@@ -113,3 +124,10 @@ def test_catalog_detail_shows_due_date_and_return_state(client):
     assert b'9780596007126' in response.content
     assert b'Due Jan 24, 2026' in response.content
     assert b'Returned Jan 20, 2026' in response.content
+
+
+@pytest.mark.django_db
+def test_catalog_detail_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/loans/unknown/')
+
+    assert response.status_code == 404

@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_list_returns_seed_loans_as_characterized_text]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_list_returns_seed_loans_as_characterized_text, tests/loans/test_catalog.py::test_list_orders_loans_by_id_not_insertion_order]
 rules:
   - id: stable-loan-order
     rule: List every loan in ascending ID order and terminate each record with a newline.
