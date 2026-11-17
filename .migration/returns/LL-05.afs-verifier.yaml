@@ -1,0 +1,51 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-synthetic-target#67
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1283
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings: []
+tests_added:
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: At a first-of-month run, report the prior calendar month using its half-open date window.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+    enforced: true
+  - capability: reports.monthly-spec
+    rule: Aggregate a single row per member and count all loans started in the report month.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+    enforced: true
+  - capability: reports.monthly-spec
+    rule: Count a loan as returned late only when its return date is after its due date.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+    enforced: true
+  - capability: reports.monthly-spec
+    rule: Sum late fees as integer cents.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+    enforced: true
+  - capability: reports.monthly-spec
+    rule: Sort rows by total late fees descending, then member id.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+    enforced: true
+  - capability: reports.monthly-spec
+    rule: Omit members with no loans started in the report month.
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_applies_previous_month_rules
+    enforced: true
+no_rules: {}
