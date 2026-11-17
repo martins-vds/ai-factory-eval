@@ -1,5 +1,7 @@
+import csv
 import json
 from datetime import date, timedelta
+from io import StringIO
 from pathlib import Path
 
 import pytest
@@ -32,6 +34,30 @@ def test_list_endpoint_returns_seeded_records(client):
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
+
+
+@pytest.mark.django_db
+def test_list_endpoint_escapes_field_and_record_delimiters(client):
+    Loan.objects.create(
+        id='L9',
+        member='Reader; Example\nSecond line',
+        isbn='978"xyz',
+        lent_on=date(2026, 3, 1),
+    )
+
+    response = client.get('/loans')
+
+    assert response.status_code == 200
+    records = csv.reader(StringIO(response.content.decode()), delimiter=';')
+    record = next(row for row in records if row[0] == 'L9')
+    assert record == [
+        'L9',
+        'Reader; Example\nSecond line',
+        '978"xyz',
+        '2026-03-01',
+        '2026-03-15',
+        '',
+    ]
 
 
 @pytest.mark.django_db
@@ -101,6 +127,7 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'isbn': '123'}, 'member'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -424,6 +451,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
