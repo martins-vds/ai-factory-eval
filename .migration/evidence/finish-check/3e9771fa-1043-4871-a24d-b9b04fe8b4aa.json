@@ -1,0 +1,46 @@
+[
+  {
+    "at": "2026-11-17T21:49:39Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20949,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-02.md",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      "src/loans/forms.py",
+      "src/loans/repository.py",
+      "src/loans/services.py",
+      "src/loans/urls.py",
+      "src/loans/views.py",
+      "templates/loans/_loan_list.html",
+      "templates/loans/detail.html",
+      "templates/loans/list.html",
+      "templates/loans/new.html",
+      "tests/loans/test_circulation.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-02.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-02`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-02.md`). See afs-migration-contract \u2192 Return files.",
+      "[mechanical] CI's validate.py will fail on this: .migration/ledger/loan.lend.yaml: evidence 'tests/loans/test_circulation.py::test_lending_page_renders_field_errors_for_blank_values': no 'test_lending_page_renders_field_errors_for_blank_values' defined in tests/loans/test_circulation.py (stale symbol). Fix it and commit."
+    ],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "self_heal.enabled is off; would have blocked"
+  }
+]

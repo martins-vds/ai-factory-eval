@@ -7,9 +7,14 @@ from .models import Loan
 from .services import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
 
 
-def _return_error(status):
-    message = 'no such loan\n' if status == 404 else 'loan already returned\n'
-    return HttpResponse(message, status=status, content_type='text/plain')
+def _return_loan_or_error(loan_id):
+    result = return_loan(loan_id)
+    if result is None:
+        return None, HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    loan, returned_now = result
+    if not returned_now:
+        return None, HttpResponse('loan already returned\n', status=409, content_type='text/plain')
+    return loan, None
 
 
 def loan_catalog(request):
@@ -52,23 +57,17 @@ def loan_catalog_lend(request):
 
 @require_POST
 def loan_return(request, loan_id):
-    result = return_loan(loan_id)
-    if result is None:
-        return _return_error(404)
-    loan, returned_now = result
-    if not returned_now:
-        return _return_error(409)
+    loan, error = _return_loan_or_error(loan_id)
+    if error is not None:
+        return error
     return HttpResponse(loan_line(loan), content_type='text/plain')
 
 
 @require_POST
 def loan_catalog_return(request, loan_id):
-    result = return_loan(loan_id)
-    if result is None:
-        return _return_error(404)
-    loan, returned_now = result
-    if not returned_now:
-        return _return_error(409)
+    loan, error = _return_loan_or_error(loan_id)
+    if error is not None:
+        return error
     if request.headers.get('HX-Request') == 'true':
         return render(
             request,
