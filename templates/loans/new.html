@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="{% url 'loan_catalog' %}">← Back to the collection</a>
+  <div class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
+      <h1 class="card-title mt-2 text-4xl">Lend a book.</h1>
+      <p class="mt-2 text-[#66705b]">Add a reader and the book’s ISBN to the collection.</p>
+      <form class="mt-6 grid gap-5" method="post" action="{% url 'loan_catalog_lend' %}">
+        {% csrf_token %}
+        <div>
+          <label class="label" for="{{ form.member.id_for_label }}"><span class="label-text">Borrower</span></label>
+          {{ form.member }}
+          {% for error in form.member.errors %}
+          <p class="mt-1 text-sm text-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div>
+          <label class="label" for="{{ form.isbn.id_for_label }}"><span class="label-text">ISBN</span></label>
+          {{ form.isbn }}
+          {% for error in form.isbn.errors %}
+          <p class="mt-1 text-sm text-error">{{ error }}</p>
+          {% endfor %}
+        </div>
+        <button class="btn btn-primary w-fit" type="submit">Record this loan</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

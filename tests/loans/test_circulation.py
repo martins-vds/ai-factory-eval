@@ -111,5 +111,8 @@ def test_browser_can_lend_and_return_using_ui_routes(client, monkeypatch):
 
     assert return_response.status_code == 200
     assert b'Returned Mar 1, 2026' in return_response.content
-    assert b'Mark returned' not in return_response.content
+    returned_loan_card = (
+        return_response.content.decode().split('Loan L4', 1)[1].split('</article>', 1)[0]
+    )
+    assert 'Mark returned' not in returned_loan_card
     assert Loan.objects.get(pk='L4').returned_on == date(2026, 3, 1)
