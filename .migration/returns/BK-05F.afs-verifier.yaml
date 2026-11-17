@@ -1,0 +1,58 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1098
+verdict: blocked
+blocked_reason: "mutation_changed: afs-mutation --changed-since origin/main was stopped after 42m49s without finishing; no fresh score or survivor report was produced."
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.855
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: Application code imports Django Http404; the layering gate marks this as known, not failing.
+    origin: BK-05C
+    evidence: "run: verify-idiom-layers"
+rules:
+  - capability: booking.routing-chain
+    rule: Candidate routes come from the injected RoutingService, and routes arriving after the cargo deadline are excluded.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+  - capability: booking.screen-route
+    rule: Unknown or stale cargo tracking IDs are rejected as not found.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found[route_candidates-False]
+    enforced: true
+  - capability: booking.screen-select-itinerary
+    rule: Unknown or stale cargo tracking IDs are rejected before itinerary selection.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found[route_candidates-True]
+    enforced: true
+  - capability: booking.routing-assign
+    rule: Assigning the selected itinerary persists it and recalculates the cargo route state.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+no_rules: {}
+mutation_survivors:
+  fresh_run: "No fresh survivors available because the changed-code mutation run did not finish."
+  prior_completed_run:
+    score: 0.855
+    report: .migration/evidence/mutants/BK-05F.md
+    relevant_to_bk_05f: "No prior survivor was identified as material to route selection; this does not replace fresh classification."
+    classes:
+      signing_salt_changes: [1, 2]
+      error_message_text_changes: [10, 13, 27, 44, 46]
+      url_quoting_of_unreserved_X: [14]
+      missing_token_fallback: [40]
