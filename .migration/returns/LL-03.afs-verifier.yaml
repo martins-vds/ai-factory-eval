@@ -1,0 +1,30 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/88
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutmut aborted on verifier test failure"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/templates/fees/payment-form.html:3
+    what: "HTMX 2 does not swap the payment form's 404/502 responses by default, so the returned failure message is not shown to users."
+    evidence: "run: idiom-ui-final"
+  - severity: major
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/templates/fees/payment-form.html:5
+    what: "The payment button's bg-[#a94e37], text-white, and hover:bg-[#873b2a] utilities are absent from the built Tailwind stylesheet."
+    evidence: "run: idiom-ui-final"
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_pay_use_case_rejects_unknown_loan_without_gateway_call
+  - tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_error_responses
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_methods
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
