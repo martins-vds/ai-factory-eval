@@ -126,6 +126,21 @@ def test_fee_page_payment_shows_gateway_failure_fragment(client, payment_gateway
     assert b'declined' in response.content
 
 
+@pytest.mark.django_db
+def test_fee_page_configures_htmx_to_swap_error_responses(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    assert any(
+        configuration in response.content
+        for configuration in (
+            b'htmx.config.responseHandling',
+            b'htmx:beforeSwap',
+            b'response-targets',
+        )
+    )
+
+
 def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monkeypatch):
     def interrupt(_request):
         raise InterruptedError('request interrupted')
