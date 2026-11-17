@@ -483,9 +483,7 @@ def test_htmx_error_responses_are_handled_for_reading_room_forms():
     )
 
     assert any(
-        marker in source.read_text(encoding='utf-8')
-        for source in sources
-        for marker in handling
+        marker in source.read_text(encoding='utf-8') for source in sources for marker in handling
     )
 
 
