@@ -101,6 +101,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -148,6 +150,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
 
     assert response.status_code == 409
     assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'already returned\n'
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db(transaction=True)
+def test_repeat_return_keeps_date_outside_test_transaction(client):
+    original_return_date = date(2026, 1, 20)
+
+    response = client.post('/loans/L2/return')
+
+    assert response.status_code == 409
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
 
