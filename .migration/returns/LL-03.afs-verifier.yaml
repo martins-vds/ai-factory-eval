@@ -1,0 +1,58 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/88
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: afs-mutation aborted on the failing verifier test before testing mutants"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "The htmx payment action has no error-response handling; htmx 2 does not swap 4xx/5xx responses, so payment failure fragments are not shown."
+    evidence: tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_error_responses
+  - severity: minor
+    where: templates/fees/payment-form.html:5
+    what: "The built Tailwind stylesheet omits bg-[#a94e37], text-white, and hover:bg-[#873b2a], so the pay button's declared colors are not applied."
+    evidence: "run: idiom-ui"
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+  - tests/fees/test_fee_calculation.py::test_pay_does_not_charge_gateway_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_http_methods
+  - tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_error_responses
+ledger_issues:
+  - "LL-03 ledger entries omit rules/no_rules inventories for the fee calculation limits and payment eligibility."
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+rules:
+  - capability: fees.calculation
+    rule: "Late days are clamped to zero when a loan is not overdue."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "The first two late days incur no fee."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "Fees accrue at 25 cents per late day and are capped at $10."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.page
+    rule: "An unknown loan has no fee and the page returns the characterized not-found response."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "Payment for an unknown loan is refused without calling the gateway."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_calculation.py::test_pay_does_not_charge_gateway_for_unknown_loan
+    enforced: true
