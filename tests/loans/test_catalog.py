@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -197,6 +198,55 @@ def test_due_date_is_fourteen_calendar_days_after_lending():
     )
 
     assert loan.due_on == date(2024, 2, 29)
+
+
+@pytest.mark.django_db
+def test_lend_use_case_sets_due_date_fourteen_days_after_lending():
+    loan = lend_loan(member='reader', isbn='123')
+
+    assert loan.due_on == loan.lent_on + timedelta(days=14)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [(' ', '123'), ('reader', ' ')],
+)
+def test_lend_use_case_rejects_whitespace_fields(member, isbn):
+    loan_count = Loan.objects.count()
+
+    try:
+        loan = lend_loan(member=member, isbn=isbn)
+    except (ValueError, ValidationError):
+        pass
+    else:
+        assert loan is None
+
+    assert Loan.objects.count() == loan_count
+
+
+@pytest.mark.django_db
+def test_return_use_case_preserves_date_on_repeat_return():
+    original_return_date = Loan.objects.get(pk='L2').returned_on
+
+    loan, updated = return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_reports_unknown_loan():
+    assert return_loan('unknown') == (None, False)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_use_case_locks_loan_inside_a_transaction():
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db
@@ -425,6 +475,14 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_htmx_return_unknown_loan_renders_an_error(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
 
 
 @pytest.mark.django_db
