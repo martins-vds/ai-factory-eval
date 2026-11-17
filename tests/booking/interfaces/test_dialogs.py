@@ -10,6 +10,7 @@ from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -93,6 +94,25 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
 
 def test_unknown_cargo_dialog_returns_not_found(client):
     response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+@pytest.mark.parametrize('method', ['GET', 'POST'])
+def test_stale_cargo_dialog_returns_not_found(client, dialog, method):
+    dashboard = client.get('/admin/dashboard/').content.decode()
+    assert f'hx-get="/admin/cargo/DEF789/{dialog}/"' in dashboard
+
+    CargoRecord.objects.filter(tracking_id='DEF789').delete()
+    path = f'/admin/cargo/DEF789/{dialog}/'
+    if method == 'GET':
+        response = client.get(path, HTTP_HX_REQUEST='true')
+    else:
+        form_data = (
+            {'destination': 'USLAX'} if dialog == 'destination' else {'deadline': '2027-01-15'}
+        )
+        response = client.post(path, form_data, HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
 

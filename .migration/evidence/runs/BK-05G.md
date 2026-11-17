@@ -49,3 +49,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-17T16:40:32+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:44:12+00:00 | stale-dialogs | 0 | 4.62 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_stale_cargo_dialog_returns_not_found` | `f97303c18f20b70c` |  |  |
+| 2026-11-17T16:44:36+00:00 | build-compileall | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:44:37+00:00 | build-django-check | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:44:37+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:44:37+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T16:44:37+00:00 | idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T16:44:38+00:00 | idiom-ui | 1 | 0.34 | `python .migration/harness/tools/check_ui.py` | `4b11a65cd1e6a1e7` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 4017939181c6f5fecf59a3a035d3bb593d2dada9" templates=3 findings=3 |
