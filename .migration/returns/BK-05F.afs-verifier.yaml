@@ -1,0 +1,87 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1013
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1,66
+    what: "BK-05C's application use case imports Django Http404, contrary to ADR-0001; the layer gate marks it known, not failing."
+    origin: BK-05C
+    evidence: "run: verify-idiom-layers (known, not failing; exit 0)"
+differential_checks:
+  source_revision: f3beacf78de4f6d34edc4971ac87e38a5c6fe59d
+  target_revision: martins-vds/ai-factory-pilot-target#406@7578652b37d29344be97404276681ea40e10d881
+  cases:
+    - capability: booking.routing-chain
+      classification: approved architecture
+      source: "Booking requests route candidates from the routing service; the source graph traversal is an HTTP self-call."
+      target: "The route-selection view calls CargoRouting, which requests candidates through the injected RoutingService."
+      decision: "#89 selects in-process routing behind RoutingService."
+      evidence:
+        - tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+        - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
+    - capability: booking.routing-candidates
+      classification: preserved behavior
+      source: "Candidates are filtered by the route specification's strict arrival deadline; candidate generation ignores the deadline."
+      target: "CargoRouting.route_candidates filters converted RoutingService paths against the current specification."
+      decision: "#89 item 5 and #238 preserve ignoring the deadline during generation and filtering candidates afterward."
+      evidence:
+        - tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    - capability: booking.screen-route
+      classification: preserved behavior with approved redirect replacement
+      source: "Route details show candidate counts, numbered itinerary legs, and deadline guidance when no candidates satisfy the specification."
+      target: "The route page renders those details and posts a signed candidate; assignment redirects to cargo details."
+      decision: "#236 approves the cargo-details redirect."
+      evidence:
+        - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
+        - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+        - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
+    - capability: booking.screen-select-itinerary
+      classification: approved divergence
+      source: "The source select-itinerary screen is blank when candidate routes exist and shows guidance when none exist."
+      target: "The target renders candidate routes when present and retains the empty-candidate guidance."
+      decision: "#252 approves rendering candidate routes."
+      evidence:
+        - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available
+        - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+    - capability: booking.routing-assign
+      classification: preserved state transition with approved redirect replacement
+      source: "Assigning an itinerary persists it and recalculates cargo routing state; source lifecycle scenario is unannotated and not executed evidence."
+      target: "CargoRouting persists the itinerary and recalculates delivery; the route screen redirects to cargo details."
+      decision: "#236 approves the redirect; #250 says the unannotated scenario is not executed evidence."
+      evidence:
+        - tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+        - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
+    - capability: booking.cargo-not-found
+      classification: approved divergence
+      source: "The characterized unknown-ID route request returned HTTP 500 after a null dereference."
+      target: "Unknown and stale IDs return HTTP 404 on route GET, itinerary GET, and route-assignment POST."
+      decision: "#232 approves a cargo-not-found 404 in place of the unhandled source failure."
+      evidence:
+        - tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
+        - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+mutation_survivor_assessment:
+  profile_gate: "n/a: no mutable code changed against origin/main"
+  supplemental_run: "verifier-route-mutation-supplement; score 0.855, 53 killed, 9 survived"
+  evidence: .migration/evidence/mutants/BK-05F.md
+  material_survivors: []
+  equivalent_survivors:
+    - "#1/#2: the opaque token salt changes, but generation and verification use the same salt."
+    - "#10/#13/#27/#46: only Http404 diagnostic text changes; the normal UI response remains 404."
+    - "#14: X is unreserved in URL quoting, so the redirect path is unchanged."
+    - "#40: either missing-token fallback fails signature validation and produces the same 404."
+    - "#44: only the caught BadSignature diagnostic text changes."
