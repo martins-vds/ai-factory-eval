@@ -42,7 +42,7 @@ def loan_catalog_return(request, loan_id):
                 'error': None if returned else 'This loan has already been returned.',
             },
         )
-    return redirect(f'/ui/loans/{loan_id}/')
+    return redirect(f'/ui/loans/{loan.pk}/')
 
 
 def loan_catalog_detail(request, loan_id):
