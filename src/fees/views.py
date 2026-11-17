@@ -2,6 +2,7 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application, payment_application
 from .gateway import GatewayResponse, GatewayUnavailable
@@ -21,6 +22,7 @@ def _payment_result(loan_id):
         return GatewayResponse(502, 'payment gateway unavailable\n')
 
 
+@require_GET
 def fee_endpoint(request, loan_id):
     fee_data = fee_application.get_fee(loan_id)
     if fee_data is None:
@@ -35,6 +37,7 @@ def fee_endpoint(request, loan_id):
     return HttpResponse(body, content_type='text/html')
 
 
+@require_GET
 def fee_page(request, loan_id):
     fee_data = fee_application.get_fee(loan_id)
     if fee_data is None:
@@ -44,6 +47,7 @@ def fee_page(request, loan_id):
     return render(request, 'fees/page.html', {'loan': loan, 'fee': fee})
 
 
+@require_POST
 def payment_endpoint(request, loan_id):
     result = _payment_result(loan_id)
     if result is None:
@@ -52,6 +56,7 @@ def payment_endpoint(request, loan_id):
     return HttpResponse(result.body, status=status, content_type='text/plain')
 
 
+@require_POST
 def payment_page(request, loan_id):
     result = _payment_result(loan_id)
     if result is None:

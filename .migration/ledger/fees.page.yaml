@@ -13,9 +13,12 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_fee_endpoint_matches_characterized_html, tests/fees/test_fees.py::test_fee_endpoint_returns_characterized_not_found_response, tests/fees/test_fees.py::test_browser_fee_page_uses_reading_room_layout_and_payment_action, tests/fees/test_fees.py::test_browser_fee_page_returns_not_found_for_unknown_loan]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_fee_endpoint_matches_characterized_html, tests/fees/test_fees.py::test_fee_endpoint_returns_characterized_not_found_response, tests/fees/test_fees.py::test_browser_fee_page_uses_reading_room_layout_and_payment_action, tests/fees/test_fees.py::test_browser_fee_page_returns_not_found_for_unknown_loan, tests/fees/test_fees.py::test_fee_and_payment_routes_reject_unsupported_methods]
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
 rules:
+  - id: fee-page-method
+    rule: "Fee pages are served only for GET requests; other methods return HTTP 405."
+    source: "LateFeeView.java:19-24"
   - id: fee-page-loan
     rule: "A request for an unknown loan returns HTTP 404; a known loan page shows its due date, late days, and two-decimal fee amount."
     source: "LateFeeView.java:23-38"

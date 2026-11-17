@@ -3,10 +3,6 @@
   <p role="status">Payment complete: {{ payment_result.body }}</p>
   {% else %}
   <p role="alert">Payment could not be completed: {{ payment_result.body }}</p>
-  <form method="post" action="/ui/payments/{{ loan.id }}/"
-        hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
-    {% csrf_token %}
-    <button class="btn mt-3 bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Try payment again</button>
-  </form>
+  {% include "fees/payment-form.html" with loan=loan button_label="Try payment again" %}
   {% endif %}
 </div>

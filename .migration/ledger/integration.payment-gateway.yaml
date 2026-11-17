@@ -14,8 +14,11 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_payment_endpoint_calls_gateway_and_returns_success, tests/fees/test_fees.py::test_payment_endpoint_maps_gateway_failure_to_bad_gateway, tests/fees/test_fees.py::test_payment_endpoint_does_not_call_gateway_for_unknown_loan, tests/fees/test_fees.py::test_payment_endpoint_maps_gateway_io_failure_to_bad_gateway, tests/fees/test_fees.py::test_payment_endpoint_preserves_interruption_as_gateway_failure, tests/fees/test_fees.py::test_browser_payment_action_uses_htmx_partial, tests/fees/test_fees.py::test_browser_payment_failure_is_visible_to_htmx]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fees.py::test_payment_endpoint_calls_gateway_and_returns_success, tests/fees/test_fees.py::test_payment_endpoint_maps_gateway_failure_to_bad_gateway, tests/fees/test_fees.py::test_payment_endpoint_does_not_call_gateway_for_unknown_loan, tests/fees/test_fees.py::test_payment_endpoint_maps_gateway_io_failure_to_bad_gateway, tests/fees/test_fees.py::test_payment_endpoint_preserves_interruption_as_gateway_failure, tests/fees/test_fees.py::test_browser_payment_action_uses_htmx_partial, tests/fees/test_fees.py::test_browser_payment_failure_is_visible_to_htmx, tests/fees/test_fees.py::test_fee_and_payment_routes_reject_unsupported_methods]
 rules:
+  - id: payment-method
+    rule: "Payment endpoints accept only POST requests; other methods return HTTP 405 without calling the gateway."
+    source: "FinePayments.java:22-28"
   - id: existing-loan
     rule: "A missing loan returns HTTP 404 and must not trigger a gateway request."
     source: "FinePayments.java:29-30"

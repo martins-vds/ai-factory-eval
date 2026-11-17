@@ -190,3 +190,20 @@ def test_browser_payment_failure_is_visible_to_htmx(client, gateway_server):
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
     assert b'<!doctype html>' not in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/ui/fees/L1/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, gateway_server, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert gateway_server.requests == []
