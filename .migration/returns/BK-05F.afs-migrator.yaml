@@ -1,0 +1,23 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1147
+pr: null
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed from origin/main"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_candidates_use_the_route_selection_signing_salt
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_outside_the_route_specification
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_unknown_cargo_with_not_found_page
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
