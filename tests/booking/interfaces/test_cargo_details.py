@@ -63,3 +63,16 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unknown_and_stale_cargo_details_show_not_found_message(client):
+    call_command('seed_sample_data')
+    repository.missing_tracking_ids.add('MNO456')
+
+    unknown_response = client.get('/admin/cargo/UNKNOWN/')
+    stale_response = client.get('/admin/cargo/MNO456/')
+
+    assert b'Cargo with tracking ID UNKNOWN not found.' in unknown_response.content
+    assert b'Cargo with tracking ID MNO456 not found.' in stale_response.content
