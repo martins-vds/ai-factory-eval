@@ -91,3 +91,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T13:03:16+00:00 | crap-score | 0 | 0.05 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-17T13:03:16+00:00 | mutation-changed | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-17T13:04:17+00:00 | regression | 0 | 61.23 | `pytest -q` | `d788c303a09705d1` |  |  |
+| 2026-11-17T13:05:58+00:00 | not-found-feedback-red | 1 | 2.16 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_render_cargo_not_found_message_for_unknown_or_stale_cargo` | `e858998b258a2ce3` | assert response.status_code == 404 |  |
+| 2026-11-17T13:06:39+00:00 | verifier-ruff-check | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T13:06:39+00:00 | verifier-ruff-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py` | `fd2299c9f1c6dc86` |  |  |
