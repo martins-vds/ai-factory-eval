@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/839
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no-mutable-code-changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+mutation_survivor_classifications:
+  source: martins-vds/ai-factory-pilot-target#406 (.migration/evidence/mutants/BK-05F.md; recorded score 0.855)
+  contract_relevant_survivors: none
+  reviewed:
+    - "#1: changing the candidate salt changes only opaque signatures; creation and verification use the same salt."
+    - "#2: using Django's default salt on both signing calls still verifies tokens; no other signing calls exist in src."
+    - "#10 and #27: changing the unknown-cargo Http404 text preserves the 404 response."
+    - "#13: changing the route-specification Http404 text preserves the 404 response."
+    - "#14: X is URI-unreserved, so adding it to quote's safe set does not change the redirect URL."
+    - "#40: either missing-candidate default fails signature validation and maps to the same 404."
+    - "#44: the changed BadSignature diagnostic is caught and does not change the response."
+    - "#46: changing the invalid-route Http404 text preserves the 404 response."
