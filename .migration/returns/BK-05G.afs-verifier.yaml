@@ -1,7 +1,7 @@
 role: afs-verifier
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
-pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/402
+pr: https://github.com/martins-vds/ai-factory-eval/pull/844
 verdict: pass
 gates:
   build: 0
