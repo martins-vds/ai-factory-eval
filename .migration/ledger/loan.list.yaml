@@ -8,8 +8,21 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:25-28
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans returns every loan ordered by id as one semicolon-separated text line per record, with a trailing newline."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1189]
+target:
+  components: [src.loans.views.loan_list, src.loans.repository.LoanRepository.all, src.loans.export.loan_line]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_seeded_loans_are_listed_in_id_order
+  - tests/loans/test_catalog.py::test_list_keeps_ids_ordered_when_records_are_inserted_out_of_order
+rules:
+  - id: list-in-id-order
+    rule: "The loan list includes every loan in ascending id order."
+    source: "LoanRepository.java:19-21"
+  - id: list-trailing-newline
+    rule: "Each exported loan line ends with a newline."
+    source: "LoanResource.java:25-28"

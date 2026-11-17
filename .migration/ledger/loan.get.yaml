@@ -7,8 +7,21 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:30-35
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans/{id} returns the formatted loan line and newline with HTTP 200, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1189]
+target:
+  components: [src.loans.views.loan_detail, src.loans.repository.LoanRepository.find, src.loans.export.loan_line]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_existing_loan_lookup_returns_one_formatted_line
+  - tests/loans/test_catalog.py::test_missing_loan_lookup_returns_the_characterized_not_found_response
+rules:
+  - id: get-existing-loan
+    rule: "An existing loan lookup returns its export line followed by a newline with HTTP 200."
+    source: "LoanResource.java:30-35"
+  - id: get-missing-loan
+    rule: "An unknown loan id returns `no such loan` followed by a newline with HTTP 404."
+    source: "LoanResource.java:30-35"
