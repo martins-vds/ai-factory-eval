@@ -1,0 +1,39 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/960
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed (origin/main)"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/route_selection/views.py:69-71
+    what: "Both route screens return a generic 404 instead of #232's visible tracking-ID-specific cargo-not-found message."
+    evidence: tests/booking/interfaces/test_route_selection.py::test_route_screens_render_cargo_not_found_message_for_unknown_or_stale_cargo
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_render_cargo_not_found_message_for_unknown_or_stale_cargo
+ledger_issues:
+  - "booking.cargo-not-found evidence asserts HTTP 404 but not the visible message required by #232."
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: CargoRouting imports django.http.Http404 across the application boundary; the current profile reports this as known, not failing.
+    origin: BK-05C
+    evidence: "run: idiom-layers"
+survivor_assessment:
+  source: .migration/evidence/mutants/BK-05F.md
+  reported_score: 0.855
+  relevant:
+    - '#10 and #27 alter cargo-not-found messages required by #232; the current generic handler hides the difference, but the survivors matter once that approved message is rendered.'
+  equivalent:
+    - '#1 and #2 change the signing salt symmetrically at creation and verification.'
+    - '#13, #44 and #46 change exception diagnostics hidden by the generic production 404 response.'
+    - '#14 adds X to quote''s safe set; X is unreserved, so the redirect URL is unchanged.'
+    - '#40 changes the missing-candidate fallback, but either value fails signature validation.'
