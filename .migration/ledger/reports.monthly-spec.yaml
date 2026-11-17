@@ -32,9 +32,9 @@ rules:
     rule: Late-return fees use the established two-day grace period, 25 cents per late day, and 1000-cent cap.
     source: src/fees/services.py:54-57
   - id: member-inclusion
-    rule: Include members with a loan start or return in the month; omit members without loan activity in the month.
-    source: legacy/docs/reports-spec.md:9
+    rule: Include only members with at least one loan started in the month; omit members without a loan start in the month.
+    source: .migration/plan/monthly-report.md:5-12; legacy/docs/reports-spec.md:9
   - id: member-order
     rule: Sort rows by total late fees descending, then member id ascending.
     source: legacy/docs/reports-spec.md:8
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable. The approved plan clarifies that rows require a loan start during the report month; return-only members are omitted."

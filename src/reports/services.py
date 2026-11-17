@@ -68,6 +68,7 @@ class MonthlyReportApplication:
                 total_late_fees_cents=totals.total_late_fees_cents,
             )
             for member_id, totals in totals_by_member.items()
+            if totals.loans_started > 0
         ]
         return sorted(
             rows,
