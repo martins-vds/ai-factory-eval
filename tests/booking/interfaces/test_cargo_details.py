@@ -70,9 +70,7 @@ def test_unrouted_cargo_details_include_route_link(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_misdirected_cargo_details_show_reroute_action_only_when_misdirected(
-    client, monkeypatch
-):
+def test_misdirected_cargo_details_show_reroute_action_only_when_misdirected(client, monkeypatch):
     call_command('seed_sample_data')
     tracking_id = TrackingId('MNO456')
     cargo = repository.find(tracking_id)
@@ -87,9 +85,9 @@ def test_misdirected_cargo_details_show_reroute_action_only_when_misdirected(
     monkeypatch.setattr(
         repository,
         'find',
-        lambda candidate: misdirected_cargo
-        if candidate.value == tracking_id.value
-        else find_cargo(candidate),
+        lambda candidate: (
+            misdirected_cargo if candidate.value == tracking_id.value else find_cargo(candidate)
+        ),
     )
     misdirected_response = client.get('/admin/cargo/MNO456/')
     misdirected_content = misdirected_response.content.decode()
