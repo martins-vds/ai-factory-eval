@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -156,6 +157,23 @@ def test_select_itinerary_renders_candidate_routes_when_available(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_candidates_use_the_route_selection_signing_salt(client):
+    tracking_id = _create_cargo(_candidate_paths())
+
+    response = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        response.content.decode(),
+    ).group(1)
+
+    candidate = signing.loads(token, salt='booking.route_selection')
+
+    assert candidate['tracking_id'] == tracking_id.value
+    assert candidate['legs']
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(client):
     tracking_id = _create_cargo(_candidate_paths())
     route_url = f'/admin/cargo/{tracking_id.value}/route/'
@@ -174,6 +192,34 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
     assert 'Itinerary' in content
     assert 'CM003' in content
     assert 'CM001' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_candidate_outside_the_route_specification(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    token = re.search(r'name="candidate" value="([^"]+)"', route_content).group(1)
+    candidate = signing.loads(token, salt='booking.route_selection')
+    candidate['legs'][-1]['unload_time'] = datetime(2030, 11, 6, tzinfo=UTC).isoformat()
+
+    response = client.post(
+        route_url,
+        {'candidate': signing.dumps(candidate, salt='booking.route_selection')},
+    )
+
+    assert response.status_code == 404
+    assert '<h1>Not Found</h1>' in response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_unknown_cargo_with_not_found_page(client):
+    response = client.post('/admin/cargo/MISSING1/route/')
+
+    assert response.status_code == 404
+    assert '<h1>Not Found</h1>' in response.content.decode()
 
 
 @pytest.mark.django_db
