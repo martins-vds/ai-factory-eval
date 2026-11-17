@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -125,6 +126,19 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [('', '123'), ('reader', '')],
+)
+def test_lend_use_case_rejects_blank_fields_without_a_request(member, isbn):
+    initial_count = Loan.objects.count()
+
+    lend_loan(member=member, isbn=isbn)
+
+    assert Loan.objects.count() == initial_count
+
+
+@pytest.mark.django_db
 def test_return_endpoint_records_the_return_date(client):
     returned_on = timezone.localdate()
     golden = HTTP_GOLDENS['POST /loans/{id}/return']
@@ -150,6 +164,26 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeat_without_changing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_use_case_runs_row_lock_inside_a_transaction():
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == timezone.localdate()
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db
@@ -420,11 +454,14 @@ def test_browser_repeat_return_keeps_original_date(client):
 @pytest.mark.django_db
 def test_browser_regular_repeat_return_shows_an_error(client):
     response = client.post('/ui/loans/L2/return/')
+    loan = Loan.objects.get(pk='L2')
 
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
-    assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+    assert f'Loan record · {loan.id}'.encode() in response.content
+    assert f'{loan.member} · ISBN {loan.isbn}'.encode() in response.content
+    assert loan.returned_on == date(2026, 1, 20)
 
 
 @pytest.mark.django_db
