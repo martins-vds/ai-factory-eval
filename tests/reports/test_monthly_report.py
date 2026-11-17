@@ -113,6 +113,5 @@ def test_monthly_report_uses_december_when_run_on_first_day_of_january():
         call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,total_late_fees_cents\n'
-        'december,1,0,0\n'
+        'member_id,loans_started,late_returns,total_late_fees_cents\ndecember,1,0,0\n'
     )
