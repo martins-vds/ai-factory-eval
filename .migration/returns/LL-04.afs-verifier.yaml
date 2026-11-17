@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-synthetic-target#65
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/103
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings:
+  - severity: major
+    where: templates/library_info/about.html:6,9-10
+    what: "The changed page uses py-8, leading-relaxed, and mt-8, but the built Tailwind stylesheet lacks all three utilities."
+    evidence: 'run: verifier-idiom-final'
+tests_added:
+  - tests/library_info/test_about_page.py::test_about_pages_only_allow_get
+ledger_issues:
+  - "about.page does not record an explicit no_rules rationale for this static information page."
+quirk_tickets: []
+inherited:
+  - where: config/settings.py:111-117
+    what: "The project static directory is not registered, so /static/css/tailwind.css returns 404 and the page styles do not load."
+    origin: LL-01
+    evidence: 'run: verifier-inherited-static'
+rules: []
+no_rules:
+  about.page: "This static information page displays fixed library details and has no eligibility, state-transition, or persistence business rules."
