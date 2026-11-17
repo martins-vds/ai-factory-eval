@@ -198,6 +198,24 @@ def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monk
     assert isinstance(failure.value.__cause__, InterruptedError)
 
 
+def test_payment_gateway_uses_the_default_url_when_unconfigured(monkeypatch):
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    requests = []
+
+    def unavailable(request):
+        requests.append((request.get_method(), request.full_url))
+        raise OSError('gateway unreachable')
+
+    monkeypatch.setattr('src.fees.gateway._open', unavailable)
+
+    with pytest.raises(PaymentGatewayFailure):
+        HttpPaymentGateway().charge('L1')
+
+    assert requests == [
+        ('POST', 'https://payments.lending-library.invalid/charge?loan=L1')
+    ]
+
+
 @pytest.mark.django_db
 def test_interrupted_payment_request_returns_gateway_failure(monkeypatch, client):
     def interrupt(_request):
