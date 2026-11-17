@@ -1,0 +1,29 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-synthetic-target#67
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1116
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings:
+  - severity: minor
+    where: .migration/harness/installed.json:4
+    what: "The PR changes the pinned harness manifest timestamp outside the LL-05 ticket scope."
+tests_added:
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_omits_members_without_previous_month_loans
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: "Only loans started in the prior-month interval contribute rows; members without qualifying loans are omitted."
+    use_case: MonthlyReportApplication.for_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_omits_members_without_previous_month_loans
+    enforced: true
+no_rules: {}
