@@ -1,5 +1,6 @@
 import re
-from datetime import date
+from dataclasses import replace
+from datetime import date, timedelta
 
 import pytest
 from django.core.management import call_command
@@ -9,10 +10,16 @@ from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
+from cargotracker.cargo.domain.delivery import Delivery, RoutingStatus
+from cargotracker.cargo.domain.itinerary import Itinerary
+from cargotracker.cargo.domain.leg import Leg
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.domain.handling_history import HandlingHistory
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
+from cargotracker.voyage.domain.voyage_number import VoyageNumber
+from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
 pytestmark = pytest.mark.django_db
 
@@ -212,3 +219,72 @@ def test_deadline_update_preserves_route_and_refreshes_not_routed_row(client):
     assert updated.itinerary == cargo.itinerary
     assert '01/15/2027' in not_routed_table
     assert 'Widget for var' not in response.content.decode()
+
+
+@pytest.mark.parametrize('field', ['destination', 'deadline'])
+def test_dialog_update_rederives_route_state(client, field):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    voyage = DjangoVoyageRepository().find(VoyageNumber('0100S'))
+    assert voyage is not None
+    arrival = cargo.route_specification.arrival_deadline - timedelta(hours=1)
+    itinerary = Itinerary(
+        [
+            Leg(
+                voyage,
+                cargo.route_specification.origin,
+                cargo.route_specification.destination,
+                arrival - timedelta(days=1),
+                arrival,
+            )
+        ]
+    )
+    cargo = replace(
+        cargo,
+        delivery=Delivery.derived_from(cargo.route_specification, itinerary, HandlingHistory.EMPTY),
+        itinerary=itinerary,
+    )
+    cargo_repository.upsert(cargo)
+    assert cargo.delivery.routing_status is RoutingStatus.ROUTED
+
+    if field == 'destination':
+        destination = next(
+            location
+            for location in shipping_locations
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
+        )
+        response = client.post(
+            f'/admin/cargo/{cargo.tracking_id.value}/destination/',
+            {'destination': destination.unlocode.value},
+            HTTP_HX_REQUEST='true',
+        )
+        assert response.status_code == 204
+    else:
+        deadline = cargo.route_specification.arrival_deadline.date() - timedelta(days=1)
+        response = client.post(
+            f'/admin/cargo/{cargo.tracking_id.value}/deadline/',
+            {'deadline': deadline.isoformat()},
+        )
+        assert response.status_code == 302
+
+    updated = cargo_repository.find(cargo.tracking_id)
+    assert updated is not None
+    assert updated.delivery.routing_status is RoutingStatus.MISROUTED
+
+
+def test_change_destination_use_case_rejects_origin_as_destination():
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(cargo.tracking_id, cargo.route_specification.origin)
+
+    unchanged = cargo_repository.find(cargo.tracking_id)
+    assert unchanged is not None
+    assert unchanged.route_specification.destination == cargo.route_specification.destination
+
+
+def test_change_deadline_use_case_rejects_non_datetime_input():
+    with pytest.raises(TypeError, match='Arrival deadline must be a datetime'):
+        specification.change_deadline(TrackingId('DEF789'), 'not-a-date')
