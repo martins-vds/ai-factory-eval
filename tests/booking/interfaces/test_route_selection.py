@@ -9,8 +9,13 @@ from django.urls import path
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.domain.delivery import RoutingStatus
+from cargotracker.cargo.domain.itinerary import Itinerary
+from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -177,6 +182,7 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
     assert 'Itinerary' in content
     assert 'CM003' in content
     assert 'CM001' not in content
+    assert repository.find(tracking_id).delivery.routing_status is RoutingStatus.ROUTED
 
 
 @pytest.mark.django_db
@@ -220,3 +226,88 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+def test_routing_use_case_rejects_late_candidates():
+    late = TransitPath((_edge('CM003', 'USNYC', 'FIHEL', 4, 6),))
+    tracking_id = _create_cargo((late,))
+
+    assert routing.route_candidates(tracking_id) == ()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_screens_filter_late_candidates_through_routing_use_case(client):
+    late = TransitPath((_edge('CM003', 'USNYC', 'FIHEL', 4, 6),))
+    tracking_id = _create_cargo((_candidate_paths()[1], late))
+
+    candidates = routing.route_candidates(tracking_id)
+    route_page = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    itinerary_page = client.get(f'/admin/cargo/{tracking_id.value}/itineraries/')
+
+    assert len(candidates) == 1
+    for response in (route_page, itinerary_page):
+        assert response.status_code == 200
+        assert 'Route option #1' in response.content.decode()
+        assert 'Route option #2' not in response.content.decode()
+    assert '<dd>1</dd>' in route_page.content.decode()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('stale', [False, True])
+@pytest.mark.parametrize('page', ['route/', 'itineraries/'])
+@override_settings(ROOT_URLCONF=__name__)
+def test_unknown_or_stale_cargo_route_screens_return_404(client, stale, page):
+    tracking_id = _create_cargo(())
+    if stale:
+        CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+    else:
+        tracking_id = TrackingId('MISSING1')
+
+    response = client.get(f'/admin/cargo/{tracking_id.value}/{page}')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_assign_route_use_case_rejects_unknown_cargo():
+    with pytest.raises(Http404):
+        routing.assign_route(TrackingId('MISSING1'), Itinerary.EMPTY)
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_changed_deadline_rejects_previously_offered_candidate(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    token = re.search(
+        r'name="candidate" value="([^"]+)"', client.get(route_url).content.decode()
+    ).group(1)
+    CargoSpecification(repository, DjangoHandlingEventRepository()).change_deadline(
+        tracking_id, datetime(2030, 11, 3, tzinfo=UTC)
+    )
+
+    response = client.post(route_url, {'candidate': token})
+
+    assert response.status_code == 404
+    assert repository.find(tracking_id).itinerary == Itinerary.EMPTY
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('stale', [False, True])
+@override_settings(ROOT_URLCONF=__name__)
+def test_unknown_or_stale_cargo_route_assignment_returns_404(client, stale):
+    tracking_id = _create_cargo(_candidate_paths())
+    token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        client.get(f'/admin/cargo/{tracking_id.value}/route/').content.decode(),
+    ).group(1)
+    if stale:
+        CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+    else:
+        tracking_id = TrackingId('MISSING1')
+
+    response = client.post(f'/admin/cargo/{tracking_id.value}/route/', {'candidate': token})
+
+    assert response.status_code == 404
