@@ -98,3 +98,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T06:04:42+00:00 | verifier-final-crap-coverage | 0 | 144.18 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `7fe56ce9324e1027` |  |  |
 | 2026-11-17T06:04:42+00:00 | verifier-final-crap-lizard | 0 | 0.29 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T06:04:42+00:00 | verifier-final-crap-score | 0 | 0.07 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T06:25:42+00:00 | verifier-mutation-changed | interrupted | n/a | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | n/a | Stopped at user request before final score; afs-run did not flush a log | interrupted |

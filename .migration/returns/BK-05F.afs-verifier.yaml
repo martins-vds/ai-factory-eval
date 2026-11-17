@@ -1,0 +1,26 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/887
+verdict: blocked
+blocked_reason: "mutation_changed: interrupted before the changed-code mutation gate produced a final score"
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: interrupted before result; no score"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_unknown_and_stale_tracking_ids_return_404_on_route_screens
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "BK-05C's application use case imports django.http.Http404; the layer gate reports it as known, not failing."
+    origin: BK-05C
+    evidence: "run: verifier-idiom-layers"
+survivor_assessment: "The existing BK-05F survivor diffs reviewed here do not change observable route-screen behavior: paired signing salts, diagnostics that map to the same 404, a quote safe-character change to an unreserved character, and an invalid-token fallback that remains invalid. The interrupted fresh mutation run produced no final survivor report."
