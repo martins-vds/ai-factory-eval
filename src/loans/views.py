@@ -2,19 +2,14 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from .models import Loan
 from .forms import LoanForm
+from .models import Loan
 from .services import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
 
 
 def _return_error(status):
-    if status == 404:
-        return HttpResponse(
-            'no such loan\n', status=404, content_type='text/plain'
-        )
-    return HttpResponse(
-        'loan already returned\n', status=409, content_type='text/plain'
-    )
+    message = 'no such loan\n' if status == 404 else 'loan already returned\n'
+    return HttpResponse(message, status=status, content_type='text/plain')
 
 
 def loan_catalog(request):
@@ -36,9 +31,7 @@ def loan_list(request):
                 content_type='text/plain',
             )
         loan = lend_loan(**form.cleaned_data)
-        return HttpResponse(
-            loan_line(loan), status=201, content_type='text/plain'
-        )
+        return HttpResponse(loan_line(loan), status=201, content_type='text/plain')
     return HttpResponse(list_loans_text(), content_type='text/plain')
 
 
