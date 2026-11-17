@@ -1,9 +1,13 @@
+from dataclasses import replace
+
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 
 
@@ -54,6 +58,43 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_unrouted_cargo_details_link_back_to_route_selection(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/DEF789/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert '<strong>Not routed</strong>' in content
+    assert 'href="/admin/cargo/DEF789/route/"' in content
+    assert 'Reroute' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_misdirected_cargo_details_offer_rerouting(client, monkeypatch):
+    call_command('seed_sample_data')
+    cargo = repository._repository.find(TrackingId('ABC123'))
+    assert cargo is not None
+    monkeypatch.setattr(
+        repository,
+        'find',
+        lambda tracking_id: replace(
+            cargo,
+            delivery=replace(cargo.delivery, misdirected=True),
+        ),
+    )
+
+    response = client.get('/admin/cargo/ABC123/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Misrouted cargo!' in content
+    assert 'href="/admin/cargo/ABC123/itineraries/"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_unknown_and_stale_cargo_details_return_http_404(client):
     call_command('seed_sample_data')
     repository.missing_tracking_ids.add('MNO456')
@@ -63,3 +104,13 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+
+
+def test_unknown_cargo_details_raise_the_cargo_not_found_message():
+    repository.missing_tracking_ids.add('UNKNOWN')
+
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        cargo_details_view(
+            RequestFactory().get('/admin/cargo/UNKNOWN/'),
+            'UNKNOWN',
+        )
