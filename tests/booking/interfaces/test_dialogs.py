@@ -3,8 +3,6 @@ from datetime import UTC, date, datetime
 
 import pytest
 from django.core.management import call_command
-from django.http import Http404
-from django.test import RequestFactory
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
