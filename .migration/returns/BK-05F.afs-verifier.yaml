@@ -1,0 +1,29 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/791
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: minor
+    where: src/cargotracker/booking/application/routing.py:1
+    what: "Known ADR-0001 layering debt: CargoRouting imports django.http.Http404; the route screens depend on this use case."
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+survivor_assessment:
+  relevant: []
+  equivalent:
+    - "#1 and #2: signing salt changes symmetrically for token creation and verification, preserving the current route-selection flow."
+    - "#10, #13, #27, #44, and #46: diagnostic exception text changes but ordinary 404 behavior is unchanged."
+    - "#14: the additional safe characters are unreserved X characters, so the redirect URL is unchanged."
+    - "#40: either missing-candidate fallback fails signature validation and produces the same 404."
