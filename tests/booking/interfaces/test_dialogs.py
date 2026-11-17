@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import UTC, date, datetime
 
 import pytest
 from django.core.management import call_command
@@ -9,10 +9,19 @@ from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
+from cargotracker.cargo.domain.cargo import Cargo
+from cargotracker.cargo.domain.delivery import Delivery, RoutingStatus
+from cargotracker.cargo.domain.itinerary import Itinerary
+from cargotracker.cargo.domain.leg import Leg
+from cargotracker.cargo.domain.route_specification import RouteSpecification
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.domain.handling_history import HandlingHistory
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
+from cargotracker.voyage.domain.voyage_number import VoyageNumber
+from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
 pytestmark = pytest.mark.django_db
 
@@ -25,6 +34,38 @@ specification = CargoSpecification(cargo_repository, DjangoHandlingEventReposito
 
 def _shipping_locations():
     return shipping_locations
+
+
+def _persist_routed_cargo():
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    voyage = DjangoVoyageRepository().find(VoyageNumber('0100S'))
+    assert voyage is not None
+    route_specification = RouteSpecification(
+        cargo.route_specification.origin,
+        cargo.route_specification.destination,
+        datetime(2030, 11, 20, tzinfo=UTC),
+    )
+    itinerary = Itinerary(
+        (
+            Leg(
+                voyage,
+                route_specification.origin,
+                route_specification.destination,
+                datetime(2030, 11, 10, tzinfo=UTC),
+                datetime(2030, 11, 15, tzinfo=UTC),
+            ),
+        )
+    )
+    routed_cargo = Cargo(
+        cargo.tracking_id,
+        route_specification,
+        Delivery.derived_from(route_specification, itinerary, HandlingHistory.EMPTY),
+        itinerary,
+        cargo.origin,
+    )
+    cargo_repository.upsert(routed_cargo)
+    return routed_cargo
 
 
 dashboard_view, _ = create_booking_views(cargo_dashboard)
@@ -91,8 +132,41 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize(
+    ('dialog', 'method'),
+    [
+        ('destination', 'get'),
+        ('destination', 'post'),
+        ('deadline', 'get'),
+        ('deadline', 'post'),
+    ],
+)
+def test_unknown_cargo_dialog_returns_not_found(client, dialog, method):
+    response = getattr(client, method)(
+        f'/admin/cargo/MISSING1/{dialog}/',
+        {'value': 'unused'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    ('dialog', 'method'),
+    [
+        ('destination', 'get'),
+        ('destination', 'post'),
+        ('deadline', 'get'),
+        ('deadline', 'post'),
+    ],
+)
+def test_stale_cargo_dialog_returns_not_found(client, dialog, method):
+    CargoRecord.objects.filter(tracking_id='DEF789').delete()
+    response = getattr(client, method)(
+        f'/admin/cargo/DEF789/{dialog}/',
+        {'value': 'unused'},
+        HTTP_HX_REQUEST='true',
+    )
 
     assert response.status_code == 404
 
@@ -212,3 +286,32 @@ def test_deadline_update_preserves_route_and_refreshes_not_routed_row(client):
     assert updated.itinerary == cargo.itinerary
     assert '01/15/2027' in not_routed_table
     assert 'Widget for var' not in response.content.decode()
+
+
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+def test_dialog_update_recalculates_route_state(client, dialog):
+    cargo = _persist_routed_cargo()
+    assert cargo.delivery.routing_status is RoutingStatus.ROUTED
+
+    if dialog == 'destination':
+        destination = next(
+            location
+            for location in shipping_locations
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
+        )
+        data = {'destination': destination.unlocode.value}
+    else:
+        data = {'deadline': date(2030, 11, 14).isoformat()}
+
+    response = client.post(
+        f'/admin/cargo/{cargo.tracking_id.value}/{dialog}/',
+        data,
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(cargo.tracking_id)
+
+    assert response.status_code == 204
+    assert updated is not None
+    assert updated.delivery.routing_status is RoutingStatus.MISROUTED
+    assert updated.itinerary == cargo.itinerary
