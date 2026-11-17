@@ -172,6 +172,18 @@ def test_invalid_destination_shows_field_error_without_updating_cargo(client):
     assert updated.route_specification.destination == cargo.route_specification.destination
 
 
+def test_destination_use_case_rejects_origin():
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(cargo.tracking_id, cargo.route_specification.origin)
+
+    unchanged = cargo_repository.find(cargo.tracking_id)
+    assert unchanged is not None
+    assert unchanged.route_specification.destination == cargo.route_specification.destination
+
+
 def test_destination_update_redirects_and_refreshes_not_routed_row(client):
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None

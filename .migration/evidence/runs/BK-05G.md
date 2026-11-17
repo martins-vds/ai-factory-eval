@@ -79,3 +79,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T19:22:36+00:00 | crap-lizard-final | 0 | 0.1 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T19:22:40+00:00 | crap-report-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-17T19:24:15+00:00 | mutation-changed-final | 0 | 91.38 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
+| 2026-11-17T19:26:40+00:00 | verifier-use-case-rule-in-scope | 0 | 1.37 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin` | `b29404b0332b987b` |  |  |

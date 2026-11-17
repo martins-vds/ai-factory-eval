@@ -22,7 +22,7 @@ tests_added:
   - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_tracking_id_returns_not_found_for_both_dialogs[MISSING1-False-deadline]
   - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_tracking_id_returns_not_found_for_both_dialogs[DEF789-True-destination]
   - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_tracking_id_returns_not_found_for_both_dialogs[DEF789-True-deadline]
-  - tests/booking/application/test_specification.py::test_change_destination_rejects_the_cargo_origin
+  - tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin
 ledger_issues: []
 quirk_tickets:
   - martins-vds/ai-factory-pilot-target#232
@@ -38,7 +38,7 @@ rules:
   - capability: booking.dialog-destination
     rule: The new destination cannot equal the cargo origin.
     use_case: CargoSpecification.change_destination
-    test: tests/booking/application/test_specification.py::test_change_destination_rejects_the_cargo_origin
+    test: tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin
     enforced: true
   - capability: booking.dialog-destination
     rule: Changing the destination of an unknown cargo is rejected.
