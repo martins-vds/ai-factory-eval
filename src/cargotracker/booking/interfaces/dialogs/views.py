@@ -53,7 +53,11 @@ def create_dialog_views(
             if request.method == 'POST'
             else (destinations[0].unlocode.value if destinations else '')
         )
-        destination_error = ''
+        context = {
+            'cargo': cargo,
+            'destinations': destinations,
+            'destination_value': destination_value,
+        }
 
         if request.method == 'POST':
             destination = next(
@@ -65,17 +69,11 @@ def create_dialog_views(
                 None,
             )
             if destination is None:
-                destination_error = 'Select a valid destination.'
+                context['destination_error'] = 'Select a valid destination.'
             else:
                 cargo_specification.change_destination(TrackingId(tracking_id), destination)
                 return _complete_dialog_update(request)
 
-        context = {
-            'cargo': cargo,
-            'destinations': destinations,
-            'destination_value': destination_value,
-            'destination_error': destination_error,
-        }
         return render(
             request,
             _dialog_template(
@@ -96,13 +94,16 @@ def create_dialog_views(
             if request.method == 'POST'
             else cargo.route_specification.arrival_deadline.date().isoformat()
         )
-        deadline_error = ''
+        context = {
+            'cargo': cargo,
+            'deadline_value': deadline_value,
+        }
 
         if request.method == 'POST':
             try:
                 deadline = date.fromisoformat(deadline_value)
             except ValueError:
-                deadline_error = 'Enter a valid arrival deadline.'
+                context['deadline_error'] = 'Enter a valid arrival deadline.'
             else:
                 cargo_specification.change_deadline(
                     TrackingId(tracking_id),
@@ -110,11 +111,6 @@ def create_dialog_views(
                 )
                 return _complete_dialog_update(request)
 
-        context = {
-            'cargo': cargo,
-            'deadline_value': deadline_value,
-            'deadline_error': deadline_error,
-        }
         return render(
             request,
             _dialog_template(

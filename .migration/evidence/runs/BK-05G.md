@@ -34,3 +34,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T21:17:15+00:00 | idiom | 0 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
 | 2026-11-17T21:18:09+00:00 | behavior | 0 | 48.95 | `pytest -q` | `0f5f7efce87440ed` |  |  |
 | 2026-11-17T21:19:06+00:00 | crap | 0 | 50.54 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `799800fd07785b92` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-17T21:22:52+00:00 | mutation_changed | 1 | 140.04 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `db9ae17030bc14f7` | afs-mutation: FAILED score=0.739 threshold=0.8 killed=51 survived=18 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.739 threshold=0.8 killed=51 survived=18 files=1 base=origin/main |
+| 2026-11-17T21:24:07+00:00 | lint-targeted | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T21:24:07+00:00 | format-targeted | 0 | 0.04 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-17T21:24:14+00:00 | dialogs-expanded | 0 | 7.1 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `7a018cab076c8003` |  |  |
+| 2026-11-17T21:24:41+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |

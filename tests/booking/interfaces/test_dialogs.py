@@ -2,7 +2,8 @@ import re
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -103,6 +104,43 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 @pytest.mark.parametrize(
+    ('url', 'title'),
+    (
+        ('/admin/cargo/DEF789/destination/', 'Change destination for cargo DEF789'),
+        ('/admin/cargo/DEF789/deadline/', 'Change arrival deadline for cargo DEF789'),
+    ),
+)
+def test_dialogs_render_full_pages_without_htmx(client, sample_bookings, url, title):
+    response = client.get(url)
+
+    assert response.status_code == 200
+    assert '<html lang="en">' in response.content.decode()
+    assert title in response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_handles_empty_options(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    available_locations[:] = [
+        cargo.route_specification.origin,
+        cargo.route_specification.destination,
+    ]
+
+    response = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true')
+    content = response.content.decode()
+    options = re.search(r'<select\b[^>]*>(.*?)</select>', content, re.DOTALL)
+    assert options is not None
+
+    assert response.status_code == 200
+    assert '<option value="" disabled selected>Choose a destination</option>' in options.group(1)
+    assert options.group(1).count('<option') == 1
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
     'url',
     (
         '/admin/cargo/UNKNOWN/destination/',
@@ -111,8 +149,27 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
 )
 def test_unknown_cargo_dialog_returns_not_found(client, sample_bookings, url):
     response = client.get(url, HTTP_HX_REQUEST='true')
+    dialog = destination_dialog_view if url.endswith('/destination/') else deadline_dialog_view
 
     assert response.status_code == 404
+    with pytest.raises(Http404, match='Cargo with tracking ID UNKNOWN not found.'):
+        dialog(RequestFactory().get(url), 'UNKNOWN')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
+    ('dialog', 'url'),
+    (
+        (destination_dialog_view, '/admin/cargo/DEF789/destination/'),
+        (deadline_dialog_view, '/admin/cargo/DEF789/deadline/'),
+    ),
+)
+def test_dialogs_reject_unsupported_methods(sample_bookings, dialog, url):
+    response = dialog(RequestFactory().put(url), 'DEF789')
+
+    assert response.status_code == 405
+    assert response['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
@@ -130,6 +187,27 @@ def test_destination_dialog_rejects_unavailable_destination(client, sample_booki
 
     assert response.status_code == 200
     assert 'Select a valid destination.' in response.content.decode()
+    assert updated is not None
+    assert updated.route_specification == cargo.route_specification
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_missing_destination(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in content
+    assert '<option value="" disabled selected>Choose a destination</option>' in content
     assert updated is not None
     assert updated.route_specification == cargo.route_specification
 
@@ -165,6 +243,26 @@ def test_destination_dialog_updates_cargo_and_refreshes_the_dashboard(client, sa
     assert new_destination.name in not_routed_table
     assert new_destination.unlocode.value in not_routed_table
     assert 'data-tracking-id="DEF789"' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_redirects_after_non_htmx_update(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    new_destination = next(
+        location
+        for location in available_locations
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': new_destination.unlocode.value},
+    )
+
+    assert response.status_code == 302
+    assert response.url == '/admin/dashboard/'
 
 
 @pytest.mark.django_db
@@ -220,3 +318,24 @@ def test_deadline_dialog_updates_cargo_and_refreshes_the_dashboard(client, sampl
     assert updated.route_specification.arrival_deadline.date().isoformat() == new_deadline
     assert '11/12/2030' in not_routed_table
     assert 'data-tracking-id="DEF789"' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_rejects_missing_deadline(client, sample_bookings):
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Enter a valid arrival deadline.' in content
+    assert 'value=""' in content
+    assert updated is not None
+    assert updated.route_specification == cargo.route_specification
