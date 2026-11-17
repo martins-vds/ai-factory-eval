@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/972
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.914
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: templates/base.html:9
+    what: HTMX 2.0.11 has no 4xx/5xx swap handler, so payment failure fragments are not shown to users.
+    evidence: tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_gateway_error_responses
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_payment_use_case_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_fee_routes_allow_only_their_configured_http_method
+  - tests/fees/test_endpoints.py::test_fee_page_payment_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_fee_page_payment_without_htmx_returns_updated_fee_page
+  - tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_gateway_error_responses
+  - tests/fees/test_endpoints.py::test_gateway_uses_the_characterized_default_url_when_unconfigured
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+mutation_notes:
+  - "Mutation report: .migration/evidence/mutants/LL-03.md (score 0.914, threshold 0.8, 21 survivors). The known module-level selection artifacts include the LL-02 route literal in src/loans/urls.py:9 and Meta.model in src/loans/forms.py:8. LL-03 routes and allowed/rejected methods are directly exercised by test_fee_routes_allow_only_their_configured_http_method."
