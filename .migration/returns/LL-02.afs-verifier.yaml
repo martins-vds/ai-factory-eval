@@ -1,0 +1,80 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1217
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutmut could not test mutants because baseline tests fail"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: Use cases import Django timezone and the concrete LoanRepository, violating the profile's port-only dependency contract.
+    evidence: "run: idiom-layers"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: lend_loan accepts blank required member and ISBN values when called directly; the form/view layer alone rejects them.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_refuses_blank_required_fields
+  - severity: major
+    where: templates/loans/detail.html:24-25
+    what: The return htmx request can receive a 404, but no 4xx handler is configured, so htmx does not swap the error into the page.
+    evidence: tests/loans/test_catalog.py::test_htmx_error_responses_are_handled_for_reading_room_forms
+  - severity: minor
+    where: templates/loans/loan-form.html:2,7,17
+    what: The built Tailwind CSS omits utilities used by changed lending/return screens, including gap-5, w-full, and CTA colors.
+    evidence: "run: idiom-ui"
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_empty_fields
+  - tests/loans/test_catalog.py::test_browser_lending_page_renders_full_form_errors_for_empty_fields
+  - tests/loans/test_catalog.py::test_browser_return_page_shows_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_htmx_error_responses_are_handled_for_reading_room_forms
+  - tests/loans/test_catalog.py::test_lend_use_case_refuses_blank_required_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_sets_due_date_fourteen_days_after_lending
+  - tests/loans/test_catalog.py::test_return_use_case_records_today_and_preserves_return_date
+  - tests/loans/test_catalog.py::test_return_use_case_refuses_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - https://github.com/martins-vds/ai-factory-synthetic-target/issues/39
+  - https://github.com/martins-vds/ai-factory-synthetic-target/issues/41
+  - https://github.com/martins-vds/ai-factory-synthetic-target/issues/43
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN must be nonempty and non-whitespace.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_refuses_blank_required_fields
+    enforced: false
+  - capability: loan.lend
+    rule: The due date is 14 calendar days after the lending date.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_sets_due_date_fourteen_days_after_lending
+    enforced: true
+  - capability: loan.return-date
+    rule: The first return records today's date and repeat returns preserve the saved date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_records_today_and_preserves_return_date
+    enforced: true
+  - capability: loan.return
+    rule: An unknown loan cannot be returned or modified.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_refuses_unknown_loan
+    enforced: true
+inherited: []
+mutant_assessment: |
+  The latest changed-code mutation run did not produce fresh survivors: mutmut could not establish
+  a passing baseline because the new direct-use-case blank-field test fails. The last successful
+  survivor file (.migration/evidence/mutants/LL-02.md) reports 17 survivors at score 0.855;
+  its results are prior evidence, not this run's score. All 17 diffs are behavior-changing:
+  views.py #8/#24/#54/#65 loosen method restrictions, #44 changes full-page versus partial-form
+  rendering, #68/#69/#70 alter unknown-return response body/status/content type, and #79 drops loan
+  details from the repeat-return error; repository.py #2 removes the transaction around row locking;
+  urls.py #2-#7 break API/UI routes; forms.py #9 invalidates form construction. The new unknown-return
+  assertions cover #68-#70, and the saved-date detail assertion covers #79, but no current mutant
+  run confirms those kills. The method, route, form, conditional-rendering, and transaction mutants
+  remain relevant to the contract.
