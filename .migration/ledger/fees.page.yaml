@@ -23,6 +23,7 @@ evidence:
   - tests/fees/test_fees.py::test_fee_endpoint_matches_characterized_html
   - tests/fees/test_fees.py::test_fee_endpoint_matches_characterized_missing_loan_response
   - tests/fees/test_fees.py::test_fee_page_uses_reading_room_layout_and_payment_action
+  - tests/fees/test_fees.py::test_fee_page_returns_not_found_for_unknown_loan
   - tests/fees/test_fees.py::test_real_browser_can_pay_a_late_fee
 rules:
   - id: fee-page-loan
