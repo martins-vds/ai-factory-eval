@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -101,6 +102,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -125,6 +128,25 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [('', '123'), ('reader', '')],
+)
+def test_lend_use_case_rejects_empty_required_fields(member, isbn):
+    with pytest.raises(ValueError):
+        lend_loan(member, isbn)
+
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+def test_lend_use_case_sets_a_fourteen_day_due_date():
+    loan = lend_loan('reader', '123')
+
+    assert loan.due_on == loan.lent_on + timedelta(days=14)
+
+
+@pytest.mark.django_db
 def test_return_endpoint_records_the_return_date(client):
     returned_on = timezone.localdate()
     golden = HTTP_GOLDENS['POST /loans/{id}/return']
@@ -140,6 +162,14 @@ def test_return_endpoint_records_the_return_date(client):
     assert Loan.objects.get(pk='L1').returned_on == returned_on
 
 
+@pytest.mark.django_db(transaction=True)
+def test_return_endpoint_can_record_a_return_outside_testcase_transactions(client):
+    response = client.post('/loans/L1/return')
+
+    assert response.status_code == 200
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
 @pytest.mark.django_db
 def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     original_return_date = date(2026, 1, 20)
@@ -150,6 +180,14 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_preserves_the_original_date_on_repeat():
+    loan, updated = return_loan('L2')
+
+    assert updated is False
+    assert loan.returned_on == date(2026, 1, 20)
 
 
 @pytest.mark.django_db
@@ -315,11 +353,25 @@ def test_browser_can_create_a_loan_from_the_new_loan_page(client):
 
 @pytest.mark.django_db
 def test_browser_lending_page_shows_errors_for_blank_fields(client):
-    response = client.post('/ui/loans/new/')
+    response = client.post('/ui/loans/new/', {'member': '', 'isbn': ''})
 
     assert response.status_code == 200
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
+
+
+def test_reading_room_configures_htmx_error_response_handling():
+    root = Path(__file__).resolve().parents[2]
+    page_and_script_sources = [
+        *root.glob('templates/**/*.html'),
+        *root.glob('static/**/*.js'),
+    ]
+    source = '\n'.join(path.read_text(encoding='utf-8') for path in page_and_script_sources)
+
+    assert any(
+        handler in source
+        for handler in ('htmx.config.responseHandling', 'htmx:beforeSwap', 'response-targets')
+    )
 
 
 @pytest.mark.django_db
@@ -376,6 +428,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L1/'
     assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
 
 
 @pytest.mark.django_db
