@@ -62,3 +62,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T23:41:12+00:00 | verify-mutation-changed | 0 | 142.33 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
 | 2026-11-17T23:42:28+00:00 | verify-regression | 0 | 75.57 | `pytest -q` | `caeb391359244728` |  |  |
 | 2026-11-17T23:43:41+00:00 | verifier-dialog-route-availability | 1 | 0.35 | `python manage.py shell -c 'from django.urls import resolve; resolve("/admin/cargo/DEF789/destination/")'` | `2dcef180c98e8b08` | Traceback (most recent call last): |  |
+| 2026-11-17T23:50:17+00:00 | final-regression | 0 | 63.07 | `pytest -q` | `44176a01b47de3ac` |  |  |
