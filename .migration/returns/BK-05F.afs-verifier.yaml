@@ -1,0 +1,63 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1121
+verdict: blocked
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: interrupted before the changed-code mutation gate completed"
+  regression: 0
+blocked_reason: "mutation_changed: interrupted to meet the session time limit; no completed score is available"
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_404_for_unknown_and_stale_tracking_ids
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_candidate_after_the_deadline_changes
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: CargoRouting imports django.http.Http404 in the application layer; BK-05F route lookup relies on this known not-failing exception path.
+    origin: BK-05C
+    evidence: "run: verifier-inherited-layer-diagnostic"
+rules:
+  - capability: booking.routing-chain
+    rule: Candidate routes must be obtained through RoutingService and filtered for origin, destination, and arrival deadline.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+  - capability: booking.routing-assign
+    rule: Assigning a valid candidate persists the itinerary and recalculates routing status, ETA, and next expected activity.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+  - capability: booking.routing-assign
+    rule: An unknown or stale tracking ID cannot be assigned an itinerary.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
+    enforced: true
+no_rules:
+  booking.screen-route: The page presents cargo and candidate data; route eligibility is enforced by CargoRouting.route_candidates.
+  booking.screen-select-itinerary: The page presents candidate routes or the approved empty-state guidance; it has no separate business rule.
+changed_code_mutation_diagnostic:
+  file: src/cargotracker/booking/interfaces/route_selection/views.py
+  run: verifier-mutation-route-selection-diagno
+  score: 0.855
+  threshold: 0.8
+  survivors:
+    - mutants: [1, 2]
+      matter: false
+      reason: Changing the signing salt changes only opaque tokens; the same module signs and verifies them with the same salt.
+    - mutants: [10, 13, 27, 46]
+      matter: false
+      reason: These change Http404 text only; normal UI behavior remains a 404 and the production default error page is generic.
+    - mutants: [14]
+      matter: false
+      reason: X is unreserved in URLs, so quote(..., safe="XXXX") produces the same redirect path.
+    - mutants: [40, 44]
+      matter: false
+      reason: Both changes are caught and converted to the same invalid-candidate 404 response.

@@ -9,8 +9,10 @@ from django.urls import path
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -199,6 +201,28 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_candidate_after_the_deadline_changes(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    CargoSpecification(repository, DjangoHandlingEventRepository()).change_deadline(
+        tracking_id,
+        datetime(2030, 11, 3, tzinfo=UTC),
+    )
+
+    response = client.post(route_url, {'candidate': candidate_token})
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
     route_page = client.get(f'/admin/cargo/{tracking_id.value}/route/')
@@ -220,3 +244,17 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_screens_return_404_for_unknown_and_stale_tracking_ids(client):
+    tracking_id = _create_cargo(())
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+
+    for screen in ('route', 'itineraries'):
+        unknown_response = client.get(f'/admin/cargo/UNKNOWN/{screen}/')
+        stale_response = client.get(f'/admin/cargo/{tracking_id.value}/{screen}/')
+
+        assert unknown_response.status_code == 404
+        assert stale_response.status_code == 404
