@@ -129,7 +129,7 @@ def test_payment_api_forwards_the_characterized_request_to_the_gateway(client, m
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     ('gateway_status', 'body'),
-    [(503, 'declined\n'), (302, 'redirected\n')],
+    [(201, 'created\n'), (503, 'declined\n'), (302, 'redirected\n')],
 )
 def test_payment_api_maps_non_success_gateway_responses_to_502(
     client, monkeypatch, gateway_status, body
