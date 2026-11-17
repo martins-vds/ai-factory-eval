@@ -1,9 +1,9 @@
-from dataclasses import dataclass
+from dataclasses import FrozenInstanceError, dataclass
 from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import Fee, FeeApplication, GatewayResponse
 
 
 @dataclass
@@ -32,6 +32,15 @@ class Clock:
 class PaymentGateway:
     def charge(self, loan_id):
         raise AssertionError('fee calculation must not charge the gateway')
+
+
+class RecordingPaymentGateway:
+    def __init__(self):
+        self.calls = []
+
+    def charge(self, loan_id):
+        self.calls.append(loan_id)
+        return GatewayResponse(200, 'charged\n')
 
 
 @pytest.mark.parametrize(
@@ -70,3 +79,27 @@ def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_payment_use_case_uses_injected_repository_and_gateway():
+    gateway = RecordingPaymentGateway()
+    application = FeeApplication(
+        LoanRepository(Loan('L1', date(2026, 1, 10))),
+        Clock(date(2026, 1, 10)),
+        gateway,
+    )
+
+    assert application.pay('L1') == GatewayResponse(200, 'charged\n')
+    assert application.pay('missing') is None
+    assert gateway.calls == ['L1']
+
+
+def test_fee_and_gateway_response_are_immutable_value_objects():
+    fee = Fee(date(2026, 1, 10), 3, 75)
+    response = GatewayResponse(200, 'charged\n')
+
+    with pytest.raises(FrozenInstanceError):
+        fee.amount_cents = 100
+
+    with pytest.raises(FrozenInstanceError):
+        response.status = 502
