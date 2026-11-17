@@ -6,10 +6,19 @@ source:
   graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
   location: legacy/src/main/resources/META-INF/seed.sql:1-3
 boundary: "The persistence unit loads three fixed example loan rows at startup: L1, L2, and L3, with their member, ISBN, and lent/returned dates."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1153]
+target:
+  components: [src.loans.migrations.0001_initial.seed_loans]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/restart.json]
-notes: "Seed reload and reset-on-restart behavior are raised in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_list_returns_seed_loans_as_characterized_text, tests/loans/test_catalog.py::test_reapplying_migrations_does_not_replace_persisted_loans]
+rules:
+  - id: characterized-seeds
+    rule: An empty database starts with the characterized L1, L2, and L3 example loans.
+    source: legacy/src/main/resources/META-INF/seed.sql:1-3
+  - id: seed-only-empty-storage
+    rule: Seed rows are inserted only when the loan table is empty and never overwrite persisted rows.
+    source: martins-vds/ai-factory-synthetic-target#42
+notes: "The approved persistence ruling replaces the source reset-on-startup behavior."
 quirks: [martins-vds/ai-factory-synthetic-target#42]

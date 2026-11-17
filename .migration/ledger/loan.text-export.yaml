@@ -8,10 +8,19 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:52-55
   risk: {crap: 2, complexity: 2, coverage: 1.0}
 boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. The docs state spreadsheet users rely on this format."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1153]
+target:
+  components: [src.loans.services.export_loans]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_list_escapes_field_and_record_delimiters]
+rules:
+  - id: semicolon-export-fields
+    rule: Export loan fields as ID, member, ISBN, lent date, due date, and returned date, separated by semicolons and terminated by a newline.
+    source: legacy/src/main/java/lib/LoanResource.java:52-55
+  - id: escape-delimiters
+    rule: Escape field and record delimiters so exported rows parse back to their original values.
+    source: martins-vds/ai-factory-synthetic-target#43
+notes: "The approved delimiter-escaping ruling replaces the source's ambiguous raw export."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
