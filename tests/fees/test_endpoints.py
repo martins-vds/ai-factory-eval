@@ -180,3 +180,23 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
         finally:
             browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_shows_gateway_failure_after_payment(live_server, payment_gateway):
+    payment_gateway.status = 503
+    payment_gateway.body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.set_default_timeout(3000)
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+            assert alert.inner_text().strip() == 'declined'
+        finally:
+            browser.close()
