@@ -118,8 +118,8 @@ def test_dialog_htmx_not_found_response_is_swapped_for_user_feedback(client):
     page = response.content.decode()
 
     assert re.search(
-        r"htmx\.config\.responseHandling[\s\S]*?404[\s\S]*?swap:\s*true"
-        r"|htmx:beforeSwap[\s\S]*?404[\s\S]*?shouldSwap\s*=\s*true",
+        r'htmx\.config\.responseHandling[\s\S]*?404[\s\S]*?swap:\s*true'
+        r'|htmx:beforeSwap[\s\S]*?404[\s\S]*?shouldSwap\s*=\s*true',
         page,
     )
 

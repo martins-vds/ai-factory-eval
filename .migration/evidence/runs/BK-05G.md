@@ -52,3 +52,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T12:53:25+00:00 | no-js-fallback-check | 1 | 2.9 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_not_routed_dialog_actions_have_non_javascript_fallbacks` | `34d6ddbf4daed9a9` | >       assert re.search(r'<a\b[^>]*href="/admin/cargo/DEF789/destination/"', not_routed_table) |  |
 | 2026-11-17T12:53:46+00:00 | dialogs-verifier | 1 | 5.66 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `9bec4ffc7efc5255` | >       assert re.search(rf'<a\b[^>]*href="/admin/cargo/DEF789/{dialog}/"', not_routed_table) |  |
 | 2026-11-17T12:54:56+00:00 | dialogs-error-paths | 1 | 5.98 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `6ee897b0e0288e96` | >       assert re.search(fallback, not_routed_table) |  |
+| 2026-11-17T12:55:42+00:00 | build-compileall | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T12:55:46+00:00 | build-django-check | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T12:55:50+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T12:55:53+00:00 | idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `dc76893b07b801d3` | 120 \|     assert re.search( |  |
+| 2026-11-17T12:56:02+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T12:56:06+00:00 | idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T12:56:18+00:00 | behavior | 1 | 6.58 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py tests/booking/application/test_specification.py` | `4772ff242db13949` | >       assert re.search(fallback, not_routed_table) |  |
+| 2026-11-17T12:57:10+00:00 | regression | 1 | 47.91 | `pytest -q` | `d8261e26d3294356` | >       assert re.search(fallback, not_routed_table) |  |
+| 2026-11-17T12:58:04+00:00 | crap-coverage | 1 | 49.06 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `a0a43821a439b761` | >       assert re.search(fallback, not_routed_table) |  |
+| 2026-11-17T12:58:08+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T12:58:12+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T13:30:58+00:00 | mutation-changed | 2 | 1959.69 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `0b0eb0b15ab26404` | afs-mutation: mutmut failed on src/cargotracker/cargo/domain/delivery.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=3 files=81 base=origin/main |
