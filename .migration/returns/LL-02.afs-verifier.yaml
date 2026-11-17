@@ -16,7 +16,7 @@ findings:
   - severity: major
     where: src/loans/services.py:4
     what: Use cases import Django's clock and concrete LoanRepository, violating the configured ports-only dependency rule.
-    evidence: "run: verify-idiom-final2"
+    evidence: "run: verify-idiom-final3"
   - severity: major
     where: src/loans/services.py:9
     what: lend_loan accepts blank and whitespace member or ISBN values when called directly; validation exists only in the form/view layer.
@@ -27,7 +27,7 @@ findings:
     evidence: tests/loans/test_catalog.py::test_return_form_configures_htmx_to_swap_error_responses
 tests_added:
   - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
-  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_without_replacing_date
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_rejected_repository_result
   - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
   - tests/loans/test_catalog.py::test_return_form_configures_htmx_to_swap_error_responses
   - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields

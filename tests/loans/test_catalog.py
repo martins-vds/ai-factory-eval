@@ -1,6 +1,7 @@
 import json
 from datetime import date, timedelta
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -184,15 +185,24 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
 
 
-@pytest.mark.django_db
-def test_return_use_case_rejects_repeat_without_replacing_date():
+def test_return_use_case_preserves_rejected_repository_result(monkeypatch):
     original_return_date = date(2026, 1, 20)
+    loan = SimpleNamespace(returned_on=original_return_date)
+    arguments = {}
 
-    loan, updated = services.return_loan('L2')
+    class LoanRepository:
+        def mark_returned(self, loan_id, returned_on):
+            arguments['loan_id'] = loan_id
+            arguments['returned_on'] = returned_on
+            return loan, False
 
+    monkeypatch.setattr(services, 'LoanRepository', LoanRepository)
+    returned_loan, updated = services.return_loan('L2')
+
+    assert arguments['loan_id'] == 'L2'
+    assert arguments['returned_on'] == timezone.localdate()
     assert not updated
-    assert loan.returned_on == original_return_date
-    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+    assert returned_loan.returned_on == original_return_date
 
 
 @pytest.mark.django_db
