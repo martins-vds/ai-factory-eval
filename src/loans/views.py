@@ -7,9 +7,7 @@ from src.loans.repository import LoanRepository
 
 
 def _text_response(body, status=200):
-    response = HttpResponse(body, status=status, content_type='text/plain')
-    response['Content-Type'] = 'text/plain'
-    return response
+    return HttpResponse(body, status=status, content_type='text/plain')
 
 
 def loan_list(request):
