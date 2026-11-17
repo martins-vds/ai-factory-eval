@@ -73,6 +73,19 @@ def test_htmx_lending_redirects_to_the_catalog(client):
 
 
 @pytest.mark.django_db
+def test_htmx_lending_returns_a_swappable_fragment_for_field_errors(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': ' ', 'isbn': ''},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'<form id="lend-form"' in response.content
+    assert response.content.count(b'This field is required.') == 2
+
+
+@pytest.mark.django_db
 def test_lending_api_rejects_missing_and_blank_values(client):
     invalid_forms = (
         {},
@@ -159,6 +172,11 @@ def test_browser_can_lend_and_return_a_book(client, live_server):
             page = browser.new_page()
             page.goto(f'{live_server.url}/ui/loans/')
             page.get_by_role('link', name='Lend a book').click()
+            page.get_by_label('Member').fill(' ')
+            page.get_by_label('ISBN').fill(' ')
+            page.get_by_role('button', name='Record this loan').click()
+            page.get_by_text('This field is required.').first.wait_for()
+            assert page.get_by_text('This field is required.').count() == 2
             page.get_by_label('Member').fill('reader')
             page.get_by_label('ISBN').fill('123')
             page.get_by_role('button', name='Record this loan').click()

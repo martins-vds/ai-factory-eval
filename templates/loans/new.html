@@ -10,19 +10,7 @@
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
       <h1 class="card-title text-4xl">Lend a book</h1>
       <p class="text-[#66705b]">Add a reader and the book they are taking home.</p>
-      <form class="mt-4 grid gap-5" method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="this" hx-swap="outerHTML">
-        {% csrf_token %}
-        {% for field in form %}
-        <div>
-          <label class="label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% for error in field.errors %}
-          <p class="mt-1 text-sm text-[#a94e37]" role="alert">{{ error }}</p>
-          {% endfor %}
-        </div>
-        {% endfor %}
-        <button class="btn w-fit bg-[#2f3428] text-[#fffdf7] hover:bg-[#434a39]" type="submit">Record this loan</button>
-      </form>
+      {% include "loans/_lend_form.html" %}
     </div>
   </article>
 </section>

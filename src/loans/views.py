@@ -26,6 +26,8 @@ def loan_lend(request):
     form = LendLoanForm(request.POST if request.method == 'POST' else None)
     if request.method == 'POST':
         if not form.is_valid():
+            if request.headers.get('HX-Request') == 'true':
+                return render(request, 'loans/_lend_form.html', {'form': form})
             return render(request, 'loans/new.html', {'form': form}, status=400)
         lend_loan(**form.cleaned_data)
         return _redirect_for_request(request, 'loan-catalog')
