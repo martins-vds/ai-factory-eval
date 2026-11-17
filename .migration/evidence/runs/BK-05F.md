@@ -80,3 +80,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-17T12:33:58+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T12:36:01+00:00 | verifier-idiom | 0 | 0.19 | `bash -c 'ruff check && ruff format --check && python .migration/harness/tools/check_layers.py'` | `59c9c1a7fb18c816` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T12:36:02+00:00 | verifier-build | 0 | 1.14 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T12:37:03+00:00 | verifier-stale-404-tests | 1 | 3.29 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `dbbc182f90ebbed4` | E       AttributeError: 'NoneType' object has no attribute 'group' |  |
+| 2026-11-17T12:37:21+00:00 | verifier-stale-404-tests-final | 0 | 2.35 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `aaab492d5e490ff2` |  |  |
+| 2026-11-17T12:37:33+00:00 | verifier-idiom-final | 0 | 0.17 | `bash -c 'ruff check && ruff format --check && python .migration/harness/tools/check_layers.py'` | `59c9c1a7fb18c816` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T12:38:11+00:00 | verifier-usecase-eligibility | 1 | 6.67 | `pytest -q tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_outside_the_route_specification` | `38a3e9970b87656b` | E                                                                        [100%] |  |
+| 2026-11-17T12:38:30+00:00 | verifier-behavior | 0 | 57.33 | `pytest -q` | `32ba647d0c7d7899` |  |  |
+| 2026-11-17T12:38:52+00:00 | verifier-usecase-eligibility-final | 1 | 1.78 | `pytest -q tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_outside_the_route_specification` | `3f3971ad3498ca4c` | E       Failed: DID NOT RAISE ValueError |  |
