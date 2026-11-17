@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+  <div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+    <section aria-labelledby="collection-heading">
+      <p class="text-xs uppercase tracking-[.2em] text-[#55594f]">The collection · {{ loans|length }} loans in view</p>
+      <h1 id="collection-heading" class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+      <p class="mb-8 text-[#55594f]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+      <div aria-label="Loan catalog">
+        {% for loan in loans %}
+          <article class="grid gap-4 border-b border-[#d8cdbb] py-5 sm:grid-cols-[1fr_auto]">
+            <div>
+              <p class="text-xl font-semibold">{{ loan.id }}</p>
+              <p class="text-[#55594f]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+              <a class="link mt-2 inline-block cursor-pointer text-[#8b3e2d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#a94e37]" href="{% url 'loan-catalog-detail' loan.id %}" hx-boost="true">View loan {{ loan.id }}</a>
+            </div>
+            <div class="sm:text-right">
+              <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+              {% if loan.returned_on %}<p class="text-sm text-[#55594f]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>{% endif %}
+            </div>
+          </article>
+        {% empty %}
+          <p class="rounded-box border border-[#d8cdbb] bg-[#fffdf7] p-6">No loans are in the collection yet.</p>
+        {% endfor %}
+      </div>
+    </section>
+    <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] p-6">
+      <p class="text-xs uppercase tracking-widest text-[#55594f]">At the desk</p>
+      <h2 class="mb-5 mt-2 text-2xl">A neighborhood collection</h2>
+      <p>Each book is lent for 14 days. The due date is listed with every loan.</p>
+      <p class="mt-5 border-t border-[#d8cdbb] pt-4 text-sm text-[#55594f]">{{ loans|length }} loans on record</p>
+    </aside>
+  </div>
+{% endblock %}

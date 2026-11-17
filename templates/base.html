@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}The Lending Library{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css">
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+  <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js"></script>
+</head>
+<body class="min-h-screen bg-[#f5f0e5] font-serif text-[#2f3428]">
+  <header class="mx-auto max-w-7xl px-6 pt-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-[#d8cdbb] pb-5">
+      <a class="cursor-pointer text-2xl font-bold tracking-tight text-[#2f3428] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#a94e37]" href="{% url 'loan-catalog' %}">
+        The Lending Library <span class="text-sm font-normal">/ a neighborhood collection</span>
+      </a>
+      <nav aria-label="Library pages" class="flex gap-2 text-sm">
+        <a class="btn btn-ghost btn-sm cursor-pointer text-[#2f3428]" href="{% url 'loan-catalog' %}">Loans</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main-content" class="mx-auto max-w-7xl px-6 py-8">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="mx-auto max-w-7xl px-6 pb-8 text-sm text-[#55594f]">
+    Open Monday to Saturday, 9:00 to 18:00 · Books are lent for 14 days
+  </footer>
+</body>
+</html>
