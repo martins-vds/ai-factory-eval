@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import date
 from io import StringIO
 from unittest.mock import patch
@@ -6,6 +7,23 @@ import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.services import MonthlyReportApplication
+
+
+@dataclass(frozen=True)
+class LoanSnapshot:
+    member: str
+    lent_on: date
+    due_on: date
+    returned_on: date
+
+
+class ReportRepository:
+    def __init__(self, loans):
+        self.loans = loans
+
+    def loans_with_activity(self, start, end):
+        return self.loans
 
 
 @pytest.mark.django_db
@@ -115,3 +133,37 @@ def test_monthly_report_uses_december_when_run_on_first_day_of_january():
     assert output.getvalue() == (
         'member_id,loans_started,late_returns,total_late_fees_cents\ndecember,1,0,0\n'
     )
+
+
+def test_monthly_report_continues_after_on_time_return_and_sums_late_fees():
+    application = MonthlyReportApplication(
+        ReportRepository(
+            [
+                LoanSnapshot(
+                    member='alpha',
+                    lent_on=date(2026, 10, 1),
+                    due_on=date(2026, 10, 15),
+                    returned_on=date(2026, 10, 15),
+                ),
+                LoanSnapshot(
+                    member='alpha',
+                    lent_on=date(2026, 9, 10),
+                    due_on=date(2026, 9, 24),
+                    returned_on=date(2026, 10, 1),
+                ),
+                LoanSnapshot(
+                    member='alpha',
+                    lent_on=date(2026, 9, 11),
+                    due_on=date(2026, 9, 25),
+                    returned_on=date(2026, 10, 2),
+                ),
+            ]
+        )
+    )
+
+    rows = application.for_previous_month(date(2026, 11, 1))
+
+    assert [
+        (row.member_id, row.loans_started, row.late_returns, row.total_late_fees_cents)
+        for row in rows
+    ] == [('alpha', 1, 2, 350)]

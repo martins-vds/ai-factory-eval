@@ -4,11 +4,37 @@ kind: behavioral
 title: Produce the specified monthly lending report
 source:
   graph_node: document:legacy/docs/reports-spec.md
-  location: legacy/docs/reports-spec.md:1-9
+  location: legacy/docs/reports-spec.md:6-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1179]
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication
+    - src.reports.repository.DjangoMonthlyReportRepository
+    - src.reports.management.commands.monthly_report.Command
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_omits_members_without_activity
+  - tests/reports/test_monthly_report.py::test_monthly_report_uses_december_when_run_on_first_day_of_january
+  - tests/reports/test_monthly_report.py::test_monthly_report_continues_after_on_time_return_and_sums_late_fees
+  - .migration/evidence/runs/LL-05.md
+rules:
+  - id: prior-calendar-month
+    rule: The command reports the prior calendar month using a half-open date interval in the server's default time zone.
+    source: legacy/docs/reports-spec.md:6; .migration/plan/monthly-report.md
+  - id: member-metrics
+    rule: Each member row counts loans started and loans returned late in the month, and sums late fees in cents for late returns in that month.
+    source: legacy/docs/reports-spec.md:7
+  - id: fee-calculation
+    rule: Late-return fees use the established two-day grace period, 25 cents per late day, and 1000-cent cap.
+    source: src/fees/services.py:54-57
+  - id: member-inclusion
+    rule: Include members with a loan start or return in the month; omit members without loan activity in the month.
+    source: legacy/docs/reports-spec.md:9
+  - id: member-order
+    rule: Sort rows by total late fees descending, then member id ascending.
+    source: legacy/docs/reports-spec.md:8
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
