@@ -45,6 +45,7 @@
       "hook.end": [
         "hookInvocationId",
         "hookType",
+        "output",
         "parentToolCallId",
         "success"
       ],
@@ -66,6 +67,41 @@
         "permissionRequest",
         "promptRequest",
         "requestId"
+      ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
       ],
       "session.start": [
         "alreadyInUse",
@@ -117,6 +153,17 @@
         "pluginVersion",
         "source",
         "trigger"
+      ],
+      "subagent.completed": [
+        "agentDisplayName",
+        "agentName",
+        "durationMs",
+        "firstDispatchedModel",
+        "model",
+        "modelSelectionSource",
+        "toolCallId",
+        "totalTokens",
+        "totalToolCalls"
       ],
       "subagent.configured": [
         "model",
@@ -190,32 +237,35 @@
       ]
     },
     "event_types": {
-      "assistant.message": 194,
-      "assistant.turn_end": 107,
-      "assistant.turn_start": 108,
-      "external_tool.completed": 1,
-      "external_tool.requested": 1,
-      "hook.end": 347,
-      "hook.start": 348,
-      "permission.completed": 164,
-      "permission.requested": 164,
+      "assistant.message": 223,
+      "assistant.turn_end": 126,
+      "assistant.turn_start": 126,
+      "external_tool.completed": 3,
+      "external_tool.requested": 3,
+      "hook.end": 398,
+      "hook.start": 399,
+      "permission.completed": 184,
+      "permission.requested": 184,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 108,
-      "skill.context_delivered_ref": 8,
-      "skill.invoked": 7,
+      "session.usage_record": 126,
+      "skill.context_delivered_ref": 9,
+      "skill.invoked": 8,
       "skill.invoked_ref": 1,
+      "subagent.completed": 1,
       "subagent.configured": 1,
       "subagent.selected": 2,
       "subagent.started": 1,
       "system.message": 2,
-      "tool.execution_complete": 198,
-      "tool.execution_start": 199,
+      "tool.execution_complete": 223,
+      "tool.execution_start": 223,
       "user.message": 2
     },
-    "events": 1964,
+    "events": 2248,
     "usage_fields": []
   },
-  "ended_at": "2026-11-17T23:03:45.494Z",
+  "ended_at": "2026-11-17T23:07:40.169Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -244,7 +294,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 1,
+      "count": 4,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -264,8 +314,13 @@
       "tool": "check_ui.py"
     },
     {
-      "count": 1,
+      "count": 3,
       "exit": 0,
+      "tool": "validate.py"
+    },
+    {
+      "count": 1,
+      "exit": 1,
       "tool": "validate.py"
     },
     {
@@ -278,11 +333,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 194
+      "requests": 223
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-17T23:04:17+00:00",
+  "recorded_at": "2026-11-17T23:08:14+00:00",
   "schema": "afs-cost/1",
   "session_id": "8553a651-cbbd-4598-b042-09fa6afd63c3",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -314,10 +369,13 @@
     {
       "count": 1,
       "skill": "domain-driven-design"
+    },
+    {
+      "count": 1,
+      "skill": "verification-before-completion"
     }
   ],
   "started_at": "2026-11-17T22:35:02.735Z",
   "surface": "coding-agent",
-  "trigger_id": "8a4da6be-8b22-4861-9c53-d80467d3c4b3",
   "usage_source": "assistant.message (output only, partial)"
 }
