@@ -7,6 +7,7 @@ from playwright.sync_api import sync_playwright
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )
+TAILWIND_CSS_PATH = Path(__file__).resolve().parents[2] / 'static/css/tailwind.css'
 HTTP_GOLDENS = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))
 
 
@@ -17,6 +18,25 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
+
+
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_reject_non_get_requests(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+    assert response['Allow'] == 'GET'
+
+
+def test_about_page_tailwind_utilities_are_in_built_stylesheet():
+    stylesheet = TAILWIND_CSS_PATH.read_text(encoding='utf-8')
+    missing = [
+        selector
+        for selector in ('.py-8', '.mt-8', '.leading-relaxed')
+        if selector not in stylesheet
+    ]
+
+    assert not missing, f'Missing About page utility selectors: {missing}'
 
 
 @pytest.mark.django_db
