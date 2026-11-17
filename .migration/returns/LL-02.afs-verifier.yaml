@@ -1,0 +1,32 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/847
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.966
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4,6
+    what: "The use-case module imports Django timezone and LoanRepository directly, violating the profile's use-case layering contract."
+    evidence: "run: verify-final-idiom"
+  - severity: minor
+    where: src/loans/forms.py:8
+    what: "Mutant #9 (Meta.model=None) survives because mutation selection runs only test_list_endpoint_returns_seeded_records for forms.py; the full suite does exercise required member/ISBN validation. Survivors #1/#2/#4 affect the pre-existing LL-01 catalog view/route, outside LL-02 flows."
+tests_added:
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
