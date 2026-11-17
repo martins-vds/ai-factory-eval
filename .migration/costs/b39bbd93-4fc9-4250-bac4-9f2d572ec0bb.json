@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -148,7 +159,14 @@
         "metadata",
         "role"
       ],
+      "system.notification": [
+        "content",
+        "kind",
+        "responsesReasoning"
+      ],
       "tool.execution_complete": [
+        "error",
+        "fileEdits",
         "interactionId",
         "model",
         "parentToolCallId",
@@ -189,35 +207,43 @@
       ]
     },
     "event_types": {
-      "assistant.message": 33,
-      "assistant.turn_end": 23,
-      "assistant.turn_start": 24,
-      "hook.end": 114,
-      "hook.start": 115,
-      "permission.completed": 43,
-      "permission.requested": 43,
+      "assistant.message": 88,
+      "assistant.turn_end": 63,
+      "assistant.turn_start": 63,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 221,
+      "hook.start": 222,
+      "permission.completed": 85,
+      "permission.requested": 85,
       "session.start": 1,
-      "session.usage_record": 24,
-      "skill.context_delivered_ref": 6,
-      "skill.invoked": 4,
+      "session.usage_record": 63,
+      "skill.context_delivered_ref": 11,
+      "skill.invoked": 9,
       "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 64,
-      "tool.execution_start": 65,
+      "system.notification": 1,
+      "tool.execution_complete": 123,
+      "tool.execution_start": 123,
       "user.message": 3
     },
-    "events": 575,
+    "events": 1177,
     "usage_fields": []
   },
-  "ended_at": "2026-11-17T22:44:33.733Z",
+  "ended_at": "2026-11-17T22:56:07.282Z",
   "event": "agentStop",
   "harness_tools": [
     {
       "count": 1,
+      "exit": 0,
+      "tool": "afs-finish-check"
+    },
+    {
+      "count": 7,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -227,12 +253,17 @@
       "tool": "afs-services"
     },
     {
-      "count": 1,
+      "count": 2,
       "exit": 0,
       "tool": "check_inputs.py"
     },
     {
       "count": 1,
+      "exit": 0,
+      "tool": "check_layers.py"
+    },
+    {
+      "count": 4,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -244,6 +275,16 @@
     {
       "count": 1,
       "exit": 0,
+      "tool": "check_ui.py"
+    },
+    {
+      "count": 3,
+      "exit": 0,
+      "tool": "validate.py"
+    },
+    {
+      "count": 1,
+      "exit": 1,
       "tool": "validate.py"
     },
     {
@@ -256,11 +297,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 33
+      "requests": 88
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-17T22:44:40+00:00",
+  "recorded_at": "2026-11-17T22:56:23+00:00",
   "schema": "afs-cost/1",
   "session_id": "b39bbd93-4fc9-4250-bac4-9f2d572ec0bb",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -268,6 +309,10 @@
     {
       "count": 1,
       "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-ledger"
     },
     {
       "count": 1,
@@ -279,11 +324,26 @@
     },
     {
       "count": 1,
+      "skill": "clean-architecture"
+    },
+    {
+      "count": 1,
+      "skill": "clean-code"
+    },
+    {
+      "count": 1,
       "skill": "code-review"
+    },
+    {
+      "count": 1,
+      "skill": "domain-driven-design"
+    },
+    {
+      "count": 1,
+      "skill": "patterns-of-enterprise-application-architecture"
     }
   ],
   "started_at": "2026-11-17T22:41:59.825Z",
   "surface": "coding-agent",
-  "trigger_id": "405bc18c-cc1d-4f4c-8c05-11c8b64b86c7",
   "usage_source": "assistant.message (output only, partial)"
 }
