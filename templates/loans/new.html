@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto grid max-w-3xl gap-12 lg:grid-cols-[1fr_19rem]">
+  <div>
+    <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+    <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk · new loan</p>
+    <h1 class="mb-4 mt-3 text-5xl">Send a book on its way.</h1>
+    <p class="mb-8 text-[#66705b]">Every loan keeps its place in the collection for fourteen days.</p>
+    <form
+      id="lend-form"
+      class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm"
+      method="post"
+      action="/ui/loans/new/"
+      hx-post="/ui/loans/new/"
+      hx-target="#lend-feedback"
+      hx-swap="innerHTML"
+    >
+      {% csrf_token %}
+      <div class="card-body gap-4">
+        <div>
+          <label class="label" for="{{ form.member.id_for_label }}">Member</label>
+          {{ form.member }}
+        </div>
+        <div>
+          <label class="label" for="{{ form.isbn.id_for_label }}">ISBN</label>
+          {{ form.isbn }}
+        </div>
+        <div id="lend-feedback" aria-live="polite">
+          {% include "loans/_lend_errors.html" %}
+        </div>
+        <button class="btn btn-primary" type="submit">Lend this book</button>
+      </div>
+    </form>
+  </div>
+  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-widest text-[#66705b]">A small promise</p>
+      <h2 class="card-title text-2xl">Fourteen days</h2>
+      <p>Each lending date carries a due date two weeks later.</p>
+    </div>
+  </aside>
+</section>
+{% endblock %}

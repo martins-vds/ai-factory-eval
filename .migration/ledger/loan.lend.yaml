@@ -8,10 +8,24 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
 boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1173]
+target:
+  components:
+    [src.loans.forms.LendLoanForm, src.loans.repository.LoanRepository.count, src.loans.repository.LoanRepository.create, src.loans.services.lend_loan, src.loans.views.loan_list]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_lending_endpoint_creates_a_loan_with_fourteen_day_due_date, tests/loans/test_circulation.py::test_lending_endpoint_rejects_missing_and_blank_fields, tests/loans/test_circulation.py::test_lending_endpoint_escapes_delimiters_in_the_export, tests/loans/test_circulation.py::test_browser_lending_page_uses_the_reading_room_htmx_form, tests/loans/test_circulation.py::test_browser_lending_form_shows_field_errors_for_blank_values]
+rules:
+  - id: required-member-isbn
+    rule: Member and ISBN values must be present and nonblank after trimming.
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: lend-date
+    rule: A new loan uses the server's local current date and is due 14 calendar days later.
+    source: legacy/src/main/java/lib/LoanResource.java:37-43; legacy/src/main/java/lib/Loan.java:44-46
+  - id: generated-id
+    rule: New loans receive the next identifier in the L<count+1> sequence.
+    source: legacy/src/main/java/lib/LoanRepository.java:27-32
+quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+notes: "Blank-field rejection and delimiter escaping follow the approved fix rulings in #39 and #43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]

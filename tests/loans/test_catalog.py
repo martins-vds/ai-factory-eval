@@ -11,6 +11,20 @@ from src.loans.repository import LoanRepository
 
 @pytest.mark.django_db
 def test_list_endpoint_returns_seeded_records(client):
+    oversized_member = client.post('/loans', {'member': 'm' * 256, 'isbn': '123'})
+    oversized_isbn = client.post('/loans', {'member': 'reader', 'isbn': '1' * 256})
+    assert oversized_member.status_code == 400
+    assert oversized_isbn.status_code == 400
+
+    lending_page = client.get('/ui/loans/new/')
+    assert lending_page.status_code == 200
+    assert lending_page.content.count(b'class="input input-bordered w-full"') == 2
+
+    browser_catalog = client.get('/ui/loans/')
+    assert browser_catalog.status_code == 200
+    assert b'Books in good company.' in browser_catalog.content
+    assert b'3 loans in view' in browser_catalog.content
+
     response = client.get('/loans')
 
     assert response.status_code == 200

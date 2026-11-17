@@ -1,0 +1,6 @@
+{% for error in form.member.errors %}
+<p class="text-sm text-error" role="alert">Member: {{ error }}</p>
+{% endfor %}
+{% for error in form.isbn.errors %}
+<p class="text-sm text-error" role="alert">ISBN: {{ error }}</p>
+{% endfor %}
