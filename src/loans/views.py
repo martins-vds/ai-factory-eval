@@ -7,6 +7,10 @@ from .models import Loan
 from .services import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
 
 
+def no_such_loan_response():
+    return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+
+
 def loan_catalog(request):
     return render(request, 'loans/list.html', {'loans': Loan.objects.all()})
 
@@ -28,7 +32,7 @@ def loan_catalog_lend(request):
 def loan_catalog_return(request, loan_id):
     loan, returned = return_loan(loan_id)
     if loan is None:
-        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+        return no_such_loan_response()
     if request.headers.get('HX-Request') == 'true':
         return render(
             request,
@@ -67,7 +71,7 @@ def loan_list(request):
 def loan_detail(request, loan_id):
     body = get_loan_text(loan_id)
     if body is None:
-        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+        return no_such_loan_response()
     return HttpResponse(body, content_type='text/plain')
 
 
@@ -75,7 +79,7 @@ def loan_detail(request, loan_id):
 def loan_return(request, loan_id):
     loan, returned = return_loan(loan_id)
     if loan is None:
-        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+        return no_such_loan_response()
     if not returned:
         return HttpResponse(
             'loan has already been returned\n',
