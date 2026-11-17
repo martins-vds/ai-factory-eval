@@ -11,6 +11,9 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.domain.itinerary import Itinerary
+from cargotracker.cargo.domain.leg import Leg
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -19,6 +22,7 @@ from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
+from cargotracker.voyage.domain.voyage_number import VoyageNumber
 from cargotracker.voyage.infrastructure.models import VoyageRecord
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
@@ -88,6 +92,20 @@ def _create_cargo(paths):
         VoyageRecord.objects.create(voyage_number=voyage_number)
     candidate_paths.paths = paths
     return CargoRegistration(repository).register(ORIGIN, DESTINATION, DEADLINE)
+
+
+def _itinerary_with_arrival(arrival_day):
+    return Itinerary(
+        (
+            Leg(
+                DjangoVoyageRepository().find(VoyageNumber('CM003')),
+                ORIGIN,
+                DESTINATION,
+                datetime(2030, 11, 1, tzinfo=UTC),
+                datetime(2030, 11, arrival_day, tzinfo=UTC),
+            ),
+        )
+    )
 
 
 @pytest.mark.django_db
@@ -198,6 +216,24 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 
 @pytest.mark.django_db
+def test_assign_route_use_case_rejects_an_itinerary_not_issued_for_the_cargo():
+    tracking_id = _create_cargo(())
+
+    assigned = routing.assign_route(tracking_id, _itinerary_with_arrival(4))
+
+    assert assigned.itinerary == Itinerary.EMPTY
+
+
+@pytest.mark.django_db
+def test_assign_route_use_case_rejects_an_itinerary_that_misses_the_deadline():
+    tracking_id = _create_cargo(())
+
+    assigned = routing.assign_route(tracking_id, _itinerary_with_arrival(6))
+
+    assert assigned.itinerary == Itinerary.EMPTY
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
@@ -212,6 +248,22 @@ def test_route_screens_reject_unsupported_http_methods(client):
     assert f'Select an Itinerary for Cargo {tracking_id.value}' in itinerary_page.content.decode()
     assert route_response.status_code == 405
     assert itinerary_response.status_code == 405
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('screen', ['route', 'itineraries'])
+@pytest.mark.parametrize('stale', [False, True])
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_screens_return_not_found_for_unknown_or_stale_cargo(client, screen, stale):
+    if stale:
+        tracking_id = _create_cargo(())
+        CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+    else:
+        tracking_id = 'MISSING1'
+
+    response = client.get(f'/admin/cargo/{tracking_id}/{screen}/')
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db

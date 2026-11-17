@@ -1,0 +1,62 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1209
+verdict: changes-required
+gates:
+  build: 0
+  behavior: "n/a: full pytest suite not rerun after the failing direct-use-case probes"
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: verifier mutation run was interrupted before afs-run produced a result"
+  regression: "n/a: full pytest suite not rerun after the failing direct-use-case probes"
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46-61
+    what: assign_route persists an itinerary that was never issued as a candidate for this cargo.
+    evidence: tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_not_issued_for_the_cargo
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46-61
+    what: assign_route persists an itinerary that arrives after the cargo's deadline.
+    evidence: tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_that_misses_the_deadline
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_not_issued_for_the_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_that_misses_the_deadline
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: booking.routing-assign
+    rule: Assignment requires a submitted, valid candidate associated with the requested cargo.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_not_issued_for_the_cargo
+    enforced: false
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: The selected itinerary must satisfy the cargo's current route specification.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_that_misses_the_deadline
+    enforced: false
+    ledger_rule: route-specification-satisfied
+no_rules:
+  booking.routing-chain: Structural orchestration; it has no independent business rule.
+  booking.screen-route: Presentation of route details and candidates; it has no independent business rule.
+  booking.screen-select-itinerary: Presentation of candidate or empty state; it has no independent business rule.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: The application layer's existing Http404 dependency is reported as known, not failing, by the layering gate.
+    origin: BK-05C
+    evidence: "run: verify-idiom-layers"
+mutation_survivors:
+  report: .migration/evidence/mutants/BK-05F.md
+  assessed:
+    - "#1 and #2: changing the candidate-signing salt does not break the paired dump/load flow; no other signing consumers exist, so neither matters here."
+    - "#10, #13, and #27: altered Http404 diagnostics preserve the normal 404 response; none matters at the UI boundary."
+    - "#14: adding X to quote's safe characters has no effect because X is unreserved; it does not matter."
+    - "#40: both the empty and changed missing-token defaults fail verification and produce the same 404; it does not matter."
+    - "#44 and #46: the changed BadSignature/Http404 diagnostics are caught or rendered as the same 404; neither matters."
+gate_notes:
+  - The direct-use-case probes failed as expected: both calls persisted the submitted itinerary.
+  - The changed-code mutation attempt was stopped after about 37 minutes without an AFS-RESULT; mutation_changed is therefore unreported.

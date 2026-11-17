@@ -79,3 +79,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T22:44:36+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T22:47:41+00:00 | unknown-stale-http-404 | 0 | 3.92 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo` | `19bf857b2a3d9624` |  |  |
+| 2026-11-17T22:48:02+00:00 | verify-build-compile | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T22:48:06+00:00 | verify-build-django-check | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T22:48:08+00:00 | verify-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T22:48:11+00:00 | verify-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T22:48:13+00:00 | verify-idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T22:48:18+00:00 | verify-idiom-ui | 0 | 0.49 | `python .migration/harness/tools/check_ui.py` | `0f886b727fd1d337` |  | gate=ui scope="templates changed since 5e97abf2162b6a64d1e12f56f715f3b13d3b0302" templates=0 findings=0 |
+| 2026-11-17T22:49:21+00:00 | verify-behavior | 0 | 60.66 | `pytest -q` | `87135d75b2d954b1` |  |  |
+| 2026-11-17T22:50:39+00:00 | verify-regression | 0 | 70.57 | `pytest -q` | `b61487ececdf6dc3` |  |  |
+| 2026-11-17T22:54:47+00:00 | verify-crap-coverage | 0 | 60.85 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `98eb27520c829651` |  |  |
+| 2026-11-17T22:54:50+00:00 | verify-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T22:54:53+00:00 | verify-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T23:33:15+00:00 | verify-direct-use-case-rules | 1 | 2.2 | `python -m pytest -q tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_not_issued_for_the_cargo tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_an_itinerary_that_misses_the_deadline` | `8eafaef1eed7cf67` | >       assert assigned.itinerary == Itinerary.EMPTY |  |
