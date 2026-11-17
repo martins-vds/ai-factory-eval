@@ -1,0 +1,20 @@
+role: afs-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#1149
+specialty: data
+pr: null
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/DM-05D.md
+specialty_evidence:
+  - .migration/evidence/runs/DM-05D.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/DM-05D.md
