@@ -19,6 +19,13 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.content.decode() == expected['body']
 
 
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_only_accept_get(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_modern_about_page_shows_library_information_in_browser(live_server):
     with sync_playwright() as playwright:
