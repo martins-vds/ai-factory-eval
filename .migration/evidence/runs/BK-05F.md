@@ -94,3 +94,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:32:20+00:00 | verify-mutation-changed | 0 | 0.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-17T16:33:04+00:00 | verify-regression | 0 | 44.11 | `pytest -q` | `4631d35cd52f476c` |  |  |
 | 2026-11-17T16:37:12+00:00 | verifier-route-mutation-supplement | 0 | 232.34 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
+| 2026-11-17T16:40:26+00:00 | verifier-final-regression | 0 | 46.36 | `pytest -q` | `65d73f19044893cc` |  |  |
