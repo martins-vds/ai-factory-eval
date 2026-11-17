@@ -29,6 +29,11 @@ rules:
     test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
     enforced: true
   - capability: booking.routing-assign
+    rule: Assigning a valid candidate persists the itinerary and recalculates routing status, ETA, and next expected activity.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+  - capability: booking.routing-assign
     rule: An unknown or stale tracking ID cannot be assigned an itinerary.
     use_case: CargoRouting.assign_route
     test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
