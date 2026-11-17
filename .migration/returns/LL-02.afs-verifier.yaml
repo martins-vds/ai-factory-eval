@@ -1,0 +1,44 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/920
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.933
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "Lending use cases import Django time and the concrete LoanRepository, violating the profile's use-case dependency contract."
+    evidence: "run: verify-final-idiom"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: "lend_loan persists empty and whitespace-only member or ISBN values when called directly; the required-field invariant is enforced only by the ModelForm."
+    evidence: "run: verify-usecase-required-fields"
+  - severity: major
+    where: templates/base.html:9
+    what: "The return form can receive a 404 for an unknown loan, but htmx has no 4xx response handler, so the error response is not rendered into the form."
+    evidence: "run: verify-htmx-error-handling"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:1
+    what: "Mutation survivors #68-70 affect the unknown-return response and are now asserted by the added endpoint test; #44 covers an unrequested HX GET, #79 drops page context while retaining the repeat-return alert, #1/#2/#20 concern the earlier catalog flow, and #13 changes ModelForm metadata without a reproduced behavior failure."
+    evidence: "run: verify-mutation-changed"
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_does_not_persist_blank_required_fields
+  - tests/loans/test_catalog.py::test_return_form_configures_htmx_to_render_not_found_responses
+  - tests/loans/test_catalog.py::test_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_the_original_date_on_repeat
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
