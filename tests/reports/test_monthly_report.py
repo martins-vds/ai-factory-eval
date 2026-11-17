@@ -1,11 +1,66 @@
 import csv
 from datetime import date
 from io import StringIO
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
+
+
+def test_monthly_report_application_aggregates_the_previous_month():
+    loans = Mock()
+    loans.started_between.return_value = [
+        SimpleNamespace(
+            id='L-max',
+            member='max',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 20),
+        ),
+        SimpleNamespace(
+            id='L-alpha',
+            member='alpha',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 5),
+        ),
+        SimpleNamespace(
+            id='L-beta',
+            member='beta',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 5),
+        ),
+        SimpleNamespace(
+            id='L-zeta-1',
+            member='zeta',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 5),
+        ),
+        SimpleNamespace(
+            id='L-zeta-2',
+            member='zeta',
+            due_on=date(2024, 2, 5),
+            returned_on=date(2024, 2, 5),
+        ),
+    ]
+    fees = Mock()
+    fees.fee_for.side_effect = lambda loan_id: SimpleNamespace(
+        amount_cents={'L-max': 1000, 'L-alpha': 250, 'L-beta': 250, 'L-zeta-1': 100, 'L-zeta-2': 50}[
+            loan_id
+        ]
+    )
+
+    reports = MonthlyReportApplication(loans, fees).for_previous_month(date(2024, 3, 1))
+
+    loans.started_between.assert_called_once_with(date(2024, 2, 1), date(2024, 3, 1))
+    assert reports == [
+        MemberMonthlyReport('max', 1, 1, 1000),
+        MemberMonthlyReport('alpha', 1, 1, 250),
+        MemberMonthlyReport('beta', 1, 1, 250),
+        MemberMonthlyReport('zeta', 2, 1, 150),
+    ]
 
 
 @pytest.mark.django_db
