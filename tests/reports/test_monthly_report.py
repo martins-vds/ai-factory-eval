@@ -167,12 +167,13 @@ def test_monthly_report_application_aggregates_and_sorts_previous_month():
             ]
 
     class Fees:
-        amounts = {
-            'L-alpha-late': 75,
-            'L-alpha-on-time': 0,
-            'L-beta-late': 75,
-            'L-charlie-late': 100,
-        }
+        def __init__(self):
+            self.amounts = {
+                'L-alpha-late': 75,
+                'L-alpha-on-time': 0,
+                'L-beta-late': 75,
+                'L-charlie-late': 100,
+            }
 
         def fee_for(self, loan_id):
             return SimpleNamespace(amount_cents=self.amounts[loan_id])
