@@ -227,9 +227,7 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 @pytest.mark.parametrize('screen', ['route', 'itineraries'])
 @pytest.mark.parametrize('stale', [False, True])
 @override_settings(ROOT_URLCONF=__name__)
-def test_route_screens_return_not_found_for_unknown_or_stale_tracking_ids(
-    client, screen, stale
-):
+def test_route_screens_return_not_found_for_unknown_or_stale_tracking_ids(client, screen, stale):
     if stale:
         tracking_id = _create_cargo(())
         CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
