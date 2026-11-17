@@ -93,3 +93,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T03:35:22+00:00 | verifier-mutation-changed | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-17T03:36:14+00:00 | verifier-regression | 0 | 51.51 | `pytest -q` | `1018dcbd1d072b35` |  |  |
 | 2026-11-17T03:39:03+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:43:04+00:00 | verifier-final-regression | 0 | 52.84 | `pytest -q` | `92fdb9afe930e70f` |  |  |
