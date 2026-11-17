@@ -1,0 +1,46 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/945
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.923
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4
+    what: Use cases import Django's clock and concrete LoanRepository, violating the configured ports-only dependency rule.
+    evidence: "run: verify-idiom-final3"
+  - severity: major
+    where: src/loans/services.py:9
+    what: lend_loan accepts blank and whitespace member or ISBN values when called directly; validation exists only in the form/view layer.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields[-123]
+  - severity: major
+    where: templates/loans/detail.html:24
+    what: The return form's htmx request can receive a 404 for an unknown or stale loan, but no configuration enables htmx 2 to swap the error response.
+    evidence: tests/loans/test_catalog.py::test_return_form_configures_htmx_to_swap_error_responses
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_rejected_repository_result
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_return_form_configures_htmx_to_swap_error_responses
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_browser_can_create_a_loan_from_the_new_loan_page
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+mutant_assessment:
+  - "Relevant and now asserted: views.py #68-70 (unknown UI return status/body), views.py #79 (repeat-return date/details), and urls.py #4 (catalog back-route)."
+  - "Not used by the planned flow: views.py #44 changes the template only for a GET carrying HX-Request, which the reading-room flow does not send."
+  - "Earlier catalog rendering mutants views.py #1-2 concern LL-01 behavior, not LL-02's lending/return capability."
+  - "forms.py #9 changes ModelForm binding; the existing successful and invalid API/browser submissions exercise this behavior, though the survivor remains noted."
