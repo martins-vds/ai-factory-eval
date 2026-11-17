@@ -47,9 +47,13 @@ def test_monthly_report_application_aggregates_the_previous_month():
     ]
     fees = Mock()
     fees.fee_for.side_effect = lambda loan_id: SimpleNamespace(
-        amount_cents={'L-max': 1000, 'L-alpha': 250, 'L-beta': 250, 'L-zeta-1': 100, 'L-zeta-2': 50}[
-            loan_id
-        ]
+        amount_cents={
+            'L-max': 1000,
+            'L-alpha': 250,
+            'L-beta': 250,
+            'L-zeta-1': 100,
+            'L-zeta-2': 50,
+        }[loan_id]
     )
 
     reports = MonthlyReportApplication(loans, fees).for_previous_month(date(2024, 3, 1))
@@ -72,82 +76,82 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
                 id='L-alpha',
                 member='alpha',
                 isbn='1',
-                lent_on=date(2026, 2, 1),
-                returned_on=date(2026, 2, 25),
+                lent_on=date(2024, 2, 1),
+                returned_on=date(2024, 2, 25),
             ),
             Loan(
                 id='L-beta',
                 member='beta',
                 isbn='2',
-                lent_on=date(2026, 2, 2),
-                returned_on=date(2026, 2, 26),
+                lent_on=date(2024, 2, 2),
+                returned_on=date(2024, 2, 26),
             ),
             Loan(
                 id='L-zeta-1',
                 member='zeta',
                 isbn='3',
-                lent_on=date(2026, 2, 3),
-                returned_on=date(2026, 2, 20),
+                lent_on=date(2024, 2, 3),
+                returned_on=date(2024, 2, 20),
             ),
             Loan(
                 id='L-zeta-2',
                 member='zeta',
                 isbn='4',
-                lent_on=date(2026, 2, 4),
-                returned_on=date(2026, 2, 18),
+                lent_on=date(2024, 2, 4),
+                returned_on=date(2024, 2, 18),
             ),
             Loan(
                 id='L-zeta-3',
                 member='zeta',
                 isbn='7',
-                lent_on=date(2026, 2, 5),
-                returned_on=date(2026, 2, 20),
+                lent_on=date(2024, 2, 5),
+                returned_on=date(2024, 2, 20),
             ),
             Loan(
                 id='L-zeta-4',
                 member='zeta',
                 isbn='8',
-                lent_on=date(2026, 2, 6),
-                returned_on=date(2026, 2, 22),
+                lent_on=date(2024, 2, 6),
+                returned_on=date(2024, 2, 22),
             ),
             Loan(
                 id='L-zeta-5',
                 member='zeta',
                 isbn='9',
-                lent_on=date(2026, 2, 7),
-                returned_on=date(2026, 2, 24),
+                lent_on=date(2024, 2, 7),
+                returned_on=date(2024, 2, 24),
             ),
             Loan(
                 id='L-max',
                 member='max',
                 isbn='10',
-                lent_on=date(2026, 2, 1),
-                returned_on=date(2026, 3, 30),
+                lent_on=date(2024, 2, 1),
+                returned_on=date(2024, 3, 30),
             ),
             Loan(
                 id='L-last-day',
                 member='last-day',
                 isbn='11',
-                lent_on=date(2026, 2, 28),
-                returned_on=date(2026, 3, 14),
+                lent_on=date(2024, 2, 29),
+                returned_on=date(2024, 3, 14),
             ),
             Loan(
                 id='L-before',
                 member='before',
                 isbn='5',
-                lent_on=date(2026, 1, 31),
+                lent_on=date(2024, 1, 31),
             ),
             Loan(
                 id='L-after',
                 member='after',
                 isbn='6',
-                lent_on=date(2026, 3, 1),
+                lent_on=date(2024, 3, 1),
             ),
         ]
     )
     monkeypatch.setattr(
         'src.reports.management.commands.monthly_report.timezone.localdate',
-        lambda: date(2026, 3, 1),
+        lambda: date(2024, 3, 1),
     )
     output = StringIO()
 
