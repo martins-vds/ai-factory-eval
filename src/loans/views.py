@@ -1,5 +1,4 @@
-from django.http import Http404
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
 
 from src.loans.repositories import LoanRepository

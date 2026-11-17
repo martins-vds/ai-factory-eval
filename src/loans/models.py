@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import ClassVar
 
 from django.db import models
 
@@ -11,7 +12,7 @@ class Loan(models.Model):
     returned_on = models.DateField(null=True, blank=True)
 
     class Meta:
-        ordering = ['id']
+        ordering: ClassVar = ['id']
 
     @property
     def due_on(self):
