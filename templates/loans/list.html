@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+  <div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+    <section>
+      <p class="prototype-muted text-xs uppercase tracking-[.2em]">
+        The collection · {{ loan_count }} loans in view
+      </p>
+      <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+      <p class="prototype-muted mb-8">
+        A quiet ledger of what is out, who has it, and when it comes home.
+      </p>
+      {% for loan in loans %}
+        <article class="loan-row grid gap-4 sm:grid-cols-[1fr_auto]">
+          <div>
+            <p class="text-xl font-semibold">ISBN {{ loan.isbn }}</p>
+            <p class="prototype-muted">
+              {{ loan.member }} ·
+              <a class="underline" href="{% url 'ui-loan-detail' loan.id %}">Record {{ loan.id }}</a>
+            </p>
+          </div>
+          <div class="sm:text-right">
+            <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+            {% if loan.returned_on %}
+              <p class="prototype-muted text-sm">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+            {% else %}
+              <p class="prototype-muted text-sm">On loan</p>
+            {% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <p class="prototype-muted">There are no loans in the catalog.</p>
+      {% endfor %}
+    </section>
+    <aside class="prototype-surface h-fit p-6">
+      <p class="prototype-muted text-xs uppercase tracking-widest">At a glance</p>
+      <h2 class="mb-5 mt-2 text-2xl">A little more time to read.</h2>
+      <p class="prototype-muted leading-relaxed">
+        Each book stays with its reader for fourteen days. Find a record to see its full loan dates.
+      </p>
+      <p class="mt-6 border-t prototype-border pt-4">
+        <span class="prototype-muted text-sm">In the catalog</span>
+        <span class="float-right font-semibold">{{ loan_count }}</span>
+      </p>
+    </aside>
+  </div>
+{% endblock %}

@@ -6,10 +6,22 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1171]
+target:
+  components: [src.loans.models.Loan, src.loans.repository]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_loans_survive_connection_restart_without_reseeding]
+rules:
+  - id: loan-identity
+    rule: "Each loan has a unique identifier stored as its primary key."
+    source: "legacy/src/main/java/lib/Loan.java:11-26"
+  - id: loan-fields
+    rule: "Member, ISBN and lent date are required; return date is nullable."
+    source: "legacy/src/main/java/lib/Loan.java:17-24"
+  - id: persistent-storage
+    rule: "Loan changes remain stored across database connections and application restarts."
+    source: "martins-vds/ai-factory-synthetic-target#42"
+notes: "The target maps the legacy LOAN fields to a Django model in PostgreSQL; the approved #42 ruling replaces H2 reset-on-startup."
 quirks: [martins-vds/ai-factory-synthetic-target#42]

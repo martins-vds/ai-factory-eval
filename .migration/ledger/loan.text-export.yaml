@@ -8,10 +8,19 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:52-55
   risk: {crap: 2, complexity: 2, coverage: 1.0}
 boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. The docs state spreadsheet users rely on this format."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1171]
+target:
+  components: [src.loans.application.format_loan, src.loans.application.export_loans]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_loan_list_matches_characterized_export, tests/loans/test_catalog.py::test_loan_export_quotes_delimiters_quotes_and_line_breaks]
+rules:
+  - id: export-format
+    rule: "Each record has id, member, ISBN, lent date, due date and nullable return date, separated by semicolons and followed by a newline."
+    source: "legacy/src/main/java/lib/LoanResource.java:52-55; legacy/docs/export-csv.md:1-4"
+  - id: escape-delimiters
+    rule: "Fields containing semicolons, quotes or line breaks are quoted; quotes inside fields are doubled."
+    source: "martins-vds/ai-factory-synthetic-target#43"
+notes: "The target applies the approved #43 fix with standard semicolon-delimited CSV quoting."
 quirks: [martins-vds/ai-factory-synthetic-target#43]

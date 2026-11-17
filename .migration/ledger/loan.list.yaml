@@ -8,8 +8,17 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:25-28
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans returns every loan ordered by id as one semicolon-separated text line per record, with a trailing newline."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1171]
+target:
+  components: [src.loans.repository.list_all, src.loans.views.loan_list]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_loan_list_matches_characterized_export, tests/loans/test_catalog.py::test_loan_list_orders_records_by_identifier]
+rules:
+  - id: identifier-order
+    rule: "List results are ordered by identifier before formatting."
+    source: "legacy/src/main/java/lib/LoanRepository.java:23-25"
+  - id: trailing-newline
+    rule: "The response ends with a newline, including when there are no records."
+    source: "legacy/src/main/java/lib/LoanResource.java:25-28"
