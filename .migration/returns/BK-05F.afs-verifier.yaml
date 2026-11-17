@@ -1,0 +1,68 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: martins-vds/ai-factory-eval#1070
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed against origin/main"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_routing_use_case_rejects_late_candidates
+  - tests/booking/interfaces/test_route_selection.py::test_screens_filter_late_candidates_through_routing_use_case
+  - tests/booking/interfaces/test_route_selection.py::test_unknown_or_stale_cargo_route_screens_return_404
+  - tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_unknown_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_changed_deadline_rejects_previously_offered_candidate
+  - tests/booking/interfaces/test_route_selection.py::test_unknown_or_stale_cargo_route_assignment_returns_404
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: booking.routing-chain
+    rule: Candidates arriving after the deadline are not offered.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/interfaces/test_route_selection.py::test_routing_use_case_rejects_late_candidates
+    enforced: true
+  - capability: booking.routing-assign
+    rule: Assignment to an unknown tracking ID is refused.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/interfaces/test_route_selection.py::test_assign_route_use_case_rejects_unknown_cargo
+    enforced: true
+no_rules:
+  booking.screen-route: Presentation of candidate details and selection; routing rules belong to the use cases.
+  booking.screen-select-itinerary: Presentation of candidate itineraries and the empty state; routing rules belong to the use cases.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:44
+    what: The BK-05C assignment use case accepts a previously offered itinerary after the deadline changes, although the BK-05F view rejects it.
+    origin: BK-05C
+    evidence: "run: verifier-route-tests"
+  - where: src/cargotracker/urls.py
+    what: With DEBUG disabled, missing cargo produces Django's generic 404 rather than the cargo-not-found page required by ruling #232.
+    origin: unknown
+    evidence: "run: verifier-cargo-not-found-page"
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: The BK-05C use case imports Django Http404 across the ADR-0001 boundary; the layering gate reports this as known, not failing.
+    origin: BK-05C
+    evidence: "run: final-idiom-layers"
+review:
+  - "The four BK-05F ledger entries identify the target components and tests. BookingServiceTest was not executed in the legacy Arquillian environment; its transcribed contracts are not evidence of an executed source test."
+  - "The route-candidates source observation used randomized service results; target tests assert endpoint and deadline properties rather than exact random routes. Rulings #89 and #238 preserve generation without a deadline followed by filtering."
+  - "The source select-itinerary page was blank with candidates; ruling #252 approves rendering those candidates. The target populated and empty cases are asserted."
+  - "Source assignment reached show.xhtml; ruling #236 requires the target cargo-details redirect. The selected itinerary and ROUTED state are asserted."
+  - "Ruling #232 replaces the source's unknown-ID failure with a cargo-not-found 404. Status is verified for both screens and assignment; the inherited generic production 404 does not identify cargo."
+  - "The normal POST form does not use htmx. Unknown cargo, invalid or cross-cargo tokens and expired candidates return 404; unsupported methods return 405. These render full responses, not htmx fragments."
+  - "The profile mutation command uses origin/main, which already contains the production implementation in this evaluation checkout and therefore returns n/a. The additional explicit-path mutation run examines the route-selection implementation; see its journal row and .migration/evidence/mutants/BK-05F.md for diffs."
+  - "The explicit-path mutation run final2-mutation-route-selection scored 0.855: 53 killed and 9 survived."
+  - "The profile UI check sees zero changed templates against origin/main. The supplementary ui-original-implementation run checked all three route-selection templates against their original implementation baseline and reported no findings."
+  - "The agent-browser CLI was unavailable, and the project's URL configuration does not yet register these screens (BK-05H owns that wiring). The screen flows were exercised with Django's request/response client and a test URL configuration, not visually checked in a browser."
+mutation_survivors:
+  - "#1 and #2 alter the signing salt. Tokens newly generated and checked by the same code still work, but in-flight tokens across a salt change break; the default salt in #2 also removes namespace isolation. No other signing use was found, so neither establishes a current exploit."
+  - "#10, #13, #27 and #46 alter Http404 messages. Production DEBUG=false renders the same generic 404; debug-mode diagnostic text changes, so these are not universally equivalent."
+  - "#14 adds X to quote's safe set; X is already an unreserved character, so the redirect is unchanged."
+  - "#40 changes the missing token fallback from empty to XXXX; both fail signature validation and produce 404."
+  - "#44 changes a BadSignature message that is caught and replaced by the same Http404."

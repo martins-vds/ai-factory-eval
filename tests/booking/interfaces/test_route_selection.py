@@ -229,6 +229,14 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
 
 @pytest.mark.django_db
+def test_routing_use_case_rejects_late_candidates():
+    late = TransitPath((_edge('CM003', 'USNYC', 'FIHEL', 4, 6),))
+    tracking_id = _create_cargo((late,))
+
+    assert routing.route_candidates(tracking_id) == ()
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_screens_filter_late_candidates_through_routing_use_case(client):
     late = TransitPath((_edge('CM003', 'USNYC', 'FIHEL', 4, 6),))
