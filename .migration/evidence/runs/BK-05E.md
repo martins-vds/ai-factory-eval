@@ -30,3 +30,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:47:11+00:00 | crap-lizard | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T16:47:11+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
 | 2026-11-17T16:52:39+00:00 | mutation-changed | 0 | 327.97 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
+| 2026-11-17T16:54:13+00:00 | tests-details | 0 | 1.98 | `pytest -q tests/booking/interfaces/test_cargo_details.py` | `f4bcd235d33b5e16` |  |  |
+| 2026-11-17T16:54:13+00:00 | idiom-test-check | 0 | 0.01 | `ruff check tests/booking/interfaces/test_cargo_details.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:54:13+00:00 | idiom-test-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_cargo_details.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-17T16:56:23+00:00 | behavior-final | 0 | 33.6 | `pytest -q` | `e1ac81a019c2e3dd` |  |  |
+| 2026-11-17T16:57:01+00:00 | crap-coverage-final | 0 | 37.57 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `baf6cdde6b835bbb` |  |  |
+| 2026-11-17T16:57:01+00:00 | crap-lizard-final | 0 | 0.08 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:57:01+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-17T16:57:01+00:00 | idiom-test-check-final | 0 | 0.01 | `ruff check tests/booking/interfaces/test_cargo_details.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:57:01+00:00 | idiom-test-format-final | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_cargo_details.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-17T17:02:24+00:00 | mutation-changed-final | 0 | 322.29 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
