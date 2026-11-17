@@ -1,0 +1,37 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/822
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.974
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "The use cases import Django's clock and concrete LoanRepository despite the layering contract forbidding framework and repository dependencies."
+    evidence: "run: final-idiom"
+  - severity: minor
+    where: src/loans/views.py:17
+    what: "Survivors #1 and #2 alter the inherited LL-01 catalog template/context; they do not affect LL-02 lending or return endpoints."
+  - severity: minor
+    where: src/loans/urls.py:9
+    what: "Survivor #4 changes the inherited LL-01 catalog route; the catalog path is not exercised by the LL-02 lending/return flows."
+tests_added:
+  - tests/loans/test_catalog.py::test_loan_form_accepts_member_and_isbn
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_return_unknown_loan_is_not_found
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
