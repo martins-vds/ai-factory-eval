@@ -1,11 +1,12 @@
 import json
+from datetime import date
 from pathlib import Path
 
 import pytest
 from playwright.sync_api import sync_playwright
 
 from src.fees.gateway import HttpPaymentGateway
-from src.fees.services import PaymentGatewayFailure
+from src.fees.services import Fee, PaymentGatewayFailure
 
 HTTP_GOLDENS = json.loads(
     (
@@ -38,6 +39,28 @@ def test_fee_endpoint_returns_characterized_not_found_response(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == '<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content.decode() == '<p>No such loan.</p>'
+
+
+def test_fee_page_formats_whole_dollar_amount(client, monkeypatch):
+    class FeeApplication:
+        def fee_for(self, loan_id):
+            return Fee(date(2026, 1, 10), 8, 200)
+
+    monkeypatch.setattr('src.fees.views.fee_application', FeeApplication())
+
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    assert b'Fee: $2.00' in response.content
 
 
 @pytest.mark.django_db
@@ -111,6 +134,7 @@ def test_fee_page_payment_returns_gateway_status_fragment(client, payment_gatewa
     assert b'role="status"' in response.content
     assert b'charged' in response.content
     assert b'id="payment-status"' in response.content
+    assert b'Late fee for L1' not in response.content
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
 
 
@@ -126,6 +150,44 @@ def test_fee_page_payment_shows_gateway_failure_fragment(client, payment_gateway
     assert b'declined' in response.content
 
 
+@pytest.mark.django_db
+def test_fee_page_payment_without_htmx_renders_full_page(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'Late fee for L1' in response.content
+    assert b'2026-01-16' in response.content
+    assert b'Fee: $10.00' in response.content
+    assert b'id="payment-status"' in response.content
+    assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_payment_rejects_unknown_loan(client, payment_gateway):
+    response = client.post('/ui/payments/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L3'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L3/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+@pytest.mark.django_db
+def test_fee_and_payment_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
 def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monkeypatch):
     def interrupt(_request):
         raise InterruptedError('request interrupted')
@@ -137,6 +199,22 @@ def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monk
 
     assert failure.value.body == 'payment gateway unavailable\n'
     assert isinstance(failure.value.__cause__, InterruptedError)
+
+
+def test_payment_gateway_uses_the_characterized_default_url(monkeypatch):
+    requested_urls = []
+
+    def unavailable(request):
+        requested_urls.append(request.full_url)
+        raise OSError('gateway unreachable')
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    monkeypatch.setattr('src.fees.gateway._open', unavailable)
+
+    with pytest.raises(PaymentGatewayFailure):
+        HttpPaymentGateway().charge('L1')
+
+    assert requested_urls == ['https://payments.lending-library.invalid/charge?loan=L1']
 
 
 @pytest.mark.django_db
