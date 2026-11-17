@@ -62,3 +62,16 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:49:50+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T16:49:50+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-17T16:51:46+00:00 | mutation-changed | 0 | 115.75 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
+| 2026-11-17T16:53:06+00:00 | exact-field-errors | 0 | 2.17 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo` | `538758f8f3923b57` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-build-compileall | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-build-django | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T16:53:23+00:00 | final-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T16:53:24+00:00 | final-ui | 1 | 0.34 | `python .migration/harness/tools/check_ui.py` | `4b11a65cd1e6a1e7` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 4017939181c6f5fecf59a3a035d3bb593d2dada9" templates=3 findings=3 |
+| 2026-11-17T16:54:10+00:00 | final-behavior | 0 | 46.36 | `pytest -q` | `65d73f19044893cc` |  |  |
+| 2026-11-17T16:54:57+00:00 | final-regression | 0 | 46.7 | `pytest -q` | `7db43d528dc7d71f` |  |  |
+| 2026-11-17T16:55:43+00:00 | final-crap-coverage | 0 | 46.17 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `559946030721f2cf` |  |  |
+| 2026-11-17T16:55:44+00:00 | final-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:55:44+00:00 | final-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T16:57:34+00:00 | final-mutation-changed | 0 | 110.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `57831e3ade7c009a` |  | gate=mutation score=0.926 threshold=0.8 killed=50 survived=4 files=1 base=origin/main |
