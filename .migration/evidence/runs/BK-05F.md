@@ -79,3 +79,24 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:42:19+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:44:16+00:00 | verify-build-compile | 0 | 0.08 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:44:18+00:00 | verify-build-django | 0 | 1.57 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:44:18+00:00 | verify-idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:44:18+00:00 | verify-idiom-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T16:44:18+00:00 | verify-idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T16:44:19+00:00 | verify-idiom-ui | 0 | 0.33 | `python .migration/harness/tools/check_ui.py` | `67a29eb11870b994` |  | gate=ui scope="templates changed since f3d04213c35ca50074a07d7ac3f1b05469d2b0ac" templates=0 findings=0 |
+| 2026-11-17T16:45:15+00:00 | verify-behavior | 0 | 46.89 | `pytest -q` | `d349e9c14fd42e4c` |  |  |
+| 2026-11-17T16:46:01+00:00 | verify-regression | 0 | 45.3 | `pytest -q` | `d62a557523da4c3f` |  |  |
+| 2026-11-17T16:46:53+00:00 | verify-crap-coverage | 0 | 42.56 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `132079eb0136353e` |  |  |
+| 2026-11-17T16:46:54+00:00 | verify-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:46:54+00:00 | verify-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T16:46:57+00:00 | verify-mutation-changed | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T16:51:24+00:00 | verify-mutation-route-selection | 0 | 222.2 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
+| 2026-11-17T16:52:43+00:00 | verify-stale-screen-test | 0 | 1.49 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_screens_return_not_found_for_stale_cargo` | `87ceaed897e66904` |  |  |
+| 2026-11-17T16:52:44+00:00 | verify-test-ruff | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:52:44+00:00 | verify-test-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-17T16:53:45+00:00 | verify-behavior-final | 0 | 43.14 | `pytest -q` | `656bed577e0b5543` |  |  |
+| 2026-11-17T16:54:28+00:00 | verify-regression-final | 0 | 43.53 | `pytest -q` | `132007c3fb9a3423` |  |  |
+| 2026-11-17T16:54:35+00:00 | verify-mutation-changed-final | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T16:58:14+00:00 | verify-mutation-route-selection-final | 0 | 218.69 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |

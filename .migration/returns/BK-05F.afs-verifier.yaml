@@ -1,0 +1,41 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1041
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_screens_return_not_found_for_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "BK-05C's application use case imports django.http.Http404; the layer checker reports this as known, not failing, and BK-05F calls CargoRouting."
+    origin: BK-05C
+    evidence: "run: verify-idiom-layers"
+mutation_recheck:
+  result: 0.855
+  command: python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py
+  evidence: "run: verify-mutation-route-selection-final"
+mutation_survivors:
+  - mutants: [1, 2]
+    assessment: equivalent
+    reason: Both signing and verification use the same salt; tokens remain opaque and valid within the same code version.
+  - mutants: [10, 13, 27, 44, 46]
+    assessment: equivalent
+    reason: These change diagnostic text only; the handling remains the same standard HTTP 404 response.
+  - mutants: [14]
+    assessment: equivalent
+    reason: X is unreserved in URLs, so the redirect path is unchanged.
+  - mutants: [40]
+    assessment: equivalent
+    reason: Both missing-token fallback values fail signature validation and produce the same HTTP 404.
