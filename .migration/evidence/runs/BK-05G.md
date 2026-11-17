@@ -56,3 +56,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:44:37+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-17T16:44:37+00:00 | idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
 | 2026-11-17T16:44:38+00:00 | idiom-ui | 1 | 0.34 | `python .migration/harness/tools/check_ui.py` | `4b11a65cd1e6a1e7` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 4017939181c6f5fecf59a3a035d3bb593d2dada9" templates=3 findings=3 |
+| 2026-11-17T16:47:55+00:00 | behavior | 0 | 47.28 | `pytest -q` | `68bafe23b4d4c27d` |  |  |
+| 2026-11-17T16:48:42+00:00 | regression | 0 | 47.02 | `pytest -q` | `04dbdce038dceb31` |  |  |
