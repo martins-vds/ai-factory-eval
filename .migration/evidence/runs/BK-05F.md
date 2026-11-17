@@ -87,3 +87,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T03:04:14+00:00 | verifier-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-17T03:04:17+00:00 | verifier-idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
 | 2026-11-17T03:05:38+00:00 | verifier-behavior | 0 | 71.47 | `pytest -q` | `d3cbe57ea6befb8b` |  |  |
+| 2026-11-17T03:07:22+00:00 | verifier-crap-coverage | 0 | 61.17 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `e52e4d6784716a94` |  |  |
+| 2026-11-17T03:07:27+00:00 | verifier-crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:07:30+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T03:08:33+00:00 | verifier-regression | 0 | 58.87 | `pytest -q` | `13be9ff32d3b5184` |  |  |
