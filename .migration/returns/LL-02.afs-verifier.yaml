@@ -1,0 +1,48 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: martins-vds/ai-factory-eval#1021
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: pytest fails before the CRAP analyzer runs"
+  mutation_changed: "n/a: mutation runner aborts on the failing blank-field use-case tests"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: tests/loans/test_catalog.py:133
+    what: "lend_loan persists blank member and ISBN values when called directly, bypassing the approved #39 rejection rule."
+    evidence: "run: verifier-focused-tests"
+  - severity: major
+    where: src/loans/services.py:4,6
+    what: Use-case code imports Django's clock and the concrete LoanRepository, violating the profile's ports-only layering contract.
+    evidence: "run: verifier-final-idiom"
+  - severity: major
+    where: templates/loans/detail.html:25; templates/loans/loan-form.html:3
+    what: Changed htmx forms have no 4xx/5xx response handling; an unknown return's 404 is not swapped into the page.
+    evidence: "run: verifier-final-idiom"
+  - severity: major
+    where: templates/loans/new.html:6,8; templates/loans/loan-form.html:2,7,17; templates/loans/list.html:37; templates/loans/detail.html:27
+    what: New reading-room utility classes are absent from static/css/tailwind.css, leaving the lending layout and action styling unapplied.
+    evidence: "run: verifier-final-idiom"
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_fields_without_a_request
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_without_changing_date
+  - tests/loans/test_catalog.py::test_return_use_case_runs_row_lock_inside_a_transaction
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues:
+  - .migration/ledger/loan.lend.yaml marks lending migrated, but its direct use case persists blank values; the existing evidence only establishes form/API validation.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+survivor_review:
+  - "Prior survivor #79 (missing loan context on the regular repeated-return page) matters; assertions for loan id, member, and ISBN were added and pass."
+  - "Prior repository survivor #2 (removing transaction.atomic around select_for_update) matters; a transaction=True direct use-case test was added and passes."
+  - "View survivors #68-#70 expose the unhandled unknown-loan UI error path and align with the htmx finding; #44 is not exercised by current markup because the new-loan page emits no htmx GET."
+  - "View method-guard survivors #8, #24, #54, #65, URL survivors #2-#7, and form survivor #9 map to existing unsupported-method, route, and required-field tests; their fresh kill status is unknown because mutation execution aborts on the failing baseline tests."
+  - "The existing mutant file reports 0.855 with 17 survivors, but the current changed-code run produced no score and does not supersede that historical result."
