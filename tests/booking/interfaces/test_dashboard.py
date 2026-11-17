@@ -93,6 +93,7 @@ def test_dashboard_partitions_cargo_in_source_order_and_renders_claimed_details_
     assert 'Hong Kong' in not_routed_table and 'Melbourne' in not_routed_table
     assert 'AUMEL' in not_routed_table and 'Deadline' in not_routed_table
     assert 'New York' in claimed_table and 'Dallas' in claimed_table
+    assert 'href="/admin/cargo/JKL567/"' in routed_table
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
     assert 'href="/admin/cargo/MNO456/"' in claimed_table
     assert 'title="Click to see details"' in claimed_table
