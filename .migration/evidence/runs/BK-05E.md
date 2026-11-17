@@ -19,3 +19,23 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
 | 2026-11-17T16:11:40+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:15:01+00:00 | verifier-misrouted-detail | 1 | 1.65 | `pytest -q tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_offer_rerouting` | `a9004ef6d858e2d8` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:15:12+00:00 | build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:15:16+00:00 | build-django-check | 0 | 0.22 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T16:15:58+00:00 | behavior | 1 | 37.74 | `pytest -q` | `86c515104fff4c32` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:16:02+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:16:05+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-17T16:16:08+00:00 | idiom-layers | 1 | 0.09 | `python .migration/harness/tools/check_layers.py` | `844177b805e7a5cb` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=1 known=3 |
+| 2026-11-17T16:16:15+00:00 | idiom-ui | 1 | 0.25 | `python .migration/harness/tools/check_ui.py` | `4e8dbad63a1d276b` | templates/booking/wizard/_deadline_form.html:5: sends an htmx request ('hx-post'), but nothing handles error responses:  | gate=ui scope="templates changed since 32f0aacf69731d56a0ccf00c9280cb80f4dce34d" templates=10 findings=1 |
+| 2026-11-17T16:16:58+00:00 | crap-coverage | 1 | 36.96 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `69d129cfa89dab0c` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:17:05+00:00 | crap-lizard | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:17:08+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-17T16:20:06+00:00 | regression | 1 | 37.73 | `pytest -q` | `2fbda2adc9d745de` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:22:48+00:00 | mutation-changed | 2 | 334.6 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `2a8f6564db5171d9` | afs-mutation: mutmut failed on src/cargotracker/booking/interfaces/dashboard/views.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=1 files=4 base=origin/main |
+| 2026-11-17T16:23:46+00:00 | behavior-final | 1 | 32.18 | `pytest -q` | `1604f7eeb8d3e378` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:24:43+00:00 | regression-final | 1 | 31.94 | `pytest -q` | `26c33f70c20306d0` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:25:18+00:00 | crap-coverage-final | 1 | 31.39 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `1abf38b44db5998b` | assert cargo_record.misdirected is False |  |
+| 2026-11-17T16:25:21+00:00 | crap-lizard-final | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T16:25:24+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-17T16:25:42+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T16:25:45+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |

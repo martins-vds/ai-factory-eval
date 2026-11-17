@@ -4,6 +4,8 @@ from django.test import override_settings
 from django.urls import path
 
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.cargo.domain.delivery import RoutingStatus
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 
 
@@ -50,6 +52,38 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
     assert 'Arrival deadline:' in content
     assert 'Itinerary' in content
     assert '0200T' in content
+    assert 'Misrouted cargo!' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unrouted_cargo_details_offer_routing(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/DEF789/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Not routed' in content
+    assert 'href="/admin/cargo/DEF789/route/"' in content
+    assert 'Itinerary' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_misrouted_cargo_details_offer_rerouting(client):
+    call_command('seed_sample_data')
+    cargo_record = CargoRecord.objects.get(tracking_id='ABC123')
+    assert cargo_record.misdirected is False
+    cargo_record.routing_status = RoutingStatus.MISROUTED.value
+    cargo_record.save(update_fields=['routing_status'])
+
+    response = client.get('/admin/cargo/ABC123/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Misrouted cargo!' in content
+    assert 'Reroute' in content
 
 
 @pytest.mark.django_db
