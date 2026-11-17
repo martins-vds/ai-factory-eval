@@ -1,0 +1,81 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/75
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutmut baseline failed because verifier tests expose target defects"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "The use cases import Django and the concrete LoanRepository, violating the profile's use-case dependency contract."
+    evidence: "run: idiom-verify"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: "Direct lend_loan calls accept and persist whitespace-only required fields; the approved #39 rule exists only in LoanForm."
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_whitespace_fields
+  - severity: major
+    where: templates/loans/detail.html:25
+    what: "An unknown-loan htmx return responds with plain-text 404 and no alert fragment; with no htmx error handler, the return form gives the user no visible explanation."
+    evidence: tests/loans/test_catalog.py::test_htmx_return_unknown_loan_renders_an_error
+  - severity: major
+    where: templates/loans/loan-form.html:2-17
+    what: "LL-02 lending and return templates reference Tailwind utilities absent from static/css/tailwind.css, so their intended spacing and custom button colors do not render."
+    evidence: "run: ui-check-verify"
+  - severity: minor
+    where: src/loans/repository.py:20-21
+    what: "The repository owns the repeated-return lifecycle decision instead of delegating that domain transition to domain policy."
+  - severity: minor
+    where: src/loans/services.py:11-13
+    what: "Loan ids are count-derived before create; concurrent lends can select the same id. The source also derives ids by count, and concurrency was not characterized, so this is not a verified fidelity divergence."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:1-226
+    what: "Material survivors include method guards (#8/#24/#54/#65), routes (#2-#7), LoanForm.Meta.model (#9), transaction.atomic (#2), and return error handling/context (#68-#70/#79). #44 only changes the unused GET-with-HX form variant. The fresh mutation run could not confirm kills because the test baseline fails."
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_sets_due_date_fourteen_days_after_lending
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_whitespace_fields
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_date_on_repeat_return
+  - tests/loans/test_catalog.py::test_return_use_case_reports_unknown_loan
+  - tests/loans/test_catalog.py::test_return_use_case_locks_loan_inside_a_transaction
+  - tests/loans/test_catalog.py::test_htmx_return_unknown_loan_renders_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited: []
+rules:
+  - capability: loan.lend
+    rule: "Required member and ISBN values are nonblank, including whitespace-only values."
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_whitespace_fields
+    enforced: false
+  - capability: loan.lend
+    rule: "The due date is 14 calendar days after the lending date."
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_sets_due_date_fourteen_days_after_lending
+    enforced: true
+  - capability: loan.return-date
+    rule: "A repeated return preserves the original returned_on date."
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_preserves_date_on_repeat_return
+    enforced: true
+  - capability: loan.return-date
+    rule: "A first return records today's date."
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_locks_loan_inside_a_transaction
+    enforced: true
+  - capability: loan.return
+    rule: "An unknown loan id does not return a loan."
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_reports_unknown_loan
+    enforced: true
+no_rules: {}
