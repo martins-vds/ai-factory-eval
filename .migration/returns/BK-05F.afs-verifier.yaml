@@ -1,0 +1,65 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1237
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: mutmut failed on 3 of 81 files because the added direct-use-case regression test fails in the baseline"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46
+    what: CargoRouting.assign_route accepts and persists a candidate after the cargo deadline changes, leaving the cargo MISROUTED instead of refusing the stale itinerary.
+    evidence: tests/booking/interfaces/test_route_selection.py::test_assign_route_refuses_candidate_that_misses_current_deadline
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_cargo_not_found_for_unknown_or_stale_tracking_ids
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_after_deadline_changes
+  - tests/booking/interfaces/test_route_selection.py::test_assign_route_refuses_candidate_that_misses_current_deadline
+ledger_issues:
+  - booking.routing-assign is marked migrated, but its route-specification-satisfied rule is not enforced by CargoRouting.assign_route when a candidate becomes stale after a deadline change.
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: The application layer imports django.http.Http404, a known ADR-0001 layering violation from BK-05C.
+    origin: BK-05C
+    evidence: "run: idiom-layers"
+rules:
+  - capability: booking.routing-chain
+    rule: Candidate routes come from RoutingService through CargoRouting.route_candidates and are filtered against the current specification, including arrival before the deadline.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+  - capability: booking.routing-assign
+    rule: Assignment requires a valid signed candidate associated with an existing cargo identified by the requested tracking ID; token validation is performed at the interface boundary.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
+    enforced: true
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: The selected itinerary must satisfy the cargo's current route specification before assignment.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/interfaces/test_route_selection.py::test_assign_route_refuses_candidate_that_misses_current_deadline
+    enforced: false
+    ledger_rule: route-specification-satisfied
+  - capability: booking.routing-assign
+    rule: A valid selected itinerary is persisted and the cargo's route state is recalculated.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+no_rules:
+  booking.screen-route: This capability presents cargo details, candidate counts, numbered itinerary legs, and empty-state guidance; it has no independent business rule.
+  booking.screen-select-itinerary: This capability presents available candidates or the no-route guidance; it has no independent business rule.
+mutation_survivors:
+  source: .migration/evidence/mutants/BK-05F.md (last successful run; fresh run produced no score or updated survivor list)
+  classifications:
+    - "#1: Equivalent; candidate tokens are opaque, and generation and verification share the same salt."
+    - "#2: No current cross-purpose signer exists in application source, so no current behavior change is demonstrated; using the default salt would remove the dedicated signing namespace."
+    - "#10, #13, #27, #44, #46: Equivalent; the changed diagnostic text is caught or renders through the same HTTP 404 response."
+    - '#14: Equivalent; "X" is unreserved and remains unquoted for both values of the safe set.'
+    - "#40: Equivalent; both missing-token fallback values fail signature validation and produce the same 404."
