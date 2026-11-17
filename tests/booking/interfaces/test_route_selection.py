@@ -200,7 +200,9 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(('page', 'method'), [('route', 'get'), ('itineraries', 'get'), ('route', 'post')])
+@pytest.mark.parametrize(
+    ('page', 'method'), [('route', 'get'), ('itineraries', 'get'), ('route', 'post')]
+)
 @pytest.mark.parametrize('stale', [False, True])
 @override_settings(ROOT_URLCONF=__name__)
 def test_route_selection_returns_cargo_not_found_for_unknown_or_stale_tracking_ids(

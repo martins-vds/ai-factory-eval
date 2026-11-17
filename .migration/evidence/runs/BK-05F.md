@@ -84,3 +84,16 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T23:03:25+00:00 | verifier-focused-tests-rerun | 1 | 1.5 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_cargo_not_found_for_unknown_or_stale_tracking_ids tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_after_deadline_changes` | `1c58a34e6250724d` | assert response.status_code == 404 |  |
 | 2026-11-17T23:03:35+00:00 | verifier-focused-tests-final | 0 | 1.42 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_cargo_not_found_for_unknown_or_stale_tracking_ids tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_after_deadline_changes` | `62be854e1a3bf172` |  |  |
 | 2026-11-17T23:04:47+00:00 | usecase-deadline-rule | 1 | 1.24 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_assign_route_refuses_candidate_that_misses_current_deadline` | `e0967d7325a176b3` | >       assert assigned.delivery.routing_status.value != 'MISROUTED' |  |
+| 2026-11-17T23:05:36+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:05:37+00:00 | build-django-check | 0 | 0.25 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T23:05:37+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T23:05:37+00:00 | idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `5957666f02e37225` |  |  |
+| 2026-11-17T23:05:37+00:00 | idiom-layers | 0 | 0.09 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T23:05:37+00:00 | idiom-ui | 0 | 0.28 | `python .migration/harness/tools/check_ui.py` | `1846abbe0bc17244` |  | gate=ui scope="templates changed since 9b8bcfb64b432090170a3b265ef0ff1818db9dce" templates=0 findings=0 |
+| 2026-11-17T23:06:12+00:00 | behavior | 1 | 34.37 | `pytest -q` | `9e3da742097a0693` | >       assert assigned.delivery.routing_status.value != 'MISROUTED' |  |
+| 2026-11-17T23:06:45+00:00 | regression | 1 | 33.74 | `pytest -q` | `145541de31b76a55` | >       assert assigned.delivery.routing_status.value != 'MISROUTED' |  |
+| 2026-11-17T23:07:24+00:00 | crap-coverage | 1 | 38.26 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `da283f9fa8b3ae4d` | >       assert assigned.delivery.routing_status.value != 'MISROUTED' |  |
+| 2026-11-17T23:07:24+00:00 | crap-lizard | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:07:24+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T23:14:10+00:00 | idiom-format-fix | 0 | 0.02 | `ruff format tests/booking/interfaces/test_route_selection.py` | `413a709001976657` |  |  |
+| 2026-11-17T23:14:19+00:00 | idiom-ruff-format-final | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
