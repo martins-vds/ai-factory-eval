@@ -76,6 +76,20 @@ def test_fee_for_returned_loan_uses_return_date_instead_of_today():
     assert fee.amount_cents == 75
 
 
+def test_fee_for_early_unreturned_loan_clamps_late_days_at_zero():
+    due_on = date(2026, 1, 10)
+    application = FeeApplication(
+        LoanRepository(Loan('L1', due_on)),
+        Clock(due_on - timedelta(days=5)),
+        PaymentGateway(),
+    )
+
+    fee = application.fee_for('L1')
+
+    assert fee.days_late == 0
+    assert fee.amount_cents == 0
+
+
 def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 

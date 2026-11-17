@@ -1,0 +1,63 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1249
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: coverage run stops at the failing htmx configuration assertion before CRAP analysis"
+  mutation_changed: "n/a: mutmut baseline fails on the htmx configuration assertion, so no mutation score is produced"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/templates/fees/payment-form.html:3
+    what: "The htmx payment form has no error-response handler; 4xx/5xx gateway error fragments are not swapped into the page."
+    evidence: tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_error_responses
+  - severity: minor
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/templates/fees/payment-form.html:5
+    what: "The payment button's bg-[#a94e37], text-white, and hover:bg-[#873b2a] utilities are absent from the committed Tailwind CSS."
+    evidence: "run: verifier-idiom-final-3"
+  - severity: minor
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/.migration/harness/installed.json:4
+    what: "The PR changes only installed_at in the pinned harness manifest; check_installed passes because installed_at is not content-hashed."
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_fee_for_early_unreturned_loan_clamps_late_days_at_zero
+  - tests/fees/test_fee_calculation.py::test_pay_existing_loan_calls_gateway
+  - tests/fees/test_fee_calculation.py::test_pay_unknown_loan_does_not_call_gateway
+  - tests/fees/test_endpoints.py::test_fee_page_configures_htmx_to_swap_error_responses
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_unsupported_methods
+ledger_issues:
+  - "The three LL-03 entries correctly remain in-progress, but none declares rules or no_rules; record the capability rules before promoting them."
+  - "The LL-02 mutation report documents known module-level survivors on route literals, method guards, and LoanForm.Meta.model as harness test-selection artifacts. The final LL-03 mutation run stopped at the failing baseline before listing survivors; fee/payment routes were checked with supported and unsupported methods."
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+rules:
+  - capability: fees.calculation
+    rule: "Late days clamp at zero; days 0–2 are waived; later days accrue 25 cents per day up to 1000 cents."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "A returned loan's fee uses returned_on rather than the current clock date."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_returned_loan_uses_return_date_instead_of_today
+    enforced: true
+  - capability: fees.page
+    rule: "An unknown loan has no fee to display."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "An unknown loan is refused before a gateway charge is attempted."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_calculation.py::test_pay_unknown_loan_does_not_call_gateway
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "For an existing loan, payment delegates to the gateway and returns its response."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_calculation.py::test_pay_existing_loan_calls_gateway
+    enforced: true
