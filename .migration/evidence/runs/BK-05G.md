@@ -49,3 +49,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:33:53+00:00 | restored-dashboard-scope | 0 | 7.12 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fa17fd845c748e59` |  |  |
 | 2026-11-08T00:35:07+00:00 | tests | 0 | 62.88 | `pytest -q` | `3cef3b8b6572c8e4` |  |  |
 | 2026-11-17T12:45:40+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T12:53:25+00:00 | no-js-fallback-check | 1 | 2.9 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_not_routed_dialog_actions_have_non_javascript_fallbacks` | `34d6ddbf4daed9a9` | >       assert re.search(r'<a\b[^>]*href="/admin/cargo/DEF789/destination/"', not_routed_table) |  |
+| 2026-11-17T12:53:46+00:00 | dialogs-verifier | 1 | 5.66 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `9bec4ffc7efc5255` | >       assert re.search(rf'<a\b[^>]*href="/admin/cargo/DEF789/{dialog}/"', not_routed_table) |  |

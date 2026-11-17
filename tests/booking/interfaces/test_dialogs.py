@@ -64,6 +64,16 @@ def test_not_routed_table_exposes_destination_and_deadline_dialogs(client):
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
 
 
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+def test_not_routed_dialog_actions_have_non_javascript_fallbacks(client, dialog):
+    response = client.get('/admin/dashboard/')
+    not_routed_table = (
+        response.content.decode().split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+    )
+
+    assert re.search(rf'<a\b[^>]*href="/admin/cargo/DEF789/{dialog}/"', not_routed_table)
+
+
 def test_destination_dialog_filters_options_without_mutating_locations(client):
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
@@ -91,8 +101,9 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+def test_unknown_cargo_dialog_returns_not_found(client, dialog):
+    response = client.get(f'/admin/cargo/MISSING1/{dialog}/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
 
