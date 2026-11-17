@@ -18,3 +18,18 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
+| 2026-11-17T03:17:05+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:18:13+00:00 | build-compileall | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:18:19+00:00 | build-django-check | 0 | 1.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T03:18:24+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T03:18:27+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-17T03:18:30+00:00 | idiom-layers | 1 | 0.15 | `python .migration/harness/tools/check_layers.py` | `844177b805e7a5cb` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=1 known=3 |
+| 2026-11-17T03:19:36+00:00 | tests | 0 | 59.49 | `pytest -q` | `ff1f030f985df6ad` |  |  |
+| 2026-11-17T03:20:36+00:00 | crap-coverage | 0 | 56.47 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `cd209c5e524cf9dd` |  |  |
+| 2026-11-17T03:20:39+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T03:20:42+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
+| 2026-11-17T03:30:22+00:00 | mutation-changed | 0 | 568.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `99c3c637fc12de56` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=origin/main |
+| 2026-11-17T03:32:14+00:00 | tests-not-found-message | 1 | 2.31 | `pytest -q tests/booking/interfaces/test_cargo_details.py::test_unknown_and_stale_cargo_details_show_not_found_message` | `b92acfcd43057904` | >       assert b'Cargo with tracking ID UNKNOWN not found.' in unknown_response.content |  |
+| 2026-11-17T03:33:26+00:00 | tests | 1 | 59.48 | `pytest -q` | `c2931ef9d4488146` | >       assert b'Cargo with tracking ID UNKNOWN not found.' in unknown_response.content |  |
+| 2026-11-17T03:33:39+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T03:33:42+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
