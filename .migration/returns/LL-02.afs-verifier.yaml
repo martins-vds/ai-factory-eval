@@ -1,0 +1,71 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: martins-vds/ai-factory-eval#1273
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutation run failed before scoring because behavior tests fail"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: The use cases import Django timezone and instantiate LoanRepository directly, violating the profile's use-case dependency contract; check_layers reports both violations.
+    evidence: "run: verifier-idiom-final"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: lend_loan accepts blank member and ISBN values when called directly; required-field validation exists only in the form/view layer.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - severity: major
+    where: src/loans/views.py:79-81
+    what: An unknown UI return returns plain-text 404, and the changed HTMX templates have no 4xx response handler, so the error is not rendered to the user.
+    evidence: tests/loans/test_catalog.py::test_htmx_unknown_return_renders_an_accessible_error
+  - severity: major
+    where: templates/loans/detail.html:27
+    what: Changed reading-room templates use Tailwind utilities absent from static/css/tailwind.css, so multiple controls and layout styles are ignored.
+    evidence: "run: verifier-ui-checks-final"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: The last successful survivor report is stale because the fresh mutation run stopped on failing behavior tests. Behavior-changing survivors include method decorators #8/#24/#54/#65, htmx branching #44, unknown-return responses #68-70, and repository transaction.atomic #2. Existing tests exercise the route/flow behaviors; new tests expose the unknown-return UI failure and exercise the transaction boundary, but no fresh mutation score confirmed any kills.
+ledger_issues:
+  - loan.lend is marked migrated with blank-value rejection, but its target use case accepts blank values; the API boundary tests alone do not prove this rule is enforced by lend_loan.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_loan_list_export_escapes_field_and_record_delimiters
+  - tests/loans/test_catalog.py::test_return_use_case_refuses_a_repeat_without_replacing_date
+  - tests/loans/test_catalog.py::test_return_use_case_refuses_an_unknown_loan
+  - tests/loans/test_catalog.py::test_return_use_case_updates_a_loan_outside_an_existing_transaction
+  - tests/loans/test_catalog.py::test_htmx_unknown_return_renders_an_accessible_error
+rules:
+  - capability: loan.lend
+    rule: Missing or blank member and ISBN values must be refused before a loan is created.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: false
+  - capability: loan.return-date
+    rule: A repeated return must be refused without replacing the original saved return date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_refuses_a_repeat_without_replacing_date
+    enforced: true
+  - capability: loan.return
+    rule: A repeated return must be refused so the API can answer 409.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_refuses_a_repeat_without_replacing_date
+    enforced: true
+  - capability: loan.return
+    rule: An unknown loan id must be refused without changing loan state.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_refuses_an_unknown_loan
+    enforced: true
+no_rules: {}
+inherited: []

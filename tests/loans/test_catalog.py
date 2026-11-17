@@ -1,5 +1,7 @@
+import csv
 import json
 from datetime import date, timedelta
+from io import StringIO
 from pathlib import Path
 
 import pytest
@@ -11,6 +13,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -51,6 +54,18 @@ def test_detail_endpoint_returns_not_found_for_unknown_loan(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn', 'field'),
+    [('', '123', 'member'), ('reader', '', 'isbn')],
+)
+def test_lend_use_case_rejects_blank_required_fields(member, isbn, field):
+    with pytest.raises(ValidationError) as error:
+        lend_loan(member=member, isbn=isbn)
+
+    assert field in error.value.message_dict
 
 
 @pytest.mark.django_db
@@ -96,11 +111,37 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
 
 
 @pytest.mark.django_db
+def test_loan_list_export_escapes_field_and_record_delimiters(client):
+    lent_on = timezone.localdate()
+    due_on = lent_on + timedelta(days=14)
+    member = 'reader\none'
+    isbn = '978;123'
+    response = client.post('/loans', {'member': member, 'isbn': isbn})
+
+    assert response.status_code == 201
+
+    export = client.get('/loans')
+    records = list(csv.reader(StringIO(export.content.decode(), newline=''), delimiter=';'))
+
+    assert export.status_code == 200
+    assert records[-1] == [
+        'L4',
+        member,
+        isbn,
+        lent_on.isoformat(),
+        due_on.isoformat(),
+        '',
+    ]
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ('payload', 'field'),
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -150,6 +191,30 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_refuses_a_repeat_without_replacing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert loan.id == 'L2'
+    assert not updated
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_refuses_an_unknown_loan():
+    assert return_loan('unknown') == (None, False)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_use_case_updates_a_loan_outside_an_existing_transaction():
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == timezone.localdate()
 
 
 @pytest.mark.django_db
@@ -367,6 +432,14 @@ def test_browser_can_return_a_loan_with_htmx(client):
     assert response.status_code == 200
     assert f'Returned on {returned_on.isoformat()}'.encode() in response.content
     assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_htmx_unknown_return_renders_an_accessible_error(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
 
 
 @pytest.mark.django_db
