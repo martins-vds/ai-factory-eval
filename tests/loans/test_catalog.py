@@ -1,16 +1,18 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
-from django.db import IntegrityError
+from django.db import IntegrityError, close_old_connections
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -115,6 +117,44 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, payload, field):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('payload', 'field'),
+    [
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'reader', 'isbn': ''}, 'isbn'),
+    ],
+)
+def test_lend_endpoint_rejects_empty_fields(payload, field, client):
+    response = client.post('/loans', payload)
+
+    assert response.status_code == 400
+    assert field.encode() in response.content
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [('', '123'), ('reader', '')],
+)
+def test_lend_use_case_rejects_blank_member_and_isbn(member, isbn):
+    with pytest.raises(ValidationError):
+        lend_loan(member, isbn)
+
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+def test_lend_use_case_sets_a_fourteen_day_due_date():
+    lent_on = timezone.localdate()
+
+    loan = lend_loan('reader', '123')
+
+    assert loan.lent_on == lent_on
+    assert loan.due_on == lent_on + timedelta(days=14)
+
+
+@pytest.mark.django_db
 def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     response = client.post('/loans', {})
 
@@ -150,6 +190,36 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_records_today():
+    returned_on = timezone.localdate()
+
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeated_return_without_replacing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert not updated
 
 
 @pytest.mark.django_db
@@ -323,6 +393,16 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
 
 
 @pytest.mark.django_db
+def test_browser_lending_page_shows_errors_for_empty_fields(client):
+    response = client.post('/ui/loans/new/', {'member': '', 'isbn': ''})
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert response.content.count(b'This field is required.') == 2
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
 def test_browser_can_lend_a_book_with_htmx(client):
     form_response = client.get('/ui/loans/new/')
 
@@ -405,6 +485,28 @@ def test_real_browser_can_lend_and_return_a_book(live_server):
             browser.close()
 
 
+@pytest.mark.django_db(transaction=True)
+def test_real_browser_shows_error_when_returned_loan_disappears(live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/loans/L1/')
+
+            def delete_loan():
+                try:
+                    Loan.objects.filter(pk='L1').delete()
+                finally:
+                    close_old_connections()
+
+            with ThreadPoolExecutor() as executor:
+                executor.submit(delete_loan).result()
+            page.get_by_role('button', name='Return book').click()
+            page.get_by_role('alert').wait_for(timeout=1500)
+        finally:
+            browser.close()
+
+
 @pytest.mark.django_db
 def test_browser_repeat_return_keeps_original_date(client):
     original_return_date = date(2026, 1, 20)
@@ -424,6 +526,7 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
