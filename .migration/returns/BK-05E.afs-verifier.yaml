@@ -1,0 +1,43 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: "https://github.com/martins-vds/ai-factory-eval/pull/1037"
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:7
+    what: The dashboard adapter imports and queries CargoRepository directly instead of invoking a use case, violating ADR-0001.
+    evidence: "run: idiom-layers"
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_unrouted_cargo_details_link_to_route_selection
+  - tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_show_reroute_action
+ledger_issues:
+  - booking.screen-cargo-details in .migration/ledger/booking.screen-cargo-details.yaml should cite the new tests for unrouted and misdirected state actions.
+quirk_tickets: []
+inherited:
+  - where: templates/booking/wizard/_deadline_form.html:5
+    what: The UI gate reports unhandled htmx 4xx/5xx responses in this wizard form.
+    origin: BK-05D
+    evidence: "run: idiom-ui"
+crap_review: >-
+  The maximum 26.0 is _prepare_tables(mapping, models) in
+  src/cargotracker/data_migration/loader.py:172-226 (100% coverage). A split is
+  advisable for maintainability given its CCN of 26, but it is unrelated to BK-05E
+  and is below the gate limit.
+survivor_assessment:
+  - >-
+    BK-05E mutant #12 changes only the Http404 reason text; the required unknown/stale
+    cargo behavior is the HTTP 404 status, which is covered. This survivor does not
+    reveal a missing BK-05E behavior.
+  - >-
+    The other survivors are in BK-05D wizard code and the data-migration exporter;
+    they are outside this ticket's scope and are not BK-05E findings.
