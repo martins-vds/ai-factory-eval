@@ -41,6 +41,15 @@ def test_fee_endpoint_returns_characterized_not_found_response(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_returns_not_found_response_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content.decode() == '<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
 def test_payment_endpoint_forwards_the_characterized_gateway_request(client, payment_gateway):
     expected = GATEWAY_GOLDENS['responses']['POST /payments/L1 via test gateway']['response']
 
@@ -125,6 +134,7 @@ def test_fee_page_payment_returns_gateway_status_fragment(client, payment_gatewa
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 200
+    assert response.content.startswith(b'<div id="payment-status"')
     assert b'role="status"' in response.content
     assert b'charged' in response.content
     assert b'id="payment-status"' in response.content
@@ -139,8 +149,19 @@ def test_fee_page_payment_shows_gateway_failure_fragment(client, payment_gateway
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 502
+    assert response.content.startswith(b'<div id="payment-status"')
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_payment_rejects_unknown_loan_without_calling_gateway(client, payment_gateway):
+    response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert payment_gateway.requests == []
 
 
 @pytest.mark.django_db
@@ -162,6 +183,7 @@ def test_non_htmx_payment_renders_full_fee_page_and_result(
     assert response.status_code == response_status
     assert response['Content-Type'] == 'text/html; charset=utf-8'
     assert b'Late fee for L1' in response.content
+    assert b'2026-01-16' in response.content
     assert b'Fee: $10.00' in response.content
     assert f'role="{role}"'.encode() in response.content
     assert result in response.content
