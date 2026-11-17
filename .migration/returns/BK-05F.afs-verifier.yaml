@@ -1,0 +1,28 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/766
+verdict: blocked
+blocked_reason: "mutation_changed: interrupted before completion due to the user time limit; no fresh score"
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: interrupted before completion due to the user time limit"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_stale_tracking_id
+ledger_issues: []
+quirk_tickets: []
+mutation_survivors:
+  report: .migration/evidence/mutants/BK-05F.md
+  last_completed_run_score: 0.855
+  assessment:
+    - mutants [1, 2]: equivalent; signing salt changes do not alter candidate validation behavior.
+    - mutants [10, 13, 27, 44, 46]: equivalent; exception diagnostic text changes do not alter the HTTP 404 response.
+    - mutant [14]: equivalent; X is unreserved and remains unescaped with either safe argument.
+    - mutant [40]: equivalent; either missing-token fallback fails signature validation and produces the same 404.
