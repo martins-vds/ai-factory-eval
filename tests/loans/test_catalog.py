@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -125,6 +126,22 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('payload', 'field'),
+    [
+        ({'member': ' ', 'isbn': '123'}, 'member'),
+        ({'member': 'reader', 'isbn': ' '}, 'isbn'),
+    ],
+)
+def test_lend_use_case_rejects_blank_fields(payload, field):
+    with pytest.raises(ValidationError) as error:
+        lend_loan(**payload)
+
+    assert field in error.value.message_dict
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
 def test_return_endpoint_records_the_return_date(client):
     returned_on = timezone.localdate()
     golden = HTTP_GOLDENS['POST /loans/{id}/return']
@@ -149,6 +166,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response.status_code == 409
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_preserves_the_original_date_for_repeated_returns():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert not updated
+    assert loan.returned_on == original_return_date
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
 
 
