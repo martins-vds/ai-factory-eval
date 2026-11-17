@@ -1,0 +1,37 @@
+[
+  {
+    "at": "2026-11-17T03:45:29Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20904,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05E",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/fcff195a-0766-4202-86c9-7c93f0e74416.json",
+      ".migration/evidence/runs/BK-05E.md",
+      ".migration/returns/BK-05E.afs-verifier.yaml",
+      "tests/booking/interfaces/test_cargo_details.py"
+    ],
+    "findings": [
+      "[mechanical] CI's validate.py will fail on this: .migration/returns/BK-05E.afs-verifier.yaml: invalid YAML: mapping values are not allowed here. Fix it and commit.",
+      "[mechanical] CI's validate.py will fail on this: in \".migration/returns/BK-05E.afs-verifier.yaml\", line 19, column 18. Fix it and commit.",
+      "[mechanical] `.migration/returns/BK-05E.afs-verifier.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]

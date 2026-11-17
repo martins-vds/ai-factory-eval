@@ -63,3 +63,5 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+    assert 'cargo not found' in unknown_response.content.decode().lower()
+    assert 'cargo not found' in stale_response.content.decode().lower()
