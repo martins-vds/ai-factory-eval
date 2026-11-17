@@ -1,13 +1,13 @@
 import os
 from dataclasses import dataclass
-from urllib.error import HTTPError, URLError
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
-@dataclass(frozen=True)
+@dataclass
 class PaymentResponse:
     status: int
     body: str
@@ -38,14 +38,10 @@ def charge_loan(loan_id: str) -> PaymentResponse:
         try:
             with response:
                 body = response.read().decode('utf-8', errors='replace')
-        except InterruptedError as error:
-            raise PaymentGatewayError('payment gateway unavailable') from error
-        except (URLError, OSError) as error:
-            raise PaymentGatewayError('payment gateway unavailable') from error
-        status = response.code
-    except InterruptedError as error:
-        raise PaymentGatewayError('payment gateway unavailable') from error
-    except (URLError, OSError) as error:
-        raise PaymentGatewayError('payment gateway unavailable') from error
+        except OSError as error:
+            raise PaymentGatewayError from error
+        return PaymentResponse(502, body)
+    except OSError as error:
+        raise PaymentGatewayError from error
 
     return PaymentResponse(status if status == 200 else 502, body)

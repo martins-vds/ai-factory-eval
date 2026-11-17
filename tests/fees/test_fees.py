@@ -3,6 +3,7 @@ import re
 import threading
 from contextlib import contextmanager
 from datetime import date, timedelta
+from urllib.error import HTTPError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
@@ -42,7 +43,7 @@ def payment_gateway(status, body):
             if 300 <= status < 400:
                 self.send_header('Location', '/redirected')
             self.end_headers()
-            self.wfile.write(body.encode())
+            self.wfile.write(body if isinstance(body, bytes) else body.encode())
 
         def log_message(self, format, *args):
             pass
@@ -97,6 +98,8 @@ def test_fee_api_caps_fees_and_uses_the_return_date(client, loan_id, amount):
 
     assert response.status_code == 200
     assert response.content.decode().endswith(f'Fee: {amount}</p>')
+    if loan_id == 'L2':
+        assert b'0 day(s) late' in response.content
 
 
 @pytest.mark.django_db
@@ -174,6 +177,7 @@ def test_payment_api_returns_gateway_failure_when_the_call_is_interrupted(client
         response = client.post('/payments/L1')
 
     assert response.status_code == 502
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'payment gateway unavailable\n'
 
 
@@ -185,6 +189,7 @@ def test_payment_api_returns_gateway_failure_when_the_gateway_is_unavailable(cli
         response = client.post('/payments/L1')
 
     assert response.status_code == 502
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'payment gateway unavailable\n'
 
 
@@ -199,6 +204,26 @@ def test_fee_page_uses_reading_room_layout_and_htmx_payment_action(client):
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'hx-target="#payment-status"' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_lists_loans_and_their_fees(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    for loan_id in ('L1', 'L2', 'L3'):
+        assert f'href="/ui/fees/{loan_id}/"'.encode() in response.content
+    assert b'L1 \xc2\xb7 ana' in response.content
+    assert b'L2 \xc2\xb7 bo' in response.content
+    assert b'$10.00' in response.content
+    assert b'$0.00' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
@@ -229,6 +254,31 @@ def test_htmx_payment_action_displays_gateway_failure(client, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_htmx_payment_action_displays_unknown_loan_failure(client, monkeypatch):
+    with payment_gateway(200, 'charged\n') as (gateway_url, requests):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+        response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'Payment could not be completed: No such loan.' in response.content
+    assert requests == []
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_displays_gateway_unavailable(client):
+    with patch('src.fees.gateway.build_opener') as build_opener:
+        build_opener.return_value.open.side_effect = OSError('connection refused')
+
+        response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'Payment could not be completed: payment gateway unavailable' in response.content
+
+
+@pytest.mark.django_db
 def test_fee_page_loads_in_a_real_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -243,3 +293,87 @@ def test_fee_page_loads_in_a_real_browser(live_server):
             assert page.get_by_role('button', name='Pay late fee').is_visible()
         finally:
             browser.close()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L1'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L1/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.parametrize(
+    ('gateway_status', 'expected_status'),
+    [(200, 200), (503, 502)],
+)
+@pytest.mark.django_db
+def test_payment_api_replaces_invalid_gateway_utf8(
+    client, monkeypatch, gateway_status, expected_status
+):
+    with payment_gateway(gateway_status, b'\xff') as (gateway_url, _):
+        monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
+
+        response = client.post('/payments/L1')
+
+    assert response.status_code == expected_status
+    assert response.content == '\ufffd'.encode()
+
+
+def test_gateway_uses_the_characterized_default_url(monkeypatch):
+    class GatewayResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return None
+
+        def read(self):
+            return b'charged\n'
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    with patch('src.fees.gateway.build_opener') as build_opener:
+        build_opener.return_value.open.return_value = GatewayResponse()
+
+        response = charge_loan('L1')
+
+    request = build_opener.return_value.open.call_args.args[0]
+    assert response.status == 200
+    assert request.method == 'POST'
+    assert request.data is None
+    assert request.full_url == 'https://payments.lending-library.invalid/charge?loan=L1'
+
+
+@pytest.mark.parametrize('error_type', [InterruptedError, OSError])
+def test_gateway_keeps_errors_reading_a_non_success_response(error_type):
+    error = error_type('gateway response interrupted')
+
+    class FailedResponse:
+        closed = False
+
+        def read(self):
+            raise error
+
+        def close(self):
+            self.closed = True
+
+    response = HTTPError(
+        'https://payments.lending-library.invalid', 503, 'Unavailable', {}, FailedResponse()
+    )
+    with patch('src.fees.gateway.build_opener') as build_opener:
+        build_opener.return_value.open.side_effect = response
+
+        with pytest.raises(PaymentGatewayError) as failure:
+            charge_loan('L1')
+
+    assert failure.value.__cause__ is error
