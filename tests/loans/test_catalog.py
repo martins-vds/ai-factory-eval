@@ -9,7 +9,9 @@ from django.db import IntegrityError, connection
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
-GOLDENS = Path(__file__).resolve().parents[2] / '.migration' / 'characterization' / 'source' / 'goldens'
+GOLDENS = (
+    Path(__file__).resolve().parents[2] / '.migration' / 'characterization' / 'source' / 'goldens'
+)
 
 
 @pytest.mark.django_db
