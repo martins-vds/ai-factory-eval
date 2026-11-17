@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -56,6 +67,41 @@
         "permissionRequest",
         "promptRequest",
         "requestId"
+      ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
       ],
       "session.model_change": [
         "contextTier",
@@ -182,31 +228,35 @@
       ]
     },
     "event_types": {
-      "assistant.message": 121,
-      "assistant.turn_end": 60,
-      "assistant.turn_start": 61,
-      "hook.end": 234,
-      "hook.start": 235,
-      "permission.completed": 99,
-      "permission.requested": 99,
+      "assistant.message": 226,
+      "assistant.turn_end": 124,
+      "assistant.turn_start": 124,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 396,
+      "hook.start": 397,
+      "permission.completed": 153,
+      "permission.requested": 153,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.model_change": 2,
       "session.start": 1,
-      "session.usage_record": 60,
-      "skill.context_delivered_ref": 6,
-      "skill.invoked": 6,
-      "subagent.completed": 1,
+      "session.usage_record": 124,
+      "skill.context_delivered_ref": 7,
+      "skill.invoked": 7,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 141,
-      "tool.execution_start": 141,
+      "tool.execution_complete": 232,
+      "tool.execution_start": 232,
       "user.message": 3
     },
-    "events": 1280,
+    "events": 2199,
     "usage_fields": []
   },
-  "ended_at": "2026-11-17T12:44:58.072Z",
+  "ended_at": "2026-11-17T13:06:29.522Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -215,12 +265,12 @@
       "tool": "afs-mutation"
     },
     {
-      "count": 9,
+      "count": 11,
       "exit": 0,
       "tool": "afs-run"
     },
     {
-      "count": 7,
+      "count": 13,
       "exit": 1,
       "tool": "afs-run"
     },
@@ -240,7 +290,7 @@
       "tool": "check_layers.py"
     },
     {
-      "count": 1,
+      "count": 5,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -250,7 +300,7 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 1,
+      "count": 5,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -268,11 +318,11 @@
     },
     "gpt-6-luna": {
       "output": 0,
-      "requests": 111
+      "requests": 216
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-17T12:44:59+00:00",
+  "recorded_at": "2026-11-17T13:06:54+00:00",
   "schema": "afs-cost/1",
   "session_id": "cf906076-cf73-48c8-a8db-d4b2c218c429",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -280,6 +330,10 @@
     {
       "count": 1,
       "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-handoff"
     },
     {
       "count": 1,
@@ -304,6 +358,5 @@
   ],
   "started_at": "2026-11-17T12:33:42.717Z",
   "surface": "coding-agent",
-  "trigger_id": "82f9c3e5-d500-4dd4-b085-6a26e7fa4a75",
   "usage_source": "assistant.message (output only, partial)"
 }
