@@ -58,3 +58,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T23:12:28+00:00 | idiom-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
 | 2026-11-17T23:12:28+00:00 | idiom-ui | 1 | 0.5 | `python .migration/harness/tools/check_ui.py` | `1c671b622318ec51` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since 9bb7454a64b2f5a3b015b1f7125db4b721cb4f05" templates=3 findings=3 |
 | 2026-11-17T23:13:33+00:00 | regression | 0 | 64.92 | `pytest -q` | `bad91fb01ed5ed3c` |  |  |
+| 2026-11-17T23:15:13+00:00 | crap-pytest-cov | 0 | 67.44 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `e8b54312a5f52af9` |  |  |
+| 2026-11-17T23:15:13+00:00 | crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T23:15:13+00:00 | crap-report | 0 | 0.05 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T23:17:53+00:00 | mutation-changed | 0 | 159.21 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
+| 2026-11-17T23:20:03+00:00 | usecase-destination-rule | 0 | 2.07 | `pytest -q tests/booking/application/test_specification.py::test_change_destination_rejects_origin_as_destination` | `1c6b0233fa8cd732` |  |  |
+| 2026-11-17T23:21:43+00:00 | behavior-final | 0 | 76.54 | `pytest -q` | `c2b44355b148548b` |  |  |
+| 2026-11-17T23:22:51+00:00 | regression-final | 0 | 67.38 | `pytest -q` | `4b4612cf53fe6f14` |  |  |
+| 2026-11-17T23:22:51+00:00 | idiom-ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T23:22:51+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T23:25:26+00:00 | mutation-changed-final | 0 | 154.82 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
