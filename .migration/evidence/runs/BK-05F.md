@@ -90,3 +90,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T05:42:35+00:00 | verifier-crap-coverage | 0 | 61.75 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `b38ca1b2d67100c3` |  |  |
 | 2026-11-17T05:42:35+00:00 | verifier-crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T05:42:35+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-17T05:53:17+00:00 | verifier-stale-route-404-test | 0 | 4.22 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_unknown_and_stale_tracking_ids_return_404_on_route_screens` | `24f7c1c0f8a4534c` |  |  |
+| 2026-11-17T05:53:17+00:00 | verifier-post-test-ruff-check | 0 | 0.02 | `ruff check tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T05:53:17+00:00 | verifier-post-test-ruff-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py` | `fd2299c9f1c6dc86` |  |  |
