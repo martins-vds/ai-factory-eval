@@ -15,7 +15,7 @@ evidence_logs:
 findings:
   - severity: minor
     where: .migration/evidence/mutants/LL-03.md:5
-    what: "Known module-level route and LoanForm.Meta.model survivors remain; direct route and method behavior tests pass, including wrong-method 405s. All 11 survivors are recorded in the mutation artifact."
+    what: "Known module-level route/view and LoanForm.Meta.model survivors remain; direct route/method, htmx/full-page, and default-URL behavior tests pass. All 11 survivors are recorded in the mutation artifact."
   - severity: minor
     where: .migration/harness/installed.json:4
     what: "installed_at changed outside LL-03's allowed files; check_installed passes because pinned file hashes are unchanged."
@@ -32,7 +32,7 @@ tests_added:
   - tests/fees/test_endpoints.py::test_fee_page_payment_rejects_unknown_loan_without_calling_gateway
   - tests/fees/test_endpoints.py::test_gateway_uses_the_default_url_when_no_override_is_configured
 ledger_issues:
-  - "The three LL-03 entries validate and cite passing target evidence, but remain in-progress after all ticket gates passed; promote them when the slice coordinator accepts the slice."
+  - "The three LL-03 entries validate and cite passing target evidence, but remain in-progress; the Migrator handoff requested promotion after regression and remaining gates pass, which they now do."
   - "integration.payment-gateway does not yet cite test_gateway_uses_the_default_url_when_no_override_is_configured for the configured-default behavior."
 quirk_tickets:
   - martins-vds/ai-factory-synthetic-target#40
