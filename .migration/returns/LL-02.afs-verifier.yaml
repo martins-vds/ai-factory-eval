@@ -1,0 +1,95 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1240
+pr: martins-vds/ai-factory-eval#1245
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: behavior tests fail before the CRAP calculation runs"
+  mutation_changed: "n/a: mutmut fails its baseline because the added evidence tests expose defects"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/src/loans/services.py:9-16
+    what: lend_loan accepts and persists blank member or ISBN values when called directly, so required-field validation is confined to the form/view.
+    evidence: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - severity: major
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/src/loans/services.py:4-6
+    what: The use-case module imports Django and LoanRepository directly, violating the ports-only layer contract in synthetic ruling #79.
+    evidence: "run: verifier-idiom-final-final-final"
+  - severity: major
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/src/loans/views.py:80-81
+    what: An unknown loan returns plain-text 404 to the htmx return action; htmx does not swap 404 responses, so the reading-room user receives no error feedback.
+    evidence: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_real_browser_shows_error_when_returned_loan_disappears
+  - severity: minor
+    where: /home/runner/work/ai-factory-eval/ai-factory-eval/templates/loans/detail.html:27
+    what: Changed reading-room templates use Tailwind utilities absent from static/css/tailwind.css, leaving several button and layout styles unapplied.
+    evidence: "run: verifier-ui-final"
+tests_added:
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_lend_endpoint_rejects_empty_fields
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_lend_use_case_sets_a_fourteen_day_due_date
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_records_today
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_rejects_unknown_loan
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_empty_fields
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_real_browser_shows_error_when_returned_loan_disappears
+  - /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues:
+  - loan.lend is correct at the API boundary, but its declared lend_loan use case does not enforce the required-field rule directly.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited: []
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN must be nonblank; the use case must refuse either blank value.
+    use_case: src.loans.services.lend_loan
+    test: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+    enforced: false
+  - capability: loan.lend
+    rule: A valid loan is dated today and due exactly 14 calendar days later.
+    use_case: src.loans.services.lend_loan
+    test: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_lend_use_case_sets_a_fourteen_day_due_date
+    enforced: true
+  - capability: loan.return-date
+    rule: A successful first return records today's date.
+    use_case: src.loans.services.return_loan
+    test: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_records_today
+    enforced: true
+  - capability: loan.return-date
+    rule: A repeated return must preserve the previously saved return date.
+    use_case: src.loans.services.return_loan
+    test: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+    enforced: true
+  - capability: loan.return
+    rule: Returning an unknown loan must report it absent and must not update a record.
+    use_case: src.loans.services.return_loan
+    test: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_rejects_unknown_loan
+    enforced: true
+  - capability: loan.return
+    rule: A repeated return must be rejected; the HTTP boundary responds with 409.
+    use_case: src.loans.services.return_loan
+    test: /home/runner/work/ai-factory-eval/ai-factory-eval/tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+    enforced: true
+no_rules: {}
+mutation_survivors:
+  prior_complete_run: .migration/evidence/mutants/LL-02.md (17 survivors; score 0.855)
+  behavior_changing_survivors:
+    - "src/loans/views.py #8: dropping the method guard changes unsupported /loans requests from 405 to a list response."
+    - "src/loans/views.py #24: dropping the method guard changes unsupported /ui/loans/new/ requests from 405."
+    - "src/loans/views.py #44: invalid non-htmx lending can return a fragment instead of the full page; covered by the new doctype assertion."
+    - "src/loans/views.py #54: dropping the POST guard allows other methods to invoke the API return use case."
+    - "src/loans/views.py #65: dropping the POST guard allows other methods to invoke the UI return use case."
+    - "src/loans/views.py #68, #69, #70: changing the unknown-loan response body, status or content type alters the UI return response; the current browser test proves this path is not rendered."
+    - "src/loans/views.py #79: removing the loan context changes the repeated-return detail; the new assertion pins the saved date shown."
+    - "src/loans/repository.py #2: removing transaction.atomic changes the locked update's PostgreSQL transaction behavior."
+    - "src/loans/forms.py #9: removing the form model breaks the lending form and its validation."
+  route_survivors:
+    - "src/loans/urls.py #2-#7 change the API return, API detail, UI list, UI lend, UI return and UI detail routes; current endpoint, smoke and browser tests exercise these paths."
+  fresh_run: verifier-mutation-changed-final-final reported score=n/a because the behavior baseline fails; current mutant kill status is unverified.
