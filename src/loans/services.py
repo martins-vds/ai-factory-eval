@@ -1,6 +1,7 @@
 import csv
 from io import StringIO
 
+from django.db import transaction
 from django.utils import timezone
 
 from .models import Loan
@@ -14,6 +15,18 @@ def lend_loan(member, isbn):
         isbn=isbn,
         lent_on=timezone.localdate(),
     )
+
+
+@transaction.atomic
+def return_loan(loan_id):
+    loan = Loan.objects.select_for_update().filter(pk=loan_id).first()
+    if loan is None:
+        return None
+    if loan.returned_on is not None:
+        return loan, False
+    loan.returned_on = timezone.localdate()
+    loan.save(update_fields=['returned_on'])
+    return loan, True
 
 
 def loan_line(loan):
