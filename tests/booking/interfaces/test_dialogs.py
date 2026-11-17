@@ -271,3 +271,20 @@ def test_dialog_update_rederives_route_state(client, field):
     updated = cargo_repository.find(cargo.tracking_id)
     assert updated is not None
     assert updated.delivery.routing_status is RoutingStatus.MISROUTED
+
+
+def test_change_destination_use_case_rejects_origin_as_destination():
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(cargo.tracking_id, cargo.route_specification.origin)
+
+    unchanged = cargo_repository.find(cargo.tracking_id)
+    assert unchanged is not None
+    assert unchanged.route_specification.destination == cargo.route_specification.destination
+
+
+def test_change_deadline_use_case_rejects_non_datetime_input():
+    with pytest.raises(TypeError, match='Arrival deadline must be a datetime'):
+        specification.change_deadline(TrackingId('DEF789'), 'not-a-date')
