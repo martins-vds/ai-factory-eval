@@ -96,3 +96,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T16:52:43+00:00 | verify-stale-screen-test | 0 | 1.49 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_screens_return_not_found_for_stale_cargo` | `87ceaed897e66904` |  |  |
 | 2026-11-17T16:52:44+00:00 | verify-test-ruff | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-17T16:52:44+00:00 | verify-test-format | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-17T16:53:45+00:00 | verify-behavior-final | 0 | 43.14 | `pytest -q` | `656bed577e0b5543` |  |  |
+| 2026-11-17T16:54:28+00:00 | verify-regression-final | 0 | 43.53 | `pytest -q` | `132007c3fb9a3423` |  |  |
+| 2026-11-17T16:54:35+00:00 | verify-mutation-changed-final | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-17T16:58:14+00:00 | verify-mutation-route-selection-final | 0 | 218.69 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
