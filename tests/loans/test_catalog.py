@@ -101,6 +101,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -148,6 +150,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
 
     assert response.status_code == 409
     assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'already returned\n'
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db(transaction=True)
+def test_repeat_return_keeps_date_outside_test_transaction(client):
+    original_return_date = date(2026, 1, 20)
+
+    response = client.post('/loans/L2/return')
+
+    assert response.status_code == 409
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
 
@@ -318,6 +331,7 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -424,7 +438,17 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_of_unknown_loan_is_not_found(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db

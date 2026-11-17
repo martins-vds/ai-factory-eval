@@ -1,0 +1,34 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/75
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.970
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "Use cases import Django timezone and the repository directly, violating the ports-only layer contract (two violations)."
+    evidence: "run: verify-idiom-final2"
+  - severity: minor
+    where: src/loans/forms.py:8
+    what: "The LoanForm Meta.model=None mutant remains a survivor; API/UI boundary tests pass, but this internal metadata mutant was not killed."
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_repeat_return_keeps_date_outside_test_transaction
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_browser_return_of_unknown_loan_is_not_found
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
