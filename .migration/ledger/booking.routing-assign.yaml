@@ -23,7 +23,15 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery"
   - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_missing_candidate_without_changing_cargo"
   - ".migration/evidence/runs/BK-05C.md"
   - ".migration/evidence/runs/BK-05F.md"
 notes: "Candidate assignment uses the application use case, persists the itinerary and redirects to cargo details under ruling #236. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]
+rules:
+  - id: route-candidate-valid
+    rule: "Assignment requires a submitted, valid signed candidate token associated with the requested cargo."
+    source: "src/cargotracker/booking/interfaces/route_selection/views.py:93-100"
+  - id: route-specification-satisfied
+    rule: "The selected itinerary must satisfy the cargo's current route specification before assignment."
+    source: "src/cargotracker/booking/interfaces/route_selection/views.py:35-38"

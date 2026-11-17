@@ -1,0 +1,54 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1186
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.869
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_missing_candidate_without_changing_cargo
+  - .migration/evidence/mutants/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+mutation_survivors:
+  - >-
+    #1: `_CANDIDATE_SALT = 'booking.route_selection'` → `'XXbooking.route_selectionXX'`.
+    Equivalent: the same runtime constant signs and verifies candidate tokens; candidates are not
+    persisted or exchanged outside the route-selection form.
+  - >-
+    #2: `_CANDIDATE_SALT = 'booking.route_selection'` → `None`. Equivalent for the same paired
+    signing/verification boundary; `None` selects Django's default signing salt consistently.
+  - >-
+    #10: the unknown-cargo POST `Http404` detail is wrapped in `XX`. Equivalent: the detail is
+    exception metadata; the user-visible response remains the same 404 page.
+  - >-
+    #13: the stale-route `Http404` detail is wrapped in `XX`. Equivalent: the route remains rejected
+    with the same user-visible 404 response.
+  - >-
+    #14: `quote(tracking_id, safe='')` → `quote(tracking_id, safe='XXXX')`. Equivalent: `X` is an
+    unreserved URI character and is never escaped by `quote`, so adding it to `safe` changes no URL.
+  - >-
+    #27: the unknown-cargo `Http404` detail from `_selection_context` is wrapped in `XX`. Equivalent:
+    the user-visible response remains the same 404 page.
+  - >-
+    #43: the caught `BadSignature` detail is wrapped in `XX`. Equivalent: the exception is translated
+    to the same invalid-candidate `Http404` response.
+  - >-
+    #45: the invalid-candidate `Http404` detail is wrapped in `XX`. Equivalent: the user-visible
+    response remains the same 404 page.
+quirk_tickets: []
+new_tickets: []
+handoff: none

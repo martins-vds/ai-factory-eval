@@ -24,3 +24,10 @@ evidence:
   - ".migration/evidence/runs/BK-05F.md"
 notes: "The target preserves the empty-route guidance and renders candidate itineraries under ruling #252; no named JUnit class exercises the source page."
 quirks: [martins-vds/ai-factory-pilot-target#252]
+rules:
+  - id: itinerary-screen-get-only
+    rule: "The itinerary-selection screen accepts GET requests only."
+    source: "src/cargotracker/booking/interfaces/route_selection/views.py:48-49"
+  - id: itinerary-screen-cargo-exists
+    rule: "An unknown cargo tracking ID returns HTTP 404 instead of rendering the itinerary screen."
+    source: "src/cargotracker/booking/interfaces/route_selection/views.py:67-70; ruling #232"

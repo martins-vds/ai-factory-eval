@@ -66,3 +66,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T21:43:00+00:00 | exact-empty-guidance | 0 | 1.5 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `7cfbd4174b4e5fac` |  |  |
 | 2026-11-17T21:43:07+00:00 | exact-guidance-mutant-probe | 1 | 1.49 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `6abb9c30581a3589` | assert route_response.status_code == 200 |  |
 | 2026-11-17T21:47:16+00:00 | mutation-changed | 0 | 226.08 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `803df353fa01ffcd` |  | gate=mutation score=0.869 threshold=0.8 killed=53 survived=8 files=1 base=origin/main |
+| 2026-11-17T21:48:00+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T21:48:00+00:00 | build-django-check | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T21:48:00+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T21:48:00+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T21:48:48+00:00 | behavior | 0 | 47.7 | `pytest -q` | `b45c62b56818adb3` |  |  |
+| 2026-11-17T21:49:34+00:00 | regression | 0 | 45.65 | `pytest -q` | `f562bcf1eda02561` |  |  |
+| 2026-11-17T21:50:20+00:00 | crap-coverage | 0 | 46.08 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `de66f716ed3d2ae2` |  |  |
+| 2026-11-17T21:50:20+00:00 | crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T21:50:20+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
