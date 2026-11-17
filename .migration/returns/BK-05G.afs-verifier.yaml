@@ -16,7 +16,7 @@ findings:
   - severity: major
     where: templates/booking/dashboard/not_routed_table.html:32
     what: "No htmx 4xx/5xx swap is configured on the table GET or either edit POST (templates/booking/dialogs/deadline.html:5 and destination.html:5), so a cargo-not-found 404 leaves the editor without user-visible feedback."
-    evidence: "run: idiom-ui-final"
+    evidence: "run: ui-scope-final"
 tests_added:
   - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_tracking_id_returns_not_found_for_both_dialogs[MISSING1-False-destination]
   - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_tracking_id_returns_not_found_for_both_dialogs[MISSING1-False-deadline]

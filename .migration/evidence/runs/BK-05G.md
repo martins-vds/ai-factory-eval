@@ -80,3 +80,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T19:22:40+00:00 | crap-report-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-17T19:24:15+00:00 | mutation-changed-final | 0 | 91.38 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
 | 2026-11-17T19:26:40+00:00 | verifier-use-case-rule-in-scope | 0 | 1.37 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin` | `b29404b0332b987b` |  |  |
+| 2026-11-17T19:27:26+00:00 | behavior-scope-final | 0 | 4.26 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/application/test_specification.py tests/characterization/test_booking.py` | `d98316b4205e7f13` |  |  |
+| 2026-11-17T19:28:07+00:00 | regression-scope-final | 0 | 36.58 | `pytest -q` | `44caf8f0fd930880` |  |  |
+| 2026-11-17T19:28:12+00:00 | build-check-scope-final | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:28:15+00:00 | django-check-scope-final | 0 | 0.22 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T19:28:19+00:00 | ruff-check-scope-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:28:23+00:00 | ruff-format-scope-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-17T19:28:27+00:00 | layers-scope-final | 0 | 0.09 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-17T19:28:31+00:00 | ui-scope-final | 1 | 0.27 | `python .migration/harness/tools/check_ui.py` | `92298271578794c0` | templates/booking/dashboard/not_routed_table.html:32: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since a3bc8509a5ca03d91315b7a1918e330affa9bf2d" templates=3 findings=3 |
+| 2026-11-17T19:29:10+00:00 | crap-coverage-scope-final | 0 | 35.07 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `cdc30ee64eaf2c02` |  |  |
+| 2026-11-17T19:29:14+00:00 | crap-lizard-scope-final | 0 | 0.08 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:29:18+00:00 | crap-report-scope-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-17T19:30:48+00:00 | mutation-changed-scope-final | 0 | 85.73 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `96ca7792398b9099` |  | gate=mutation score=0.889 threshold=0.8 killed=48 survived=6 files=1 base=origin/main |
