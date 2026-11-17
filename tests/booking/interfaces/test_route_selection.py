@@ -2,6 +2,8 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
+from django.core.signing import BadSignature
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -11,6 +13,7 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -195,6 +198,77 @@ def test_route_assignment_rejects_a_modified_candidate(client):
     assert response.status_code == 404
     details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
     assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_candidate_for_another_cargo(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    candidate_response = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        candidate_response.content.decode(),
+    ).group(1)
+    other_tracking_id = CargoRegistration(repository).register(ORIGIN, DESTINATION, DEADLINE)
+
+    response = client.post(
+        f'/admin/cargo/{other_tracking_id.value}/route/',
+        {'candidate': candidate_token},
+    )
+
+    assert response.status_code == 404
+    assert (
+        CargoRecord.objects.get(tracking_id=other_tracking_id.value).routing_status == 'NOT_ROUTED'
+    )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_candidate_token_uses_a_route_selection_specific_salt(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_response = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_response.content.decode(),
+    ).group(1)
+
+    with pytest.raises(BadSignature):
+        signing.loads(candidate_token, salt='django.core.signing')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_candidate_after_deadline_changes(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).update(
+        spec_arrival_deadline=datetime(2030, 11, 3, tzinfo=UTC).date()
+    )
+
+    response = client.post(route_url, {'candidate': candidate_token})
+
+    assert response.status_code == 404
+    assert CargoRecord.objects.get(tracking_id=tracking_id.value).routing_status == 'NOT_ROUTED'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize('stale', [False, True])
+def test_route_selection_returns_not_found_for_unknown_or_stale_cargo(client, stale):
+    if stale:
+        tracking_id = _create_cargo(()).value
+        CargoRecord.objects.filter(tracking_id=tracking_id).delete()
+    else:
+        tracking_id = 'MISSING1'
+
+    response = client.get(f'/admin/cargo/{tracking_id}/route/')
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db

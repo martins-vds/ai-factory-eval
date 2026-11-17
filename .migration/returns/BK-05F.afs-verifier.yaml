@@ -1,0 +1,78 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1265
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46
+    what: CargoRouting.assign_route persists an itinerary that is not a candidate and misses the current arrival deadline; both guards exist only in the view.
+    evidence: tests/booking/application/test_routing.py::test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline
+tests_added:
+  - tests/booking/application/test_routing.py::test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_for_another_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_after_deadline_changes
+  - tests/booking/interfaces/test_route_selection.py::test_candidate_token_uses_a_route_selection_specific_salt
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_returns_not_found_for_unknown_or_stale_cargo
+ledger_issues:
+  - booking.routing-assign is marked migrated, but its direct use-case assignment rules are not enforced by CargoRouting.assign_route.
+quirk_tickets: []
+rules:
+  - capability: booking.routing-assign
+    rule: Assignment requires a submitted, valid candidate associated with the requested cargo.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline
+    enforced: false
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: The selected itinerary must satisfy the cargo's current route specification before assignment.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline
+    enforced: false
+    ledger_rule: route-specification-satisfied
+no_rules:
+  booking.routing-chain: Structural delegation through routing use cases; no independent business rule.
+  booking.screen-route: Screen presentation of cargo details, candidate counts, itineraries, and empty-state guidance.
+  booking.screen-select-itinerary: Screen presentation of candidates or the approved empty-state guidance.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: BK-05C's application service imports django.http.Http404, a known ADR-0001 layering debt reported as non-failing by check_layers.py.
+    origin: BK-05C
+    evidence: "run: idiom-layers"
+mutation_survivors:
+  - mutant: 1
+    matters: false
+    reason: Both token signing and verification use the same changed, purpose-specific salt; the route-selection flow remains unchanged.
+  - mutant: 2
+    matters: true
+    reason: Replacing the explicit purpose salt with Django's default removes route-token purpose separation; the added salt test rejects that substitution.
+  - mutant: 10
+    matters: false
+    reason: Changes only the cargo-not-found diagnostic; the normal UI still returns the same generic 404.
+  - mutant: 13
+    matters: false
+    reason: Changes only the stale-route diagnostic; the normal UI still returns the same generic 404.
+  - mutant: 14
+    matters: false
+    reason: X is unreserved in URLs, so the changed quote safe set yields the same redirect.
+  - mutant: 27
+    matters: false
+    reason: Changes only the cargo-not-found diagnostic; the normal UI still returns the same generic 404.
+  - mutant: 40
+    matters: false
+    reason: Both the empty and replacement fallback values fail signature validation and produce the same 404.
+  - mutant: 44
+    matters: false
+    reason: The changed BadSignature diagnostic is caught and mapped to the same 404.
+  - mutant: 46
+    matters: false
+    reason: Changes only the invalid-route diagnostic; the normal UI still returns the same generic 404.
