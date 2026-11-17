@@ -196,6 +196,19 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_missing_candidate_without_changing_cargo(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+
+    response = client.post(route_url)
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
     route_response = client.put(f'/admin/cargo/{tracking_id.value}/route/')
