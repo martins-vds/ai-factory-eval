@@ -241,9 +241,7 @@ def test_dialog_update_rederives_route_state(client, field):
     )
     cargo = replace(
         cargo,
-        delivery=Delivery.derived_from(
-            cargo.route_specification, itinerary, HandlingHistory.EMPTY
-        ),
+        delivery=Delivery.derived_from(cargo.route_specification, itinerary, HandlingHistory.EMPTY),
         itinerary=itinerary,
     )
     cargo_repository.upsert(cargo)
@@ -253,7 +251,8 @@ def test_dialog_update_rederives_route_state(client, field):
         destination = next(
             location
             for location in shipping_locations
-            if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
         )
         response = client.post(
             f'/admin/cargo/{cargo.tracking_id.value}/destination/',
