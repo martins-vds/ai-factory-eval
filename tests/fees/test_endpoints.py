@@ -192,9 +192,7 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
     ],
 )
 @pytest.mark.django_db
-def test_fee_and_payment_routes_reject_unsupported_methods(
-    client, payment_gateway, method, path
-):
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, method, path):
     response = getattr(client, method)(path)
 
     assert response.status_code == 405
