@@ -3,10 +3,10 @@ import re
 import threading
 from contextlib import contextmanager
 from datetime import date, timedelta
-from urllib.error import HTTPError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 import pytest
 from playwright.sync_api import sync_playwright
