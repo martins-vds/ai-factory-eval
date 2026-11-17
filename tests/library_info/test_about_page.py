@@ -6,7 +6,7 @@ def test_about_endpoint_matches_characterized_response(client):
     response = client.get('/about')
 
     assert response.status_code == 200
-    assert response['Content-Type'].split(';', maxsplit=1)[0] == 'text/html'
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == (
         '<!doctype html>\n'
         '<html lang="en">\n'

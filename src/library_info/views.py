@@ -4,7 +4,9 @@ from django.views.decorators.http import require_GET
 
 @require_GET
 def about_endpoint(request):
-    return render(request, 'library_info/legacy_about.html')
+    response = render(request, 'library_info/legacy_about.html')
+    response['Content-Type'] = 'text/html'
+    return response
 
 
 @require_GET
