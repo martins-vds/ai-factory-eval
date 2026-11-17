@@ -11,6 +11,7 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -212,6 +213,22 @@ def test_route_screens_reject_unsupported_http_methods(client):
     assert f'Select an Itinerary for Cargo {tracking_id.value}' in itinerary_page.content.decode()
     assert route_response.status_code == 405
     assert itinerary_response.status_code == 405
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('screen', ['route', 'itineraries'])
+@pytest.mark.parametrize('stale', [False, True])
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_screens_return_not_found_for_unknown_or_stale_cargo(client, screen, stale):
+    if stale:
+        tracking_id = _create_cargo(())
+        CargoRecord.objects.filter(tracking_id=tracking_id.value).delete()
+    else:
+        tracking_id = 'MISSING1'
+
+    response = client.get(f'/admin/cargo/{tracking_id}/{screen}/')
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db
