@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -56,6 +67,41 @@
         "permissionRequest",
         "promptRequest",
         "requestId"
+      ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
       ],
       "session.start": [
         "alreadyInUse",
@@ -147,7 +193,13 @@
         "metadata",
         "role"
       ],
+      "system.notification": [
+        "content",
+        "kind",
+        "responsesReasoning"
+      ],
       "tool.execution_complete": [
+        "error",
         "fileEdits",
         "interactionId",
         "model",
@@ -189,36 +241,61 @@
       ]
     },
     "event_types": {
-      "assistant.message": 68,
-      "assistant.turn_end": 40,
-      "assistant.turn_start": 41,
-      "hook.end": 200,
-      "hook.start": 201,
-      "permission.completed": 95,
-      "permission.requested": 95,
+      "assistant.message": 225,
+      "assistant.turn_end": 125,
+      "assistant.turn_start": 125,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 403,
+      "hook.start": 404,
+      "permission.completed": 168,
+      "permission.requested": 168,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 40,
+      "session.usage_record": 125,
       "skill.context_delivered_ref": 11,
       "skill.invoked": 6,
       "skill.invoked_ref": 5,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 1,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 127,
-      "tool.execution_start": 127,
+      "system.notification": 2,
+      "tool.execution_complete": 235,
+      "tool.execution_start": 235,
       "user.message": 3
     },
-    "events": 1069,
+    "events": 2255,
     "usage_fields": []
   },
-  "ended_at": "2026-11-17T12:50:23.553Z",
+  "ended_at": "2026-11-17T13:23:29.352Z",
   "event": "agentStop",
   "harness_tools": [
     {
-      "count": 11,
+      "count": 1,
       "exit": 0,
+      "tool": "afs-finish-check"
+    },
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 53,
+      "exit": 0,
+      "tool": "afs-run"
+    },
+    {
+      "count": 4,
+      "exit": 1,
+      "tool": "afs-run"
+    },
+    {
+      "count": 1,
+      "exit": 4,
       "tool": "afs-run"
     },
     {
@@ -232,12 +309,12 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 1,
+      "count": 5,
       "exit": 0,
       "tool": "check_layers.py"
     },
     {
-      "count": 1,
+      "count": 3,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -247,7 +324,7 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 1,
+      "count": 3,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -261,11 +338,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 68
+      "requests": 225
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-17T12:50:29+00:00",
+  "recorded_at": "2026-11-17T13:23:44+00:00",
   "schema": "afs-cost/1",
   "session_id": "8b156420-1004-4535-a3b6-671513564887",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -297,6 +374,5 @@
   ],
   "started_at": "2026-11-17T12:46:02.808Z",
   "surface": "coding-agent",
-  "trigger_id": "5783d7b3-0755-4cc4-bf58-bdede896378d",
   "usage_source": "assistant.message (output only, partial)"
 }
