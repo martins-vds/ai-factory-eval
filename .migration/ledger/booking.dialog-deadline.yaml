@@ -5,16 +5,30 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml:src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml
   location: src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml:9-33
   risk: {crap: 6, complexity: 2, coverage: 0.0}
-boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "Deadline dialog receives trackingId, displays origin/destination and the current deadline, validates a date update, and refreshes the dashboard on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates.booking.dialogs.deadline
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_initial_value_and_parse_error"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_and_refreshes_the_dashboard"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: deadline-parse-feedback
+    rule: "Reject an unparseable deadline, show an actionable field-level error, and leave the dialog active."
+    source: martins-vds/ai-factory-pilot-target#234
+  - id: preserve-other-route-fields
+    rule: "Changing the deadline preserves the cargo's existing origin and destination."
+    source: martins-vds/ai-factory-pilot-target#294
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]
+notes: "Parse failures show a field error per #234; successful updates refresh the dashboard without the unavailable-widget warning per #251."

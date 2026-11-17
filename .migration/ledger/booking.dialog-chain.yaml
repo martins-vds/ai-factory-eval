@@ -5,11 +5,15 @@ source:
   graph_node: class:src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:ChangeDestinationDialog
   location: src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:15-43
   risk: {crap: 2, complexity: 1, coverage: 0.0}
-boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
+boundary: "Not-routed table actions open destination/deadline dialogs; successful application-use-case updates close the dialog and refresh the dashboard."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views
+    - templates.booking.dashboard.not_routed_table
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
@@ -17,4 +21,13 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_dashboard_opens_destination_and_deadline_dialogs_from_not_routed_rows"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_refreshes_the_dashboard"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_and_refreshes_the_dashboard"
+  - ".migration/evidence/runs/BK-05G.md"
+quirks: [martins-vds/ai-factory-pilot-target#251]
+rules:
+  - id: successful-completion-refresh
+    rule: "After a successful update, close the dialog and refresh the dashboard; keep it open when validation fails."
+    source: martins-vds/ai-factory-pilot-target#251
+notes: "The target uses one HTMX dialog for both updates and redirects to the dashboard after success; the PrimeFaces widget warning is intentionally absent per ruling #251."

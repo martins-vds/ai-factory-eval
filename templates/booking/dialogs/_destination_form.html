@@ -1,0 +1,50 @@
+<form
+  method="post"
+  action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+  hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+  hx-target="#cargo-edit-dialog-content"
+  hx-swap="innerHTML"
+  class="flex flex-col gap-6"
+>
+  {% csrf_token %}
+  <section aria-labelledby="destination-dialog-heading">
+    <h2 id="destination-dialog-heading" class="mb-4 text-xl font-semibold">
+      Change destination for cargo {{ cargo.tracking_id.value }}
+    </h2>
+    <dl class="mb-4 space-y-2">
+      <div>
+        <dt class="inline font-medium">Origin:</dt>
+        <dd class="inline">{{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})</dd>
+      </div>
+      <div>
+        <dt class="inline font-medium">Current destination:</dt>
+        <dd class="inline">{{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})</dd>
+      </div>
+    </dl>
+    {% if destination_error %}
+      <p class="mb-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <label class="mb-1 block font-medium text-slate-800" for="destination">New destination</label>
+    <select
+      class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      id="destination"
+      name="destination"
+      required
+      autofocus
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    >
+      <option value="" disabled{% if not destination_value %} selected{% endif %}>Choose a destination</option>
+      {% for location in destinations %}
+        <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
+          {{ location.name }} ({{ location.unlocode.value }})
+        </option>
+      {% endfor %}
+    </select>
+  </section>
+  <nav aria-label="Dialog actions" class="flex justify-end gap-3">
+    <a class="rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-600" href="/admin/dashboard/">Cancel</a>
+    <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit">
+      Update destination
+    </button>
+  </nav>
+</form>
