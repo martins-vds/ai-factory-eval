@@ -7,9 +7,25 @@ source:
   flow: View Late Fee
   location: legacy/src/main/java/lib/LateFeeView.java:23-38
 boundary: "GET /fees/{id} renders an HTML heading, due/late-day text, and a two-decimal dollar fee; an unknown loan returns HTTP 404 with `<p>No such loan.</p>`."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1175]
+target:
+  components: [src.fees.views.fee_detail, src.fees.views.fee_page, templates/fees/detail.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/characterization/source/goldens/browser.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_fees.py::test_fee_endpoint_matches_characterized_html
+  - tests/fees/test_fees.py::test_fee_endpoint_matches_characterized_missing_loan_response
+  - tests/fees/test_fees.py::test_fee_page_uses_reading_room_layout_and_payment_action
+  - tests/fees/test_fees.py::test_real_browser_can_pay_a_late_fee
+rules:
+  - id: fee-page-loan
+    rule: Existing loans show the due date, late-day count, and two-decimal fee; an unknown loan returns 404 with the characterized no-loan fragment.
+    source: legacy/src/main/java/lib/LateFeeView.java:26-38
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
