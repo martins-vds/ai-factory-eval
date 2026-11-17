@@ -183,6 +183,8 @@ def test_non_htmx_payment_failure_renders_an_alert(client, payment_gateway):
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
     assert b'Late fee for L1' in response.content
+    assert b'2026-01-16' in response.content
+    assert b'day(s) late' in response.content
     assert b'Fee: $10.00' in response.content
 
 
