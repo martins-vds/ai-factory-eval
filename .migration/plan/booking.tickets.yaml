@@ -42,7 +42,7 @@ tickets:
   - BK-05B
 - id: BK-05D
   title: Build the cargo-registration wizard
-  role: afs-migrator
+  role: afs-specialist-migrator
   specialty: ui
   files:
   - src/cargotracker/booking/interfaces/wizard/views.py
@@ -63,7 +63,7 @@ tickets:
   - BK-05A
 - id: BK-05E
   title: Build the cargo dashboard, tables, and details
-  role: afs-migrator
+  role: afs-specialist-migrator
   specialty: ui
   files:
   - src/cargotracker/booking/interfaces/dashboard/views.py
