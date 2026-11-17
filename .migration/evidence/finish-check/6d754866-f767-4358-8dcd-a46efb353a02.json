@@ -1,0 +1,34 @@
+[
+  {
+    "at": "2026-11-17T05:15:39Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16970,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-04",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/c3dd62c8-64e3-4f90-b269-d84ed92d6ef4.json",
+      ".migration/evidence/runs/LL-04.md",
+      "tests/library_info/test_about_page.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-04.afs-verifier.yaml` with `role: afs-verifier`, `ticket: LL-04`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-04.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
