@@ -2,6 +2,7 @@ role: afs-verifier
 ticket: BK-05E
 issue: martins-vds/ai-factory-pilot-target#292
 pr: https://github.com/martins-vds/ai-factory-eval/pull/1201
+verification_scope: The gates below apply to this eval checkout snapshot. GitHub PR #358's current head (96551a067cefad177e0bef2d576636cca4eabc70) uses CargoDashboard after follow-up PR #385; that revision was not available in this checkout.
 verdict: changes-required
 gates:
   build: 0
