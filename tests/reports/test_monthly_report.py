@@ -1,11 +1,70 @@
 import csv
 from datetime import date
 from io import StringIO
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan
+from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
+
+
+def test_monthly_report_application_aggregates_the_previous_month():
+    loans = Mock()
+    loans.started_between.return_value = [
+        SimpleNamespace(
+            id='L-max',
+            member='max',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 20),
+        ),
+        SimpleNamespace(
+            id='L-alpha',
+            member='alpha',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 5),
+        ),
+        SimpleNamespace(
+            id='L-beta',
+            member='beta',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 5),
+        ),
+        SimpleNamespace(
+            id='L-zeta-1',
+            member='zeta',
+            due_on=date(2024, 2, 1),
+            returned_on=date(2024, 2, 5),
+        ),
+        SimpleNamespace(
+            id='L-zeta-2',
+            member='zeta',
+            due_on=date(2024, 2, 5),
+            returned_on=date(2024, 2, 5),
+        ),
+    ]
+    fees = Mock()
+    fees.fee_for.side_effect = lambda loan_id: SimpleNamespace(
+        amount_cents={
+            'L-max': 1000,
+            'L-alpha': 250,
+            'L-beta': 250,
+            'L-zeta-1': 100,
+            'L-zeta-2': 50,
+        }[loan_id]
+    )
+
+    reports = MonthlyReportApplication(loans, fees).for_previous_month(date(2024, 3, 1))
+
+    loans.started_between.assert_called_once_with(date(2024, 2, 1), date(2024, 3, 1))
+    assert reports == [
+        MemberMonthlyReport('max', 1, 1, 1000),
+        MemberMonthlyReport('alpha', 1, 1, 250),
+        MemberMonthlyReport('beta', 1, 1, 250),
+        MemberMonthlyReport('zeta', 2, 1, 150),
+    ]
 
 
 @pytest.mark.django_db
@@ -17,75 +76,82 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
                 id='L-alpha',
                 member='alpha',
                 isbn='1',
-                lent_on=date(2026, 2, 1),
-                returned_on=date(2026, 2, 25),
+                lent_on=date(2024, 2, 1),
+                returned_on=date(2024, 2, 25),
             ),
             Loan(
                 id='L-beta',
                 member='beta',
                 isbn='2',
-                lent_on=date(2026, 2, 2),
-                returned_on=date(2026, 2, 26),
+                lent_on=date(2024, 2, 2),
+                returned_on=date(2024, 2, 26),
             ),
             Loan(
                 id='L-zeta-1',
                 member='zeta',
                 isbn='3',
-                lent_on=date(2026, 2, 3),
-                returned_on=date(2026, 2, 20),
+                lent_on=date(2024, 2, 3),
+                returned_on=date(2024, 2, 20),
             ),
             Loan(
                 id='L-zeta-2',
                 member='zeta',
                 isbn='4',
-                lent_on=date(2026, 2, 4),
-                returned_on=date(2026, 2, 18),
+                lent_on=date(2024, 2, 4),
+                returned_on=date(2024, 2, 18),
             ),
             Loan(
                 id='L-zeta-3',
                 member='zeta',
                 isbn='7',
-                lent_on=date(2026, 2, 5),
-                returned_on=date(2026, 2, 20),
+                lent_on=date(2024, 2, 5),
+                returned_on=date(2024, 2, 20),
             ),
             Loan(
                 id='L-zeta-4',
                 member='zeta',
                 isbn='8',
-                lent_on=date(2026, 2, 6),
-                returned_on=date(2026, 2, 22),
+                lent_on=date(2024, 2, 6),
+                returned_on=date(2024, 2, 22),
             ),
             Loan(
                 id='L-zeta-5',
                 member='zeta',
                 isbn='9',
-                lent_on=date(2026, 2, 7),
-                returned_on=date(2026, 2, 24),
+                lent_on=date(2024, 2, 7),
+                returned_on=date(2024, 2, 24),
             ),
             Loan(
                 id='L-max',
                 member='max',
                 isbn='10',
-                lent_on=date(2026, 2, 1),
-                returned_on=date(2026, 3, 30),
+                lent_on=date(2024, 2, 1),
+                returned_on=date(2024, 3, 30),
+            ),
+            Loan(
+                id='L-last-day',
+                member='last-day',
+                isbn='11',
+                lent_on=date(2024, 2, 29),
+                returned_on=date(2024, 3, 14),
             ),
             Loan(
                 id='L-before',
                 member='before',
                 isbn='5',
-                lent_on=date(2026, 1, 31),
+                lent_on=date(2024, 1, 31),
             ),
             Loan(
                 id='L-after',
                 member='after',
                 isbn='6',
-                lent_on=date(2026, 3, 1),
+                lent_on=date(2024, 3, 1),
             ),
         ]
     )
     monkeypatch.setattr(
         'src.reports.management.commands.monthly_report.timezone.localdate',
-        lambda: date(2026, 3, 1),
+        lambda: date(2024, 3, 1),
     )
     output = StringIO()
 
@@ -97,6 +163,7 @@ def test_monthly_report_summarizes_previous_month_loans_in_specified_order(monke
         ['alpha', '1', '1', '250'],
         ['beta', '1', '1', '250'],
         ['zeta', '5', '4', '150'],
+        ['last-day', '1', '0', '0'],
     ]
 
 
