@@ -1,9 +1,12 @@
+from dataclasses import replace
+
 import pytest
 from django.core.management import call_command
 from django.test import override_settings
 from django.urls import path
 
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 
 
@@ -50,6 +53,50 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
     assert 'Arrival deadline:' in content
     assert 'Itinerary' in content
     assert '0200T' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unrouted_cargo_details_include_route_link(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/DEF789/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert '<strong>Not routed</strong>' in content
+    assert 'href="/admin/cargo/DEF789/route/"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_misdirected_cargo_details_show_reroute_action_only_when_misdirected(
+    client, monkeypatch
+):
+    call_command('seed_sample_data')
+    tracking_id = TrackingId('MNO456')
+    cargo = repository.find(tracking_id)
+    assert cargo is not None
+    misdirected_cargo = replace(cargo, delivery=replace(cargo.delivery, misdirected=True))
+    find_cargo = repository.find
+
+    normal_response = client.get('/admin/cargo/MNO456/')
+    assert normal_response.status_code == 200
+    assert 'Misrouted cargo!' not in normal_response.content.decode()
+
+    monkeypatch.setattr(
+        repository,
+        'find',
+        lambda candidate: misdirected_cargo
+        if candidate.value == tracking_id.value
+        else find_cargo(candidate),
+    )
+    misdirected_response = client.get('/admin/cargo/MNO456/')
+    misdirected_content = misdirected_response.content.decode()
+
+    assert misdirected_response.status_code == 200
+    assert 'Misrouted cargo!' in misdirected_content
+    assert 'href="/admin/cargo/MNO456/itineraries/"' in misdirected_content
 
 
 @pytest.mark.django_db
