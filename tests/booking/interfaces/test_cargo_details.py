@@ -54,6 +54,20 @@ def test_cargo_details_render_route_fields_and_itinerary(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_unrouted_cargo_details_link_to_route_selection(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/DEF789/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert '<strong>Not routed</strong>' in content
+    assert 'href="/admin/cargo/DEF789/route/"' in content
+    assert 'Reroute' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_unknown_and_stale_cargo_details_return_http_404(client):
     call_command('seed_sample_data')
     repository.missing_tracking_ids.add('MNO456')
@@ -63,3 +77,16 @@ def test_unknown_and_stale_cargo_details_return_http_404(client):
 
     assert unknown_response.status_code == 404
     assert stale_response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__, DEBUG=False)
+def test_unknown_and_stale_cargo_details_render_cargo_not_found_message(client):
+    call_command('seed_sample_data')
+    repository.missing_tracking_ids.add('MNO456')
+
+    for tracking_id in ('UNKNOWN', 'MNO456'):
+        response = client.get(f'/admin/cargo/{tracking_id}/')
+
+        assert response.status_code == 404
+        assert f'Cargo with tracking ID {tracking_id} not found.'.encode() in response.content
