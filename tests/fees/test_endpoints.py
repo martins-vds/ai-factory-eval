@@ -155,6 +155,7 @@ def test_ui_payment_rejects_unknown_loan_without_calling_gateway(client, payment
     response = client.post('/ui/payments/unknown/')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'no such loan\n'
     assert payment_gateway.requests == []
 
@@ -166,6 +167,8 @@ def test_ui_payment_without_htmx_renders_the_complete_fee_page(client, payment_g
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/html; charset=utf-8'
     assert b'Late fee for L1' in response.content
+    assert b'<dd>2026-01-16</dd>' in response.content
+    assert b'day(s) late' in response.content
     assert b'Fee: $10.00' in response.content
     assert b'role="status"' in response.content
     assert b'charged' in response.content
