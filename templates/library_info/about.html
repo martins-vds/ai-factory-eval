@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}About · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_19rem]">
+  <div>
+    <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The neighborhood collection</p>
+    <h1 class="mb-4 mt-3 text-5xl md:text-6xl">About the Lending Library</h1>
+    <p class="mb-8 max-w-2xl text-lg leading-relaxed text-[#66705b]">
+      A neighborhood library for finding books and sharing stories.
+    </p>
+    <article class="border-y border-[#d8cdbb] py-6">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Visiting and borrowing</p>
+      <p class="mt-3 max-w-2xl leading-relaxed">
+        Open Monday to Saturday, 9:00 to 18:00. Books are lent for 14 days.
+      </p>
+    </article>
+    <p class="mt-6 leading-relaxed">
+      Contact:
+      <a class="underline decoration-[#d8cdbb] underline-offset-4" href="mailto:desk@lending-library.invalid">
+        desk@lending-library.invalid
+      </a>
+    </p>
+  </div>
+  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-widest text-[#66705b]">At the desk</p>
+      <h2 class="card-title text-2xl">Come find your next book.</h2>
+      <p>Browse the collection or get in touch with the library team.</p>
+      <a class="btn mt-3 bg-[#a94e37] text-white hover:bg-[#873b2a]" href="/ui/loans/">
+        Browse the collection
+      </a>
+    </div>
+  </aside>
+</section>
+{% endblock %}

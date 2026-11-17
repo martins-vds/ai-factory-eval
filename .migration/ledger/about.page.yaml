@@ -8,8 +8,11 @@ source:
   location: legacy/src/main/resources/static/about.html:1-9
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1159]
+target:
+  components: [src.library_info.urls, src.library_info.views.about_page, src.library_info.views.about_ui, templates/library_info/legacy_about.html, templates/library_info/about.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-04.md, tests/library_info/test_pages.py::test_about_endpoint_matches_characterized_response, tests/library_info/test_pages.py::test_about_ui_renders_reading_room_content_and_assets]
+no_rules: "Static information page; it accepts no user input and has no state transitions."
