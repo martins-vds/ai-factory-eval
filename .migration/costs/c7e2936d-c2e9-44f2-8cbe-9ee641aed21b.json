@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -141,6 +152,8 @@
         "role"
       ],
       "tool.execution_complete": [
+        "error",
+        "fileEdits",
         "interactionId",
         "model",
         "parentToolCallId",
@@ -181,36 +194,53 @@
       ]
     },
     "event_types": {
-      "assistant.message": 28,
-      "assistant.turn_end": 21,
-      "assistant.turn_start": 22,
-      "hook.end": 125,
-      "hook.start": 126,
-      "permission.completed": 63,
-      "permission.requested": 63,
+      "assistant.message": 147,
+      "assistant.turn_end": 72,
+      "assistant.turn_start": 72,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 274,
+      "hook.start": 275,
+      "permission.completed": 134,
+      "permission.requested": 134,
       "session.model_change": 2,
       "session.start": 1,
-      "session.usage_record": 22,
-      "skill.context_delivered_ref": 4,
-      "skill.invoked": 4,
-      "subagent.completed": 1,
+      "session.usage_record": 72,
+      "skill.context_delivered_ref": 11,
+      "skill.invoked": 11,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 80,
-      "tool.execution_start": 81,
+      "tool.execution_complete": 163,
+      "tool.execution_start": 163,
       "user.message": 3
     },
-    "events": 656,
+    "events": 1548,
     "usage_fields": []
   },
-  "ended_at": "2026-11-17T12:36:50.375Z",
+  "ended_at": "2026-11-17T12:50:09.920Z",
   "event": "agentStop",
   "harness_tools": [
     {
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-finish-check"
+    },
+    {
       "count": 1,
       "exit": 0,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 13,
+      "exit": 0,
+      "tool": "afs-run"
+    },
+    {
+      "count": 10,
+      "exit": 1,
       "tool": "afs-run"
     },
     {
@@ -219,12 +249,17 @@
       "tool": "afs-services"
     },
     {
-      "count": 1,
+      "count": 2,
       "exit": 0,
       "tool": "check_inputs.py"
     },
     {
-      "count": 1,
+      "count": 2,
+      "exit": 1,
+      "tool": "check_layers.py"
+    },
+    {
+      "count": 4,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -234,7 +269,7 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 1,
+      "count": 4,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -252,11 +287,11 @@
     },
     "gpt-6-luna": {
       "output": 0,
-      "requests": 20
+      "requests": 139
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-17T12:36:55+00:00",
+  "recorded_at": "2026-11-17T12:50:23+00:00",
   "schema": "afs-cost/1",
   "session_id": "c7e2936d-c2e9-44f2-8cbe-9ee641aed21b",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -275,11 +310,38 @@
     },
     {
       "count": 1,
+      "skill": "agent-browser"
+    },
+    {
+      "count": 1,
+      "skill": "clean-architecture"
+    },
+    {
+      "count": 1,
+      "skill": "clean-code"
+    },
+    {
+      "count": 1,
       "skill": "code-review"
+    },
+    {
+      "count": 1,
+      "skill": "domain-driven-design"
+    },
+    {
+      "count": 1,
+      "skill": "patterns-of-enterprise-application-architecture"
+    },
+    {
+      "count": 1,
+      "skill": "ui-ux-pro-max"
+    },
+    {
+      "count": 1,
+      "skill": "verification-before-completion"
     }
   ],
   "started_at": "2026-11-17T12:34:19.767Z",
   "surface": "coding-agent",
-  "trigger_id": "3c4f0cbc-3676-45b8-b2d8-8d7de8da12ef",
   "usage_source": "assistant.message (output only, partial)"
 }
