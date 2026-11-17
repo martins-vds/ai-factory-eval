@@ -9,7 +9,23 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components: [src.fees.services.calculate_late_fee]
+status: migrated
+rules:
+  - id: late-days
+    rule: "Use returnedOn when present, otherwise server-local today, and clamp late days at zero."
+    source: "legacy/src/main/java/lib/LateFeeView.java:31-37"
+  - id: grace-period
+    rule: "A loan no more than two days late has no fee; if later than two days, charge every late day."
+    source: "legacy/src/main/java/lib/LateFeeView.java:31-37"
+  - id: fee-cap
+    rule: "Charge 25 cents per late day after the grace threshold, capped at $10.00."
+    source: "legacy/src/main/java/lib/LateFeeView.java:31-37"
+evidence:
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_fees.py::test_fee_api_waives_only_two_days_and_charges_all_late_days_after
+  - tests/fees/test_fees.py::test_fee_api_caps_fees_and_uses_the_return_date

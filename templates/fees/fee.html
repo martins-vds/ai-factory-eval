@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Late fees · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="grid gap-5 md:grid-cols-[1.4fr_1fr]">
+  <div>
+    <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+    <h1 class="mb-8 mt-3 text-5xl">Late fees</h1>
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-[#66705b]">{{ loan.member }} · {{ loan.id }}</p>
+        <h2 class="mt-2 text-3xl">Loan {{ loan.id }} · ISBN {{ loan.isbn }}</h2>
+        <p class="mt-5">
+          Due {{ loan.due_on|date:"M j, Y" }}{% if loan.returned_on %} · returned {{ loan.returned_on|date:"M j, Y" }}{% endif %}
+        </p>
+        <p class="mt-2">
+          {{ fee.days_late }} late days{% if fee.days_late <= 2 %} · first two days waived{% endif %}
+        </p>
+        <p class="mt-7 text-6xl font-bold">{{ fee.formatted_amount }}</p>
+        <p class="text-sm text-[#66705b]">
+          When more than two days late, each late day is 25¢; the fee is capped at $10.00.
+        </p>
+        {% if fee.amount_cents %}
+        <div id="payment-status" class="mt-5"></div>
+        <form method="post" action="/ui/payments/{{ loan.id }}/"
+              hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="innerHTML">
+          {% csrf_token %}
+          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">
+            Pay late fee
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </article>
+  </div>
+  <nav aria-label="Choose a loan fee" class="space-y-2">
+    {% for item in fees %}
+    <a class="block rounded-lg border border-[#d8cdbb] bg-[#fffdf7] p-4 text-[#2f3428]"
+       href="/ui/fees/{{ item.loan.id }}/">
+      <span class="flex justify-between gap-3">
+        <strong>{{ item.loan.id }} · {{ item.loan.member }}</strong>
+        <strong>{{ item.fee.formatted_amount }}</strong>
+      </span>
+      <small class="mt-1 block text-[#66705b]">ISBN {{ item.loan.isbn }}</small>
+    </a>
+    {% endfor %}
+  </nav>
+</section>
+{% endblock %}
