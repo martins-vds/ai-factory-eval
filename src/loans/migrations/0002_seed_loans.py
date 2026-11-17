@@ -24,10 +24,6 @@ def seed_loans(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ('loans', '0001_initial'),
-    ]
+    dependencies = (('loans', '0001_initial'),)
 
-    operations = [
-        migrations.RunPython(seed_loans, migrations.RunPython.noop),
-    ]
+    operations = (migrations.RunPython(seed_loans, migrations.RunPython.noop),)

@@ -4,13 +4,11 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = ()
 
-    operations = [
+    operations = (
         migrations.CreateModel(
             name='Loan',
             fields=[
@@ -21,7 +19,7 @@ class Migration(migrations.Migration):
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],
             options={
-                'ordering': ['id'],
+                'ordering': ('id',),
             },
         ),
-    ]
+    )
