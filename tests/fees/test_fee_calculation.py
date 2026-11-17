@@ -70,3 +70,22 @@ def test_fee_for_unknown_loan_returns_none():
     application = FeeApplication(LoanRepository(None), Clock(date(2026, 1, 1)), PaymentGateway())
 
     assert application.fee_for('missing') is None
+
+
+def test_payment_does_not_call_gateway_for_unknown_loan():
+    class RecordingGateway:
+        def __init__(self):
+            self.calls = []
+
+        def charge(self, loan_id):
+            self.calls.append(loan_id)
+
+    gateway = RecordingGateway()
+    application = FeeApplication(
+        LoanRepository(None),
+        Clock(date(2026, 1, 1)),
+        gateway,
+    )
+
+    assert application.pay('missing') is None
+    assert gateway.calls == []

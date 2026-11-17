@@ -1,0 +1,61 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1138
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+  - .migration/evidence/mutants/LL-03.md
+findings:
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "HTMX 2 does not swap the payment form's 404/502 responses by default, so users never see the returned error fragment."
+    evidence: "run: idiom-ui-verifier"
+  - severity: minor
+    where: templates/fees/payment-form.html:5
+    what: "The button's background, text, and hover utilities are absent from the built CSS and are ignored by the browser."
+    evidence: "run: idiom-ui-verifier"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:1
+    what: "Nine mutants survived, including module-level route/form and HX-header survivors; behavior tests exercise these routes with permitted and rejected HTTP methods, while dataclass-freezing and loan-transaction mutants are listed in the report."
+    evidence: "run: mutation-changed-latest"
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_payment_does_not_call_gateway_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_endpoint_formats_the_capped_fee_as_ten_dollars
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_page_payment_returns_full_page_for_regular_post
+  - tests/fees/test_endpoints.py::test_fee_page_payment_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_payment_gateway_uses_the_characterized_default_url
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+rules:
+  - capability: fees.calculation
+    rule: "Clamp late days at zero; waive up to two days, then charge 25 cents/day with a $10 cap."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "Use the loan's return date rather than today's date when calculating a returned loan's fee."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_returned_loan_uses_return_date_instead_of_today
+    enforced: true
+  - capability: fees.page
+    rule: "An unknown loan yields no fee."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "Do not call the payment gateway unless the requested loan exists."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_calculation.py::test_payment_does_not_call_gateway_for_unknown_loan
+    enforced: true
+no_rules: {}
