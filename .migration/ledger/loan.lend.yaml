@@ -32,6 +32,7 @@ evidence:
   - tests/loans/test_circulation.py::test_browser_lending_displays_errors_when_no_fields_are_submitted
   - tests/loans/test_circulation.py::test_browser_can_lend_a_book_from_the_reading_room_form
   - tests/loans/test_circulation.py::test_htmx_lending_redirects_to_the_catalog
+  - tests/loans/test_circulation.py::test_htmx_lending_returns_a_swappable_fragment_for_field_errors
   - tests/loans/test_circulation.py::test_browser_can_lend_and_return_a_book
   - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
 rules:
