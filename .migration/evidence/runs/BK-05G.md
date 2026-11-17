@@ -24,3 +24,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T21:12:01+00:00 | lint-targeted | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-17T21:12:01+00:00 | format-targeted | 0 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
 | 2026-11-17T21:12:04+00:00 | dialogs-green | 0 | 3.81 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `ad4dc636c010c6b7` |  |  |
+| 2026-11-17T21:15:02+00:00 | format-targeted | 0 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-17T21:15:02+00:00 | lint-targeted | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T21:15:06+00:00 | dialogs-green | 0 | 3.79 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `1c569b590fa8576c` |  |  |
+| 2026-11-17T21:16:06+00:00 | format-targeted | 0 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-17T21:16:06+00:00 | lint-targeted | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T21:16:10+00:00 | dialogs-green | 0 | 4.34 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `7e454276a0aa633e` |  |  |
+| 2026-11-17T21:17:09+00:00 | build | 0 | 0.41 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T21:17:15+00:00 | idiom | 0 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
+| 2026-11-17T21:18:09+00:00 | behavior | 0 | 48.95 | `pytest -q` | `0f5f7efce87440ed` |  |  |
+| 2026-11-17T21:19:06+00:00 | crap | 0 | 50.54 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `799800fd07785b92` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |

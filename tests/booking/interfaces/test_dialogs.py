@@ -8,7 +8,7 @@ from django.urls import path
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
-from cargotracker.booking.interfaces.dialogs.views import create_specification_dialog_views
+from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -18,9 +18,9 @@ cargo_repository = DjangoCargoRepository()
 location_repository = DjangoLocationRepository()
 cargo_dashboard = CargoDashboard(cargo_repository)
 available_locations = []
-destination_dialog_view, deadline_dialog_view = create_specification_dialog_views(
-    CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
+destination_dialog_view, deadline_dialog_view = create_dialog_views(
     cargo_dashboard,
+    CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
     lambda: available_locations,
 )
 dashboard_view, _ = create_booking_views(cargo_dashboard)
@@ -54,9 +54,11 @@ def test_dashboard_opens_destination_and_deadline_dialogs_from_not_routed_rows(
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
     assert 'href="/admin/cargo/DEF789/destination/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in not_routed_table
+    assert 'aria-haspopup="dialog"' in not_routed_table
     assert 'href="/admin/cargo/DEF789/deadline/"' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in not_routed_table
     assert 'id="cargo-edit-dialog"' in content
+    assert 'id="cargo-edit-dialog-title"' in content
 
 
 @pytest.mark.django_db
@@ -76,14 +78,41 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     second_options = re.search(r'<select\b[^>]*>(.*?)</select>', second.content.decode(), re.DOTALL)
     assert options is not None
     assert second_options is not None
+    first_option = re.search(r'<option\b[^>]*selected', options.group(1))
+    first_destination = next(
+        location
+        for location in available_locations
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+    )
 
     assert first.status_code == 200
+    fallback = client.get(url)
+    assert fallback.status_code == 200
+    assert '<html lang="en">' in fallback.content.decode()
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
     assert cargo.route_specification.origin.unlocode.value not in options.group(1)
     assert cargo.route_specification.destination.unlocode.value not in options.group(1)
+    assert first_option is not None
+    assert f'value="{first_destination.unlocode.value}" selected' in options.group(1)
+    assert 'aria-invalid="true"' not in content
     assert options.group(1) == second_options.group(1)
     assert available_locations == original_locations
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
+    'url',
+    (
+        '/admin/cargo/UNKNOWN/destination/',
+        '/admin/cargo/UNKNOWN/deadline/',
+    ),
+)
+def test_unknown_cargo_dialog_returns_not_found(client, sample_bookings, url):
+    response = client.get(url, HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
 
 
 @pytest.mark.django_db

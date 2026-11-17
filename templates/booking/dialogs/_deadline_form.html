@@ -2,7 +2,7 @@
   method="post"
   action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
   hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
-  hx-target="#cargo-edit-dialog"
+  hx-target="#cargo-edit-dialog-content"
   hx-swap="innerHTML"
   class="flex flex-col gap-6"
 >
@@ -14,8 +14,8 @@
     <p class="mb-4">
       {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
     </p>
-    {% if error %}
-      <p class="mb-2 text-red-700" id="deadline-error" role="alert">{{ error }}</p>
+    {% if deadline_error %}
+      <p class="mb-2 text-red-700" id="deadline-error" role="alert">{{ deadline_error }}</p>
     {% endif %}
     <label class="mb-1 block font-medium text-slate-800" for="deadline">Arrival deadline</label>
     <input
@@ -26,7 +26,7 @@
       value="{{ deadline_value }}"
       required
       autofocus
-      {% if error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+      {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
     >
   </section>
   <nav aria-label="Dialog actions" class="flex justify-end gap-3">

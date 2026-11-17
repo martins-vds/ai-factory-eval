@@ -5,16 +5,34 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeDestination.xhtml:src/main/webapp/admin/dialogs/changeDestination.xhtml
   location: src/main/webapp/admin/dialogs/changeDestination.xhtml:9-40
   risk: {crap: 20, complexity: 4, coverage: 0.0}
-boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "Destination dialog receives trackingId, displays origin/current destination, offers eligible destinations, and refreshes the dashboard on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates.booking.dialogs.destination
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_unavailable_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_refreshes_the_dashboard"
+  - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
+rules:
+  - id: eligible-destination-options
+    rule: "Do not offer the cargo's origin or current destination, and compute options without mutating the available-location list."
+    source: martins-vds/ai-factory-pilot-target#235
+  - id: reject-unavailable-destination
+    rule: "Refuse a submitted destination unless it is one of the eligible locations."
+    source: martins-vds/ai-factory-pilot-target#235
+  - id: preserve-other-route-fields
+    rule: "Changing the destination preserves the cargo's existing origin and arrival deadline."
+    source: martins-vds/ai-factory-pilot-target#294
+notes: "Destination options exclude origin/current destination without mutating the location list per #235; successful updates refresh without the unavailable-widget warning per #251."

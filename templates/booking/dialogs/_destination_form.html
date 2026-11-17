@@ -2,7 +2,7 @@
   method="post"
   action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
   hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
-  hx-target="#cargo-edit-dialog"
+  hx-target="#cargo-edit-dialog-content"
   hx-swap="innerHTML"
   class="flex flex-col gap-6"
 >
@@ -21,8 +21,8 @@
         <dd class="inline">{{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})</dd>
       </div>
     </dl>
-    {% if error %}
-      <p class="mb-2 text-red-700" id="destination-error" role="alert">{{ error }}</p>
+    {% if destination_error %}
+      <p class="mb-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
     {% endif %}
     <label class="mb-1 block font-medium text-slate-800" for="destination">New destination</label>
     <select
@@ -31,7 +31,7 @@
       name="destination"
       required
       autofocus
-      {% if error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
     >
       <option value="" disabled{% if not destination_value %} selected{% endif %}>Choose a destination</option>
       {% for location in destinations %}
