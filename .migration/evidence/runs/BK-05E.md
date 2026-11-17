@@ -19,3 +19,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T18:30:44+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `efcf0c40f9c44d17` |  | gate=crap max=26.0 threshold=30 over=0 methods=180 |
 | 2026-11-07T18:31:15+00:00 | mutation-changed | 0 | 25.98 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `4e8520baafe17cc5` |  | gate=mutation score=0.929 threshold=0.8 killed=13 survived=1 files=1 base=origin/main |
 | 2026-11-17T19:20:30+00:00 | setup-probe | 0 | 0.01 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:22:21+00:00 | build-compileall | 0 | 0.11 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T19:22:26+00:00 | build-django-check | 0 | 1.67 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T19:22:29+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-17T19:22:32+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `b30e83bb722165b1` |  |  |
+| 2026-11-17T19:22:35+00:00 | idiom-layers | 1 | 0.17 | `python .migration/harness/tools/check_layers.py` | `844177b805e7a5cb` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=1 known=3 |
+| 2026-11-17T19:22:41+00:00 | idiom-ui | 1 | 0.48 | `python .migration/harness/tools/check_ui.py` | `ded165534558ef10` | templates/booking/wizard/_deadline_form.html:5: sends an htmx request ('hx-post'), but nothing handles error responses:  | gate=ui scope="templates changed since d1ee513dfb9fc8d33f066897c0a68788a77ec678" templates=10 findings=1 |
+| 2026-11-17T19:24:04+00:00 | tests | 0 | 73.89 | `pytest -q` | `3605d1a2b18154db` |  |  |
