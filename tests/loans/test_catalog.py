@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -115,6 +116,23 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, payload, field):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [
+        ('', '123'),
+        ('reader', ''),
+        ('  ', '123'),
+        ('reader', '  '),
+    ],
+)
+def test_lend_use_case_rejects_blank_member_and_isbn(member, isbn):
+    with pytest.raises(ValidationError):
+        lend_loan(member=member, isbn=isbn)
+
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
 def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     response = client.post('/loans', {})
 
@@ -150,6 +168,17 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeat_and_preserves_original_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert loan is not None
+    assert updated is False
+    assert loan.returned_on == original_return_date
 
 
 @pytest.mark.django_db
@@ -319,6 +348,8 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
 
     assert response.status_code == 200
     assert response.content.count(b'This field is required.') == 2
+    assert b'<!doctype html>' in response.content
+    assert b'Lend a book' in response.content
     assert Loan.objects.count() == 3
 
 
@@ -424,7 +455,24 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_page_reports_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert b'no such loan' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_catalog_route_is_available(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
 
 
 @pytest.mark.django_db
