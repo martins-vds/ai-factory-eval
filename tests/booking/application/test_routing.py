@@ -114,6 +114,29 @@ def test_assign_route_persists_itinerary_and_recalculates_delivery():
 
 
 @pytest.mark.django_db
+def test_assign_route_does_not_assign_itinerary_that_misses_arrival_deadline():
+    routing, tracking_id, _ = _routing_service(())
+    late_itinerary = Itinerary(
+        (
+            Leg(
+                DjangoVoyageRepository().find(VoyageNumber('CM001')),
+                ORIGIN,
+                DESTINATION,
+                datetime(2030, 11, 1, tzinfo=UTC),
+                datetime(2030, 11, 6, tzinfo=UTC),
+            ),
+        )
+    )
+
+    routing.assign_route(tracking_id, late_itinerary)
+
+    stored = DjangoCargoRepository().find(tracking_id)
+    assert stored is not None
+    assert stored.itinerary is Itinerary.EMPTY
+    assert stored.delivery.routing_status is RoutingStatus.NOT_ROUTED
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ('operation', 'stale'),
     [
