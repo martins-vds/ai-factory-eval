@@ -1,0 +1,36 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/941
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.971
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: minor
+    where: src/fees/views.py:22-23
+    what: The API and page views duplicate the unknown-loan fee response.
+  - severity: minor
+    where: src/fees/gateway.py:29-33
+    what: The interruption and I/O exception branches repeat the same gateway-failure mapping.
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:3
+    what: Remaining route-literal and LoanForm.Meta.model survivors are inherited from LL-02 and match the known module-level selection issue; LL-03 methods are covered with accepted and rejected requests.
+ledger_issues:
+  - The three LL-03 entries remain in-progress; reconcile their status after slice acceptance.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_payment_for_unknown_loan_does_not_call_gateway
+  - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_response_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_fee_page_payment_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_non_htmx_payment_renders_full_fee_page_and_result
+  - tests/fees/test_endpoints.py::test_gateway_uses_characterized_default_url_without_configuration
+  - tests/fees/test_endpoints.py::test_real_browser_displays_payment_gateway_failure
