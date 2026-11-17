@@ -6,9 +6,34 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1197]
+target:
+  components:
+    - config.settings.INSTALLED_APPS
+    - src.reports.management.commands.monthly_report.Command
+    - src.reports.repository.DjangoMonthlyReportRepository
+    - src.reports.services.MonthlyReportApplication
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_summarizes_previous_month_loans
+  - tests/reports/test_monthly_report.py::test_monthly_report_previous_month_window_crosses_year_boundary
+rules:
+  - id: prior-calendar-month
+    rule: "Include loans started in the prior calendar month using a half-open date interval in the server's default time zone."
+    source: "legacy/docs/reports-spec.md:6; .migration/plan/monthly-report.md:5-12"
+  - id: monthly-member-totals
+    rule: "Emit one row for each member with loans started during the report month, count those loans, and omit members without loans started in the month."
+    source: "legacy/docs/reports-spec.md:7,9"
+  - id: late-returns
+    rule: "Count a loan as returned late only when its return date is after its due date."
+    source: "legacy/docs/reports-spec.md:7"
+  - id: late-fees
+    rule: "Sum each report-month loan's late fee in cents using its return date or the report date when still open; waive fees through two late days, then charge 25 cents per late day up to 1000 cents per loan."
+    source: "legacy/src/main/java/lib/LateFeeView.java:31-37"
+  - id: fee-order
+    rule: "Sort report rows by total late fees descending, then member id ascending."
+    source: "legacy/docs/reports-spec.md:8"
