@@ -32,7 +32,15 @@ class FeeApplication:
 
     def all(self):
         today = self.clock.today()
-        return [
-            (loan, calculate_late_fee(loan, today))
-            for loan in self.repository.all()
-        ]
+        return [(loan, calculate_late_fee(loan, today)) for loan in self.repository.all()]
+
+
+class PaymentApplication:
+    def __init__(self, repository, gateway):
+        self.repository = repository
+        self.gateway = gateway
+
+    def pay(self, loan_id):
+        if self.repository.find(loan_id) is None:
+            return None
+        return self.gateway.charge(loan_id)
