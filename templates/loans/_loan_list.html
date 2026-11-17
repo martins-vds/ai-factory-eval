@@ -16,9 +16,10 @@
           <p class="text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
           {% else %}
           <p class="mt-2 text-sm font-semibold text-[#a94e37]">On loan</p>
-          <form class="mt-2" method="post" action="{% url 'loan_catalog_return' loan.id %}" hx-post="{% url 'loan_catalog_return' loan.id %}" hx-target="#loan-list" hx-swap="outerHTML">
+          <form class="mt-2" method="post" action="{% url 'loan_catalog_return' loan.id %}" hx-post="{% url 'loan_catalog_return' loan.id %}" hx-target="#loan-list" hx-swap="outerHTML" hx-on::response-error="this.querySelector('[role=alert]').textContent = 'Unable to update this loan. Refresh and try again.'">
             {% csrf_token %}
             <button class="btn btn-outline btn-sm" type="submit">Mark returned</button>
+            <p class="mt-1 text-sm text-error" role="alert"></p>
           </form>
           {% endif %}
         </div>
