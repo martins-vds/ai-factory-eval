@@ -1,0 +1,29 @@
+[
+  {
+    "at": "2026-11-17T23:51:12Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21210,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05G",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/6b5e8543-5231-4ea0-bfd0-12c069d8e12c.json",
+      ".migration/evidence/runs/BK-05G.md",
+      ".migration/returns/BK-05G.afs-verifier.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
