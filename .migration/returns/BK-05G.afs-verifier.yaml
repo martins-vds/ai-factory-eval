@@ -1,0 +1,19 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: martins-vds/ai-factory-eval#966
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.889
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_returns_not_found
+ledger_issues: []
+quirk_tickets: []
