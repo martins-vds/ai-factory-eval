@@ -101,6 +101,8 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
@@ -315,9 +317,10 @@ def test_browser_can_create_a_loan_from_the_new_loan_page(client):
 
 @pytest.mark.django_db
 def test_browser_lending_page_shows_errors_for_blank_fields(client):
-    response = client.post('/ui/loans/new/')
+    response = client.post('/ui/loans/new/', {'member': '', 'isbn': ''})
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -422,9 +425,20 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     response = client.post('/ui/loans/L2/return/')
 
     assert response.status_code == 409
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_for_unknown_loan_returns_not_found(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db
