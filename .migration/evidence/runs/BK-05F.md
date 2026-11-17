@@ -94,3 +94,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T19:43:29+00:00 | verify-added-stale-id | 0 | 4.25 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo` | `3d761e1e96b14cd0` |  |  |
 | 2026-11-17T19:43:57+00:00 | verify-added-test-ruff | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-17T19:43:57+00:00 | verify-added-test-format | 0 | 0.02 | `ruff format --check tests/booking/interfaces/test_route_selection.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-17T19:09:46+00:00 | verify-mutation-changed | 143 | 2569 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `e3b0c44298fc1c14` | stopped without final output | not completed after 42m49s |
