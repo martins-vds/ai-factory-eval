@@ -27,3 +27,10 @@ evidence:
   - "tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline"
   - ".migration/evidence/runs/BK-05F.md"
 notes: "Named source tests cover routing behavior, not view rendering. The source bean returns `.html` although Faces Servlet maps `.xhtml`; ruling #236 requires the target to redirect to cargo details."
+rules:
+  - id: route-screen-methods
+    rule: "The route screen accepts GET to display candidates and POST to submit an assignment; other methods are rejected."
+    source: "src/cargotracker/booking/interfaces/route_selection/views.py:29-31"
+  - id: route-screen-cargo-exists
+    rule: "An unknown cargo tracking ID returns HTTP 404 instead of rendering the route screen."
+    source: "src/cargotracker/booking/interfaces/route_selection/views.py:67-70; ruling #232"
