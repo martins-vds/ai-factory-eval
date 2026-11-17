@@ -49,3 +49,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T21:34:39+00:00 | behavior-final | 0 | 55.82 | `pytest -q` | `fa54c80c0a7687bc` |  |  |
 | 2026-11-17T21:35:32+00:00 | crap-final | 0 | 52.71 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `ee158a7de1fac800` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-17T21:36:46+00:00 | regression-final | 0 | 74.64 | `pytest -q` | `a9c372b58c4f937f` |  |  |
+| 2026-11-17T21:38:58+00:00 | final-build-compile-verify | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-17T21:38:58+00:00 | final-build-check-verify | 0 | 0.34 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-17T21:38:58+00:00 | final-idiom-verify | 0 | 0.02 | `bash -c 'ruff check && ruff format --check'` | `6a496cdbbfea65a9` |  |  |
+| 2026-11-17T21:39:50+00:00 | final-behavior-verify | 0 | 52.11 | `pytest -q` | `0e68f8a9afc62c20` |  |  |
+| 2026-11-17T21:40:45+00:00 | final-crap-verify | 0 | 54.69 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `4ce2b5b8695e901a` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
