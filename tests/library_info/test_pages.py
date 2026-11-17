@@ -35,7 +35,9 @@ def test_about_ui_renders_reading_room_content_and_assets(client, live_server):
                 'Open Monday to Saturday, 9:00 to 18:00. Books are lent for 14 days.',
                 exact=True,
             ).is_visible()
-            assert page.get_by_text('Contact: desk@lending-library.invalid', exact=True).is_visible()
+            assert page.get_by_text(
+                'Contact: desk@lending-library.invalid', exact=True
+            ).is_visible()
             assert page.locator('link[href="/static/css/tailwind.css"]').count() == 1
             assert (
                 page.locator(
