@@ -1,0 +1,30 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/940
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: afs-mutation exited 2 before scoring; three of 81 files had untested mutants after verifier-added tests failed"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: major
+    where: templates/booking/dashboard/not_routed_table.html:29-49
+    what: Destination and deadline edit actions have no native link or form fallback, so the page cannot open them without JavaScript.
+    evidence: tests/booking/interfaces/test_dialogs.py::test_not_routed_dialog_actions_have_non_javascript_fallbacks
+  - severity: major
+    where: templates/booking/dashboard/not_routed_table.html:72-83
+    what: HTMX 404 responses are not configured to swap, so an unknown or stale tracking ID leaves the dialog on its loading message instead of showing the not-found response.
+    evidence: tests/booking/interfaces/test_dialogs.py::test_dialog_htmx_not_found_response_is_swapped_for_user_feedback
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_dialog_actions_have_non_javascript_fallbacks
+  - tests/booking/interfaces/test_dialogs.py::test_dialog_htmx_not_found_response_is_swapped_for_user_feedback
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_returns_not_found
+ledger_issues:
+  - booking.screen-not-routed-table remains in-progress and lists only BK-05E although its note assigns the dialog actions to BK-05G; this return and dialog evidence are not linked.
+quirk_tickets: []

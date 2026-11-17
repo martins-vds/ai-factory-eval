@@ -64,3 +64,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-17T12:58:08+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-17T12:58:12+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-17T13:30:58+00:00 | mutation-changed | 2 | 1959.69 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `0b0eb0b15ab26404` | afs-mutation: mutmut failed on src/cargotracker/cargo/domain/delivery.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=3 files=81 base=origin/main |
+| 2026-11-17T13:33:18+00:00 | validate | 2 | 0.12 | `python .migration/harness/tools/validate.py` | `8ccf6c31e456c000` | validate.py: error: the following arguments are required: folder |  |
+| 2026-11-17T13:33:27+00:00 | validate | 0 | 2.31 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
