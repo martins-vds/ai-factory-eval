@@ -28,7 +28,7 @@ findings:
     evidence: tests/loans/test_catalog.py::test_htmx_return_unknown_loan_renders_an_error
   - severity: major
     where: templates/loans/loan-form.html:2-17
-    what: "New lending and return templates use Tailwind utilities absent from static/css/tailwind.css, so the LL-02 controls are unstyled."
+    what: "LL-02 lending and return templates reference Tailwind utilities absent from static/css/tailwind.css, so their intended spacing and custom button colors do not render."
     evidence: "run: ui-check-verify"
   - severity: minor
     where: src/loans/repository.py:20-21
