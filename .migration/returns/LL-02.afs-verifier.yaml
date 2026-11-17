@@ -1,0 +1,49 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1044
+pr: martins-vds/ai-factory-eval#1049
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: pytest failed before CRAP analysis"
+  mutation_changed: "n/a: mutmut failed on the behavior-test baseline"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:9
+    what: lend_loan accepts empty required fields when called directly; the form alone enforces ruling #39.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_empty_required_fields
+  - severity: major
+    where: src/loans/services.py:4
+    what: The use case imports Django time and the concrete ORM repository; the repeat-return invariant is also enforced in the repository adapter.
+    evidence: "run: verify-idiom-final2"
+  - severity: major
+    where: templates/loans/detail.html:25
+    what: The htmx return request has no 4xx/5xx response handler, so its unknown-loan 404 is not swapped into the page.
+    evidence: tests/loans/test_catalog.py::test_reading_room_configures_htmx_error_response_handling
+  - severity: minor
+    where: templates/loans/new.html:6
+    what: The new reading-room templates use Tailwind utilities absent from the built CSS; the UI gate reports 16 missing utility/error-handling findings.
+    evidence: "run: verify-idiom-final2"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:1
+    what: Of the 17 recorded survivors, unknown-return response and transaction-boundary diffs matter and now have tests; the repeat-return context mutant has existing coverage. Route, method-guard, and LoanForm.Meta.model survivors have behavior coverage, but mutation kills remain unconfirmed.
+    evidence: "run: verify-mutation-final2"
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_empty_required_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_sets_a_fourteen_day_due_date
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_the_original_date_on_repeat
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_reading_room_configures_htmx_error_response_handling
+  - tests/loans/test_catalog.py::test_return_endpoint_can_record_a_return_outside_testcase_transactions
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
