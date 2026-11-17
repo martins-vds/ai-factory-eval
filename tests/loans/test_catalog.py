@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 
@@ -124,6 +125,15 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     assert response.content.decode() == (
         'member: This field is required.\nisbn: This field is required.'
     )
+
+
+@pytest.mark.django_db
+def test_loan_form_requires_member_and_isbn_fields():
+    form = LoanForm(data={'member': '', 'isbn': ''})
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert not form.is_valid()
+    assert set(form.errors) == {'member', 'isbn'}
 
 
 @pytest.mark.django_db
