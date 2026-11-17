@@ -41,6 +41,22 @@ def test_fee_endpoint_returns_characterized_not_found_response(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L3'),
+        ('get', '/payments/L3'),
+        ('post', '/ui/fees/L3/'),
+        ('get', '/ui/payments/L3/'),
+    ],
+)
+def test_fee_routes_reject_unsupported_http_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
 def test_payment_endpoint_forwards_the_characterized_gateway_request(client, payment_gateway):
     expected = GATEWAY_GOLDENS['responses']['POST /payments/L1 via test gateway']['response']
 
