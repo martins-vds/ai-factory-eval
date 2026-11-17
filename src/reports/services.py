@@ -27,6 +27,13 @@ class MonthlyReportRow:
     late_fees_cents: int
 
 
+@dataclass
+class _MemberTotals:
+    loans_started: int = 0
+    late_returns: int = 0
+    late_fees_cents: int = 0
+
+
 class MonthlyReportApplication:
     def __init__(self, repository: MonthlyReportRepository, clock: Clock):
         self.repository = repository
@@ -37,21 +44,26 @@ class MonthlyReportApplication:
         month_end = today.replace(day=1)
         previous_month_end = month_end - timedelta(days=1)
         month_start = previous_month_end.replace(day=1)
-        totals: dict[str, list[int]] = {}
+        totals: dict[str, _MemberTotals] = {}
 
         for loan in self.repository.started_between(month_start, month_end):
-            member_totals = totals.setdefault(loan.member, [0, 0, 0])
-            member_totals[0] += 1
+            member_totals = totals.setdefault(loan.member, _MemberTotals())
+            member_totals.loans_started += 1
 
             fee_end = loan.returned_on if loan.returned_on is not None else today
             days_late = max(0, (fee_end - loan.due_on).days)
             if loan.returned_on is not None and loan.returned_on > loan.due_on:
-                member_totals[1] += 1
+                member_totals.late_returns += 1
             if days_late > 2:
-                member_totals[2] += min(1000, days_late * 25)
+                member_totals.late_fees_cents += min(1000, days_late * 25)
 
         rows = [
-            MonthlyReportRow(member, loans_started, late_returns, late_fees_cents)
-            for member, (loans_started, late_returns, late_fees_cents) in totals.items()
+            MonthlyReportRow(
+                member,
+                totals.loans_started,
+                totals.late_returns,
+                totals.late_fees_cents,
+            )
+            for member, totals in totals.items()
         ]
         return sorted(rows, key=lambda row: (-row.late_fees_cents, row.member))
