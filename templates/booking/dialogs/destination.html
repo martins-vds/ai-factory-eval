@@ -27,7 +27,7 @@
         class="select select-bordered w-full"
         required
       >
-        <option value="">Select a destination</option>
+        <option value=""{% if not destination_value %} selected{% endif %}>Select a destination</option>
         {% for location in destinations %}
           <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
             {{ location.name }} ({{ location.unlocode.value }})

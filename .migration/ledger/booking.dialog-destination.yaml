@@ -8,7 +8,11 @@ source:
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/destination.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +20,9 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_specification_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_fields_and_refreshes_table"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "Destination filtering and render stability are presentation behavior (#235); cargo destination invariants are recorded in booking.destination-change."
+notes: "Destination options exclude origin and current destination without mutating the location list (#235); successful updates refresh the table without the unavailable-widget warning (#251)."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
