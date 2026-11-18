@@ -57,6 +57,8 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert 'AUMEL' not in option_codes
     assert locations_before == location_repository.find_all()
     assert option_codes == second_option_codes
+    assert 'method="dialog"' in content
+    assert 'Cancel' in content
 
 
 @pytest.mark.django_db
@@ -191,3 +193,6 @@ def test_not_routed_table_opens_edit_dialogs_without_changing_route_link(client)
     assert 'aria-label="Change destination for cargo DEF789"' in not_routed_table
     assert 'aria-label="Change deadline for cargo DEF789"' in not_routed_table
     assert 'id="cargo-edit-dialog"' in not_routed_table
+    assert 'aria-label="Edit cargo"' in not_routed_table
+    assert 'hx-on::after-swap=' in not_routed_table
+    assert 'dialog.showModal()' in not_routed_table
