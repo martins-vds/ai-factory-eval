@@ -1,0 +1,86 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1435
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1442
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 6.0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings: []
+tests_added:
+  - tests/loans/test_circulation_services.py::test_lend_loan_rejects_missing_required_values
+  - tests/loans/test_circulation_services.py::test_lend_loan_rejects_blank_values
+  - tests/loans/test_circulation_services.py::test_lend_loan_records_the_server_date
+  - tests/loans/test_circulation_services.py::test_lend_loan_sets_due_date_fourteen_days_after_lending
+  - tests/loans/test_circulation_services.py::test_lend_loan_allocates_an_id_after_the_existing_loan_count
+  - tests/loans/test_circulation_services.py::test_return_loan_records_the_server_date
+  - tests/loans/test_circulation_services.py::test_return_loan_reports_an_unknown_id
+  - tests/loans/test_circulation_services.py::test_return_loan_rejects_a_repeat_without_changing_the_date
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited: []
+rules:
+  - capability: loan.lend
+    rule: Missing member or ISBN fields are rejected with HTTP 400.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation_services.py::test_lend_loan_rejects_missing_required_values
+    enforced: true
+    ledger_rule: member-isbn-required
+  - capability: loan.lend
+    rule: Empty or whitespace-only member and ISBN values are rejected with field errors.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation_services.py::test_lend_loan_rejects_blank_values
+    enforced: true
+    ledger_rule: reject-blank-values
+  - capability: loan.lend
+    rule: A successful loan is dated with the current server date.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation_services.py::test_lend_loan_records_the_server_date
+    enforced: true
+    ledger_rule: lent-date
+  - capability: loan.lend
+    rule: A loan is due 14 calendar days after its lending date.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation_services.py::test_lend_loan_sets_due_date_fourteen_days_after_lending
+    enforced: true
+    ledger_rule: due-date
+  - capability: loan.lend
+    rule: A new loan id is L followed by the current loan count plus one.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation_services.py::test_lend_loan_allocates_an_id_after_the_existing_loan_count
+    enforced: true
+    ledger_rule: generated-id
+  - capability: loan.return-date
+    rule: The first return records the current server date on the loan.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation_services.py::test_return_loan_records_the_server_date
+    enforced: true
+    ledger_rule: record-first-return
+  - capability: loan.return-date
+    rule: A return attempt on an already-returned loan is rejected without replacing its original return date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation_services.py::test_return_loan_rejects_a_repeat_without_changing_the_date
+    enforced: true
+    ledger_rule: preserve-return-date
+  - capability: loan.return
+    rule: Only an existing loan can be returned; an absent id returns HTTP 404 and `no such loan`.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation_services.py::test_return_loan_reports_an_unknown_id
+    enforced: true
+    ledger_rule: known-loan
+  - capability: loan.return
+    rule: An already-returned loan cannot be returned again; the original date remains unchanged.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation_services.py::test_return_loan_rejects_a_repeat_without_changing_the_date
+    enforced: true
+    ledger_rule: repeat-rejected
