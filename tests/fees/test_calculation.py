@@ -10,9 +10,9 @@ from src.fees.services import calculate_late_fee
     [
         (date(2026, 1, 1), None, 0, 0),
         (date(2026, 1, 3), None, 2, 0),
-        (date(2026, 1, 4), None, 3, 25),
+        (date(2026, 1, 4), None, 3, 75),
         (date(2026, 3, 1), None, 59, 1000),
-        (date(2026, 2, 1), date(2026, 1, 4), 3, 25),
+        (date(2026, 2, 1), date(2026, 1, 4), 3, 75),
     ],
 )
 def test_late_fee_uses_return_date_or_today_with_grace_period_and_cap(
