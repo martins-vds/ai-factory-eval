@@ -13,8 +13,7 @@ def fee_api(request, loan_id):
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
     body = format_html(
-        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-        '<p class="fee">Fee: {}</p>',
+        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: {}</p>',
         fee.loan.id,
         fee.loan.due_on,
         fee.late_days,
@@ -56,13 +55,10 @@ def payment_page(request, loan_id):
             status=result.status_code,
         )
 
-    if result.status_code == 404:
+    if result.loan is None:
         return render(request, 'fees/not-found.html', context, status=404)
 
-    fee = fee_application.calculate(loan_id)
-    if fee is None:
-        return render(request, 'fees/not-found.html', context, status=404)
-
+    fee = fee_application.calculate_for(result.loan)
     context.update(
         {
             'fee': fee,

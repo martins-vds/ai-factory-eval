@@ -10,30 +10,30 @@
   </nav>
   <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
   <h1 class="mb-8 mt-3 text-5xl">Late fees</h1>
-  <div class="grid gap-8 md:grid-cols-[1fr_18rem]">
+  <div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
     <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
       <div class="card-body">
         <p class="text-[#66705b]">{{ fee.loan.member }} · {{ fee.loan.id }}</p>
-        <h2 class="card-title mt-2 text-3xl">Loan {{ fee.loan.id }}</h2>
-        <p class="mt-5">Due {{ fee.loan.due_on|date:"M j, Y" }}{% if fee.loan.returned_on %} · returned {{ fee.loan.returned_on|date:"M j, Y" }}{% endif %}</p>
+        <h2 class="card-title mt-2 text-2xl">Loan {{ fee.loan.id }}</h2>
+        <p class="mt-6">Due {{ fee.loan.due_on|date:"M j, Y" }}{% if fee.loan.returned_on %} · returned {{ fee.loan.returned_on|date:"M j, Y" }}{% endif %}</p>
         <p class="mt-2">{{ fee.late_days }} day(s) late · first two days waived</p>
-        <p class="mt-7 text-6xl font-bold">{{ fee.amount }}</p>
+        <p class="mt-6 text-5xl font-bold">{{ fee.amount }}</p>
         <p class="mt-2 text-[#66705b]">Once more than two days late, each late day is charged at 25¢, capped at $10.00.</p>
         <div id="payment-status" class="mt-6">
           {% if result %}{% include "fees/payment-status.html" %}{% endif %}
         </div>
-        <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
-              hx-post="/ui/payments/{{ fee.loan.id }}/"
+        <form method="post" action="{% url 'payment_page' fee.loan.id %}"
+              hx-post="{% url 'payment_page' fee.loan.id %}"
               hx-target="#payment-status" hx-swap="innerHTML"
               hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
           {% csrf_token %}
-          <button class="btn mt-3 bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+          <button class="btn btn-primary mt-3" type="submit">Pay late fee</button>
         </form>
       </div>
     </article>
-    <nav aria-label="Choose a loan fee" class="space-y-2">
+    <nav aria-label="Choose a loan fee" class="grid gap-4">
       {% for item in fees %}
-      <a class="block border border-[#d8cdbb] bg-[#fffdf7] p-4 text-[#2f3428]" href="/ui/fees/{{ item.loan.id }}/">
+      <a class="block border border-[#d8cdbb] bg-[#fffdf7] px-6 py-5 text-[#2f3428]" href="{% url 'fee_page' item.loan.id %}">
         <strong>{{ item.loan.id }}</strong> · {{ item.loan.member }}
         <span class="mt-1 block text-[#66705b]">{{ item.amount }}</span>
       </a>

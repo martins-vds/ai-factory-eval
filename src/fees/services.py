@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from datetime import date
 from typing import Protocol
@@ -38,12 +37,12 @@ class FeeApplication:
 
     def calculate(self, loan_id: str) -> FeeQuote | None:
         loan = self.loans.find(loan_id)
-        return self._quote(loan) if loan else None
+        return self.calculate_for(loan) if loan else None
 
     def all_fees(self) -> list[FeeQuote]:
-        return [self._quote(loan) for loan in self.loans.all()]
+        return [self.calculate_for(loan) for loan in self.loans.all()]
 
-    def _quote(self, loan: LoanRecord) -> FeeQuote:
+    def calculate_for(self, loan: LoanRecord) -> FeeQuote:
         end_date = loan.returned_on or self.clock.today()
         late_days = max(0, (end_date - loan.due_on).days)
         amount_cents = 0 if late_days <= 2 else min(1000, late_days * 25)
@@ -69,6 +68,7 @@ class PaymentResult:
     status_code: int
     body: str
     failure: PaymentGatewayError | None = None
+    loan: LoanRecord | None = None
 
     @property
     def succeeded(self):
@@ -81,15 +81,17 @@ class PaymentApplication:
         self.gateway = gateway
 
     def pay(self, loan_id: str) -> PaymentResult:
-        if self.loans.find(loan_id) is None:
+        loan = self.loans.find(loan_id)
+        if loan is None:
             return PaymentResult(404, 'no such loan\n')
 
         try:
             response = self.gateway.charge(loan_id)
         except PaymentGatewayError as exc:
-            return PaymentResult(502, 'payment gateway unavailable\n', exc)
+            return PaymentResult(502, 'payment gateway unavailable\n', exc, loan)
 
         return PaymentResult(
             200 if response.status_code == 200 else 502,
             response.body,
+            loan=loan,
         )
