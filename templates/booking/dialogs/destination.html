@@ -1,4 +1,4 @@
-<dialog id="destination-dialog" open class="modal modal-open" aria-labelledby="destination-heading" aria-modal="true">
+<dialog id="destination-dialog" class="modal" aria-labelledby="destination-heading" aria-modal="true">
   <div class="modal-box">
     <h2 id="destination-heading" class="text-xl font-semibold">Change destination</h2>
     <p class="mt-3">Origin: {{ cargo.route_specification.origin.name }}</p>
@@ -19,8 +19,7 @@
         name="destination"
         required
         autofocus
-        aria-describedby="{% if destination_error %}destination-error{% endif %}"
-        {% if destination_error %}aria-invalid="true"{% endif %}
+        {% if destination_error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
         class="select select-bordered w-full"
       >
         <option value="" selected disabled>Choose a destination</option>

@@ -1,4 +1,13 @@
-<section id="not-routed-cargo" aria-labelledby="not-routed-cargo-heading">
+<section
+  id="not-routed-cargo"
+  aria-labelledby="not-routed-cargo-heading"
+  hx-get="/admin/dashboard/"
+  hx-trigger="cargo-updated from:body"
+  hx-select="#not-routed-cargo"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+>
   <h2 id="not-routed-cargo-heading" class="mb-3 text-xl font-semibold text-gray-900">Not Routed Cargo</h2>
   <div class="overflow-x-auto">
     <table class="w-full border-collapse text-left">
@@ -8,6 +17,7 @@
           <th scope="col" class="p-3">Origin</th>
           <th scope="col" class="p-3">Destination</th>
           <th scope="col" class="p-3">Deadline</th>
+          <th scope="col" class="p-3">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -30,9 +40,33 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                  hx-target="#cargo-dialog"
+                  hx-swap="innerHTML"
+                  aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+                  class="btn btn-ghost"
+                >Change destination</button>
+                <button
+                  type="button"
+                  hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                  hx-target="#cargo-dialog"
+                  hx-swap="innerHTML"
+                  aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+                  class="btn btn-ghost"
+                >Change arrival deadline</button>
+              </div>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+<div
+  id="cargo-dialog"
+  hx-on::after-swap="const dialog = this.querySelector('dialog'); if (dialog && !dialog.open) dialog.showModal()"
+></div>

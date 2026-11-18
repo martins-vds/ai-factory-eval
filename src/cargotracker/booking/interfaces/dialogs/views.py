@@ -1,5 +1,5 @@
 from collections.abc import Callable
-from datetime import date, datetime, time
+from datetime import UTC, date, datetime, time
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -38,7 +38,8 @@ def create_destination_dialog_view(
         destinations = [
             location
             for location in locations
-            if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
         ]
         destination_error = ''
         if request.method == 'POST':
@@ -95,7 +96,7 @@ def create_deadline_dialog_view(
             else:
                 cargo_specification.change_deadline(
                     TrackingId(tracking_id),
-                    timezone.make_aware(datetime.combine(deadline, time.min)),
+                    datetime.combine(deadline, time.min, tzinfo=UTC),
                 )
                 return _update_complete(request)
 

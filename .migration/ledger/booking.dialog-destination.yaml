@@ -5,16 +5,26 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeDestination.xhtml:src/main/webapp/admin/dialogs/changeDestination.xhtml
   location: src/main/webapp/admin/dialogs/changeDestination.xhtml:9-40
   risk: {crap: 20, complexity: 4, coverage: 0.0}
-boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "Destination dialog receives trackingId, displays origin/current destination, offers filtered destinations excluding both, and updates/refreshes the not-routed row on success."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-eval#1418]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_destination_dialog_view
+    - templates/booking/dialogs/destination.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_route_specification_and_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_options_are_stable_across_renders"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_origin_without_changing_route"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_destination_preserves_route_and_refreshes_table"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "The filtered choice list is dialog presentation; route-specification invariants and updates are enforced by the booking.destination-change capability."
+notes: "The #235 ruling requires each render to filter a copy without mutating the location list. Successful updates omit the #251 unavailable-widget warning."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]

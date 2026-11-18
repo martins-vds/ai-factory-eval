@@ -15,3 +15,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:46:40+00:00 | red-deadline-parse-error | 1 | 1.31 | `pytest -q tests/booking/interfaces/test_dialogs.py -k parse_error` | `4f5fb2d042b7759d` | assert cargo is not None |  |
 | 2026-11-18T13:46:58+00:00 | red-deadline-success | 1 | 1.38 | `pytest -q tests/booking/interfaces/test_dialogs.py -k updates_deadline` | `f7d8842ef45cf804` | assert cargo is not None |  |
 | 2026-11-18T13:47:18+00:00 | green-deadline-flows | 0 | 2.29 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `8c6fecfc1b2d4cb4` |  |  |
+| 2026-11-18T13:47:51+00:00 | stable-destination-options | 1 | 1.28 | `pytest -q tests/booking/interfaces/test_dialogs.py -k stable_across_renders` | `317464814fa5d506` | E       TypeError: create_destination_dialog_view() missing 1 required positional argument: 'list_shipping_locations' |  |
+| 2026-11-18T13:48:00+00:00 | stable-destination-options | 0 | 1.27 | `pytest -q tests/booking/interfaces/test_dialogs.py -k stable_across_renders` | `4bdbdee06d197466` |  |  |
+| 2026-11-18T13:48:17+00:00 | red-dialog-table-actions | 1 | 1.31 | `pytest -q tests/booking/interfaces/test_dialogs.py -k opens_destination` | `a1058d27d1976f2e` | assert response.status_code == 200 |  |
+| 2026-11-18T13:48:38+00:00 | green-dialog-flows | 0 | 2.9 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `833d0e0e1598f02f` |  |  |
+| 2026-11-18T13:48:44+00:00 | dashboard-regression | 0 | 1.61 | `pytest -q tests/booking/interfaces/test_dashboard.py` | `7d4c2db06b269aea` |  |  |
+| 2026-11-18T13:49:56+00:00 | ui-boundary-regression | 0 | 3.48 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `be6b35fc91699d3b` |  |  |
+| 2026-11-18T13:49:59+00:00 | ui-template-check | 0 | 0.27 | `python .migration/harness/tools/check_ui.py` | `7c2daa377753628d` |  | gate=ui scope="templates changed since 0e7957db18c6fb70b7245b24e4a6ac8e854abe5f" templates=3 findings=0 |
+| 2026-11-18T13:52:25+00:00 | focused-dialog-suite | 0 | 3.48 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `4201ab072cc558d0` |  |  |
+| 2026-11-18T13:52:29+00:00 | idiom-ruff-check | 1 | 0.02 | `ruff check` | `a41e36073d296c99` | Found 1 error. |  |
+| 2026-11-18T13:52:35+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T13:52:39+00:00 | idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `57f66d94f77b3a7b` |  |  |
+| 2026-11-18T13:52:54+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T13:53:57+00:00 | focused-dialog-tests | 1 | 3.23 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `d1505eba75da152e` | E       AssertionError: Regex pattern did not match. |  |
+| 2026-11-18T13:54:05+00:00 | focused-dialog-tests | 0 | 3.27 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `bf52e4e51d0f2814` |  |  |
