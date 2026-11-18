@@ -1,0 +1,22 @@
+[
+  {
+    "at": "2026-11-18T13:40:28Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20346,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "decision": "allow",
+    "why": "error: TimeoutExpired(['git', 'fetch', '-q', 'origin', '+refs/heads/*:refs/remotes/origin/*'], 90)"
+  }
+]
