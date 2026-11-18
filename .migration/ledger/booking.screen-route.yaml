@@ -7,9 +7,13 @@ source:
   risk: {crap: 12, complexity: 3, coverage: 0.0}
 boundary: "Route page loads cargo and candidates, displays origin/destination/deadline and candidate count, shows an empty-state message or numbered itineraries with voyage, load/unload locations and dates, and lets the user select an index."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-eval#1385]
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/route.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
@@ -18,4 +22,9 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_page_renders_candidate_properties_and_numbered_legs"
+  - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_cargo_details_and_persists_selected_route"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "The screen presents the application's already-filtered route candidates; business eligibility belongs to booking.routing-candidates."
+notes: "The page displays cargo route details, candidate counts, numbered legs, and assignment controls. The target candidate-property assertions are not claimed as executed legacy evidence for #239; assignment redirects to cargo details under ruling #236."
+quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#239]

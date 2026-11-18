@@ -7,12 +7,20 @@ source:
   risk: {crap: 12, complexity: 3, coverage: 0.0}
 boundary: "The select-itinerary page reads trackingId and loads ItinerarySelection; when routeCandidates is empty it advises moving the arrival deadline further into the future."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-eval#1385]
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/select_itinerary.html
+status: migrated
 verification: characterized
 characterization_tier: A
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "This page contains only an empty-route state; the populated candidate table is in route.xhtml. With candidates present, its body is blank (.migration/quirks/booking-select-itinerary-blank-with-candidates.md). No named JUnit class exercises the page."
+  - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidates_when_present"
+  - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_keeps_no_routes_guidance_when_candidates_are_empty"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "The page presents candidate routes or no-route guidance and does not apply additional business rules."
+notes: "The page now renders candidates when present, as approved by ruling #252, and retains the characterized no-route guidance when empty."
 quirks: [martins-vds/ai-factory-pilot-target#252]
