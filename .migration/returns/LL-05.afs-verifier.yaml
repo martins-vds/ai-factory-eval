@@ -1,0 +1,60 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1469
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1480
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 9.0
+  mutation_changed: 0.967
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings:
+  - severity: minor
+    where: src/reports/services.py:12
+    what: "Possible Data Clumps (judgment call): start_on and end_before travel together through the use-case/repository period query; only one operation currently uses this pair."
+tests_added:
+  - tests/reports/test_monthly_report.py::test_monthly_report_waives_two_late_days_and_excludes_next_month_returns
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: "A first-of-month run covers the complete previous calendar month using a half-open date interval."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: report-window
+  - capability: reports.monthly-spec
+    rule: "Include one row per member with a loan started in the report month; omit members without a loan started in that month."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: member-inclusion
+  - capability: reports.monthly-spec
+    rule: "Count loans started and late returns made in the report month, and sum late fees in cents."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: monthly-metrics
+  - capability: reports.monthly-spec
+    rule: "Waive fees through two days late, then charge 25 cents per late day."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_waives_two_late_days_and_excludes_next_month_returns
+    enforced: true
+    ledger_rule: late-fee-policy
+  - capability: reports.monthly-spec
+    rule: "Cap each late fee at 1000 cents."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: late-fee-policy
+  - capability: reports.monthly-spec
+    rule: "Sort rows by total late fees descending, then member id ascending."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: report-order
+no_rules: {}
