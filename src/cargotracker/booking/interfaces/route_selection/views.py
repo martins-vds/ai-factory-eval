@@ -17,7 +17,6 @@ from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
 
 _CANDIDATE_SALT = 'booking.route-selection'
-_CANDIDATE_MAX_AGE = 15 * 60
 
 
 def _candidate_token(tracking_id: str, itinerary: Itinerary) -> str:
@@ -46,7 +45,7 @@ def _candidate_token(tracking_id: str, itinerary: Itinerary) -> str:
 
 
 def _itinerary_from_token(token: str, tracking_id: str) -> Itinerary:
-    payload = signing.loads(token, salt=_CANDIDATE_SALT, max_age=_CANDIDATE_MAX_AGE)
+    payload = signing.loads(token, salt=_CANDIDATE_SALT)
     if not isinstance(payload, dict) or payload.get('tracking_id') != tracking_id:
         raise signing.BadSignature
 

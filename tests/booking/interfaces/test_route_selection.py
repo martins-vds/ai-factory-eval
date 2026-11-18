@@ -1,8 +1,11 @@
+from dataclasses import replace
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -112,6 +115,8 @@ def test_route_page_displays_candidate_count_and_numbered_itinerary_legs(
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
     assert 'Leg 1' in content and 'Leg 2' in content
     assert '0300A' in content and '0200T' in content
+    assert 'role="alert"' not in content
+    assert response.context['candidate_error'] == ''
 
     candidates = [route['itinerary'] for route in response.context['routes']]
     assert candidate_routing_service.requested_route == (ORIGIN, DESTINATION)
@@ -181,10 +186,15 @@ def test_route_and_select_itinerary_show_no_route_guidance(seeded_route_candidat
     assert 'Potential routes:' in route_response.content.decode()
     assert '0</span>' in route_response.content.decode()
     assert (
+        'No routes found that satisfy the route specification. '
         'Try setting an arrival deadline further into the future.'
         in route_response.content.decode()
     )
-    assert 'a few weeks at least' in selection_response.content.decode()
+    assert (
+        'No routes found that satisfy the route specification. '
+        'Try setting an arrival deadline further into the future (a few weeks at least).'
+        in selection_response.content.decode()
+    )
     assert 'Assign itinerary' not in selection_response.content.decode()
 
 
@@ -202,6 +212,97 @@ def test_invalid_candidate_token_does_not_assign_a_route(client, seeded_route_ca
     cargo = cargo_repository.find(TrackingId('DEF789'))
 
     assert assignment_response.status_code == 400
-    assert 'Choose a valid route.' in assignment_response.content.decode()
+    assert assignment_response.context['candidate_error'] == 'Choose a valid route.'
+    assert cargo is not None
+    assert not cargo.itinerary.legs
+
+
+@pytest.mark.parametrize(
+    'url',
+    ['/admin/cargo/DEF789/route/', '/admin/cargo/DEF789/itineraries/'],
+)
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_pages_reject_unsupported_methods(client, url):
+    response = client.put(url)
+
+    assert response.status_code == 405
+    assert response.headers['Allow'] == 'GET, POST'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_page_reports_missing_cargo():
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        route_view(RequestFactory().get('/admin/cargo/UNKNOWN/route/'), 'UNKNOWN')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_signed_candidate_for_another_cargo_cannot_be_assigned(client, seeded_route_candidates):
+    response = client.get('/admin/cargo/DEF789/route/')
+    token = response.context['routes'][0]['token']
+
+    assignment_response = client.post(
+        '/admin/cargo/MNO456/route/',
+        {'candidate': token},
+    )
+
+    assert assignment_response.status_code == 400
+    assert assignment_response.context['candidate_error'] == 'Choose a valid route.'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
+    'payload',
+    [
+        ['not a mapping'],
+        {'tracking_id': 'DEF789', 'legs': []},
+    ],
+)
+def test_invalid_signed_candidate_payloads_are_rejected(client, seeded_route_candidates, payload):
+    token = signing.dumps(payload, salt='booking.route-selection')
+
+    response = client.post('/admin/cargo/DEF789/route/', {'candidate': token})
+
+    assert response.status_code == 400
+    assert response.context['candidate_error'] == 'Choose a valid route.'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_missing_candidate_is_rejected(client, seeded_route_candidates):
+    response = client.post('/admin/cargo/DEF789/route/')
+
+    assert response.status_code == 400
+    assert response.context['candidate_error'] == 'Choose a valid route.'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_candidate_must_still_satisfy_the_current_route_specification(
+    client, seeded_route_candidates
+):
+    response = client.get('/admin/cargo/DEF789/route/')
+    token = response.context['routes'][1]['token']
+    updated_specification = replace(
+        seeded_route_candidates.route_specification,
+        arrival_deadline=datetime(2026, 11, 14, tzinfo=UTC),
+    )
+    cargo_repository.upsert(
+        replace(seeded_route_candidates, route_specification=updated_specification)
+    )
+
+    assignment_response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate': token},
+    )
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+
+    assert assignment_response.status_code == 400
+    assert (
+        assignment_response.context['candidate_error']
+        == 'Choose a route that satisfies the current route specification.'
+    )
     assert cargo is not None
     assert not cargo.itinerary.legs
