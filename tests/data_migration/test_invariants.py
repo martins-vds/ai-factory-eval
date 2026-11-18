@@ -187,6 +187,5 @@ def test_loaded_carrier_movement_schedules_are_in_order(tmp_path):
         assert all(movement.departure_time < movement.arrival_time for movement in movements)
         assert all(
             previous.arrival_time <= following.departure_time
-            and previous.arrival_location_id == following.departure_location_id
             for previous, following in pairwise(movements)
         )

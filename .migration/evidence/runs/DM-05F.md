@@ -40,3 +40,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:48:37+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
 | 2026-11-18T13:04:25+00:00 | behavior | 0 | 47.14 | `pytest -q` | `a82b0444afc8953f` |  |  |
 | 2026-11-18T13:05:32+00:00 | regression | 0 | 48.55 | `pytest -q` | `03da98cea7b5bf95` |  |  |
+| 2026-11-18T13:08:55+00:00 | targeted-tests | 0 | 2.16 | `pytest -q tests/data_migration/test_invariants.py` | `2f3f135b0c3dde0e` |  |  |
+| 2026-11-18T13:08:56+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T13:08:56+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `9eb349efea514fbe` |  |  |
+| 2026-11-18T13:09:01+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T13:09:02+00:00 | build-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T13:09:02+00:00 | idiom-layers | 0 | 0.15 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T13:09:02+00:00 | idiom-ui | 0 | 0.54 | `python .migration/harness/tools/check_ui.py` | `4bb50f56ce3cb94f` |  | gate=ui scope="templates changed since eb1a34bde78d1032d64b46b30e4fe650290f317f" templates=0 findings=0 |
+| 2026-11-18T13:10:07+00:00 | crap-coverage | 0 | 57.79 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `0d51c8842525a1d6` |  |  |
+| 2026-11-18T13:10:08+00:00 | crap-lizard | 0 | 0.15 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T13:10:08+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
+| 2026-11-18T13:10:57+00:00 | behavior | 0 | 49.31 | `pytest -q` | `518edc79ceaef887` |  |  |
+| 2026-11-18T13:11:45+00:00 | regression | 0 | 47.21 | `pytest -q` | `05f04b74015cef79` |  |  |
