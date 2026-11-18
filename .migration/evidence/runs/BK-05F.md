@@ -60,3 +60,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T03:48:57+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T03:49:21+00:00 | mutation-changed | 0 | 0.26 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-18T03:52:48+00:00 | route-interface-contract-tests | 0 | 4.45 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `abd89a051ad0ad52` |  |  |
+| 2026-11-18T03:53:23+00:00 | route-interface-tests-after-simplificati | 0 | 1.75 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `bd9d8a067a918c6d` |  |  |
+| 2026-11-18T03:53:26+00:00 | mutation-changed-first-edit | 0 | 0.05 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
