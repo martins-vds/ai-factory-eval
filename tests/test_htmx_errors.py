@@ -1,62 +1,107 @@
+from pathlib import Path
+
 import pytest
+from playwright.sync_api import sync_playwright
+
+HTMX_CDN_URL = 'https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js'
+HTMX_FIXTURE = Path(__file__).parent / 'fixtures' / 'htmx-2.0.11.min.js'
 
 
-def assert_error_responses_are_configured(response, target):
-    assert response.status_code == 200
-    assert response.content.count(b'htmx.config.responseHandling = [') == 1
-    assert b'{code: "204", swap: false}' in response.content
-    assert b'{code: "[23]..", swap: true}' in response.content
-    assert b'{code: "[45]..", swap: true, error: true}' in response.content
-    assert b'{code: "...", swap: false}' in response.content
-    assert f'hx-target="#{target}"'.encode() in response.content
+@pytest.fixture
+def htmx_page(live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        page = browser.new_page()
+        page.route(
+            HTMX_CDN_URL,
+            lambda route: route.fulfill(
+                path=str(HTMX_FIXTURE),
+                content_type='application/javascript',
+            ),
+        )
+        yield page
+        browser.close()
 
 
-@pytest.mark.django_db
-def test_payment_error_fragment_matches_the_payment_target(client, monkeypatch):
-    page = client.get('/ui/fees/L1/')
+def assert_error_fragment_swapped(
+    page,
+    *,
+    base_url,
+    page_path,
+    request_path,
+    button_name,
+    status,
+    target,
+    message,
+):
+    request = {}
 
-    assert_error_responses_are_configured(page, 'payment-status')
+    def respond_with_error(route):
+        request['headers'] = route.request.headers
+        route.fulfill(
+            status=status,
+            content_type='text/html',
+            body=f'<div id="{target}"><p role="alert">{message}</p></div>',
+        )
 
-    def unavailable(_request):
-        raise OSError('gateway unreachable')
+    page.route(f'**{request_path}', respond_with_error)
+    page.goto(f'{base_url}{page_path}')
+    assert page.evaluate('typeof htmx') == 'object'
+    assert page.evaluate(
+        'htmx.config.responseHandling.map(({code, swap, error}) => [code, swap, error ?? null])'
+    ) == [
+        ['204', False, None],
+        ['[23]..', True, None],
+        ['[45]..', True, True],
+        ['...', False, None],
+    ]
 
-    monkeypatch.setattr('src.fees.gateway._open', unavailable)
-    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+    with page.expect_response(lambda response: response.url.endswith(request_path)) as response:
+        page.get_by_role('button', name=button_name).click()
 
-    assert response.status_code == 502
-    assert b'id="payment-status"' in response.content
-    assert b'role="alert"' in response.content
-    assert b'payment gateway unavailable' in response.content
-
-
-@pytest.mark.django_db
-def test_return_error_fragment_matches_the_return_target(client):
-    page = client.get('/ui/loans/L1/')
-
-    assert_error_responses_are_configured(page, 'return-status')
-
-    first_return = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
-    response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
-
-    assert first_return.status_code == 200
-    assert response.status_code == 200
-    assert b'id="return-status"' in response.content
-    assert b'role="alert"' in response.content
-    assert b'already returned' in response.content
+    assert response.value.status == status
+    assert request['headers']['hx-request'] == 'true'
+    assert request['headers']['hx-target'] == target
+    assert page.locator(f'#{target} [role="alert"]').inner_text() == message
 
 
-@pytest.mark.django_db
-def test_lending_error_fragment_matches_the_loan_form_target(client):
-    page = client.get('/ui/loans/new/')
-
-    assert_error_responses_are_configured(page, 'loan-form')
-
-    response = client.post(
-        '/ui/loans/new/',
-        {'member': '', 'isbn': ''},
-        HTTP_HX_REQUEST='true',
+@pytest.mark.django_db(transaction=True)
+def test_payment_error_fragment_replaces_payment_status(htmx_page, live_server):
+    assert_error_fragment_swapped(
+        htmx_page,
+        base_url=live_server.url,
+        page_path='/ui/fees/L1/',
+        request_path='/ui/payments/L1/',
+        button_name='Pay late fee',
+        status=502,
+        target='payment-status',
+        message='Payment declined.',
     )
 
-    assert response.status_code == 200
-    assert b'id="loan-form"' in response.content
-    assert response.content.count(b'This field is required.') == 2
+
+@pytest.mark.django_db(transaction=True)
+def test_return_error_fragment_replaces_return_status(htmx_page, live_server):
+    assert_error_fragment_swapped(
+        htmx_page,
+        base_url=live_server.url,
+        page_path='/ui/loans/L1/',
+        request_path='/ui/loans/L1/return/',
+        button_name='Return book',
+        status=409,
+        target='return-status',
+        message='This loan was already returned.',
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_lending_error_fragment_replaces_loan_form(htmx_page, live_server):
+    assert_error_fragment_swapped(
+        htmx_page,
+        base_url=live_server.url,
+        page_path='/ui/loans/new/',
+        request_path='/ui/loans/new/',
+        button_name='Lend book',
+        status=422,
+        target='loan-form',
+        message='The lending service is unavailable.',
+    )
