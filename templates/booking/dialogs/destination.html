@@ -1,0 +1,48 @@
+<dialog id="destination-dialog" aria-labelledby="destination-dialog-heading" class="modal">
+  <div class="modal-box">
+    <h2 id="destination-dialog-heading" class="mb-4 text-xl font-semibold">Change destination</h2>
+    <p>
+      Cargo from {{ cargo.route_specification.origin.name }}
+      ({{ cargo.route_specification.origin.unlocode.value }})
+      to {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </p>
+    <p class="mt-2">
+      Arrival deadline: {{ cargo.route_specification.arrival_deadline|date:"Y-m-d" }}
+    </p>
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+      class="mt-4"
+    >
+      {% csrf_token %}
+      <label class="label mb-1 block font-medium" for="destination">Destination</label>
+      <select
+        id="destination"
+        name="destination"
+        {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+        class="select select-bordered w-full"
+        required
+      >
+        <option value=""{% if not destination_value %} selected{% endif %}>Select a destination</option>
+        {% for location in destinations %}
+          <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
+            {{ location.name }} ({{ location.unlocode.value }})
+          </option>
+        {% endfor %}
+      </select>
+      {% if destination_error %}
+        <p id="destination-error" role="alert" class="mt-2 text-red-700">{{ destination_error }}</p>
+      {% endif %}
+      <div class="modal-action">
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+    <form method="dialog" class="modal-action">
+      <button type="submit" class="btn">Cancel</button>
+    </form>
+  </div>
+</dialog>
