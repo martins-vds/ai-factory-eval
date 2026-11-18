@@ -32,6 +32,9 @@ def test_lending_use_case_rejects_missing_or_blank_fields(member, isbn, field):
         lend_loan(member, isbn, LoanRepository(), date(2026, 3, 1))
 
     assert field in error.value.errors
+    assert error.value.errors[field] == (
+        'Member is required.' if field == 'member' else 'ISBN is required.'
+    )
     assert Loan.objects.count() == 3
 
 
