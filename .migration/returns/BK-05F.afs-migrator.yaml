@@ -1,0 +1,33 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1331
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - .migration/evidence/mutants/BK-05F.md
+  - "Resolved old mutants #5 and #20: test_route_screens_reject_unsupported_http_methods returns 405 for unsupported route and itinerary methods."
+  - "Resolved mutants #16 and #21: assert each full no-route status sentence; both assertions failed on the XX-wrapped mutant and passed on the restored view."
+  - "Equivalent #1: salt 'booking.route_selection' to 'XXbooking.route_selectionXX'; signing.dumps and signing.loads share the salt, and candidate signatures are opaque in the route-selection interface."
+  - "Equivalent #2: salt 'booking.route_selection' to None; issuance and verification change together, and no other signing consumer exists in this target."
+  - "Equivalent #10, #13, #27, #44, #46: Http404/BadSignature detail text changes, but each failure maps to the same generic 404 response."
+  - 'Equivalent #14: quote(..., safe="") to quote(..., safe="XXXX"); quote always leaves unreserved X characters unchanged.'
+  - "Equivalent #40: missing candidate default '' to 'XXXX'; either unsigned value fails signature verification and produces the same 404 response."
+  - "Diagnostic only, not the profile gate: afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py scored 0.855 (53 killed, 9 survived; threshold 0.8)."

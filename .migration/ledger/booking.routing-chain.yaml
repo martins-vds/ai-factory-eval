@@ -26,3 +26,4 @@ evidence:
   - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary"
   - ".migration/evidence/runs/BK-05F.md"
 notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
+no_rules: "This capability wires the route-selection flow; route eligibility and assignment rules are recorded on the behavioral capabilities."

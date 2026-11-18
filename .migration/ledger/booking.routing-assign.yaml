@@ -27,3 +27,10 @@ evidence:
   - ".migration/evidence/runs/BK-05F.md"
 notes: "Candidate assignment uses the application use case, persists the itinerary and redirects to cargo details under ruling #236. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]
+rules:
+  - id: cargo-exists
+    rule: "Refuse route assignment when the cargo does not exist."
+    source: "ItinerarySelection.java:59-69; ruling #232"
+  - id: route-satisfies-current-specification
+    rule: "Assign only an itinerary that satisfies the cargo's current route specification."
+    source: "ItinerarySelection.java:59-69; RouteSpecificationTest.testIsSatisfiedBySuccess"

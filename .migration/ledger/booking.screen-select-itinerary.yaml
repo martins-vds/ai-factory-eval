@@ -24,3 +24,4 @@ evidence:
   - ".migration/evidence/runs/BK-05F.md"
 notes: "The target preserves the empty-route guidance and renders candidate itineraries under ruling #252; no named JUnit class exercises the source page."
 quirks: [martins-vds/ai-factory-pilot-target#252]
+no_rules: "This capability presents the already-filtered itinerary candidates and empty-state guidance; it makes no additional business decision."
