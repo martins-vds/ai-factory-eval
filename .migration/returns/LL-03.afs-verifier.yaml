@@ -1,0 +1,91 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#1344
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1351
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.972
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+  - .migration/evidence/mutants/LL-03.md
+findings:
+  - severity: minor
+    where: src/fees/views.py:18-19
+    what: "Missing-loan response construction is repeated across API and UI handlers."
+  - severity: minor
+    where: src/fees/services.py:65-70
+    what: "The private helper name `_calculate` does not identify that it calculates a loan fee."
+tests_added:
+  - tests/fees/test_fee_services.py::test_fee_application_returns_none_for_an_unknown_loan
+  - tests/fees/test_fee_services.py::test_fee_application_does_not_charge_for_an_unknown_loan
+  - tests/fees/test_fee_services.py::test_fee_application_returns_the_gateway_result_for_an_existing_loan
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+rules:
+  - capability: fees.calculation
+    rule: Late days are the non-negative difference from the due date to returned_on or today.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_clamps_days_before_the_due_date_to_zero
+    enforced: true
+    ledger_rule: late-days
+  - capability: fees.calculation
+    rule: When a loan has a returned_on date, fee calculation uses that date rather than today.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_uses_return_date_and_never_exceeds_ten_dollars
+    enforced: true
+    ledger_rule: late-days
+  - capability: fees.calculation
+    rule: Fees are zero through two late days; after that, charge 25 cents per late day.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_waives_the_first_two_days_and_charges_the_third
+    enforced: true
+    ledger_rule: grace-and-rate
+  - capability: fees.calculation
+    rule: The fee is capped at $10.00.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_uses_return_date_and_never_exceeds_ten_dollars
+    enforced: true
+    ledger_rule: fee-cap
+  - capability: fees.page
+    rule: An unknown loan produces no fee; the HTTP adapter responds with 404 and the characterized body.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_application_returns_none_for_an_unknown_loan
+    enforced: true
+    ledger_rule: known-loan
+  - capability: fees.page
+    rule: Fee pages accept GET requests.
+    use_case: Django HTTP method adapter
+    test: tests/fees/test_views.py::test_fee_and_payment_routes_restrict_http_methods
+    enforced: true
+    ledger_rule: request-methods
+  - capability: integration.payment-gateway
+    rule: Unknown loans return no payment result and do not call the payment gateway.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_fee_application_does_not_charge_for_an_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan
+  - capability: integration.payment-gateway
+    rule: The payment endpoint accepts POST requests only.
+    use_case: Django HTTP method adapter
+    test: tests/fees/test_views.py::test_fee_and_payment_routes_restrict_http_methods
+    enforced: true
+    ledger_rule: request-method
+  - capability: integration.payment-gateway
+    rule: Gateway HTTP 200 returns 200 with its body; other responses return 502 with the gateway body.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_fee_application_returns_the_gateway_result_for_an_existing_loan
+    enforced: true
+    ledger_rule: gateway-result
+  - capability: integration.payment-gateway
+    rule: I/O and interrupted gateway calls return 502 unavailable; interruption preserves its logged cause.
+    use_case: HttpPaymentGateway.charge
+    test: tests/fees/test_gateway.py::test_payment_gateway_preserves_interruption_cause
+    enforced: true
+    ledger_rule: gateway-failure
+no_rules: {}
