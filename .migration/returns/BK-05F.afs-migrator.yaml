@@ -1,0 +1,41 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.950
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_reports_unknown_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_candidate_that_no_longer_satisfies_the_specification
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_missing_candidate
+  - .migration/evidence/runs/BK-05F.md
+mutation_survivors:
+  - mutant: "views.py:22 Mutant #1"
+    diff: "_CANDIDATE_SALT: 'booking.route_selection' -> 'XXbooking.route_selectionXX'"
+    classification: equivalent
+    why: "The same private salt is used for signing and verification of the transient candidate token, so changing both sides preserves the UI flow."
+  - mutant: "views.py:22 Mutant #2"
+    diff: "_CANDIDATE_SALT: 'booking.route_selection' -> None"
+    classification: equivalent
+    why: "The same private salt is used for signing and verification of the transient candidate token, so changing both sides preserves the UI flow."
+  - mutant: "views.py:39 Mutant #14"
+    diff: "quote(tracking_id, safe=\"\") -> quote(tracking_id, safe=\"XXXX\")"
+    classification: equivalent
+    why: "quote always leaves unreserved ASCII letters unescaped; adding X to safe does not change the path, while slash remains escaped."

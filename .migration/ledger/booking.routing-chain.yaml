@@ -16,6 +16,7 @@ target:
 status: migrated
 verification: legacy-test
 characterization_tier: A
+no_rules: "This structural capability composes candidate lookup and assignment; their business rules are owned by booking.routing-assign."
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testAssignRoute"

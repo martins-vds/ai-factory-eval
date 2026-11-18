@@ -15,6 +15,13 @@ target:
 status: migrated
 verification: legacy-test
 characterization_tier: A
+rules:
+  - id: cargo-exists
+    rule: "Refuse route assignment when the cargo tracking ID is unknown or stale."
+    source: "CargoRouting._find_cargo in src/cargotracker/booking/application/routing.py"
+  - id: route-specification-satisfied
+    rule: "Only assign a selected itinerary when it satisfies the cargo's current route specification."
+    source: "BK-05F plan and src/cargotracker/booking/interfaces/route_selection/views.py:36"
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testAssignRoute"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/domain/model/cargo/CargoTest.java::testRoutingStatus"
