@@ -1,0 +1,39 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+specialty: ui
+pr: martins-vds/ai-factory-eval#1318
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.951
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_candidate_that_no_longer_satisfies_the_specification
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_for_unknown_cargo_returns_not_found
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_without_a_candidate_returns_not_found
+  - .migration/evidence/runs/BK-05F.md
+  - .migration/evidence/mutants/BK-05F.md
+mutation_survivors:
+  - mutant: "views.py:39 #14"
+    diff: 'quote(tracking_id, safe="") -> quote(tracking_id, safe="XXXX")'
+    classification: equivalent
+    reason: urllib.parse.quote always leaves ASCII letters unescaped, so adding X to the safe set changes no URL output; safe="" still encodes reserved path characters.
+  - mutant: "views.py:97 #43"
+    diff: "'Candidate belongs to another cargo.' -> 'XXCandidate belongs to another cargo.XX'"
+    classification: equivalent
+    reason: BadSignature is caught and translated to the same Http404 response; its cause message is not rendered by the route-selection interface.
+  - mutant: "views.py:100 #45"
+    diff: "'The selected route is invalid.' -> 'XXThe selected route is invalid.XX'"
+    classification: equivalent
+    reason: Both raise HTTP 404 and the non-debug handler renders the same generic 404 page; the internal Http404 reason is not shown.

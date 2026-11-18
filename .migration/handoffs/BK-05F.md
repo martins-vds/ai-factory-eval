@@ -25,3 +25,29 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-18T04:08:24Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-run-changed-code-mutation-yet-again` / https://github.com/martins-vds/ai-factory-eval/pull/1318 · **Last commit:** e7ad928f1acc16de52dd1de3860790089789c5e1
+
+### Done
+- Changed-code mutation passes at 0.951 (58 killed, 3 equivalent survivors), above the 0.8 threshold; journal row is in `.migration/evidence/runs/BK-05F.md`, raw log `.migration/runs/BK-05F/20261118T040145622929Z-mutation-changed-exact-feedback.log`.
+- Added exact interface assertions for signed route candidates, route-specification rejection, no-route guidance, unknown cargo, and missing candidate handling. The focused module passed 10 tests; the final full behavior suite passed 471 tests.
+- Build and idiom gates passed; CRAP max was 26.0 against 30. Secret scan found no secrets. CodeQL was skipped because all changes were assessed trivial.
+
+### Remaining
+- [ ] Resolve the migration-validation blocker for `booking.routing-chain`, `booking.screen-route`, `booking.screen-select-itinerary`, and `booking.routing-assign` by adding the required `rules` or `no_rules` fields.
+- [ ] Obtain scope approval for those ledger files or have the authorized agent update them, then rerun `python .migration/harness/tools/validate.py .migration`.
+- [ ] Update the return file after validation is clean.
+
+### Decisions made
+- Kept three survivors and classified them in the return as equivalent: adding `X` to `quote`'s safe set does not change its output; `BadSignature`'s cause text is converted to the same 404; the altered `Http404` reason yields the same generic non-debug 404 page.
+- Did not edit ledger files because the BK-05F issue restricts edits to planned files and says to stop and hand off when another file is needed.
+
+### Blockers / questions
+- The stop rule fired when final validation found four ledger entries with no business rules or `no_rules`. These `.migration/ledger/*.yaml` files are outside the ticket's planned file scope; an operator must approve scope expansion or assign ledger remediation separately.
+
+### Failing commands
+- `python .migration/harness/tools/validate.py .migration` → exit 1; reported that each of the four ledger entries above lacks `rules`/`no_rules` (validation was run directly, so no raw gate log was created).
+
+### Next step for the next session
+Resume BK-05F only after scope approval: update the four named ledger entries with their enforced business rules or justified `no_rules`, rerun migration validation, and finalize the return.
