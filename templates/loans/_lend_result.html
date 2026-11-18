@@ -1,0 +1,8 @@
+{% if errors %}
+<div role="alert" class="text-[#a94e37]">
+  {% if errors.member %}<p>Member: {{ errors.member }}</p>{% endif %}
+  {% if errors.isbn %}<p>ISBN: {{ errors.isbn }}</p>{% endif %}
+</div>
+{% elif loan %}
+<p role="status">Loan {{ loan.id }} has been added.</p>
+{% endif %}

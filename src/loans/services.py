@@ -11,6 +11,14 @@ class LoanValidationError(ValueError):
         super().__init__('Loan fields are invalid.')
 
 
+class LoanNotFoundError(LookupError):
+    pass
+
+
+class LoanAlreadyReturnedError(ValueError):
+    pass
+
+
 def lend_loan(member: str | None, isbn: str | None, lent_on: date, store: LoanStore) -> LoanRecord:
     errors = {}
     if member is None or not member.strip():
@@ -21,6 +29,17 @@ def lend_loan(member: str | None, isbn: str | None, lent_on: date, store: LoanSt
         raise LoanValidationError(errors)
 
     return store.create(id=store.next_id(), member=member, isbn=isbn, lent_on=lent_on)
+
+
+def return_loan(loan_id: str, returned_on: date, store: LoanStore) -> LoanRecord:
+    loan = store.find(loan_id)
+    if loan is None:
+        raise LoanNotFoundError(loan_id)
+    if loan.returned_on is not None or not store.return_if_unreturned(loan_id, returned_on):
+        raise LoanAlreadyReturnedError(loan_id)
+
+    loan.returned_on = returned_on
+    return loan
 
 
 def loan_line(loan: LoanRecord) -> str:
