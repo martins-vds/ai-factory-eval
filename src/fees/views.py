@@ -73,7 +73,7 @@ def payment_page(request, loan_id):
     if result.status_code == 404:
         return render(request, 'fees/not-found.html', status=404)
     if result.status_code == 200:
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect('fee-page', loan_id=loan_id)
 
     fee = fee_application.calculate(loan_id)
     if fee is None:
