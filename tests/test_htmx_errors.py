@@ -4,7 +4,6 @@ import pytest
 from django.core.management import call_command
 from django.utils import timezone
 
-
 RESPONSE_HANDLING = (
     b'"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},'
     b'{"code":"[45]..","swap":true,"error":true},{"code":"...","swap":true}]'
