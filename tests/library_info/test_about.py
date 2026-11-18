@@ -33,7 +33,7 @@ def test_about_page_presents_library_information_in_a_browser(live_server):
             assert response is not None
             assert response.status == 200
             assert page.get_by_role('heading', name='About the Lending Library').is_visible()
-            assert page.get_by_text('Monday to Saturday', exact=False).is_visible()
+            assert page.get_by_text('Monday to Saturday, 9:00 to 18:00', exact=False).is_visible()
             assert page.get_by_text('14-day lending period', exact=False).is_visible()
             assert page.locator('link[href="/static/css/tailwind.css"]').count() == 1
             assert page.locator('link[href*="daisyui@4.12.24"]').count() == 1
