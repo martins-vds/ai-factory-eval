@@ -20,14 +20,16 @@ def create_loan(loan_id, member, lent_on, returned_on=None):
 @pytest.mark.django_db
 def test_monthly_report_aggregates_previous_month_loans(monkeypatch):
     Loan.objects.all().delete()
-    create_loan('LL05-1', 'alice', date(2026, 5, 3))
-    create_loan('LL05-2', 'alice', date(2026, 3, 1), date(2026, 5, 1))
-    create_loan('LL05-3', 'bob', date(2026, 5, 2))
-    create_loan('LL05-4', 'bob', date(2026, 5, 3), date(2026, 5, 20))
-    create_loan('LL05-5', 'carol', date(2026, 5, 4), date(2026, 5, 19))
-    create_loan('LL05-6', 'dave', date(2026, 5, 31), date(2026, 6, 1))
-    create_loan('LL05-7', 'only-returned', date(2026, 3, 1), date(2026, 5, 1))
-    create_loan('LL05-8', 'june', date(2026, 6, 1))
+    create_loan('LL05-01', 'alice', date(2026, 5, 3))
+    create_loan('LL05-02', 'alice', date(2026, 3, 1), date(2026, 5, 1))
+    create_loan('LL05-03', 'bob', date(2026, 5, 2), date(2026, 5, 16))
+    create_loan('LL05-04', 'bob', date(2026, 5, 3), date(2026, 5, 20))
+    create_loan('LL05-05', 'carol', date(2026, 5, 4), date(2026, 5, 19))
+    create_loan('LL05-06', 'dave', date(2026, 5, 31), date(2026, 6, 1))
+    create_loan('LL05-07', 'only-returned', date(2026, 3, 1), date(2026, 5, 1))
+    create_loan('LL05-08', 'june', date(2026, 6, 1))
+    create_loan('LL05-11', 'alice', date(2026, 5, 3), date(2026, 5, 20))
+    create_loan('LL05-12', 'bob', date(2026, 5, 4), date(2026, 5, 19))
 
     monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 6, 1))
     output = StringIO()
@@ -36,8 +38,8 @@ def test_monthly_report_aggregates_previous_month_loans(monkeypatch):
 
     assert output.getvalue() == (
         'member_id,loans_started,late_returns,late_fees_cents\n'
-        'alice,1,1,1000\n'
-        'bob,2,1,75\n'
+        'alice,2,2,1075\n'
+        'bob,3,2,75\n'
         'carol,1,1,0\n'
         'dave,1,0,0\n'
     )
@@ -54,6 +56,5 @@ def test_monthly_report_prior_month_window_crosses_year_boundary(monkeypatch):
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,late_fees_cents\n'
-        'december,1,0,0\n'
+        'member_id,loans_started,late_returns,late_fees_cents\ndecember,1,0,0\n'
     )
