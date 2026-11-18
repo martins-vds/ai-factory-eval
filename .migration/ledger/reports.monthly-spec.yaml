@@ -7,8 +7,30 @@ source:
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.reports.services.MonthlyReport
+    - src.reports.management.commands.monthly_report.Command.handle
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_lists_february_activity_by_fees_then_member_in_local_time
+  - tests/reports/test_monthly_report.py::test_monthly_report_counts_late_returns_and_caps_fees
+  - .migration/evidence/runs/LL-05.md
+rules:
+  - id: prior-calendar-month
+    rule: "Use the prior calendar month in the server's default time zone, with an inclusive first day and exclusive next-month boundary."
+    source: "legacy/docs/reports-spec.md:6; .migration/plan/monthly-report.md:5-12"
+  - id: member-inclusion
+    rule: "Emit one row for each member with at least one loan started in the report month, and omit members without a loan started in that month."
+    source: ".migration/plan/monthly-report.md:5-12"
+  - id: monthly-loan-totals
+    rule: "Count loans started in the report month and loans returned after their due date during that month; total late fees in cents using a two-day grace period, 25 cents per late day thereafter, and a $10 cap."
+    source: "legacy/docs/reports-spec.md:7; legacy/src/main/java/lib/LateFeeView.java:31-37; .migration/plan/monthly-report.md:5-12"
+  - id: report-order
+    rule: "Sort rows by total late fees descending, then member id ascending."
+    source: "legacy/docs/reports-spec.md:8; .migration/plan/monthly-report.md:5-12"
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
