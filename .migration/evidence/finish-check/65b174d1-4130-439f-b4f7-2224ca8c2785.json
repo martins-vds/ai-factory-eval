@@ -1,0 +1,30 @@
+[
+  {
+    "at": "2026-11-18T16:08:45Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20546,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/65b174d1-4130-439f-b4f7-2224ca8c2785.json",
+      ".migration/evidence/runs/LL-02.md",
+      ".migration/returns/LL-02.afs-verifier.yaml",
+      "tests/loans/test_circulation.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
