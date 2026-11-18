@@ -43,6 +43,18 @@ def test_lending_creates_a_persisted_fourteen_day_loan(client):
     assert saved_loan.content == response.content
 
 
+@pytest.mark.django_db
+def test_lending_escapes_delimiters_in_the_loan_record(client):
+    today = date.today()
+
+    response = client.post('/loans', {'member': 'a;b', 'isbn': '123;456'})
+
+    assert response.status_code == 201
+    assert response.content.decode() == (
+        f'L4;"a;b";"123;456";{today.isoformat()};{(today + timedelta(days=14)).isoformat()};\n'
+    )
+
+
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_lending_allocates_distinct_ids():
     requests_started = Barrier(8)
