@@ -88,10 +88,13 @@ def test_destination_dialog_shows_current_specification_and_stable_filtered_opti
     assert 'Melbourne' in first_content
     assert 'value="CNHKG"' not in first_options
     assert 'value="AUMEL"' not in first_options
+    assert 'value="USDAL"' in first_options
+    assert '<option value="" disabled selected>Choose a destination</option>' in first_options
     assert first_options == second_options
     assert [
         location.unlocode.value for location in locations_for_dialogs
     ] == original_location_codes
+    assert '<html' not in first_content.lower()
 
 
 @pytest.mark.django_db
@@ -110,6 +113,7 @@ def test_deadline_dialog_shows_the_existing_value(client):
     assert 'Melbourne' in content
     assert re.search(r'<input\b[^>]*name="deadline"[^>]*>', content)
     assert f'value="{current_deadline}"' in content
+    assert '<html' not in content.lower()
 
 
 @pytest.mark.django_db
@@ -127,7 +131,9 @@ def test_invalid_destination_is_reported_without_changing_cargo(client):
     cargo_after = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in response.content.decode()
+    content = response.content.decode()
+    assert 'Select a valid destination.' in content
+    assert '<html' not in content.lower()
     assert cargo_after == cargo_before
 
 
@@ -150,6 +156,7 @@ def test_invalid_deadline_shows_field_error_and_keeps_cargo_unchanged(client):
     assert 'Enter a valid arrival deadline.' in content
     assert 'aria-invalid="true"' in content
     assert 'aria-describedby="deadline-error"' in content
+    assert '<html' not in content.lower()
     assert cargo_after == cargo_before
 
 
@@ -227,9 +234,15 @@ def test_dialog_pages_render_form_actions_without_errors(client):
     assert destination.status_code == 200
     assert 'action="/admin/cargo/DEF789/destination/"' in destination.content.decode()
     assert 'role="alert"' not in destination.content.decode()
+    assert 'value="USDAL"' in _select_options(destination.content.decode())
+    assert '<option value="" disabled selected>Choose a destination</option>' in _select_options(
+        destination.content.decode()
+    )
+    assert '<html' in destination.content.decode().lower()
     assert deadline.status_code == 200
     assert 'action="/admin/cargo/DEF789/deadline/"' in deadline.content.decode()
     assert 'role="alert"' not in deadline.content.decode()
+    assert '<html' in deadline.content.decode().lower()
 
 
 @pytest.mark.django_db
@@ -266,6 +279,7 @@ def test_missing_dialog_values_show_field_errors(client):
     assert 'Select a valid destination.' in destination_content
     assert 'aria-describedby="destination-error"' in destination_content
     assert 'aria-invalid="true"' in destination_content
+    assert '<option value="" disabled selected>Choose a destination</option>' in destination_content
     assert deadline.status_code == 200
     assert 'Enter a valid arrival deadline.' in deadline_content
     assert 'aria-describedby="deadline-error"' in deadline_content

@@ -29,3 +29,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:52:15+00:00 | behavior-dialog-boundaries | 0 | 3.88 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `2454e23acf96015c` |  |  |
 | 2026-11-18T12:54:31+00:00 | mutation-changed | 0 | 118.67 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `f1e0b9576945bd53` |  | gate=mutation score=0.845 threshold=0.8 killed=60 survived=11 files=1 base=origin/main |
 | 2026-11-18T12:55:23+00:00 | mutation-coverage-probe | 0 | 3.68 | `bash -c 'COVERAGE_FILE=/tmp/bk-05g-dialog-coverage python -m pytest -q -p no:cacheprovider -o addopts= --cov=src --cov-context=test --cov-report= tests/booking/interfaces/test_dialogs.py'` | `49414f99cfb93935` |  |  |
+| 2026-11-18T12:56:06+00:00 | idiom-dialog-assertions | 0 | 0.01 | `ruff check tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T12:56:06+00:00 | format-dialog-assertions | 1 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `837682230d9f2324` | 237 \|     assert 'value="USDAL"' in _select_options(destination.content.decode()) |  |
+| 2026-11-18T12:56:10+00:00 | behavior-dialog-assertions | 0 | 3.97 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `36308943e37e1d73` |  |  |
+| 2026-11-18T12:56:15+00:00 | format-dialog-assertions-fix | 0 | 0.01 | `ruff format tests/booking/interfaces/test_dialogs.py` | `413a709001976657` |  |  |
+| 2026-11-18T12:56:19+00:00 | idiom-dialog-final | 0 | 0.01 | `ruff check tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T12:56:19+00:00 | format-dialog-final | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-18T12:56:23+00:00 | behavior-dialog-final | 0 | 4.05 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `cc69e7e3db4d0a13` |  |  |
