@@ -5,8 +5,7 @@ from playwright.sync_api import sync_playwright
 
 ABOUT_GOLDEN = json.loads(
     (
-        Path(__file__).resolve().parents[2]
-        / '.migration/characterization/source/goldens/http.json'
+        Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
     ).read_text(encoding='utf-8')
 )['GET /about']['response']
 
@@ -34,11 +33,13 @@ def test_about_page_presents_library_information_in_a_browser(live_server):
             assert page.locator('link[href="/static/css/tailwind.css"]').count() == 1
             assert page.locator('link[href*="daisyui@4.12.24"]').count() == 1
             assert page.locator('script[src*="htmx.org@2.0.11"]').count() == 1
-            assert page.get_by_role(
-                'link', name='desk@lending-library.invalid'
-            ).get_attribute('href') == 'mailto:desk@lending-library.invalid'
-            assert page.get_by_role('link', name='Browse the collection').get_attribute(
-                'href'
-            ) == '/ui/loans/'
+            assert (
+                page.get_by_role('link', name='desk@lending-library.invalid').get_attribute('href')
+                == 'mailto:desk@lending-library.invalid'
+            )
+            assert (
+                page.get_by_role('link', name='Browse the collection').get_attribute('href')
+                == '/ui/loans/'
+            )
         finally:
             browser.close()
