@@ -1,0 +1,11 @@
+{% if successful %}
+<p class="alert mt-6 border border-[#d8cdbb] py-6 text-[#66705b]" role="status">Payment received.</p>
+{% elif not_found %}
+<p class="alert mt-6 border border-[#d8cdbb] py-6 text-[#a94e37]" role="alert">
+  Loan not found.
+</p>
+{% else %}
+<p class="alert mt-6 border border-[#d8cdbb] py-6 text-[#a94e37]" role="alert">
+  Payment could not be completed. Please try again.
+</p>
+{% endif %}

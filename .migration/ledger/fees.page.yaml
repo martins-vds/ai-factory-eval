@@ -13,3 +13,19 @@ verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json]
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
+target:
+  components: [src.fees.views.fee_api, src.fees.views.fee_page, templates/fees/detail.html]
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_use_cases.py::test_fee_application_returns_none_for_an_unknown_loan
+  - tests/fees/test_views.py::test_fee_api_returns_the_characterized_html_fragment
+  - tests/fees/test_views.py::test_fee_api_formats_the_capped_amount_as_ten_dollars
+  - tests/fees/test_views.py::test_fee_api_returns_the_characterized_not_found_fragment
+  - tests/fees/test_views.py::test_fee_page_uses_the_reading_room_layout_and_ui_payment_route
+  - tests/fees/test_views.py::test_unknown_fee_page_renders_a_reading_room_not_found_page
+rules:
+  - id: existing-loan
+    rule: A fee page is available only for an existing loan; an unknown loan is not found.
+    source: LateFeeView.java:26-29

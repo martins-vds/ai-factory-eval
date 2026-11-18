@@ -13,3 +13,26 @@ status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components: [src.fees.services.FeeApplication]
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_use_cases.py::test_fee_starts_at_twenty_five_cents_per_day_after_grace_period
+  - tests/fees/test_use_cases.py::test_fee_is_waived_through_two_days_and_capped_at_ten_dollars
+  - tests/fees/test_use_cases.py::test_fee_uses_return_date_and_never_charges_for_early_returns
+  - tests/fees/test_use_cases.py::test_fee_application_returns_none_for_an_unknown_loan
+rules:
+  - id: late-days
+    rule: Days late use returned_on when present or the clock's today otherwise, and never fall below zero.
+    source: LateFeeView.java:31-33
+  - id: grace-period
+    rule: Late fees are waived through two days late.
+    source: LateFeeView.java:34
+  - id: daily-rate
+    rule: After the grace period, the fee is 25 cents per late day.
+    source: LateFeeView.java:35
+  - id: fee-cap
+    rule: The fee cannot exceed $10.
+    source: LateFeeView.java:35
