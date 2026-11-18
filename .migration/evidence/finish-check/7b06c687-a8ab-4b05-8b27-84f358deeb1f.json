@@ -54,5 +54,66 @@
     "blocks_before": 1,
     "decision": "allow",
     "why": "same failure twice; wrote .migration/handoffs/BK-05F.md"
+  },
+  {
+    "at": "2026-11-18T16:32:51Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20908,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/7b06c687-a8ab-4b05-8b27-84f358deeb1f.json",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/handoffs/BK-05F.md"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05F.afs-verifier.yaml` with `role: afs-verifier`, `ticket: BK-05F`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05F.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/BK-05F.md"
+  },
+  {
+    "at": "2026-11-18T16:34:47Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21581,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/7b06c687-a8ab-4b05-8b27-84f358deeb1f.json",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/handoffs/BK-05F.md",
+      ".migration/returns/BK-05F.afs-verifier.yaml"
+    ],
+    "findings": [
+      "[mechanical] CI's validate.py will fail on this: .migration/returns/BK-05F.afs-verifier.yaml: invalid YAML: mapping values are not allowed here. Fix it and commit.",
+      "[mechanical] CI's validate.py will fail on this: in \".migration/returns/BK-05F.afs-verifier.yaml\", line 32, column 39. Fix it and commit.",
+      "[mechanical] `.migration/returns/BK-05F.afs-verifier.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty."
+    ],
+    "blocks_before": 1,
+    "decision": "block",
+    "why": "block 2 of 2"
   }
 ]

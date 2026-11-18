@@ -1,0 +1,34 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1463
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1479
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.887
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: booking.routing-assign
+    rule: Assigning an itinerary persists its legs and recalculates delivery routing status, ETA, and next expected activity.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+    ledger_rule: assigned-route-state
+no_rules:
+  booking.routing-chain: Page-to-use-case orchestration; business rules belong to the behavioral capabilities it calls.
+  booking.screen-route: Presentation only; route eligibility is owned by booking.routing-candidates.
+  booking.screen-select-itinerary: Presentation of candidates or no-route guidance; no business rule.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: Known ADR-0001 layering debt: the use case imports django.http.Http404; recorded as BK-05C debt.
+    origin: BK-05C
+    evidence: "run: verify-idiom-layers"
