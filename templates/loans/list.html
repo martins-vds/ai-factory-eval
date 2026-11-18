@@ -8,6 +8,7 @@
     <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The collection · {{ loans|length }} loans in view</p>
     <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
     <p class="mb-8 text-[#66705b]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    {% if feedback %}<p class="mb-4 text-[#a94e37]" role="status">{{ feedback }}</p>{% endif %}
     <div class="divide-y divide-[#d8cdbb]">
       {% for loan in loans %}
       <article class="grid gap-4 py-5 sm:grid-cols-[1fr_auto]">
@@ -21,6 +22,10 @@
           <p class="text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
           {% else %}
           <p class="mt-2 text-sm font-semibold text-[#a94e37]">On loan</p>
+          <form method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="body" hx-swap="innerHTML">
+            {% csrf_token %}
+            <button class="btn btn-sm mt-2">Return {{ loan.id }}</button>
+          </form>
           {% endif %}
         </div>
       </article>
@@ -32,8 +37,17 @@
   <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-widest text-[#66705b]">At the desk</p>
-      <h2 class="card-title text-2xl">Loan details</h2>
-      <p>Choose a record to see its lending dates and return status.</p>
+      <h2 class="card-title text-2xl">Lend a book</h2>
+      <form method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="body" hx-swap="innerHTML">
+        {% csrf_token %}
+        <label for="id_member" class="label-text">Member name</label>
+        <input id="id_member" name="member" value="{{ form.member.value|default_if_none:'' }}" class="input input-bordered" autocomplete="name" aria-invalid="{% if form.member.errors %}true{% else %}false{% endif %}"{% if form.member.errors %} aria-describedby="member-error"{% endif %}>
+        {% for error in form.member.errors %}<p id="member-error" class="mt-2 text-sm text-[#a94e37]" role="alert">{{ error }}</p>{% endfor %}
+        <label for="id_isbn" class="label-text">ISBN</label>
+        <input id="id_isbn" name="isbn" value="{{ form.isbn.value|default_if_none:'' }}" class="input input-bordered" aria-invalid="{% if form.isbn.errors %}true{% else %}false{% endif %}"{% if form.isbn.errors %} aria-describedby="isbn-error"{% endif %}>
+        {% for error in form.isbn.errors %}<p id="isbn-error" class="mt-2 text-sm text-[#a94e37]" role="alert">{{ error }}</p>{% endfor %}
+        <button class="btn mt-2">Create 14-day loan</button>
+      </form>
     </div>
   </aside>
 </section>

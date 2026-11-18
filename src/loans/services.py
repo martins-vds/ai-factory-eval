@@ -1,8 +1,6 @@
 import csv
 from io import StringIO
 
-from .repository import LoanRepository
-
 
 def loan_line(loan):
     output = StringIO(newline='')
@@ -20,10 +18,18 @@ def loan_line(loan):
     return output.getvalue()
 
 
-def list_loans_text():
-    return ''.join(loan_line(loan) for loan in LoanRepository().all())
+def list_loans_text(repository):
+    return ''.join(loan_line(loan) for loan in repository.all())
 
 
-def get_loan_text(loan_id):
-    loan = LoanRepository().find(loan_id)
+def get_loan_text(repository, loan_id):
+    loan = repository.find(loan_id)
     return loan_line(loan) if loan else None
+
+
+def lend_loan(repository, member, isbn, lent_on):
+    return repository.lend(member, isbn, lent_on)
+
+
+def return_loan(repository, loan_id, returned_on):
+    return repository.mark_returned(loan_id, returned_on)
