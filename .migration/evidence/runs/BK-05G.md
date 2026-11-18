@@ -69,3 +69,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T15:49:06+00:00 | verifier-rule-direct | 0 | 2.05 | `pytest -q tests/booking/application/test_specification.py::test_change_destination_rejects_origin_as_destination` | `67ecf94f55b8e441` |  |  |
 | 2026-11-18T15:49:09+00:00 | verifier-origin-post | 1 | 2.66 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_update_rejects_origin_as_destination_without_updating_cargo` | `cba5c0a9ea935ed9` | assert original is not None |  |
 | 2026-11-18T15:49:29+00:00 | verifier-origin-post-repro | 1 | 2.64 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_update_rejects_origin_as_destination_without_updating_cargo` | `6db22ada00bb9579` | assert original is not None |  |
+| 2026-11-18T15:50:36+00:00 | verifier-ruff-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T15:50:36+00:00 | verifier-format-final | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T15:51:42+00:00 | verifier-behavior-final | 1 | 66.78 | `pytest -q` | `d7e22e7fd9692dc5` | assert original is not None |  |
+| 2026-11-18T15:52:48+00:00 | verifier-regression-final | 1 | 65.58 | `pytest -q` | `20468338f06f033d` | assert original is not None |  |
+| 2026-11-18T15:54:12+00:00 | verifier-crap-coverage | 1 | 66.87 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `c5ad7ff95f551e92` | assert original is not None |  |
+| 2026-11-18T15:54:12+00:00 | verifier-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:54:12+00:00 | verifier-crap-threshold | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `1ff736494c69c382` |  | gate=crap max=26.0 threshold=30 over=0 methods=204 |
