@@ -42,3 +42,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T16:00:45+00:00 | invariants-null-voyage-fixed | 1 | 5.02 | `pytest -q tests/data_migration/test_invariants.py` | `482c7be0bec152af` | E                   django.core.exceptions.FieldError: Cannot resolve keyword 'type' into field. Choices are: cargo, car |  |
 | 2026-11-18T16:00:59+00:00 | invariants-null-voyage-fixed | 0 | 4.55 | `pytest -q tests/data_migration/test_invariants.py` | `6e5e34b5f4f11c36` |  |  |
 | 2026-11-18T16:02:27+00:00 | invariants-null-voyage-fixed | 0 | 4.13 | `pytest -q tests/data_migration/test_invariants.py` | `f329478ba065a40c` |  |  |
+| 2026-11-18T16:06:33+00:00 | build-compileall-final | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T16:06:34+00:00 | build-check-final | 0 | 0.63 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T16:08:20+00:00 | behavior-final | 0 | 106.3 | `pytest -q` | `cbf92bdf378c3375` |  |  |
+| 2026-11-18T16:08:20+00:00 | idiom-ruff-check-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T16:08:21+00:00 | idiom-ruff-format-final | 0 | 0.02 | `ruff format --check` | `9eb349efea514fbe` |  |  |
+| 2026-11-18T16:08:21+00:00 | idiom-layers-final | 0 | 0.24 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T16:08:22+00:00 | idiom-ui-final | 0 | 0.87 | `python .migration/harness/tools/check_ui.py` | `02b26224a2c553ec` |  | gate=ui scope="templates changed since fa30180469cd6e75006c8265246bbdeb038185e4" templates=0 findings=0 |
+| 2026-11-18T16:10:02+00:00 | crap-coverage-final | 0 | 100.34 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `8a40723e00e7ba4a` |  |  |
+| 2026-11-18T16:10:03+00:00 | crap-lizard-final | 0 | 0.27 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T16:10:03+00:00 | crap-score-final | 0 | 0.12 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
+| 2026-11-18T16:14:31+00:00 | mutation-changed | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-18T16:15:17+00:00 | regression | 0 | 45.58 | `pytest -q` | `ec9dc27ae370ab0d` |  |  |
