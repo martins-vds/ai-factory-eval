@@ -21,6 +21,13 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery"
+  - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_selected_itinerary"
+  - "tests/booking/interfaces/test_route_selection.py::test_invalid_candidate_selection_does_not_assign_a_route"
   - ".migration/evidence/runs/BK-05C.md"
-notes: "The bean returns a show.html outcome, while the running UI resolved the selected route to show.xhtml; preserve this observed result for quirk #236 review. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
+  - ".migration/evidence/runs/BK-05F.md"
+rules:
+  - id: offered-candidate
+    rule: "A route assignment must select an itinerary currently offered as a candidate for the cargo."
+    source: "src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ItinerarySelection.java:59-69"
+notes: "After assignment, redirect to cargo details as approved by ruling #236. The unannotated source candidate and lifecycle test methods are not counted as executed legacy evidence (#239, #250)."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]
