@@ -37,6 +37,13 @@ def _seed_booking_data():
     locations[:] = DjangoLocationRepository().find_all()
 
 
+@pytest.fixture(autouse=True)
+def reset_locations():
+    locations.clear()
+    yield
+    locations.clear()
+
+
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
@@ -47,9 +54,24 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
 
     assert response.status_code == 200
     assert 'href="/admin/cargo/DEF789/route/"' in table
+    assert 'href="/admin/cargo/DEF789/destination/"' in table
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in table
+    assert 'href="/admin/cargo/DEF789/deadline/"' in table
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in table
     assert 'id="booking-dialog"' in table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_has_a_full_page_fallback_without_htmx(client):
+    _seed_booking_data()
+
+    response = client.get('/admin/cargo/DEF789/destination/')
+
+    assert response.status_code == 200
+    assert '<header' in response.content.decode()
+    assert 'id="destination"' in response.content.decode()
+    assert 'id="booking-dialog"' not in response.content.decode()
 
 
 @pytest.mark.django_db
@@ -66,6 +88,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     assert first.status_code == 200
     assert 'Hong Kong' in first.content.decode()
     assert 'Melbourne' in first.content.decode()
+    assert 'destination-error' not in first.content.decode()
     assert 'value="CNHKG"' not in first.content.decode()
     assert 'value="AUMEL"' not in first.content.decode()
     assert 'value="USNYC"' in first.content.decode()
@@ -102,6 +125,43 @@ def test_destination_dialog_updates_cargo_and_refreshes_not_routed_table(client)
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_destination_form_redirects_to_dashboard_without_htmx(client):
+    _seed_booking_data()
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'USNYC'},
+    )
+
+    updated = repository.find(TrackingId('DEF789'))
+    assert updated is not None
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/dashboard/'
+    assert updated.route_specification.destination.unlocode.value == 'USNYC'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_origin_as_a_new_destination(client):
+    _seed_booking_data()
+    cargo = repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': cargo.route_specification.origin.unlocode.value},
+    )
+
+    unchanged = repository.find(TrackingId('DEF789'))
+    assert unchanged is not None
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert 'aria-invalid="true"' in response.content.decode()
+    assert unchanged.route_specification.destination == cargo.route_specification.destination
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_shows_initial_value_and_parse_error_without_updating(client):
     _seed_booking_data()
     cargo = repository.find(TrackingId('DEF789'))
@@ -118,6 +178,9 @@ def test_deadline_dialog_shows_initial_value_and_parse_error_without_updating(cl
     unchanged = repository.find(TrackingId('DEF789'))
     assert unchanged is not None
     assert initial.status_code == 200
+    assert 'Hong Kong' in initial.content.decode()
+    assert 'Melbourne' in initial.content.decode()
+    assert 'deadline-error' not in initial.content.decode()
     assert f'value="{initial_deadline:%Y-%m-%d}"' in initial.content.decode()
     assert response.status_code == 200
     assert 'Enter a valid arrival deadline.' in response.content.decode()
@@ -146,9 +209,7 @@ def test_deadline_dialog_updates_cargo_and_refreshes_table(client):
     assert '01/15/2027' in response.content.decode()
     assert updated.route_specification.origin == cargo.route_specification.origin
     assert updated.route_specification.destination == cargo.route_specification.destination
-    assert updated.route_specification.arrival_deadline == datetime(
-        2027, 1, 15, tzinfo=UTC
-    )
+    assert updated.route_specification.arrival_deadline == datetime(2027, 1, 15, tzinfo=UTC)
     assert updated.itinerary == cargo.itinerary
     assert 'Widget for var' not in response.content.decode()
 
@@ -166,3 +227,19 @@ def test_dialogs_return_not_found_for_unknown_cargo(client, url):
     response = client.get(url)
 
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    'url',
+    (
+        '/admin/cargo/DEF789/destination/',
+        '/admin/cargo/DEF789/deadline/',
+    ),
+)
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_reject_unsupported_methods(client, url):
+    response = client.put(url)
+
+    assert response.status_code == 405
+    assert response['Allow'] == 'GET, POST'

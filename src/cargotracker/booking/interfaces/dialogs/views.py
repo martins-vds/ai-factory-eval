@@ -2,7 +2,7 @@ from collections.abc import Callable
 from datetime import UTC, date, datetime, time
 
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
@@ -14,7 +14,7 @@ from cargotracker.location.domain.location import Location
 def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo:
     cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
     if cargo is None:
-        raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+        raise Http404
     return cargo
 
 
@@ -57,6 +57,24 @@ def _refreshed_not_routed_table(
     return response
 
 
+def _render_dialog(
+    request: HttpRequest, template_name: str, context: dict[str, object]
+) -> HttpResponse:
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, template_name, {**context, 'is_dialog': True})
+    return render(
+        request,
+        'booking/dialogs/edit_page.html',
+        {**context, 'dialog_template': template_name, 'is_dialog': False},
+    )
+
+
+def _after_update(request: HttpRequest, cargo_dashboard: CargoDashboard) -> HttpResponse:
+    if request.headers.get('HX-Request') == 'true':
+        return _refreshed_not_routed_table(request, cargo_dashboard)
+    return redirect('/admin/dashboard/')
+
+
 def create_dialog_views(
     cargo_dashboard: CargoDashboard,
     cargo_specification: CargoSpecification,
@@ -71,7 +89,7 @@ def create_dialog_views(
         context = _destination_context(cargo, locations)
         potential_destinations = context['potential_destinations']
         if request.method == 'GET':
-            return render(request, 'booking/dialogs/destination.html', context)
+            return _render_dialog(request, 'booking/dialogs/destination.html', context)
 
         destination_code = request.POST.get('destination', '')
         destination = next(
@@ -84,13 +102,13 @@ def create_dialog_views(
         )
         if destination is None:
             context['destination_error'] = 'Select a valid destination.'
-            return render(request, 'booking/dialogs/destination.html', context)
+            return _render_dialog(request, 'booking/dialogs/destination.html', context)
 
         try:
             cargo_specification.change_destination(TrackingId(tracking_id), destination)
         except LookupError as error:
-            raise Http404(f'Cargo with tracking ID {tracking_id} not found.') from error
-        return _refreshed_not_routed_table(request, cargo_dashboard)
+            raise Http404 from error
+        return _after_update(request, cargo_dashboard)
 
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         if request.method not in {'GET', 'POST'}:
@@ -99,13 +117,13 @@ def create_dialog_views(
         cargo = _find_cargo(cargo_dashboard, tracking_id)
         context = _deadline_context(cargo)
         if request.method == 'GET':
-            return render(request, 'booking/dialogs/deadline.html', context)
+            return _render_dialog(request, 'booking/dialogs/deadline.html', context)
 
         try:
             deadline = date.fromisoformat(request.POST.get('deadline', ''))
         except ValueError:
             context['deadline_error'] = 'Enter a valid arrival deadline.'
-            return render(request, 'booking/dialogs/deadline.html', context)
+            return _render_dialog(request, 'booking/dialogs/deadline.html', context)
 
         try:
             cargo_specification.change_deadline(
@@ -113,7 +131,7 @@ def create_dialog_views(
                 datetime.combine(deadline, time.min, tzinfo=UTC),
             )
         except LookupError as error:
-            raise Http404(f'Cargo with tracking ID {tracking_id} not found.') from error
-        return _refreshed_not_routed_table(request, cargo_dashboard)
+            raise Http404 from error
+        return _after_update(request, cargo_dashboard)
 
     return destination_dialog, deadline_dialog

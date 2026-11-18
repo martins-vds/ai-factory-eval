@@ -1,6 +1,16 @@
-<form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-target="#booking-dialog-content" hx-swap="innerHTML">
+<form
+  method="post"
+  action="{{ request.path }}"
+  {% if is_dialog %}
+    hx-post="{{ request.path }}"
+    hx-target="#booking-dialog-content"
+    hx-swap="innerHTML"
+    hx-on::response-error="document.getElementById('dialog-response-error').textContent = 'Unable to update the destination.'"
+  {% endif %}
+>
   {% csrf_token %}
   <h2 id="booking-dialog-heading" class="mb-4 text-xl font-semibold">Change destination</h2>
+  <p id="dialog-response-error" class="mb-2 text-red-700" role="alert" aria-live="polite"></p>
   <dl class="mb-4 space-y-2">
     <div>
       <dt class="font-medium">Origin</dt>
@@ -28,13 +38,13 @@
     {% endfor %}
   </select>
   <div class="mt-6 flex justify-end gap-3">
-    <button
-      type="button"
-      class="btn btn-ghost"
-      hx-on:click="this.closest('dialog').close()"
-    >
-      Cancel
-    </button>
+    {% if is_dialog %}
+      <button type="button" class="btn btn-ghost" hx-on:click="this.closest('dialog').close()">
+        Cancel
+      </button>
+    {% else %}
+      <a href="/admin/dashboard/" class="btn btn-ghost">Cancel</a>
+    {% endif %}
     <button type="submit" class="btn btn-primary">Update</button>
   </div>
 </form>
