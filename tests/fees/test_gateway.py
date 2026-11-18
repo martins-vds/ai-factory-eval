@@ -49,3 +49,15 @@ def test_gateway_uses_the_characterized_default_url_when_unconfigured(monkeypatc
 
     assert result.body == b'charged\n'
     assert urls == ['https://payments.lending-library.invalid/charge?loan=L3']
+
+
+def test_gateway_rejects_http_url_without_a_host(monkeypatch):
+    class Opener:
+        def open(self, request):
+            pytest.fail('the gateway should reject a URL without a host')
+
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http:///charge')
+    monkeypatch.setattr('src.fees.gateway.build_opener', lambda *handlers: Opener())
+
+    with pytest.raises(GatewayUnavailable):
+        HttpPaymentGateway().charge('L3')
