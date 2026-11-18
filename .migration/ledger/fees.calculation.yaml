@@ -8,8 +8,14 @@ source:
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1425]
+target:
+  components: [src.fees.services.calculate_late_fee, src.fees.services.FeeApplication.quote]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_fee_waives_up_to_two_days_and_caps_at_ten_dollars, tests/fees/test_services.py::test_fee_uses_return_date_and_never_counts_early_days_as_late]
+rules:
+  - id: fee-calculation
+    rule: Days late are clamped at zero using returnedOn or server-local today; fees are waived through two days, then cost $0.25 per late day up to $10.00.
+    source: LateFeeView.java:31-37
