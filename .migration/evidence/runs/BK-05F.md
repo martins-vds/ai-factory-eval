@@ -50,3 +50,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:12:26+00:00 | mutation-changed-final2 | 0 | 242.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `b9f85756107ebb82` |  | gate=mutation score=0.887 threshold=0.8 killed=47 survived=6 files=1 base=origin/main |
 | 2026-11-18T13:13:11+00:00 | regression-final2 | 0 | 45.59 | `pytest -q` | `74578b7ba71a8ba7` |  |  |
 | 2026-11-18T13:13:29+00:00 | migration-validate | 0 | 3.9 | `python .migration/harness/tools/validate.py .migration` | `ef34805838431398` |  |  |
+| 2026-11-18T15:42:53+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
