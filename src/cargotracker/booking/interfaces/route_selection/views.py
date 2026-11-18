@@ -92,9 +92,9 @@ def _selection_context(
 
 def _selected_itinerary(request: HttpRequest, tracking_id: str) -> Itinerary:
     try:
-        candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
+        candidate = signing.loads(request.POST['candidate'], salt=_CANDIDATE_SALT)
         if candidate['tracking_id'] != tracking_id:
-            raise BadSignature('Candidate belongs to another cargo.')
+            raise BadSignature
         return _deserialize_itinerary(candidate['legs'])
     except (BadSignature, KeyError, TypeError, ValueError) as error:
         raise Http404('The selected route is invalid.') from error

@@ -16,6 +16,7 @@ target:
 status: migrated
 verification: characterized
 characterization_tier: A
+no_rules: "This screen presents candidate itineraries and empty-state guidance; candidate eligibility and assignment rules are owned by booking.routing-assign."
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"

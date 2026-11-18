@@ -25,3 +25,30 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-18T03:29:17Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-continue-changed-code-mutation-again` / https://github.com/martins-vds/ai-factory-pilot-target/pull/394 · **Last commit:** eb3279c1
+
+### Done
+- The profile's changed-code mutation gate passes: 0.950 (57 killed, 3 survived), threshold 0.8; see `.migration/runs/BK-05F/20261118T032034366002Z-mutation-changed.log`.
+- All profile build, idiom, behavior, CRAP, and changed-code mutation gates pass from the committed code; the full suite reports 471 passed. The run journal is `.migration/evidence/runs/BK-05F.md`.
+- The three survivors are classified as equivalent in `.migration/returns/BK-05F.afs-migrator.yaml`; CodeQL reported zero alerts.
+- Added interface tests for unknown cargo, stale route specifications, and missing candidate tokens; exact-message checks now kill prefix/suffix message mutants.
+
+### Remaining
+- [ ] Resolve the route-specification rule's layer placement and add a direct use-case test.
+- [ ] Rerun the affected gates and migration validation, then replace this handoff with a completed return.
+
+### Decisions made
+- Simplified missing-candidate lookup and removed the unused `BadSignature` detail; both preserve the generic invalid-route 404.
+- Kept the three remaining equivalent mutants and documented their diffs and rationale in the return file.
+
+### Blockers / questions
+- Self-verification exposed that `route_selection/views.py:36` enforces the route-specification rule, while `CargoRouting.assign_route` accepts and persists an itinerary that the domain marks as `MISROUTED`. The business rule is recorded under `booking.routing-assign`; the use case must refuse an itinerary that does not satisfy the current specification.
+- The required fix and direct test are outside BK-05F's approved file list: `src/cargotracker/booking/application/routing.py` and `tests/booking/application/test_routing.py`. Do not edit them until the coordinator/operator authorizes a plan-scope extension or a follow-up ticket.
+
+### Failing commands
+- None remain for the profile gates; the initial Ruff findings were corrected and the final Ruff checks passed.
+
+### Next step for the next session
+Obtain authorization to extend BK-05F to `src/cargotracker/booking/application/routing.py` and `tests/booking/application/test_routing.py`; then move the route-specification refusal into `CargoRouting.assign_route`, add a direct use-case rejection test, rerun the gates, and finalize the return.
