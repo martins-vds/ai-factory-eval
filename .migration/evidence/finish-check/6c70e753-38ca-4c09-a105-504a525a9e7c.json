@@ -1,0 +1,75 @@
+[
+  {
+    "at": "2026-11-18T13:34:18Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17725,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-04",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-04.md",
+      ".migration/handoffs/LL-04.md",
+      ".migration/ledger/about.page.yaml",
+      ".migration/returns/LL-04.afs-migrator.yaml",
+      "config/urls.py",
+      "src/library_info/__init__.py",
+      "src/library_info/urls.py",
+      "src/library_info/views.py",
+      "templates/library_info/about.html",
+      "templates/library_info/about_legacy.html",
+      "tests/library_info/test_page.py"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-04.afs-migrator.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-18T13:35:35Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18188,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-04",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6c70e753-38ca-4c09-a105-504a525a9e7c.json",
+      ".migration/evidence/runs/LL-04.md",
+      ".migration/handoffs/LL-04.md",
+      ".migration/ledger/about.page.yaml",
+      ".migration/returns/LL-04.afs-migrator.yaml",
+      "config/urls.py",
+      "src/library_info/__init__.py",
+      "src/library_info/urls.py",
+      "src/library_info/views.py",
+      "templates/library_info/about.html",
+      "templates/library_info/about_legacy.html",
+      "tests/library_info/test_page.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
