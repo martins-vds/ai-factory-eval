@@ -6,10 +6,19 @@ source:
   graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
   flow: View Late Fee
   location: legacy/src/main/java/lib/LateFeeView.java:23-38
-boundary: "GET /fees/{id} renders an HTML heading, due/late-day text, and a two-decimal dollar fee; an unknown loan returns HTTP 404 with `<p>No such loan.</p>`."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "GET /fees/{id} preserves the characterized HTML; the separate /ui/fees/{id}/ page presents the fee in the reading-room layout and offers payment; an unknown loan returns HTTP 404 with `<p>No such loan.</p>`."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1292]
+target:
+  components: [src.fees.views.fee_detail, src.fees.views.fee_page, templates/fees/page.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_views.py::test_fee_endpoint_matches_the_characterized_html, tests/fees/test_views.py::test_fee_endpoint_returns_the_characterized_not_found_response, tests/fees/test_views.py::test_fee_page_uses_reading_room_layout_and_posts_payment_to_ui_route, tests/fees/test_views.py::test_fee_page_returns_not_found_for_an_unknown_loan, tests/fees/test_views.py::test_payment_page_returns_not_found_for_an_unknown_loan, tests/fees/test_views.py::test_regular_fee_payment_renders_updated_fee_page, tests/fees/test_views.py::test_fee_and_payment_routes_restrict_http_methods, tests/fees/test_views.py::test_browser_can_view_and_pay_a_late_fee]
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
+rules:
+  - id: known-loan
+    rule: "An unknown loan returns HTTP 404 with `<p>No such loan.</p>`."
+    source: "LateFeeView.java:26-29"
+  - id: request-methods
+    rule: "Fee pages accept GET requests, and payment endpoints accept POST requests."
+    source: "LateFeeView.java:23; FinePayments.java:26"

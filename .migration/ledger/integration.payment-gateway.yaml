@@ -7,11 +7,26 @@ source:
   flow: Pay Late Fee
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
-boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or https://payments.lending-library.invalid; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1292]
+target:
+  components: [src.fees.services.FeeApplication.pay, src.fees.gateway.HttpPaymentGateway, src.fees.views.payment]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_views.py::test_payment_endpoint_posts_to_the_gateway_and_returns_its_success, tests/fees/test_views.py::test_payment_endpoint_maps_gateway_decline_to_502_and_preserves_its_body, tests/fees/test_views.py::test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan, tests/fees/test_views.py::test_payment_endpoint_maps_connection_error_to_gateway_unavailable, tests/fees/test_views.py::test_payment_endpoint_reports_interruption_as_gateway_failure_without_losing_it, tests/fees/test_gateway.py::test_payment_gateway_uses_source_default_or_configured_url, tests/fees/test_gateway.py::test_payment_gateway_maps_non_200_status_to_502, tests/fees/test_gateway.py::test_payment_gateway_maps_http_errors_to_502_and_preserves_body, tests/fees/test_gateway.py::test_payment_gateway_maps_connection_errors_to_unavailable, tests/fees/test_gateway.py::test_payment_gateway_preserves_interruption_cause, tests/fees/test_views.py::test_payment_page_returns_not_found_for_an_unknown_loan, tests/fees/test_views.py::test_payment_page_returns_not_found_if_loan_disappears_before_payment, tests/fees/test_views.py::test_regular_fee_payment_renders_updated_fee_page, tests/fees/test_views.py::test_htmx_payment_action_shows_gateway_success, tests/fees/test_views.py::test_htmx_payment_action_shows_a_decline_without_losing_fee_page, tests/fees/test_views.py::test_browser_can_view_and_pay_a_late_fee]
+notes: "The approved fix in #40 logs an interrupted call with its InterruptedError cause before returning the characterized 502 response."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+rules:
+  - id: existing-loan
+    rule: "Unknown loans return 404 without calling the payment gateway."
+    source: "FinePayments.java:29-31"
+  - id: request-method
+    rule: "The payment endpoint accepts POST requests only."
+    source: "FinePayments.java:26"
+  - id: gateway-result
+    rule: "Gateway HTTP 200 returns 200 with its body; other HTTP responses return 502 with the gateway body."
+    source: "FinePayments.java:34-36"
+  - id: gateway-failure
+    rule: "I/O and interrupted gateway calls return 502 with `payment gateway unavailable`; interrupted calls retain a logged InterruptedError cause under the approved fix."
+    source: "FinePayments.java:34-40; approved fix: martins-vds/ai-factory-synthetic-target#40"

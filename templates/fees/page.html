@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Late fees · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+  <h1 class="mb-8 mt-3 text-5xl md:text-6xl">Late fees</h1>
+  <div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-[#66705b]">{{ fee.loan.id }} · {{ fee.loan.member }}</p>
+        <h2 class="card-title text-4xl">Fee summary</h2>
+        <dl class="mt-6 grid gap-4">
+          <div class="flex justify-between gap-4">
+            <dt>Due date</dt>
+            <dd>{{ fee.loan.due_on|date:"M j, Y" }}</dd>
+          </div>
+          {% if fee.loan.returned_on %}
+          <div class="flex justify-between gap-4">
+            <dt>Returned</dt>
+            <dd>{{ fee.loan.returned_on|date:"M j, Y" }}</dd>
+          </div>
+          {% endif %}
+          <div class="flex justify-between gap-4">
+            <dt>Late days</dt>
+            <dd>{{ fee.days_late }}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-t border-[#d8cdbb] py-5 text-xl">
+            <dt>Fee due</dt>
+            <dd class="font-bold">${{ fee.amount|floatformat:2 }}</dd>
+          </div>
+        </dl>
+        <p class="mt-2 text-sm text-[#66705b]">
+          The first two late days are waived. After that, each late day is 25¢, up to $10.00.
+        </p>
+        {% if result %}
+          {% include "fees/payment-status.html" %}
+        {% else %}
+        <div id="payment-status" class="mt-3" aria-live="polite"></div>
+        {% endif %}
+        <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
+              hx-post="/ui/payments/{{ fee.loan.id }}/"
+              hx-target="#payment-status" hx-swap="outerHTML">
+          {% csrf_token %}
+          <button class="btn btn-outline mt-3 text-[#a94e37]" type="submit">
+            Pay late fee
+          </button>
+        </form>
+      </div>
+    </article>
+    <nav aria-label="Choose a loan fee" class="grid gap-4">
+      {% for item in fees %}
+      <a class="card border border-[#d8cdbb] bg-[#fffdf7] text-[#2f3428] shadow-sm"
+         href="/ui/fees/{{ item.loan.id }}/"
+         {% if item.loan.id == fee.loan.id %}aria-current="page"{% endif %}>
+        <div class="card-body">
+          <span class="flex justify-between gap-4">
+            <strong>{{ item.loan.id }} · {{ item.loan.member }}</strong>
+            <strong>${{ item.amount|floatformat:2 }}</strong>
+          </span>
+          <span class="mt-2 block text-sm text-[#66705b]">
+            {{ item.days_late }} late days · due {{ item.loan.due_on|date:"M j, Y" }}
+          </span>
+        </div>
+      </a>
+      {% endfor %}
+    </nav>
+  </div>
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.target.id === 'payment-status') {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
+{% endblock %}

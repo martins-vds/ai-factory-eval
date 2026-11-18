@@ -7,9 +7,21 @@ source:
   flow: View Late Fee
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
-boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "GET /fees/{id} and the fee page calculate max(0, days from due date to returnedOn or today); the first two late days are waived, then 25 cents is charged for each late day, capped at $10."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1292]
+target:
+  components: [src.fees.services.FeeApplication.calculate]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fee_services.py::test_fee_calculation_waives_the_first_two_days_and_charges_the_third, tests/fees/test_fee_services.py::test_fee_calculation_uses_return_date_and_never_exceeds_ten_dollars, tests/fees/test_fee_services.py::test_fee_calculation_clamps_days_before_the_due_date_to_zero, tests/fees/test_views.py::test_fee_endpoint_matches_the_characterized_html]
+rules:
+  - id: late-days
+    rule: "Late days are the non-negative difference between the due date and the returned date or today."
+    source: "LateFeeView.java:31-33"
+  - id: grace-and-rate
+    rule: "Fees are zero through two late days; after that, charge 25 cents per late day."
+    source: "LateFeeView.java:34"
+  - id: fee-cap
+    rule: "The fee is capped at $10.00."
+    source: "LateFeeView.java:34"
