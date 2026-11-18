@@ -6,3 +6,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 |---|---|---|---|---|---|---|---|
 | 2026-11-18T03:06:52+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T03:09:32+00:00 | snapshot-check | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py snapshot tests/data_migration/fixtures/DM-05C` | `525bd2128fe2515f` |  | gate=data-snapshot tables=6 problems=0 |
+| 2026-11-18T03:11:17+00:00 | invariants-red | 1 | 4.2 | `pytest -q tests/data_migration/test_invariants.py` | `0a7d0bcd225ba1e9` | E       TypeError: TempPathFactory.__init__() missing 4 required positional arguments: 'given_basetemp', 'retention_coun |  |
+| 2026-11-18T03:11:26+00:00 | invariants | 0 | 2.11 | `pytest -q tests/data_migration/test_invariants.py` | `578cebb7a3c297c1` |  |  |
