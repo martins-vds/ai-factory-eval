@@ -8,6 +8,7 @@ from django.core.management import call_command
 from django.utils import timezone
 
 from src.loans.models import Loan as LoanModel
+from src.reports.repository import DjangoMonthlyReportLoanRepository
 from src.reports.services import MonthlyReportApplication, MonthlyReportRow
 
 
@@ -76,6 +77,42 @@ def test_monthly_report_for_january_uses_december_of_the_previous_year():
 
     assert repository.period == (date(2025, 12, 1), date(2026, 1, 1))
     assert report == []
+
+
+@pytest.mark.django_db
+def test_monthly_report_application_excludes_loans_outside_the_previous_month():
+    LoanModel.objects.create(
+        id='LL05-before',
+        member='before',
+        isbn='1',
+        lent_on=date(2026, 1, 31),
+    )
+    LoanModel.objects.create(
+        id='LL05-start',
+        member='qualifying',
+        isbn='2',
+        lent_on=date(2026, 2, 1),
+    )
+    LoanModel.objects.create(
+        id='LL05-last',
+        member='qualifying',
+        isbn='3',
+        lent_on=date(2026, 2, 28),
+    )
+    LoanModel.objects.create(
+        id='LL05-end',
+        member='after',
+        isbn='4',
+        lent_on=date(2026, 3, 1),
+    )
+    application = MonthlyReportApplication(
+        DjangoMonthlyReportLoanRepository(),
+        FeeCalculator({'LL05-start': Fee(0), 'LL05-last': Fee(0)}),
+    )
+
+    report = application.monthly_report_for(date(2026, 3, 1))
+
+    assert report == [MonthlyReportRow('qualifying', 2, 0, 0)]
 
 
 @pytest.mark.django_db
