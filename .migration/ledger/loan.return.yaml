@@ -7,11 +7,32 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after the first return, HTTP 404 with `no such loan` and a newline when the id is absent, and HTTP 409 for a repeated return. The reading-room UI returns through /ui/loans/{id}/return/."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1422]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
+  - tests/loans/test_circulation.py::test_return_api_returns_not_found_for_unknown_loan
+  - tests/loans/test_circulation.py::test_ui_return_renders_a_not_found_response_for_unknown_loans
+  - tests/loans/test_circulation.py::test_reading_room_supports_lending_and_returning_in_a_browser
+  - .migration/evidence/runs/LL-02.md
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components: [src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+rules:
+  - id: loan-must-exist
+    rule: A return request for an unknown loan id is rejected as not found.
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
+  - id: already-returned-rejected
+    rule: A loan that has already been returned cannot be returned again.
+    source: martins-vds/ai-factory-synthetic-target#41
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#41
+  reason: Approved fix rejects repeat returns and preserves the original return date.

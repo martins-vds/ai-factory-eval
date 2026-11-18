@@ -3,17 +3,21 @@
 {% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
 
 {% block content %}
-<section class="mx-auto max-w-3xl">
+<section class="mx-auto max-w-3xl" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan record · {{ loan.id }}</p>
       <h1 class="card-title mt-2 text-4xl">A book in good company.</h1>
+      {% if message %}<p role="alert">{{ message }}</p>{% endif %}
       <p class="mt-2">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
       <dl class="mt-6 grid gap-4 sm:grid-cols-2">
         <div><dt class="text-sm text-[#66705b]">Lent</dt><dd>{{ loan.lent_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
-        <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
+        <div>
+          <dt class="text-sm text-[#66705b]">Returned</dt>
+          <dd id="return-control">{% include "loans/_return_control.html" %}</dd>
+        </div>
       </dl>
     </div>
   </article>

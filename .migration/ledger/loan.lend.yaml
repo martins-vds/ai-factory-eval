@@ -7,11 +7,34 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans requires nonblank member and ISBN values (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record. The reading-room UI lends through /ui/loans/new/."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1422]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_fields_without_creating_a_loan
+  - tests/loans/test_circulation.py::test_lend_api_creates_a_loan_with_the_characterized_response
+  - tests/loans/test_circulation.py::test_lend_api_escapes_semicolons_in_created_loan_fields
+  - tests/loans/test_circulation.py::test_lend_api_rejects_missing_or_blank_required_fields
+  - tests/loans/test_circulation.py::test_ui_lending_renders_field_errors_for_full_page_and_htmx_requests
+  - tests/loans/test_circulation.py::test_reading_room_supports_lending_and_returning_in_a_browser
+  - .migration/evidence/runs/LL-02.md
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+target:
+  components: [src.loans.services.lend_loan, src.loans.views.loan_list, src.loans.views.loan_catalog_lend]
+rules:
+  - id: member-required
+    rule: Member must not be missing, empty or whitespace-only.
+    source: legacy/src/main/java/lib/LoanResource.java:37-43; martins-vds/ai-factory-synthetic-target#39
+  - id: isbn-required
+    rule: ISBN must not be missing, empty or whitespace-only.
+    source: legacy/src/main/java/lib/LoanResource.java:37-43; martins-vds/ai-factory-synthetic-target#39
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#38
+  reason: The approved fix-all ruling rejects blank fields and escapes delimited export values (quirks #39 and #43).
