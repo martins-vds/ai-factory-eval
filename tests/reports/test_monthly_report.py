@@ -1,6 +1,7 @@
 import csv
 from datetime import UTC, date, datetime
 from io import StringIO
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -9,6 +10,133 @@ from django.test import override_settings
 from django.utils import timezone
 
 from src.loans.models import Loan
+from src.reports.services import MonthlyReport
+
+
+class FixedClock:
+    def __init__(self, today):
+        self.current_date = today
+
+    def today(self):
+        return self.current_date
+
+
+class LoanRepository:
+    def __init__(self, loans):
+        self.loans = loans
+        self.requested_period = None
+
+    def for_month(self, start, end):
+        self.requested_period = (start, end)
+        return self.loans
+
+
+def report_loan(member, lent_on, due_on, returned_on=None):
+    return SimpleNamespace(
+        member=member,
+        lent_on=lent_on,
+        due_on=due_on,
+        returned_on=returned_on,
+    )
+
+
+def test_monthly_report_uses_prior_month_with_half_open_bounds():
+    repository = LoanRepository([])
+    report = MonthlyReport(repository, FixedClock(date(2026, 1, 1)))
+
+    report.render()
+
+    assert repository.requested_period == (date(2025, 12, 1), date(2026, 1, 1))
+
+
+def test_monthly_report_includes_only_members_with_loans_started_in_month():
+    repository = LoanRepository(
+        [
+            report_loan('alpha', date(2025, 12, 1), date(2025, 12, 15)),
+            report_loan(
+                'alpha',
+                date(2025, 11, 1),
+                date(2025, 12, 10),
+                date(2026, 1, 1),
+            ),
+            report_loan(
+                'return-only',
+                date(2025, 11, 1),
+                date(2025, 12, 10),
+                date(2025, 12, 11),
+            ),
+            report_loan('next-month', date(2026, 1, 1), date(2026, 1, 15)),
+        ]
+    )
+    report = MonthlyReport(repository, FixedClock(date(2026, 1, 1)))
+
+    rows = list(csv.reader(StringIO(report.render())))
+
+    assert rows == [
+        ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
+        ['alpha', '1', '0', '0'],
+    ]
+
+
+def test_monthly_report_calculates_late_returns_and_fees():
+    repository = LoanRepository(
+        [
+            report_loan('capped', date(2025, 12, 1), date(2025, 12, 15)),
+            report_loan(
+                'capped',
+                date(2025, 11, 1),
+                date(2025, 10, 1),
+                date(2025, 12, 31),
+            ),
+            report_loan(
+                'charged',
+                date(2025, 12, 1),
+                date(2025, 12, 10),
+                date(2025, 12, 13),
+            ),
+            report_loan(
+                'grace',
+                date(2025, 12, 1),
+                date(2025, 12, 10),
+                date(2025, 12, 12),
+            ),
+        ]
+    )
+    report = MonthlyReport(repository, FixedClock(date(2026, 1, 1)))
+
+    rows = list(csv.reader(StringIO(report.render())))
+
+    assert rows == [
+        ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
+        ['capped', '1', '1', '1000'],
+        ['charged', '1', '1', '75'],
+        ['grace', '1', '1', '0'],
+    ]
+
+
+def test_monthly_report_sorts_fees_descending_then_member_id():
+    repository = LoanRepository(
+        [
+            report_loan(
+                'beta',
+                date(2025, 12, 1),
+                date(2025, 12, 10),
+                date(2025, 12, 13),
+            ),
+            report_loan(
+                'alpha',
+                date(2025, 12, 1),
+                date(2025, 12, 10),
+                date(2025, 12, 13),
+            ),
+            report_loan('zero', date(2025, 12, 1), date(2025, 12, 10)),
+        ]
+    )
+    report = MonthlyReport(repository, FixedClock(date(2026, 1, 1)))
+
+    rows = list(csv.reader(StringIO(report.render())))
+
+    assert [row[0] for row in rows] == ['member_id', 'alpha', 'beta', 'zero']
 
 
 @pytest.mark.django_db
