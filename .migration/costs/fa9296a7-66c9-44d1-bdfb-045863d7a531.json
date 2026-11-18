@@ -231,34 +231,34 @@
       ]
     },
     "event_types": {
-      "assistant.message": 228,
-      "assistant.turn_end": 128,
-      "assistant.turn_start": 129,
-      "hook.end": 440,
-      "hook.start": 441,
-      "permission.completed": 250,
-      "permission.requested": 250,
+      "assistant.message": 268,
+      "assistant.turn_end": 154,
+      "assistant.turn_start": 154,
+      "hook.end": 492,
+      "hook.start": 493,
+      "permission.completed": 260,
+      "permission.requested": 260,
       "session.compaction_complete": 1,
       "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 129,
+      "session.usage_record": 154,
       "skill.context_delivered_ref": 15,
       "skill.invoked": 12,
       "skill.invoked_ref": 3,
-      "subagent.completed": 2,
+      "subagent.completed": 3,
       "subagent.configured": 3,
       "subagent.selected": 4,
       "subagent.started": 3,
       "system.message": 4,
-      "system.notification": 3,
-      "tool.execution_complete": 271,
-      "tool.execution_start": 272,
-      "user.message": 7
+      "system.notification": 4,
+      "tool.execution_complete": 297,
+      "tool.execution_start": 297,
+      "user.message": 9
     },
-    "events": 2597,
+    "events": 2892,
     "usage_fields": []
   },
-  "ended_at": "2026-11-18T13:14:33.852Z",
+  "ended_at": "2026-11-18T13:41:05.460Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -316,11 +316,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 228
+      "requests": 268
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-18T13:15:34+00:00",
+  "recorded_at": "2026-11-18T13:41:50+00:00",
   "schema": "afs-cost/1",
   "session_id": "fa9296a7-66c9-44d1-bdfb-045863d7a531",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -376,6 +376,5 @@
   ],
   "started_at": "2026-11-18T12:50:59.423Z",
   "surface": "coding-agent",
-  "trigger_id": "7a6cf1a3-2b70-4e2b-8c36-4b0d9fd32f3b",
   "usage_source": "assistant.message (output only, partial)"
 }
