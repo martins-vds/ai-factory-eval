@@ -1,0 +1,43 @@
+<form
+  id="lend-form"
+  class="mt-6 grid gap-4"
+  action="/ui/loans/new/"
+  method="post"
+  hx-post="/ui/loans/new/"
+  hx-target="#lend-form"
+  hx-swap="outerHTML"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+>
+  {% csrf_token %}
+  <div>
+    <label class="label" for="id_member"><span class="label-text">Member</span></label>
+    <input
+      class="input input-bordered"
+      id="id_member"
+      name="member"
+      type="text"
+      maxlength="255"
+      required
+      value="{{ form.member.value|default_if_none:'' }}"
+    >
+    {% for error in form.member.errors %}
+    <p class="mt-1 text-sm text-error" role="alert">{{ error }}</p>
+    {% endfor %}
+  </div>
+  <div>
+    <label class="label" for="id_isbn"><span class="label-text">ISBN</span></label>
+    <input
+      class="input input-bordered"
+      id="id_isbn"
+      name="isbn"
+      type="text"
+      maxlength="255"
+      required
+      value="{{ form.isbn.value|default_if_none:'' }}"
+    >
+    {% for error in form.isbn.errors %}
+    <p class="mt-1 text-sm text-error" role="alert">{{ error }}</p>
+    {% endfor %}
+  </div>
+  <button class="btn btn-primary" type="submit">Lend book</button>
+</form>
