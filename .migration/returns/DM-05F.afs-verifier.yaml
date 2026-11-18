@@ -1,0 +1,37 @@
+role: afs-verifier
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#1434
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1439
+verdict: blocked
+blocked_reason: "mutation_changed: interrupted by user time limit before completion"
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: null
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+findings: []
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+handoff: .migration/handoffs/DM-05F.md
+rules:
+  - capability: data.cargo
+    rule: Delivery.derived_from rejects route specification, itinerary, or handling history arguments of the wrong type.
+    use_case: Delivery.derived_from
+    test: tests/cargo/test_domain_calculations.py::test_delivery_rejects_invalid_derivation_inputs
+    enforced: true
+no_rules:
+  data.leg: "DM-05F checks loaded itinerary continuity; no use-case refusal rule applies."
+  data.handling-event: "DM-05F checks persisted reference integrity; no use-case refusal rule applies."
+  data.location: "Referenced lookup table; no use-case business rule applies."
+  data.voyage: "Referenced schedule parent; no use-case business rule applies."
+  data.carrier-movement: "DM-05F checks loaded schedule intervals; no use-case refusal rule applies."
+inherited:
+  - where: src/cargotracker/data_migration/management/commands/export_data_snapshot.py
+    what: "The exporter is absent from this ticket's base; verify-export fails with an unknown command, so the target CSV export and reconciliation could not complete."
+    origin: unknown
+    evidence: "run: verify-export"
