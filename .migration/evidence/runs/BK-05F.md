@@ -62,3 +62,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T03:05:59+00:00 | mutation-tests-focused | 1 | 4.11 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `b8e4bd3868baea4d` | E       AttributeError: 'NoneType' object has no attribute 'group' |  |
 | 2026-11-18T03:06:16+00:00 | mutation-tests-focused | 0 | 1.88 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `e8d6e9e0af6cb182` |  |  |
 | 2026-11-18T03:06:27+00:00 | mutation-tests-focused | 0 | 1.82 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `6fb768e49a612111` |  |  |
+| 2026-11-18T03:10:31+00:00 | mutation-changed | 0 | 221.82 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `7d60af2ed936b1bf` |  | gate=mutation score=0.850 threshold=0.8 killed=51 survived=9 files=1 base=origin/main |
+| 2026-11-18T03:11:39+00:00 | mutation-probe-post-unknown | 0 | 1.4 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_reports_unknown_cargo` | `b0889bb9822ec0b0` |  |  |
+| 2026-11-18T03:12:14+00:00 | mutation-tests-focused | 0 | 1.87 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `e8d6e9e0af6cb182` |  |  |
+| 2026-11-18T03:12:28+00:00 | mutation-tests-focused | 0 | 1.88 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `e8d6e9e0af6cb182` |  |  |
