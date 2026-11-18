@@ -57,3 +57,14 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T03:31:22+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `3f312c166bbf236c` |  | gate=crap max=26.0 threshold=30 over=0 methods=209 |
 | 2026-11-18T03:33:55+00:00 | mutation-changed-fallback | 0 | 150.29 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `dd48af6b78d5b7ad` |  | gate=mutation score=0.852 threshold=0.8 killed=69 survived=12 files=1 base=origin/main |
 | 2026-11-18T03:37:44+00:00 | migration-validate-final | 0 | 4.01 | `python .migration/harness/tools/validate.py .migration` | `a3cead9cf227b8af` |  |  |
+| 2026-11-18T03:42:25+00:00 | behavior-post-codeql | 0 | 44.89 | `pytest -q` | `5e48356bc6e9ea72` |  |  |
+| 2026-11-18T03:42:29+00:00 | migration-validate-post-codeql | 0 | 4.03 | `python .migration/harness/tools/validate.py .migration` | `a3cead9cf227b8af` |  |  |
+
+## UI browser verification
+
+Playwright against an isolated PostgreSQL database and test-only URL configuration opened the
+not-routed dashboard, loaded both edit dialogs through htmx, updated destination and deadline, and
+observed the refreshed table. Direct destination and deadline navigation rendered full pages; a
+native destination form submission redirected to the dashboard and updated the cargo. The temporary
+server and database were removed afterward. The development server did not have its generated
+Tailwind CSS asset, so visual styling was not assessed.
