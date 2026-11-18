@@ -1,0 +1,39 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1472
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.962
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin_as_destination
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: booking.dialog-destination
+    rule: A destination update requires an existing cargo.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/application/test_specification.py::test_change_destination_raises_lookup_error_for_unknown_cargo
+    enforced: true
+    ledger_rule: cargo-exists
+  - capability: booking.dialog-destination
+    rule: A destination update cannot set the destination to the cargo origin.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin_as_destination
+    enforced: true
+  - capability: booking.dialog-deadline
+    rule: A deadline update requires an existing cargo.
+    use_case: CargoSpecification.change_deadline
+    test: tests/booking/application/test_specification.py::test_change_deadline_raises_lookup_error_for_unknown_cargo
+    enforced: true
+    ledger_rule: cargo-exists
+no_rules:
+  booking.dialog-chain: Dialog opening, cancellation, and table refresh are interaction wiring; the destination and deadline business rules belong to the specification use cases.
