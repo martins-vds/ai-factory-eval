@@ -1,0 +1,31 @@
+<section class="rounded-box rounded-lg border border-base-300 border-slate-300 bg-white p-6 shadow-sm">
+  <h2 id="cargo-edit-dialog-heading" class="mb-4 text-xl font-semibold">Change arrival deadline</h2>
+  <p class="mb-4">
+    Origin: {{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})<br>
+    Destination: {{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-target="#cargo-edit-dialog"
+    hx-swap="innerHTML"
+    class="flex flex-col gap-4"
+  >
+    {% csrf_token %}
+    <label class="label mb-1 block font-medium text-slate-800" for="arrival-deadline">Arrival deadline</label>
+    {% if deadline_error %}
+      <p class="text-red-700" id="deadline-error" role="alert">{{ deadline_error }}</p>
+    {% endif %}
+    <input
+      class="input input-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      type="date"
+      id="arrival-deadline"
+      name="deadline"
+      value="{{ deadline_value }}"
+      {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+    >
+    <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" name="action" value="update">Update</button>
+  </form>
+  {% include "booking/dialogs/_cancel_form.html" %}
+</section>

@@ -28,11 +28,36 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                class="btn btn-ghost min-h-11 rounded-md px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+                type="button"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+              >Change destination</button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+              <button
+                class="btn btn-ghost min-h-11 rounded-md px-3 py-2 text-sm font-semibold text-blue-700 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+                type="button"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+                aria-label="Change deadline for cargo {{ cargo.tracking_id.value }}"
+              >Change deadline</button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </section>
+<dialog
+  id="cargo-edit-dialog"
+  class="modal rounded-box max-w-2xl border border-slate-300 bg-white p-0 shadow-xl"
+  aria-labelledby="cargo-edit-dialog-heading"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+  hx-on::after-swap="if (!this.open) this.showModal()"
+></dialog>
