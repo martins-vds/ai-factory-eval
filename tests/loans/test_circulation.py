@@ -1,9 +1,24 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 import pytest
 from django.utils import timezone
+from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
+from src.loans.services import InvalidLoan, LoanUseCases
+
+
+class LoanRecorder:
+    def __init__(self):
+        self.requests = []
+
+    def lend(self, member, isbn, lent_on):
+        self.requests.append((member, isbn, lent_on))
+
+
+class FixedClock:
+    def today(self):
+        return date(2026, 11, 18)
 
 
 @pytest.mark.django_db
@@ -40,6 +55,34 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, fields):
     assert response['Content-Type'] == 'text/plain'
     assert response.content == b'member and isbn are required\n'
     assert Loan.objects.count() == 3
+
+
+@pytest.mark.parametrize(
+    ('member', 'isbn', 'expected_fields'),
+    [
+        ('   ', '123', {'member': 'This field is required.'}),
+        ('reader', '   ', {'isbn': 'This field is required.'}),
+        (
+            '   ',
+            '   ',
+            {
+                'member': 'This field is required.',
+                'isbn': 'This field is required.',
+            },
+        ),
+    ],
+)
+def test_lend_use_case_reports_each_blank_field_before_creating_a_loan(
+    member, isbn, expected_fields
+):
+    repository = LoanRecorder()
+    use_cases = LoanUseCases(repository, FixedClock())
+
+    with pytest.raises(InvalidLoan) as error:
+        use_cases.lend(member, isbn)
+
+    assert error.value.fields == expected_fields
+    assert repository.requests == []
 
 
 @pytest.mark.django_db
@@ -85,6 +128,7 @@ def test_lending_page_uses_the_reading_room_form_and_ui_route(client):
     assert b'name="isbn"' in response.content
     assert b'action="/ui/loans/"' in response.content
     assert b'hx-post="/ui/loans/"' in response.content
+    assert response.content.count(b'class="input input-bordered w-full"') == 2
 
 
 @pytest.mark.django_db
@@ -104,6 +148,56 @@ def test_browser_lending_creates_a_loan_and_redirects_to_its_record(client):
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L4/'
     assert Loan.objects.get(pk='L4').member == 'dee'
+
+
+@pytest.mark.django_db
+def test_loan_list_page_displays_the_collection_and_lend_link(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'Loan L1' in response.content
+    assert b'href="/ui/loans/new/"' in response.content
+
+
+@pytest.mark.parametrize(
+    'path',
+    ['/ui/loans/', '/ui/loans/new/'],
+)
+@pytest.mark.django_db
+def test_lending_pages_reject_unsupported_methods(client, path):
+    response = client.put(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_htmx_lending_returns_a_created_loan_fragment(client):
+    response = client.post(
+        '/ui/loans/',
+        {'member': 'dee', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 201
+    assert b'role="status"' in response.content
+    assert b'Loan L4 has been recorded.' in response.content
+    assert b'href="/ui/loans/L4/"' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_lending_validation_returns_only_the_form_fragment(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': '', 'isbn': ' '},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' not in response.content
+    assert b'name="member"' in response.content
+    assert b'name="isbn"' in response.content
+    assert response.content.count(b'This field is required.') == 2
 
 
 @pytest.mark.django_db
@@ -137,4 +231,71 @@ def test_htmx_repeat_return_renders_a_swappable_status(client):
     assert response.status_code == 200
     assert b'role="status"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan L2' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.parametrize(
+    'path',
+    ['/loans', '/loans/L1/return', '/ui/loans/', '/ui/loans/new/', '/ui/loans/L1/return/'],
+)
+@pytest.mark.django_db
+def test_loan_endpoints_reject_unsupported_methods(client, path):
+    response = client.put(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_browser_return_redirects_to_the_updated_record(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db
+def test_htmx_return_reports_the_successful_transition(client):
+    response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="status"' in response.content
+    assert b'Loan L1 was marked returned on' in response.content
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_endpoint_saves_outside_a_test_transaction(client):
+    response = client.post('/loans/L1/return')
+
+    assert response.status_code == 200
+    assert Loan.objects.get(pk='L1').returned_on == timezone.localdate()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_real_browser_can_lend_and_return_a_book(live_server):
+    today = timezone.localdate()
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            context = browser.new_context(java_script_enabled=False)
+            page = context.new_page()
+            page.goto(f'{live_server.url}/ui/loans/new/')
+            page.get_by_label('Member').fill('dee')
+            page.get_by_label('ISBN').fill('123')
+            page.get_by_role('button', name='Record this loan').click()
+            assert page.url.endswith('/ui/loans/L4/')
+            page.get_by_role('button', name='Mark as returned').click()
+            assert page.locator('dd').nth(2).inner_text() == (
+                f'{today.strftime("%b")} {today.day}, {today.year}'
+            )
+        finally:
+            context.close()
+            browser.close()
+
+    loan = Loan.objects.get(pk='L4')
+    assert loan.member == 'dee'
+    assert loan.returned_on == today

@@ -10,7 +10,8 @@
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
       <h1 class="card-title mt-2 text-4xl">Lend a book</h1>
       <p class="mt-2 text-[#66705b]">Record the member and the book joining the collection.</p>
-      <div id="loan-feedback" aria-live="polite">
+      <div id="loan-feedback" aria-live="polite"
+           hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
         {% include "loans/loan-form.html" %}
       </div>
     </div>

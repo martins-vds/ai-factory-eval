@@ -20,13 +20,13 @@
       </dl>
       {% if not loan.returned_on %}
       <form class="mt-6" method="post" action="/ui/loans/{{ loan.id }}/return/"
-            hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="innerHTML"
-            hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+            hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="innerHTML">
         {% csrf_token %}
         <button class="btn btn-primary" type="submit">Mark as returned</button>
       </form>
       {% endif %}
-      <div id="return-status" aria-live="polite"></div>
+      <div id="return-status" aria-live="polite"
+           hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"></div>
     </div>
   </article>
 </section>

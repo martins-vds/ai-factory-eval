@@ -7,13 +7,11 @@ from .ports import Clock, LoanRecord, LoanRepository
 class InvalidLoan(ValueError):
     def __init__(self, fields):
         self.fields = fields
-        super().__init__('member and isbn are required')
 
 
 class LoanAlreadyReturned(ValueError):
     def __init__(self, loan):
         self.loan = loan
-        super().__init__('already returned')
 
 
 class LoanUseCases:

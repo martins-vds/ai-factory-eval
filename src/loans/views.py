@@ -35,12 +35,7 @@ def loan_list(request):
             return HttpResponse(
                 'member and isbn are required\n', status=400, content_type='text/plain'
             )
-        try:
-            loan = use_cases.lend(**form.cleaned_data)
-        except InvalidLoan:
-            return HttpResponse(
-                'member and isbn are required\n', status=400, content_type='text/plain'
-            )
+        loan = use_cases.lend(**form.cleaned_data)
         return HttpResponse(loan_line(loan), status=201, content_type='text/plain')
     return HttpResponse(list_loans_text(use_cases.all()), content_type='text/plain')
 
@@ -90,18 +85,17 @@ def loan_return_page(request, loan_id):
     use_cases = loan_use_cases()
     try:
         loan = use_cases.return_loan(loan_id)
-        updated = True
     except LoanAlreadyReturned as error:
         loan = error.loan
-        updated = False
+        if request.headers.get('HX-Request') == 'true':
+            return render(request, 'loans/return-status.html', {'loan': loan, 'updated': False})
+        return render(
+            request, 'loans/detail.html', {'loan': loan, 'return_error': True}, status=409
+        )
 
     if loan is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
 
     if request.headers.get('HX-Request') == 'true':
-        return render(request, 'loans/return-status.html', {'loan': loan, 'updated': updated})
-    if not updated:
-        return render(
-            request, 'loans/detail.html', {'loan': loan, 'return_error': True}, status=409
-        )
+        return render(request, 'loans/return-status.html', {'loan': loan, 'updated': True})
     return redirect(f'/ui/loans/{loan.id}/')
