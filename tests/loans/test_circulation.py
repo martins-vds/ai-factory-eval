@@ -5,6 +5,7 @@ from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
+from src.loans.repository import LoanRepository
 from src.loans.services import InvalidLoan, LoanAlreadyReturned, LoanUseCases, loan_line
 
 
@@ -105,6 +106,18 @@ def test_lend_use_case_uses_the_clock_date():
     use_cases.lend('reader', '123')
 
     assert repository.requests == [('reader', '123', date(2026, 11, 18))]
+
+
+@pytest.mark.django_db
+def test_lend_use_case_creates_a_fourteen_day_loan_with_the_next_identity():
+    use_cases = LoanUseCases(LoanRepository(), FixedClock())
+
+    loan = use_cases.lend('reader', '123')
+
+    assert loan.id == 'L4'
+    assert loan.lent_on == date(2026, 11, 18)
+    assert loan.due_on == date(2026, 12, 2)
+    assert Loan.objects.get(pk='L4').member == 'reader'
 
 
 def test_lend_use_case_preserves_surrounding_whitespace_in_nonblank_values():
