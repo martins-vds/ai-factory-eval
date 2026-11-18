@@ -7,7 +7,8 @@ from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
-from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
+from cargotracker.booking.interfaces.dialogs.views import create_destination_dialog_view
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -15,14 +16,13 @@ from cargotracker.location.infrastructure.repository import DjangoLocationReposi
 cargo_repository = DjangoCargoRepository()
 location_repository = DjangoLocationRepository()
 dashboard = CargoDashboard(cargo_repository)
-destination_dialog_view, deadline_dialog_view = create_dialog_views(
-    CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
+destination_dialog_view = create_destination_dialog_view(
     dashboard,
+    CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
     location_repository.find_all,
 )
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/destination/', destination_dialog_view),
-    path('admin/cargo/<str:tracking_id>/deadline/', deadline_dialog_view),
 ]
 
 
@@ -42,3 +42,22 @@ def test_destination_dialog_shows_current_route_specification_and_filtered_optio
     assert options is not None
     assert 'CNHKG' not in options.group(1)
     assert 'AUMEL' not in options.group(1)
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_origin_without_changing_route(client):
+    call_command('seed_sample_data')
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'CNHKG'},
+        HTTP_HX_REQUEST='true',
+    )
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert 'aria-invalid="true"' in response.content.decode()
+    assert cargo is not None
+    assert cargo.route_specification.destination.unlocode.value == 'AUMEL'
