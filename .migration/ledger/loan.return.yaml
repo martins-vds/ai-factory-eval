@@ -7,11 +7,37 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, HTTP 404 with `no such loan` and a newline when the id is absent, and HTTP 409 when the loan is already returned. The browser flow is POST /ui/loans/{id}/return/."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1407]
+target:
+  components:
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.services.return_loan
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_browser
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_api_reports_an_unknown_loan
+  - tests/loans/test_circulation.py::test_return_api_does_not_require_a_browser_csrf_token
+  - tests/loans/test_circulation.py::test_return_api_keeps_the_first_return_date_and_rejects_repeats
+  - tests/loans/test_circulation.py::test_returning_a_loan_from_the_browser_updates_its_status
+notes: "Approved divergence under martins-vds/ai-factory-synthetic-target#41: repeated returns are rejected without changing the original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#41
+  reason: "Approved fix: reject repeat return requests rather than overwriting the original returned date."
+rules:
+  - id: known-loan
+    rule: "Returning an unknown loan is rejected with HTTP 404 and `no such loan` plus a newline."
+    source: "legacy/src/main/java/lib/LoanResource.java:45-50"
+  - id: return-once
+    rule: "A loan can be returned only once; repeated return requests are rejected and do not alter its return date."
+    source: "martins-vds/ai-factory-synthetic-target#41"

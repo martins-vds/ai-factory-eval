@@ -1,0 +1,20 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1407
+pr: martins-vds/ai-factory-eval#1412
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.803
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - loan.lend
+  - loan.return-date
+  - loan.return
+quirk_tickets: []
+new_tickets: []
+handoff: none
