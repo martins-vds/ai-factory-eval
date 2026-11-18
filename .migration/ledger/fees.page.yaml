@@ -19,7 +19,7 @@ status: migrated
 verification: differential
 evidence:
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_fee_application_returns_none_for_an_unknown_loan
+  - tests/fees/test_use_cases.py::test_fee_application_returns_none_for_an_unknown_loan
   - tests/fees/test_views.py::test_fee_api_returns_the_characterized_html_fragment
   - tests/fees/test_views.py::test_fee_api_returns_the_characterized_not_found_fragment
   - tests/fees/test_views.py::test_fee_page_uses_the_reading_room_layout_and_ui_payment_route

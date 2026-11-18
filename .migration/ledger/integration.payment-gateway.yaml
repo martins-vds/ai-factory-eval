@@ -21,10 +21,10 @@ status: migrated
 verification: differential
 evidence:
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_payment_checks_for_a_loan_before_calling_the_gateway
-  - tests/fees/test_services.py::test_payment_forwards_success_and_maps_other_gateway_status_to_bad_gateway
-  - tests/fees/test_services.py::test_payment_failure_keeps_an_interruption_as_the_gateway_failure_cause
-  - tests/fees/test_services.py::test_payment_failure_keeps_an_io_error_as_the_gateway_failure_cause
+  - tests/fees/test_use_cases.py::test_payment_checks_for_a_loan_before_calling_the_gateway
+  - tests/fees/test_use_cases.py::test_payment_forwards_success_and_maps_other_gateway_status_to_bad_gateway
+  - tests/fees/test_use_cases.py::test_payment_failure_keeps_an_interruption_as_the_gateway_failure_cause
+  - tests/fees/test_use_cases.py::test_payment_failure_keeps_an_io_error_as_the_gateway_failure_cause
   - tests/fees/test_gateway.py::test_http_payment_gateway_sends_empty_post_to_charge_endpoint
   - tests/fees/test_gateway.py::test_http_payment_gateway_preserves_non_success_status_and_body
   - tests/fees/test_gateway.py::test_http_payment_gateway_does_not_follow_redirects
