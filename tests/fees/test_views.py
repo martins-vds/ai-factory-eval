@@ -137,6 +137,19 @@ def test_regular_payment_action_renders_the_fee_page_with_result(client, gateway
 
 
 @pytest.mark.django_db
+def test_regular_payment_action_renders_gateway_failure_with_fee_page(client, gateway_server):
+    gateway_server.responses.append((503, 'declined\n'))
+
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 502
+    assert b'<!doctype html>' in response.content
+    assert b'Payment failed: declined' in response.content
+    assert b'hx-post="/ui/payments/L1/"' in response.content
+    assert gateway_server.received == [{'method': 'POST', 'path': '/charge?loan=L1', 'body': ''}]
+
+
+@pytest.mark.django_db
 def test_regular_payment_action_renders_not_found_for_unknown_loan(client, gateway_server):
     response = client.post('/ui/payments/missing/')
 
@@ -178,3 +191,44 @@ def test_browser_can_pay_late_fee(live_server, gateway_server):
             browser.close()
 
     assert gateway_server.received == [{'method': 'POST', 'path': '/charge?loan=L1', 'body': ''}]
+
+
+@pytest.mark.django_db
+def test_browser_shows_gateway_failure_from_htmx_error_response(live_server, gateway_server):
+    gateway_server.responses.append((503, 'declined\n'))
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.locator('#payment-status [role="alert"]')
+            alert.wait_for()
+            assert 'Payment failed: declined' in alert.inner_text()
+        finally:
+            browser.close()
+
+    assert gateway_server.received == [{'method': 'POST', 'path': '/charge?loan=L1', 'body': ''}]
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_returns_not_found_fragment(client, gateway_server):
+    response = client.post('/ui/payments/missing/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'Payment failed: no such loan' in response.content
+    assert gateway_server.received == []
+
+
+@pytest.mark.django_db
+def test_fee_page_configures_htmx_to_swap_error_responses(client, gateway_server):
+    response = client.get('/ui/fees/L1/')
+
+    assert response.status_code == 200
+    assert (
+        b'hx-on::before-swap="if (event.detail.xhr.status >= 400) '
+        b'event.detail.shouldSwap = true"' in response.content
+    )
