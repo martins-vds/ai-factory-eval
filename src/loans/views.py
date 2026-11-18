@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
 from .forms import LoanForm
@@ -33,6 +34,7 @@ def loan_catalog_detail(request, loan_id):
     return render(request, 'loans/detail.html', {'loan': loan})
 
 
+@csrf_exempt
 @require_http_methods(['GET', 'POST'])
 def loan_list(request):
     if request.method == 'POST':
@@ -72,6 +74,7 @@ def loan_lend(request):
     )
 
 
+@csrf_exempt
 @require_POST
 def loan_return(request, loan_id):
     try:

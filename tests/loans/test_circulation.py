@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import pytest
+from django.test import Client
 from django.utils import timezone
 
 from src.loans.models import Loan
@@ -44,6 +45,17 @@ def test_lending_use_case_creates_a_loan_for_the_supplied_date():
 
 
 @pytest.mark.django_db
+def test_lending_repository_assigns_the_next_loan_id():
+    loan = LoanRepository().create(
+        member='dee',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+
+    assert loan.id == 'L4'
+
+
+@pytest.mark.django_db
 def test_return_use_case_rejects_unknown_loan():
     with pytest.raises(LoanNotFound):
         return_loan('unknown', LoanRepository(), date(2026, 3, 1))
@@ -64,6 +76,18 @@ def test_return_use_case_records_the_supplied_date():
     loan = return_loan('L1', LoanRepository(), date(2026, 3, 1))
 
     assert loan.returned_on == date(2026, 3, 1)
+    assert Loan.objects.get(pk='L1').returned_on == date(2026, 3, 1)
+
+
+@pytest.mark.django_db
+def test_repository_cannot_replace_a_return_date():
+    repository = LoanRepository()
+
+    first = repository.record_return('L1', date(2026, 3, 1))
+    repeated = repository.record_return('L1', date(2026, 3, 2))
+
+    assert first.returned_on == date(2026, 3, 1)
+    assert repeated is None
     assert Loan.objects.get(pk='L1').returned_on == date(2026, 3, 1)
 
 
@@ -117,6 +141,17 @@ def test_return_api_preserves_the_characterized_unknown_loan_response(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_api_write_endpoints_do_not_require_browser_csrf_tokens():
+    client = Client(enforce_csrf_checks=True)
+
+    lending = client.post('/loans', {'member': 'dee', 'isbn': '123'})
+    returning = client.post('/loans/L1/return')
+
+    assert lending.status_code == 201
+    assert returning.status_code == 200
 
 
 @pytest.mark.django_db

@@ -1,5 +1,7 @@
 from django import forms
 
+from .services import lending_errors
+
 
 class LoanForm(forms.Form):
     member = forms.CharField(
@@ -13,14 +15,13 @@ class LoanForm(forms.Form):
         strip=False,
     )
 
-    def clean_member(self):
-        member = self.cleaned_data['member']
-        if not member.strip():
-            raise forms.ValidationError('Member is required.')
-        return member
-
-    def clean_isbn(self):
-        isbn = self.cleaned_data['isbn']
-        if not isbn.strip():
-            raise forms.ValidationError('ISBN is required.')
-        return isbn
+    def clean(self):
+        cleaned_data = super().clean()
+        errors = lending_errors(
+            cleaned_data.get('member'),
+            cleaned_data.get('isbn'),
+        )
+        for field, message in errors.items():
+            if field in cleaned_data:
+                self.add_error(field, message)
+        return cleaned_data

@@ -12,7 +12,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eva
 target:
   components:
     - src.loans.services.return_loan
-    - src.loans.repository.LoanRepository.save
+    - src.loans.repository.LoanRepository.record_return
     - src.loans.models.Loan.returned_on
     - src.loans.views.loan_return
     - src.loans.views.loan_return_page
@@ -27,6 +27,7 @@ evidence:
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_return_use_case_records_the_supplied_date
   - tests/loans/test_circulation.py::test_return_use_case_preserves_the_original_date_on_repeat
+  - tests/loans/test_circulation.py::test_repository_cannot_replace_a_return_date
   - tests/loans/test_circulation.py::test_return_api_marks_an_unreturned_loan_and_rejects_a_repeat
   - tests/loans/test_circulation.py::test_return_page_updates_status_and_rejects_repeated_or_unknown_returns
 notes: "The approved #41 ruling rejects a repeated return and preserves its original date."

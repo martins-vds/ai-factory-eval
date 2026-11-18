@@ -19,22 +19,26 @@ class LoanAlreadyReturned(Exception):
     pass
 
 
+def lending_errors(member: str | None, isbn: str | None) -> dict[str, str]:
+    errors = {}
+    if not member or not member.strip():
+        errors['member'] = 'Member is required.'
+    if not isbn or not isbn.strip():
+        errors['isbn'] = 'ISBN is required.'
+    return errors
+
+
 def lend_loan(
     member: str | None,
     isbn: str | None,
     repository: LoanRepositoryPort,
     today: date,
 ) -> LoanRecord:
-    errors = {}
-    if not member or not member.strip():
-        errors['member'] = 'Member is required.'
-    if not isbn or not isbn.strip():
-        errors['isbn'] = 'ISBN is required.'
+    errors = lending_errors(member, isbn)
     if errors:
         raise LoanInputError(errors)
 
     return repository.create(
-        id=repository.next_id(),
         member=member,
         isbn=isbn,
         lent_on=today,
@@ -52,8 +56,13 @@ def return_loan(
     if loan.returned_on is not None:
         raise LoanAlreadyReturned(loan_id)
 
-    loan.returned_on = today
-    return repository.save(loan)
+    returned_loan = repository.record_return(loan_id, today)
+    if returned_loan is not None:
+        return returned_loan
+
+    if repository.find(loan_id) is None:
+        raise LoanNotFound(loan_id)
+    raise LoanAlreadyReturned(loan_id)
 
 
 def loan_line(loan: LoanRecord) -> str:
