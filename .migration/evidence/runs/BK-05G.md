@@ -58,3 +58,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:06:05+00:00 | crap-lizard-final | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T13:06:05+00:00 | crap-threshold-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `1ff736494c69c382` |  | gate=crap max=26.0 threshold=30 over=0 methods=204 |
 | 2026-11-18T15:43:12+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:45:49+00:00 | verifier-idiom-ruff | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T15:45:49+00:00 | verifier-idiom-format | 0 | 0.03 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T15:45:49+00:00 | verifier-build-compile | 0 | 0.13 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:45:49+00:00 | verifier-idiom-layers | 0 | 0.23 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T15:45:50+00:00 | verifier-idiom-ui | 0 | 0.55 | `python .migration/harness/tools/check_ui.py` | `0837bed28b1a91d5` |  | gate=ui scope="templates changed since be9c0c1f1244e171b47b06cf2cdf70cc8a01573c" templates=4 findings=0 |
+| 2026-11-18T15:45:50+00:00 | verifier-build-check | 0 | 1.66 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T15:47:12+00:00 | verifier-behavior | 0 | 75.01 | `pytest -q` | `81e1f4271052737c` |  |  |
+| 2026-11-18T15:48:19+00:00 | verifier-regression | 0 | 66.74 | `pytest -q` | `9c95d67ab44af18b` |  |  |
