@@ -189,7 +189,9 @@ def test_cargo_specification_rejects_non_datetime_deadline():
 
     unchanged = repository.find(cargo.tracking_id)
     assert unchanged is not None
-    assert unchanged.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    assert (
+        unchanged.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    )
 
 
 @pytest.mark.django_db

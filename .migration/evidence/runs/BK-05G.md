@@ -77,3 +77,9 @@ Tailwind CSS asset, so visual styling was not assessed.
 | 2026-11-18T04:17:22+00:00 | verify-build-django-check | 0 | 1.64 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-18T04:18:45+00:00 | verify-behavior-full | 0 | 75.58 | `pytest -q` | `1254f99396b81e4a` |  |  |
 | 2026-11-18T04:19:29+00:00 | verify-dialog-usecase-rules | 0 | 2.81 | `pytest -q tests/booking/interfaces/test_dialogs.py -k cargo_specification` | `5a40ad9ea320a369` |  |  |
+| 2026-11-18T04:19:54+00:00 | verifier-build-compile | 0 | 0.08 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:19:55+00:00 | verifier-build-django-check | 0 | 0.38 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T04:19:55+00:00 | verifier-idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:19:55+00:00 | verifier-idiom-format | 1 | 0.01 | `ruff format --check` | `5885e2903349adc3` | 191 \|     assert unchanged is not None |  |
+| 2026-11-18T04:20:17+00:00 | verifier-idiom-format-corrected | 1 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `4109d361c53a67af` | 192 \|     assert ( |  |
+| 2026-11-18T04:20:26+00:00 | verifier-idiom-format-corrected-2 | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `fd2299c9f1c6dc86` |  |  |
