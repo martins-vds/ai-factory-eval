@@ -3,13 +3,13 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
 from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
-from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
@@ -19,12 +19,6 @@ from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, Voy
 
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
 MAPPING = Path(__file__).parents[2] / '.migration' / 'data' / 'mapping.yaml'
-
-
-def _read_table(snapshot, table):
-    with (snapshot / f'{table}.csv').open(encoding='utf-8', newline='') as stream:
-        reader = csv.DictReader(stream)
-        return reader.fieldnames, list(reader)
 
 
 def _write_table(snapshot, table, updates=None, additions=()):
@@ -121,8 +115,10 @@ def test_loaded_cargo_delivery_matches_its_itinerary_and_handling_history(tmp_pa
     _load_invariant_snapshot(tmp_path)
     cargo_repository = DjangoCargoRepository()
     history_repository = DjangoHandlingEventRepository()
+    cargos = cargo_repository.find_all()
 
-    for cargo in cargo_repository.find_all():
+    assert cargos
+    for cargo in cargos:
         history = history_repository.lookup_handling_history_of_cargo(cargo.tracking_id)
         expected = Delivery.derived_from(
             cargo.route_specification,
@@ -142,13 +138,15 @@ def test_loaded_cargo_delivery_matches_its_itinerary_and_handling_history(tmp_pa
 @pytest.mark.django_db(transaction=True)
 def test_loaded_itinerary_legs_connect(tmp_path):
     _load_invariant_snapshot(tmp_path)
+    cargos = list(CargoRecord.objects.all())
 
-    for cargo in CargoRecord.objects.all():
+    assert cargos
+    for cargo in cargos:
         legs = list(cargo.legs.order_by('load_time', 'pk'))
         assert len(legs) == 2
         assert all(
             current.load_location_id == previous.unload_location_id
-            for previous, current in zip(legs, legs[1:], strict=False)
+            for previous, current in pairwise(legs)
         )
 
 
@@ -160,6 +158,7 @@ def test_loaded_handling_event_references_exist(tmp_path):
     events = list(HandlingEventRecord.objects.all())
 
     assert events
+    assert any(event.voyage_id is not None for event in events)
     assert all(event.location_id in location_ids for event in events)
     assert all(
         event.voyage_id is None or event.voyage_id in voyage_ids for event in events
@@ -170,7 +169,9 @@ def test_loaded_handling_event_references_exist(tmp_path):
 def test_loaded_voyage_carrier_movements_are_in_schedule_order(tmp_path):
     _load_invariant_snapshot(tmp_path)
 
-    for voyage in VoyageRecord.objects.all():
+    voyages = list(VoyageRecord.objects.all())
+    assert voyages
+    for voyage in voyages:
         movements = list(
             CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
@@ -179,5 +180,5 @@ def test_loaded_voyage_carrier_movements_are_in_schedule_order(tmp_path):
         assert all(
             previous.arrival_time <= current.departure_time
             and previous.arrival_location_id == current.departure_location_id
-            for previous, current in zip(movements, movements[1:], strict=False)
+            for previous, current in pairwise(movements)
         )
