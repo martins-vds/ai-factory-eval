@@ -31,21 +31,23 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
-            <td class="flex gap-2 p-3">
-              <a
-                class="btn btn-sm btn-outline"
-                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
-                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
-                hx-target="#cargo-edit-dialog"
-                hx-swap="outerHTML"
-              >Change destination</a>
-              <a
-                class="btn btn-sm btn-outline"
-                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
-                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
-                hx-target="#cargo-edit-dialog"
-                hx-swap="outerHTML"
-              >Change deadline</a>
+            <td class="p-3">
+              <div class="flex flex-wrap gap-2">
+                <a
+                  class="btn btn-sm btn-outline min-h-11"
+                  href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                  hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                  hx-target="#cargo-edit-dialog"
+                  hx-swap="outerHTML"
+                >Change destination</a>
+                <a
+                  class="btn btn-sm btn-outline min-h-11"
+                  href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                  hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                  hx-target="#cargo-edit-dialog"
+                  hx-swap="outerHTML"
+                >Change deadline</a>
+              </div>
             </td>
           </tr>
         {% endfor %}
