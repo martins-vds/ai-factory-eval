@@ -86,6 +86,80 @@ def test_monthly_report_uses_calendar_months_and_counts_accrued_fees():
 
 
 @pytest.mark.django_db
+def test_monthly_report_application_waives_first_two_days_of_lateness():
+    class JanuaryFirst:
+        def today(self):
+            return date(2099, 1, 1)
+
+    Loan.objects.create(
+        id='monthly-report-one-day-late',
+        member='One',
+        isbn='isbn',
+        lent_on=date(2098, 12, 1),
+        returned_on=date(2098, 12, 16),
+    )
+    Loan.objects.create(
+        id='monthly-report-two-days-late',
+        member='Two',
+        isbn='isbn',
+        lent_on=date(2098, 12, 2),
+        returned_on=date(2098, 12, 18),
+    )
+    Loan.objects.create(
+        id='monthly-report-three-days-late',
+        member='Three',
+        isbn='isbn',
+        lent_on=date(2098, 12, 3),
+        returned_on=date(2098, 12, 20),
+    )
+
+    report = MonthlyReportApplication(DjangoMonthlyReportRepository(), JanuaryFirst())
+
+    assert report.generate() == [
+        MonthlyReportRow('Three', 1, 1, 75),
+        MonthlyReportRow('One', 1, 1, 0),
+        MonthlyReportRow('Two', 1, 1, 0),
+    ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_application_orders_by_fees_then_member_id():
+    class JanuaryFirst:
+        def today(self):
+            return date(2099, 1, 1)
+
+    Loan.objects.create(
+        id='monthly-report-order-z',
+        member='Z',
+        isbn='isbn',
+        lent_on=date(2098, 12, 1),
+        returned_on=date(2098, 12, 18),
+    )
+    Loan.objects.create(
+        id='monthly-report-order-a',
+        member='A',
+        isbn='isbn',
+        lent_on=date(2098, 12, 2),
+        returned_on=date(2098, 12, 19),
+    )
+    Loan.objects.create(
+        id='monthly-report-order-high',
+        member='High',
+        isbn='isbn',
+        lent_on=date(2098, 12, 3),
+        returned_on=date(2098, 12, 23),
+    )
+
+    report = MonthlyReportApplication(DjangoMonthlyReportRepository(), JanuaryFirst())
+
+    assert report.generate() == [
+        MonthlyReportRow('High', 1, 1, 150),
+        MonthlyReportRow('A', 1, 1, 75),
+        MonthlyReportRow('Z', 1, 1, 75),
+    ]
+
+
+@pytest.mark.django_db
 def test_monthly_report_caps_each_loan_fee():
     class FebruaryTwentyEighth:
         def today(self):

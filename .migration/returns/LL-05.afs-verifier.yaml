@@ -1,0 +1,66 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1460
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1461
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.974
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings:
+  - severity: minor
+    where: src/reports/services.py:38-49
+    what: "Possible primitive-obsession smell: report totals use positional list indexes; no behavior impact."
+tests_added:
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_waives_first_two_days_of_lateness
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_orders_by_fees_then_member_id
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: "Select loans started in the prior calendar month using a half-open date range in the server's default time zone."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_uses_calendar_months_and_counts_accrued_fees
+    enforced: true
+    ledger_rule: prior-calendar-month
+  - capability: reports.monthly-spec
+    rule: "Emit one row for each member with at least one loan started in the report month, count those loans, and omit other members."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_uses_calendar_months_and_counts_accrued_fees
+    enforced: true
+    ledger_rule: member-aggregation
+  - capability: reports.monthly-spec
+    rule: "Count returned loans that are late; an overdue loan still open at report generation is not a late return."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_uses_calendar_months_and_counts_accrued_fees
+    enforced: true
+    ledger_rule: late-returns
+  - capability: reports.monthly-spec
+    rule: "Use a loan's return date for its fee, or the report date if it is still open."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_uses_calendar_months_and_counts_accrued_fees
+    enforced: true
+    ledger_rule: late-fees
+  - capability: reports.monthly-spec
+    rule: "Waive fees for up to two late days; charge 25 cents per late day when more than two days late."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_waives_first_two_days_of_lateness
+    enforced: true
+    ledger_rule: late-fees
+  - capability: reports.monthly-spec
+    rule: "Cap each loan's late fee at 1000 cents."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_caps_each_loan_fee
+    enforced: true
+    ledger_rule: late-fees
+  - capability: reports.monthly-spec
+    rule: "Sort by total late fees descending, then member id ascending."
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_orders_by_fees_then_member_id
+    enforced: true
+    ledger_rule: ordering
