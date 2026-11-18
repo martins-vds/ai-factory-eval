@@ -17,10 +17,20 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
+class PaymentGateway(Protocol):
+    def charge(self, loan_id: str) -> 'GatewayResponse': ...
+
+
 @dataclass(frozen=True)
 class LateFee:
     days_late: int
     amount_cents: int
+
+
+@dataclass(frozen=True)
+class GatewayResponse:
+    status_code: int
+    body: str
 
 
 @dataclass(frozen=True)
@@ -53,3 +63,14 @@ class FeeApplication:
             today=self.clock.today(),
         )
         return FeeQuote(loan=loan, days_late=fee.days_late, amount_cents=fee.amount_cents)
+
+
+class PaymentApplication:
+    def __init__(self, repository: LoanRepository, gateway: PaymentGateway):
+        self.repository = repository
+        self.gateway = gateway
+
+    def charge(self, loan_id: str) -> GatewayResponse | None:
+        if self.repository.find(loan_id) is None:
+            return None
+        return self.gateway.charge(loan_id)
