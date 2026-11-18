@@ -25,5 +25,6 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs"
   - "tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_assignment_reports_unknown_cargo"
   - ".migration/evidence/runs/BK-05F.md"
 notes: "Named source tests cover routing behavior, not view rendering. The source bean returns `.html` although Faces Servlet maps `.xhtml`; ruling #236 requires the target to redirect to cargo details."

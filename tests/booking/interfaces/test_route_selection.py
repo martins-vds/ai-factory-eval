@@ -207,9 +207,11 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 def test_route_assignment_reports_unknown_cargo():
     request = RequestFactory().post('/admin/cargo/MISSING1/route/')
 
-    with patch.object(dashboard, 'get_cargo_details', return_value=None):
-        with pytest.raises(Http404) as error:
-            route_view(request, 'MISSING1')
+    with (
+        patch.object(dashboard, 'get_cargo_details', return_value=None),
+        pytest.raises(Http404) as error,
+    ):
+        route_view(request, 'MISSING1')
     assert str(error.value) == 'Cargo with tracking ID MISSING1 not found.'
 
 
@@ -227,9 +229,11 @@ def test_route_assignment_rejects_a_candidate_that_no_longer_satisfies_the_speci
     cargo.route_specification.is_satisfied_by.return_value = False
     request = RequestFactory().post(route_url, {'candidate': candidate_token})
 
-    with patch.object(dashboard, 'get_cargo_details', return_value=cargo):
-        with pytest.raises(Http404) as error:
-            route_view(request, tracking_id.value)
+    with (
+        patch.object(dashboard, 'get_cargo_details', return_value=cargo),
+        pytest.raises(Http404) as error,
+    ):
+        route_view(request, tracking_id.value)
     assert str(error.value) == 'The selected route no longer satisfies the route specification.'
 
 
