@@ -167,3 +167,20 @@ tickets:
   - .migration/returns/BK-05J.afs-auditor.yaml
   blocked_by:
   - BK-05I
+- id: BK-05K
+  title: Render htmx error responses on every page (one response-handling setting in the base template)
+  role: afs-migrator
+  specialty: ui
+  files:
+  - templates/base.html
+  - templates/admin/live_map.html
+  - templates/booking/dashboard/not_routed_table.html
+  - templates/booking/dialogs/deadline.html
+  - templates/booking/dialogs/destination.html
+  - templates/booking/wizard/_deadline_form.html
+  - templates/tracking/track.html
+  - tests/test_htmx_errors.py
+  - .migration/evidence/runs/BK-05K.md
+  - .migration/returns/BK-05K.afs-migrator.yaml
+  capabilities: []
+  blocked_by: []
