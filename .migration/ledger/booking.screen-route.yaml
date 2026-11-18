@@ -8,7 +8,11 @@ source:
 boundary: "Route page loads cargo and candidates, displays origin/destination/deadline and candidate count, shows an empty-state message or numbered itineraries with voyage, load/unload locations and dates, and lets the user select an index."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/route_selection.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -18,4 +22,9 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_and_select_itinerary_render_candidate_properties"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_page_displays_candidate_routes_with_path_properties"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_and_select_itinerary_show_empty_candidate_guidance"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "The route screen displays cargo and eligible candidates; assignment validation is recorded under booking.routing-assign."
+notes: "Target interface tests now cover rendering as well as the source routing contracts. Assignment redirects to cargo details under ruling #236."

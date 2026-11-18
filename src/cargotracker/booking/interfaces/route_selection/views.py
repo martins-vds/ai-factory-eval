@@ -32,7 +32,7 @@ def create_route_selection_views(
                 selection_error = 'Select a valid itinerary.'
             else:
                 cargo_routing.assign_route(cargo_tracking_id, candidates[candidate_index])
-                return redirect(f'/admin/cargo/{tracking_id}/')
+                return redirect(f'/admin/cargo/{cargo_tracking_id.value}/')
 
         return render(
             request,

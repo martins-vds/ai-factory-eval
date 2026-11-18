@@ -9,3 +9,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:36:36+00:00 | route-selection-tests | 1 | 3.99 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `815295e43bae075e` | assert route_response.status_code == 200 |  |
 | 2026-11-18T12:36:48+00:00 | route-selection-tests | 0 | 3.8 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `0a12e90a870401ae` |  |  |
 | 2026-11-18T12:37:39+00:00 | route-selection-tests | 0 | 4.29 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `523e69b47e13e49c` |  |  |
+| 2026-11-18T12:39:14+00:00 | route-selection-tests | 0 | 4.7 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `87646c4ae6d185e9` |  |  |

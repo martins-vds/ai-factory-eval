@@ -14,9 +14,9 @@ from cargotracker.booking.interfaces.route_selection.views import create_route_s
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
+from cargotracker.pathfinder.application.routing import RoutingService
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
-from cargotracker.pathfinder.application.routing import RoutingService
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
 NOW = datetime(2026, 11, 7, tzinfo=UTC)
