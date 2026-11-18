@@ -1,8 +1,11 @@
+from datetime import date
+
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from .models import Loan
-from .services import get_loan_text, list_loans_text
+from .repository import LoanRepository
+from .services import InvalidLoan, get_loan_text, lend_loan, list_loans_text
 
 
 def loan_catalog(request):
@@ -15,11 +18,26 @@ def loan_catalog_detail(request, loan_id):
 
 
 def loan_list(request):
-    return HttpResponse(list_loans_text(), content_type='text/plain')
+    if request.method == 'POST':
+        try:
+            loan = lend_loan(
+                LoanRepository(),
+                request.POST.get('member'),
+                request.POST.get('isbn'),
+                date.today(),
+            )
+        except InvalidLoan:
+            return HttpResponse('member and isbn are required\n', status=400, content_type='text/plain')
+        return HttpResponse(
+            get_loan_text(LoanRepository(), loan.id),
+            status=201,
+            content_type='text/plain',
+        )
+    return HttpResponse(list_loans_text(LoanRepository()), content_type='text/plain')
 
 
 def loan_detail(request, loan_id):
-    body = get_loan_text(loan_id)
+    body = get_loan_text(LoanRepository(), loan_id)
     if body is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
     return HttpResponse(body, content_type='text/plain')
