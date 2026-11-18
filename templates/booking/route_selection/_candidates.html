@@ -4,13 +4,13 @@
   </h2>
   {% if candidates %}
     <ol class="space-y-6">
-      {% for itinerary in candidates %}
+      {% for option in candidate_options %}
         <li class="rounded border border-gray-200 p-4">
           <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
             <h3 class="text-lg font-semibold text-gray-900">Route option #{{ forloop.counter }}</h3>
             <form action="{{ assignment_url }}" method="post">
               {% csrf_token %}
-              <input name="route_index" type="hidden" value="{{ forloop.counter0 }}">
+              <input name="candidate_token" type="hidden" value="{{ option.token }}">
               <button
                 class="rounded bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800"
                 type="submit"
@@ -30,7 +30,7 @@
                 </tr>
               </thead>
               <tbody>
-                {% for leg in itinerary.legs %}
+                {% for leg in option.itinerary.legs %}
                   <tr class="border-b border-gray-200">
                     <th class="p-3" scope="row">Leg {{ forloop.counter }}</th>
                     <td class="p-3 text-red-800">{{ leg.voyage.voyage_number.value }}</td>

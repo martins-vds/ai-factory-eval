@@ -7,9 +7,14 @@ source:
   risk: {crap: 12, complexity: 3, coverage: 0.0}
 boundary: "Route page loads cargo and candidates, displays origin/destination/deadline and candidate count, shows an empty-state message or numbered itineraries with voyage, load/unload locations and dates, and lets the user select an index."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets:
+  - martins-vds/ai-factory-pilot-target#225
+  - martins-vds/ai-factory-eval#1417
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
@@ -18,4 +23,9 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_page_displays_cargo_and_candidate_properties"
+  - "tests/booking/interfaces/test_route_selection.py::test_assign_candidate_redirects_to_cargo_details"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "Presentation-only route details and candidate options; eligibility and persistence rules belong to the routing application capabilities."
+quirks: [martins-vds/ai-factory-pilot-target#236]
+notes: "The running source page was characterized independently of the named routing tests. The target follows the approved #236 redirect to cargo details."

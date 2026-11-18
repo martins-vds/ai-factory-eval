@@ -3,8 +3,8 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from django.core.management import call_command
-from django.urls import path
 from django.test import override_settings
+from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
@@ -108,7 +108,7 @@ def test_select_itinerary_renders_populated_candidates(client, register_cargo):
     assert response.context['candidates']
     assert 'Potential routes:' in content
     assert 'Route option #1' in content
-    assert 'name="route_index"' in content
+    assert 'name="candidate_token"' in content
 
 
 @pytest.mark.django_db
@@ -142,9 +142,11 @@ def test_assign_candidate_redirects_to_cargo_details(client, monkeypatch, regist
     selected_index = 1
     selected_candidate = candidates[selected_index]
 
+    page_response = client.get(f'/admin/cargo/{tracking_id}/route/')
+    candidate_token = page_response.context['candidate_options'][selected_index]['token']
     response = client.post(
         f'/admin/cargo/{tracking_id}/route/',
-        {'route_index': str(selected_index)},
+        {'candidate_token': candidate_token},
     )
     details_response = client.get(response.url)
     cargo = cargo_repository.find(TrackingId(tracking_id))
@@ -158,3 +160,49 @@ def test_assign_candidate_redirects_to_cargo_details(client, monkeypatch, regist
     assert 'Routing Details for Cargo' in details_content
     assert 'Itinerary' in details_content
     assert selected_candidate.legs[0].voyage.voyage_number.value in details_content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_assignment_keeps_the_candidate_displayed_before_candidates_change(
+    client, monkeypatch, register_cargo
+):
+    tracking_id = register_cargo(datetime(2030, 1, 1, tzinfo=UTC))
+    generated_candidates = cargo_routing.route_candidates(TrackingId(tracking_id))
+    displayed_candidates = generated_candidates[:2]
+    changed_candidates = tuple(reversed(displayed_candidates))
+    responses = iter((displayed_candidates, changed_candidates))
+    monkeypatch.setattr(
+        cargo_routing,
+        'route_candidates',
+        lambda _tracking_id: next(responses),
+    )
+
+    page_response = client.get(f'/admin/cargo/{tracking_id}/route/')
+    selected_candidate = page_response.context['candidates'][0]
+    candidate_token = page_response.context['candidate_options'][0]['token']
+    assignment_response = client.post(
+        f'/admin/cargo/{tracking_id}/route/',
+        {'candidate_token': candidate_token},
+    )
+    assigned_cargo = cargo_repository.find(TrackingId(tracking_id))
+
+    assert assignment_response.status_code == 302
+    assert assigned_cargo is not None
+    assert assigned_cargo.itinerary == selected_candidate
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_assignment_rejects_an_invalid_candidate_token(client, register_cargo):
+    tracking_id = register_cargo(datetime(2030, 1, 1, tzinfo=UTC))
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id}/route/',
+        {'candidate_token': 'not-a-valid-token'},
+    )
+    cargo = cargo_repository.find(TrackingId(tracking_id))
+
+    assert response.status_code == 400
+    assert cargo is not None
+    assert cargo.itinerary.legs == ()
