@@ -1,4 +1,4 @@
-<div id="payment-status" class="mt-4">
+<div id="payment-status" class="mt-6">
   {% if result.status == 200 %}
   <p role="status">{{ result.body|default:"Payment accepted." }}</p>
   {% else %}

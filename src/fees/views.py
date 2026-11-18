@@ -3,8 +3,7 @@ import logging
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.html import format_html
-from django.views.decorators.http import require_GET
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application, payment_application
 
@@ -31,8 +30,7 @@ def fee_detail(request, loan_id):
 
     return HttpResponse(
         format_html(
-            '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-            '<p class="fee">Fee: ${}</p>',
+            '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: ${}</p>',
             fee.loan_id,
             fee.due_on.isoformat(),
             fee.late_days,

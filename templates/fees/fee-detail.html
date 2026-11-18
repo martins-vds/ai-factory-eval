@@ -18,7 +18,7 @@
         <form method="post" action="/ui/payments/{{ fee.loan_id }}/"
               hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-status" hx-swap="outerHTML">
           {% csrf_token %}
-          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+          <button class="btn btn-primary" type="submit">Pay late fee</button>
         </form>
       </div>
     </div>

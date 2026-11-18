@@ -50,6 +50,25 @@ def test_fee_endpoint_applies_grace_period_and_cap(client, late_days, expected_a
 
 
 @pytest.mark.django_db
+def test_fee_endpoint_uses_return_date_instead_of_current_date(client):
+    today = timezone.localdate()
+    due_on = today - timedelta(days=19)
+    Loan.objects.create(
+        id='L9',
+        member='reader',
+        isbn='123',
+        lent_on=due_on - timedelta(days=14),
+        returned_on=due_on + timedelta(days=2),
+    )
+
+    response = client.get('/fees/L9')
+
+    assert response.status_code == 200
+    assert b'2 day(s) late' in response.content
+    assert b'Fee: $0.00' in response.content
+
+
+@pytest.mark.django_db
 def test_fee_endpoint_returns_characterized_not_found_response(client):
     response = client.get('/fees/unknown')
 

@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.fees.services import PaymentApplication
 
@@ -38,9 +39,7 @@ def payment_gateway(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_sends_characterized_request_and_forwards_success(
-    client, payment_gateway
-):
+def test_payment_endpoint_sends_characterized_request_and_forwards_success(client, payment_gateway):
     response = client.post('/payments/L1')
 
     assert response.status_code == 200
@@ -50,9 +49,7 @@ def test_payment_endpoint_sends_characterized_request_and_forwards_success(
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_maps_gateway_failure_to_502_and_preserves_body(
-    client, payment_gateway
-):
+def test_payment_endpoint_maps_gateway_failure_to_502_and_preserves_body(client, payment_gateway):
     payment_gateway['status'] = 503
     payment_gateway['body'] = b'declined\n'
 
@@ -65,9 +62,7 @@ def test_payment_endpoint_maps_gateway_failure_to_502_and_preserves_body(
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_does_not_call_gateway_for_unknown_loan(
-    client, payment_gateway
-):
+def test_payment_endpoint_does_not_call_gateway_for_unknown_loan(client, payment_gateway):
     response = client.post('/payments/unknown')
 
     assert response.status_code == 404
@@ -76,9 +71,7 @@ def test_payment_endpoint_does_not_call_gateway_for_unknown_loan(
 
 
 @pytest.mark.django_db
-def test_payment_endpoint_maps_connection_failure_to_characterized_502(
-    client, monkeypatch
-):
+def test_payment_endpoint_maps_connection_failure_to_characterized_502(client, monkeypatch):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
 
     response = client.post('/payments/L1')
@@ -114,3 +107,50 @@ def test_htmx_payment_action_renders_success_fragment(client, payment_gateway):
     assert b'id="payment-status"' in response.content
     assert b'role="status"' in response.content
     assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_renders_gateway_failure_safely(client, payment_gateway):
+    payment_gateway['status'] = 503
+    payment_gateway['body'] = b'<b>declined</b>\n'
+
+    response = client.post('/ui/payments/L2/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 502
+    assert b'<!doctype html>' not in response.content
+    assert b'role="alert"' in response.content
+    assert b'&lt;b&gt;declined&lt;/b&gt;' in response.content
+    assert b'<b>declined</b>' not in response.content
+
+
+@pytest.mark.django_db
+def test_regular_payment_action_renders_a_complete_result_page(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert b'Payment result</h1>' in response.content
+    assert b'role="status"' in response.content
+    assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_can_pay_from_the_fee_page(payment_gateway, live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            assert page.get_by_role('heading', name='Late fee for L1').is_visible()
+            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
+
+            page.get_by_role('button', name='Pay late fee').click()
+
+            if htmx_available:
+                page.get_by_role('status').wait_for()
+                assert page.get_by_role('status').inner_text() == 'charged'
+            else:
+                page.wait_for_url('**/ui/payments/L1/')
+                assert page.get_by_role('status').inner_text() == 'charged'
+        finally:
+            browser.close()
