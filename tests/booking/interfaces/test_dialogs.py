@@ -190,6 +190,16 @@ def test_destination_update_rejects_locations_outside_the_offered_choices(client
 
 
 @pytest.mark.django_db
+def test_destination_use_case_rejects_origin_as_destination():
+    call_command('seed_sample_data')
+    cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
+
+    assert cargo is not None
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(cargo.tracking_id, cargo.route_specification.origin)
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_missing_cargo_dialog_request_returns_not_found(client):
     call_command('seed_sample_data')
