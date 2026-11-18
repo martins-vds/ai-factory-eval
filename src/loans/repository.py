@@ -10,6 +10,9 @@ class LoanRepository:
     def find(self, loan_id):
         return Loan.objects.filter(pk=loan_id).first()
 
+    def next_id(self):
+        return f'L{self.all().count() + 1}'
+
     @transaction.atomic
     def create(self, **fields):
         return Loan.objects.create(**fields)
