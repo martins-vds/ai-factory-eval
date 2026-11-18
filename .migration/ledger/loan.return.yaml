@@ -19,6 +19,7 @@ evidence:
   - tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
   - tests/loans/test_circulation.py::test_return_api_returns_not_found_for_unknown_loan
   - tests/loans/test_circulation.py::test_ui_return_renders_a_not_found_response_for_unknown_loans
+  - tests/loans/test_circulation.py::test_reading_room_supports_lending_and_returning_in_a_browser
   - .migration/evidence/runs/LL-02.md
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

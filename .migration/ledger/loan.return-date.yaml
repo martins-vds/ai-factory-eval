@@ -20,6 +20,7 @@ evidence:
   - tests/loans/test_circulation.py::test_return_use_case_rejects_a_repeat_and_preserves_the_original_date
   - tests/loans/test_circulation.py::test_return_api_records_date_and_rejects_repeated_returns
   - tests/loans/test_circulation.py::test_ui_return_rejects_repeated_returns_and_preserves_the_original_date
+  - tests/loans/test_circulation.py::test_reading_room_supports_lending_and_returning_in_a_browser
   - .migration/evidence/runs/LL-02.md
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
