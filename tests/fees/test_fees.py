@@ -46,6 +46,7 @@ def test_fee_endpoint_applies_grace_period_and_cap(client, late_days, expected_a
     response = client.get(f'/fees/{loan_id}')
 
     assert response.status_code == 200
+    assert f'{late_days} day(s) late'.encode() in response.content
     assert f'Fee: ${expected_amount}' in response.content.decode()
 
 
@@ -71,6 +72,15 @@ def test_fee_endpoint_uses_return_date_instead_of_current_date(client):
 @pytest.mark.django_db
 def test_fee_endpoint_returns_characterized_not_found_response(client):
     response = client.get('/fees/unknown')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content.decode() == '<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
 
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/html'

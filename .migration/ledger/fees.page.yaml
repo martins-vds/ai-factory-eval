@@ -20,6 +20,7 @@ evidence:
   - .migration/evidence/runs/LL-03.md
   - tests/fees/test_fees.py::test_fee_endpoint_displays_characterized_days_and_amount
   - tests/fees/test_fees.py::test_fee_endpoint_returns_characterized_not_found_response
+  - tests/fees/test_fees.py::test_fee_page_returns_not_found_for_unknown_loan
   - tests/fees/test_fees.py::test_reading_room_fee_page_shows_fee_and_htmx_payment_action
   - tests/fees/test_payments.py::test_browser_can_pay_from_the_fee_page
 rules:

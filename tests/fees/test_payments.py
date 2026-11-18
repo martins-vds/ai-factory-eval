@@ -4,6 +4,7 @@ from threading import Thread
 import pytest
 from playwright.sync_api import sync_playwright
 
+from src.fees.gateway import DEFAULT_PAYMENT_GATEWAY_URL
 from src.fees.services import PaymentApplication
 
 
@@ -98,6 +99,27 @@ def test_payment_application_retains_interrupted_gateway_error():
     assert result.failure is interruption
 
 
+def test_payment_gateway_uses_characterized_default_url():
+    assert DEFAULT_PAYMENT_GATEWAY_URL == 'https://payments.lending-library.invalid'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/ui/fees/L1/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway['request'] is None
+
+
 @pytest.mark.django_db
 def test_htmx_payment_action_renders_success_fragment(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
@@ -130,6 +152,7 @@ def test_regular_payment_action_renders_a_complete_result_page(client, payment_g
     assert response.status_code == 200
     assert b'<!doctype html>' in response.content
     assert b'Payment result</h1>' in response.content
+    assert b'href="/ui/fees/L1/"' in response.content
     assert b'role="status"' in response.content
     assert b'charged' in response.content
 

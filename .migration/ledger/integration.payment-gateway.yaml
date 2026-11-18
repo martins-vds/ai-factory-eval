@@ -25,6 +25,8 @@ evidence:
   - tests/fees/test_payments.py::test_payment_endpoint_does_not_call_gateway_for_unknown_loan
   - tests/fees/test_payments.py::test_payment_endpoint_maps_connection_failure_to_characterized_502
   - tests/fees/test_payments.py::test_payment_application_retains_interrupted_gateway_error
+  - tests/fees/test_payments.py::test_payment_gateway_uses_characterized_default_url
+  - tests/fees/test_payments.py::test_fee_and_payment_routes_reject_unsupported_methods
   - tests/fees/test_payments.py::test_htmx_payment_action_renders_success_fragment
   - tests/fees/test_payments.py::test_htmx_payment_action_renders_gateway_failure_safely
   - tests/fees/test_payments.py::test_browser_can_pay_from_the_fee_page
