@@ -7,6 +7,7 @@ from typing import Protocol
 
 class LoanRecord(Protocol):
     id: str
+    member: str
     due_on: date
     returned_on: date | None
 

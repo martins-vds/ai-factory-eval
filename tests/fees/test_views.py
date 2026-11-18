@@ -1,5 +1,7 @@
-import pytest
 from urllib.error import URLError
+
+import pytest
+from playwright.sync_api import sync_playwright
 
 
 @pytest.mark.django_db
@@ -130,3 +132,21 @@ def test_htmx_payment_action_shows_a_decline_without_losing_fee_page(client, pay
     assert b'id="payment-status"' in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_can_view_and_pay_a_late_fee(live_server, payment_gateway):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            assert page.get_by_role('heading', name='Late fees').is_visible()
+            page.get_by_role('button', name='Pay late fee').click()
+            status = page.get_by_role('status')
+            status.wait_for()
+            assert 'Payment received: charged' in status.inner_text()
+        finally:
+            browser.close()
+
+    assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]

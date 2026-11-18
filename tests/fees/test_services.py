@@ -9,6 +9,7 @@ from src.fees.services import FeeApplication
 class Loan:
     id: str
     due_on: date
+    member: str = 'reader'
     returned_on: date | None = None
 
 
