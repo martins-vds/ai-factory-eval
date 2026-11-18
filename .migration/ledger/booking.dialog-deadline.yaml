@@ -22,8 +22,12 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_specification_and_deadline"
   - "tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_without_updating_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_missing_deadline_shows_error_and_keeps_field_empty"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_route_fields_and_refreshes_table"
+  - "tests/booking/interfaces/test_dialogs.py::test_stale_dialog_request_renders_an_error_fragment"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_reject_unsupported_methods"
   - ".migration/evidence/runs/BK-05G.md"
+  - ".migration/evidence/mutants/BK-05G.md"
 no_rules: "Date parsing and its inline field error are presentation validation (#234); cargo deadline invariants are recorded in booking.deadline-change."
 notes: "Parse failures render an inline field error instead of being only printed (#234); successful updates refresh the not-routed table without the unavailable-widget warning (#251)."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]

@@ -21,8 +21,13 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_specification_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_missing_destination_shows_error_and_keeps_empty_option_selected"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_fields_and_refreshes_table"
+  - "tests/booking/interfaces/test_dialogs.py::test_stale_dialog_request_renders_an_error_fragment"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_reject_unsupported_methods"
   - ".migration/evidence/runs/BK-05G.md"
+  - ".migration/evidence/mutants/BK-05G.md"
 no_rules: "Destination filtering and render stability are presentation behavior (#235); cargo destination invariants are recorded in booking.destination-change."
 notes: "Destination options exclude origin and current destination without mutating the location list (#235); successful updates refresh the table without the unavailable-widget warning (#251)."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]

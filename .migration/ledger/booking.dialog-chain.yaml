@@ -25,7 +25,10 @@ evidence:
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_fields_and_refreshes_table"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_route_fields_and_refreshes_table"
   - "tests/booking/interfaces/test_dialogs.py::test_dashboard_dialog_flows_update_cargo_and_refreshed_table"
+  - "tests/booking/interfaces/test_dialogs.py::test_stale_dialog_request_renders_an_error_fragment"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_reject_unsupported_methods"
   - ".migration/evidence/runs/BK-05G.md"
+  - ".migration/evidence/mutants/BK-05G.md"
 no_rules: "Dialog open, cancel, update and refresh are UI-flow behavior; destination and deadline business invariants are recorded in their behavioral capabilities."
 notes: "The HTMX dialogs replace the old PrimeFaces dialog chain and refresh the not-routed table after successful updates. The unavailable widget warning has no equivalent in the target (#251)."
 quirks: [martins-vds/ai-factory-pilot-target#251]
