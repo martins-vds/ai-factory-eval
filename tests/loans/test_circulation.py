@@ -207,9 +207,7 @@ def test_ui_return_rejects_repeated_returns_and_preserves_the_original_date(clie
     assert b'Returned on' in first.content
     assert repeated.status_code == 409
     assert b'already been returned' in repeated.content
-    assert current_record.content.decode().endswith(
-        f'{timezone.localdate().isoformat()}\n'
-    )
+    assert current_record.content.decode().endswith(f'{timezone.localdate().isoformat()}\n')
 
 
 @pytest.mark.django_db
