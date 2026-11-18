@@ -8,7 +8,26 @@ source:
   location: legacy/src/main/resources/static/about.html:1-9
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1411]
+target:
+  components:
+    - src.library_info.views.about
+    - src.library_info.views.about_page
+    - src.library_info.urls
+    - templates/library_info/about.html
+    - templates/library_info/about_legacy.html
+status: migrated
+verification: differential
+characterization_tier: A
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - .migration/evidence/runs/LL-04.md
+  - tests/library_info/test_page.py::test_about_endpoint_matches_characterized_response
+  - tests/library_info/test_page.py::test_modern_about_page_shows_library_information_in_browser
+no_rules: "This capability renders fixed public information without input validation or state transitions."
 status: pending
 verification: differential
 characterization_tier: A
