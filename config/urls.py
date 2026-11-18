@@ -18,6 +18,7 @@ Including another URLconf
 from django.urls import include, path
 
 urlpatterns = [
+    path('', include('src.library_info.urls')),
     path('', include('src.loans.urls')),
     path('', include('src.fees.urls')),
 ]
