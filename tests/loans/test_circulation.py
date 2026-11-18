@@ -114,6 +114,38 @@ def test_returning_an_unknown_loan_keeps_the_characterized_not_found_response(cl
     assert response.content.decode() == 'no such loan\n'
 
 
+@pytest.mark.parametrize(
+    ('path', 'data', 'status'),
+    [
+        ('/loans', {'member': 'dee', 'isbn': '123'}, 201),
+        ('/loans/L1/return', {}, 200),
+    ],
+)
+@pytest.mark.django_db
+def test_api_mutations_do_not_require_a_csrf_token(path, data, status):
+    client = Client(enforce_csrf_checks=True)
+
+    response = client.post(path, data)
+
+    assert response.status_code == status
+
+
+@pytest.mark.parametrize(
+    ('path', 'data'),
+    [
+        ('/ui/loans/new/', {'member': 'reader', 'isbn': '123'}),
+        ('/ui/loans/L1/return/', {}),
+    ],
+)
+@pytest.mark.django_db
+def test_browser_mutations_still_require_a_csrf_token(path, data):
+    client = Client(enforce_csrf_checks=True)
+
+    response = client.post(path, data)
+
+    assert response.status_code == 403
+
+
 @pytest.mark.django_db
 def test_new_loan_page_uses_reading_room_layout(client):
     response = client.get('/ui/loans/new/')

@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/loans/test_circulation.py::test_returning_a_loan_persists_today_and_returns_the_formatted_record, tests/loans/test_circulation.py::test_returning_an_unknown_loan_keeps_the_characterized_not_found_response, tests/loans/test_circulation.py::test_browser_return_keeps_original_date_on_repeat, .migration/evidence/runs/LL-02.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/loans/test_circulation.py::test_returning_a_loan_persists_today_and_returns_the_formatted_record, tests/loans/test_circulation.py::test_returning_an_unknown_loan_keeps_the_characterized_not_found_response, tests/loans/test_circulation.py::test_api_mutations_do_not_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_mutations_still_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_return_keeps_original_date_on_repeat, .migration/evidence/runs/LL-02.md]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
 rules:
