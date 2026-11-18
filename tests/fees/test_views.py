@@ -214,7 +214,7 @@ def test_unknown_ui_payment_renders_error_fragment(client):
     assert response.status_code == 404
     assert b'<!doctype html>' not in response.content
     assert b'role="alert"' in response.content
-    assert b'No such loan.' in response.content
+    assert b'Payment could not be completed: No such loan.</p>' in response.content
 
 
 @pytest.mark.django_db
