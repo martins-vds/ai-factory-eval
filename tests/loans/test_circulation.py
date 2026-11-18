@@ -2,8 +2,8 @@ from datetime import date, timedelta
 from types import SimpleNamespace
 
 import pytest
-from django.utils.formats import date_format
 from django.utils import timezone
+from django.utils.formats import date_format
 from playwright.sync_api import sync_playwright
 
 from src.loans.services import (
@@ -312,6 +312,8 @@ def test_reading_room_supports_lending_and_returning_in_a_browser(live_server):
             page.get_by_text('Loan L4 has been added.').wait_for()
             page.get_by_role('link', name='Loan L4').click()
             page.get_by_role('button', name='Return book').click()
-            page.get_by_text(f'Returned on {date_format(timezone.localdate(), "M j, Y")}').wait_for()
+            page.get_by_text(
+                f'Returned on {date_format(timezone.localdate(), "M j, Y")}'
+            ).wait_for()
         finally:
             browser.close()
