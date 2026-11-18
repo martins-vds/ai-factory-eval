@@ -7,11 +7,44 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans requires nonblank member and ISBN form fields (otherwise HTTP 400 with the characterized error); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1304]
+target:
+  components:
+    - src.loans.services.lend_loan
+    - src.loans.views.loan_list
+    - src.loans.views.loan_lend_page
+    - src.loans.clock.SystemClock
+    - src.loans.repository.LoanRepository
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - tests/loans/test_circulation.py::test_lend_use_case_assigns_the_next_id_and_clock_date
+  - tests/loans/test_circulation.py::test_lend_endpoint_creates_a_loan_with_a_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lend_endpoint_rejects_blank_or_missing_required_fields
+  - tests/loans/test_circulation.py::test_browser_lend_form_renders_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_full_page_lend_form_renders_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_full_page_lend_form_preserves_isbn_when_member_is_missing
+  - tests/loans/test_circulation.py::test_browser_lend_form_creates_a_loan_with_htmx
+rules:
+  - id: member-required
+    rule: Member must be present and contain a non-whitespace value.
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: isbn-required
+    rule: ISBN must be present and contain a non-whitespace value.
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: lending-date
+    rule: A new loan is dated with the current date in the server's default time zone.
+    source: legacy/src/main/java/lib/LoanResource.java:37-43; loan-circulation plan
+  - id: loan-id
+    rule: A new loan receives the next L<count+1> identifier.
+    source: legacy/src/main/java/lib/LoanResource.java:37-43
+notes: "The ruling in martins-vds/ai-factory-synthetic-target#39 rejects missing, empty and whitespace-only fields. Export delimiter escaping is approved in martins-vds/ai-factory-synthetic-target#43 and covered by loan.text-export."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]

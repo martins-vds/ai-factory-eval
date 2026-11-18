@@ -1,0 +1,16 @@
+<div id="lend-form">
+  <form method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="#lend-form" hx-swap="outerHTML">
+    {% csrf_token %}
+    <div class="mb-4">
+      <label class="label" for="member"><span class="label-text">Member</span></label>
+      <input class="input input-bordered" id="member" name="member" value="{{ member }}" required>
+      {% if errors.member %}<p class="mt-1 text-sm text-[#a94e37]" role="alert">{{ errors.member }}</p>{% endif %}
+    </div>
+    <div class="mb-4">
+      <label class="label" for="isbn"><span class="label-text">ISBN</span></label>
+      <input class="input input-bordered" id="isbn" name="isbn" value="{{ isbn }}" required>
+      {% if errors.isbn %}<p class="mt-1 text-sm text-[#a94e37]" role="alert">{{ errors.isbn }}</p>{% endif %}
+    </div>
+    <button class="btn btn-primary" type="submit">Lend book</button>
+  </form>
+</div>
