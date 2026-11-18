@@ -1,5 +1,6 @@
 import csv
 import hashlib
+import itertools
 import json
 import shutil
 from pathlib import Path
@@ -202,7 +203,7 @@ def test_loaded_itinerary_legs_connect_in_order(loaded_snapshot):
     for cargo in CargoRecord.objects.all():
         legs = list(LegRecord.objects.filter(cargo=cargo).order_by('load_time', 'pk'))
         assert legs
-        for previous, following in zip(legs, legs[1:]):
+        for previous, following in itertools.pairwise(legs):
             assert previous.unload_location_id == following.load_location_id
 
 
@@ -229,6 +230,6 @@ def test_loaded_carrier_movement_schedules_are_in_order(loaded_snapshot):
         )
         for movement in schedule:
             assert movement.departure_time <= movement.arrival_time
-        for previous, following in zip(schedule, schedule[1:]):
+        for previous, following in itertools.pairwise(schedule):
             assert previous.arrival_time <= following.departure_time
             assert previous.arrival_location_id == following.departure_location_id
