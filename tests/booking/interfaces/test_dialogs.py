@@ -180,6 +180,19 @@ def test_destination_update_rejects_locations_outside_the_offered_choices(client
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_missing_cargo_dialog_request_returns_not_found(client):
+    call_command('seed_sample_data')
+
+    response = client.get(
+        '/admin/cargo/MISSING1/deadline/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_not_routed_table_opens_edit_dialogs_without_changing_route_link(client):
     call_command('seed_sample_data')
 
