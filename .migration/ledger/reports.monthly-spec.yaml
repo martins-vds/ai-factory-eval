@@ -6,9 +6,37 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#1397
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication.generate
+    - src.reports.repository.DjangoMonthlyReportRepository.for_period
+    - src.reports.management.commands.monthly_report.Command.handle
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member
+  - tests/reports/test_monthly_report.py::test_monthly_report_command_reads_persisted_loans
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+rules:
+  - id: report-window
+    rule: "A run on the first day of the month covers the complete previous calendar month using a half-open date interval."
+    source: legacy/docs/reports-spec.md:5
+  - id: member-inclusion
+    rule: "Include one row per member with at least one loan started in the report month; omit members without a loan started in that month."
+    source: legacy/docs/reports-spec.md:6,8
+  - id: monthly-metrics
+    rule: "Count loans started in the report month, count late returns made in the report month, and sum those late fees in cents."
+    source: legacy/docs/reports-spec.md:6
+  - id: late-fee-policy
+    rule: "Waive fees for up to two days late, then charge 25 cents per day up to 1000 cents."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: report-order
+    rule: "Sort by total late fees descending, then member id ascending."
+    source: legacy/docs/reports-spec.md:7
