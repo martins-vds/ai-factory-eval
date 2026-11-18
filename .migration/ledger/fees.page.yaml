@@ -23,6 +23,7 @@ evidence:
   - tests/fees/test_views.py::test_fee_api_matches_the_characterized_html
   - tests/fees/test_views.py::test_fee_api_returns_the_characterized_unknown_loan_response
   - tests/fees/test_views.py::test_fee_page_shows_the_fee_and_posts_payment_to_the_ui_route
+  - tests/fees/test_views.py::test_real_browser_can_view_and_pay_a_late_fee
   - tests/fees/test_views.py::test_unknown_fee_page_renders_a_not_found_page
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
 rules:

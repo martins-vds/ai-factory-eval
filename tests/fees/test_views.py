@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 
 @pytest.fixture
@@ -66,6 +67,7 @@ def test_fee_page_shows_the_fee_and_posts_payment_to_the_ui_route(client):
     assert b'Fee: $4.75' in response.content
     assert b'action="/ui/payments/L3/"' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
+    assert b'hx-on::response-error=' in response.content
 
 
 @pytest.mark.django_db
@@ -113,6 +115,20 @@ def test_payment_api_returns_502_when_the_gateway_is_unavailable(client, monkeyp
 
 
 @pytest.mark.django_db
+def test_payment_api_returns_502_when_the_gateway_call_is_interrupted(client, monkeypatch):
+    class InterruptingOpener:
+        def open(self, request, timeout):
+            raise InterruptedError('payment request interrupted')
+
+    monkeypatch.setattr('src.fees.gateway.build_opener', lambda *args: InterruptingOpener())
+
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
 def test_htmx_payment_success_renders_a_status(payment_gateway, client):
     response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
 
@@ -146,6 +162,44 @@ def test_browser_payment_failure_renders_a_full_error_page(payment_gateway, clie
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
     assert b'href="/ui/fees/L3/"' in response.content
+
+
+@pytest.mark.django_db
+def test_real_browser_can_view_and_pay_a_late_fee(payment_gateway, live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+
+            assert page.get_by_role('heading', name='Late fee for L3').is_visible()
+            page.get_by_role('button', name='Pay late fee').click()
+            page.locator('#payment-status [role="status"]').wait_for()
+            assert page.locator('#payment-status [role="status"]').inner_text() == 'charged'
+        finally:
+            browser.close()
+
+    assert payment_gateway['requests'] == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
+def test_real_browser_renders_a_gateway_failure(payment_gateway, live_server):
+    payment_gateway['status'] = 503
+    payment_gateway['body'] = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+
+            page.get_by_role('button', name='Pay late fee').click()
+            page.locator('#payment-status [role="alert"]').wait_for()
+            assert page.locator('#payment-status [role="alert"]').inner_text() == 'declined'
+        finally:
+            browser.close()
+
+    assert payment_gateway['requests'] == [('POST', '/charge?loan=L3', b'')]
 
 
 @pytest.mark.django_db

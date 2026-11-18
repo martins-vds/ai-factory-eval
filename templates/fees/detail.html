@@ -8,14 +8,15 @@
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Library account · {{ fee.loan_id }}</p>
-      <h1 class="card-title mt-2 text-4xl">A small fee for a longer stay.</h1>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ fee.loan_id }}</h1>
       <p class="mt-2">Due {{ fee.due_on|date:"Y-m-d" }}, {{ fee.late_days }} day(s) late.</p>
-      <p class="fee mt-4 text-2xl">Fee: ${{ fee.amount|floatformat:2 }}</p>
+      <p class="fee mt-6 text-2xl">Fee: ${{ fee.amount|floatformat:2 }}</p>
       <div id="payment-status" class="mt-6"></div>
       <form method="post" action="/ui/payments/{{ fee.loan_id }}/"
-            hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-status" hx-swap="innerHTML">
+            hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-status" hx-swap="innerHTML"
+            hx-on::response-error="document.getElementById('payment-status').textContent = 'Payment could not be completed.'; document.getElementById('payment-status').setAttribute('role', 'alert')">
         {% csrf_token %}
-        <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+        <button class="btn" style="background-color: #a94e37; color: #fff;" type="submit">Pay late fee</button>
       </form>
     </div>
   </article>
