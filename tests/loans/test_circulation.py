@@ -164,3 +164,87 @@ def test_return_endpoint_reports_unknown_loan(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_browser_lending_page_uses_reading_room_and_htmx(client):
+    response = client.get('/ui/loans/new/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'hx-post="/ui/loans/new/"' in response.content
+    assert b'htmx.org@2.0.11' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_lending_page_renders_field_errors_for_blank_values(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': ' \t', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'id="error-member"' in response.content
+    assert b'This field is required.' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_lending_redirects_to_collection_after_success(client, monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 11, 18))
+
+    response = client.post('/ui/loans/new/', {'member': 'reader', 'isbn': '123'})
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    assert b'L4;reader;123;2026-11-18;2026-12-02;' in client.get('/loans').content
+
+
+@pytest.mark.django_db
+def test_browser_collection_posts_returns_to_htmx_path(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'href="/ui/loans/new/"' in response.content
+    assert b'hx-post="/ui/loans/L1/return/"' in response.content
+    assert b'hx-target="#loan-L1"' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_return_replaces_loan_row_with_return_date(client, monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 11, 18))
+
+    response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'id="loan-L1"' in response.content
+    assert b'Returned Nov 18, 2026' in response.content
+    assert b'hx-post="/ui/loans/L1/return/"' not in response.content
+
+
+@pytest.mark.django_db
+def test_browser_repeat_return_renders_error_and_preserves_return_date(client):
+    response = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'This loan has already been returned.' in response.content
+    assert b'Returned Jan 20, 2026' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_detail_not_found_renders_a_library_page(client):
+    response = client.get('/ui/loans/missing/')
+
+    assert response.status_code == 404
+    assert b'Loan not found' in response.content
+    assert b'Back to the collection' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_htmx_return_not_found_renders_an_error_fragment(client):
+    response = client.post('/ui/loans/missing/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content

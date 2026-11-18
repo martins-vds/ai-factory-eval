@@ -1,0 +1,21 @@
+<form class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm" method="post" action="/ui/loans/new/"
+      hx-post="/ui/loans/new/" hx-target="#loan-form" hx-swap="innerHTML">
+  {% csrf_token %}
+  <div class="card-body gap-5">
+    <div>
+      <label class="label" for="id_member"><span class="label-text font-semibold">Member</span></label>
+      <input class="input input-bordered" id="id_member" name="member" value="{{ member|default:'' }}"
+             required aria-invalid="{% if errors.member %}true{% else %}false{% endif %}"
+             aria-describedby="error-member">
+      {% if errors.member %}<p class="mt-1 text-sm text-[#a94e37]" id="error-member">{{ errors.member }}</p>{% endif %}
+    </div>
+    <div>
+      <label class="label" for="id_isbn"><span class="label-text font-semibold">ISBN</span></label>
+      <input class="input input-bordered" id="id_isbn" name="isbn" value="{{ isbn|default:'' }}"
+             required aria-invalid="{% if errors.isbn %}true{% else %}false{% endif %}"
+             aria-describedby="error-isbn">
+      {% if errors.isbn %}<p class="mt-1 text-sm text-[#a94e37]" id="error-isbn">{{ errors.isbn }}</p>{% endif %}
+    </div>
+    <button class="btn btn-outline border-[#d8cdbb] text-[#a94e37]" type="submit">Lend this book</button>
+  </div>
+</form>
