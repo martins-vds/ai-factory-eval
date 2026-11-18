@@ -29,6 +29,7 @@ evidence:
   - tests/fees/test_services.py::test_payment_maps_every_non_success_gateway_status_to_bad_gateway
   - tests/fees/test_services.py::test_payment_returns_gateway_failure_without_losing_the_exception
   - tests/fees/test_views.py::test_payment_api_posts_the_characterized_request_and_forwards_success
+  - tests/fees/test_views.py::test_payment_api_accepts_a_direct_post_without_a_csrf_token
   - tests/fees/test_views.py::test_payment_api_maps_non_success_gateway_status_to_502
   - tests/fees/test_views.py::test_payment_api_does_not_call_gateway_for_an_unknown_loan
   - tests/fees/test_views.py::test_payment_api_returns_502_when_the_gateway_is_unavailable

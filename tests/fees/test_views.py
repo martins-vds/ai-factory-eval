@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
+from django.test import Client
 from playwright.sync_api import sync_playwright
 
 
@@ -81,6 +82,23 @@ def test_payment_api_posts_the_characterized_request_and_forwards_success(
     assert response['Content-Type'] == 'text/plain'
     assert response.content == b'charged\n'
     assert payment_gateway['requests'] == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
+def test_payment_api_accepts_a_direct_post_without_a_csrf_token(payment_gateway):
+    response = Client(enforce_csrf_checks=True).post('/payments/L3')
+
+    assert response.status_code == 200
+    assert response.content == b'charged\n'
+    assert payment_gateway['requests'] == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
+def test_ui_payment_still_requires_a_csrf_token(payment_gateway):
+    response = Client(enforce_csrf_checks=True).post('/ui/payments/L3/')
+
+    assert response.status_code == 403
+    assert payment_gateway['requests'] == []
 
 
 @pytest.mark.django_db

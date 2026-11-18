@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.html import format_html
 from django.views.decorators.http import require_GET, require_POST
 
@@ -37,6 +38,7 @@ def _payment_outcome(loan_id):
     return result.status_code == 200, result.body, result.status_code
 
 
+@csrf_exempt
 @require_POST
 def payment_api(request, loan_id):
     _, body, status = _payment_outcome(loan_id)
