@@ -1,8 +1,10 @@
 import logging
+from datetime import date
 
 import pytest
 
 from src.fees.gateway import HttpPaymentGateway
+from src.loans.models import Loan
 
 
 @pytest.mark.django_db
@@ -10,6 +12,7 @@ def test_fee_api_returns_the_characterized_html_fragment(client):
     response = client.get('/fees/L3')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == (
         '<h1>Late fee for L3</h1>'
         '<p>Due 2025-12-15, 19 day(s) late.</p>'
@@ -22,7 +25,24 @@ def test_fee_api_returns_the_characterized_not_found_fragment(client):
     response = client.get('/fees/unknown')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == '<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_fee_api_formats_the_capped_amount_as_ten_dollars(client):
+    Loan.objects.create(
+        id='L9',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 1, 1),
+        returned_on=date(2026, 11, 18),
+    )
+
+    response = client.get('/fees/L9')
+
+    assert response.status_code == 200
+    assert 'Fee: $10.00' in response.content.decode()
 
 
 @pytest.mark.django_db
@@ -32,6 +52,7 @@ def test_payment_api_gateway_forwards_success(client, payment_gateway_server):
     response = client.post('/payments/L3')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'charged\n'
     assert received == [('POST', '/charge?loan=L3', b'')]
 
@@ -178,6 +199,14 @@ def test_regular_payment_failure_renders_page(client, payment_gateway_server):
 
 
 @pytest.mark.django_db
+def test_regular_payment_success_redirects_to_the_fee_page(client, payment_gateway_server):
+    response = client.post('/ui/payments/L3/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L3/'
+
+
+@pytest.mark.django_db
 def test_regular_unknown_payment_renders_not_found(client, payment_gateway_server):
     received, _, _ = payment_gateway_server
 
@@ -190,6 +219,8 @@ def test_regular_unknown_payment_renders_not_found(client, payment_gateway_serve
 
 
 @pytest.mark.django_db
-def test_payment_routes_reject_unsupported_methods(client):
+def test_routes_reject_unsupported_methods(client):
+    assert client.post('/fees/L3').status_code == 405
     assert client.get('/payments/L3').status_code == 405
+    assert client.post('/ui/fees/L3/').status_code == 405
     assert client.get('/ui/payments/L3/').status_code == 405

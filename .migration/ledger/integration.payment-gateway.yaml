@@ -40,7 +40,9 @@ evidence:
   - tests/fees/test_views.py::test_htmx_payment_gateway_failure_fragment
   - tests/fees/test_views.py::test_htmx_unknown_payment_shows_error_without_gateway
   - tests/fees/test_views.py::test_regular_payment_failure_renders_page
+  - tests/fees/test_views.py::test_regular_payment_success_redirects_to_the_fee_page
   - tests/fees/test_views.py::test_regular_unknown_payment_renders_not_found
+  - tests/fees/test_views.py::test_routes_reject_unsupported_methods
 rules:
   - id: existing-loan
     rule: The loan must exist before the payment gateway is called.
