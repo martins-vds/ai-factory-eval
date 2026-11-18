@@ -1,0 +1,35 @@
+<dialog open class="modal modal-open" aria-labelledby="deadline-dialog-title">
+  <div class="modal-box">
+    <h2 id="deadline-dialog-title" class="text-xl font-semibold">Change deadline</h2>
+    <p class="mt-3">Origin: {{ origin.name }}</p>
+    <p>Destination: {{ destination.name }}</p>
+    <form
+      method="post"
+      action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      hx-target="#not-routed-cargo"
+      hx-swap="outerHTML"
+      hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+      class="mt-4 space-y-4"
+    >
+      {% csrf_token %}
+      <div>
+        <label for="deadline" class="mb-1 block font-medium">Arrival deadline</label>
+        <input
+          id="deadline"
+          name="deadline"
+          type="date"
+          value="{{ deadline_value }}"
+          required
+          {% if error %}aria-describedby="deadline-error" aria-invalid="true"{% endif %}
+          class="input input-bordered w-full"
+        >
+        {% if error %}<p id="deadline-error" role="alert" class="mt-1 text-red-700">{{ error }}</p>{% endif %}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="/admin/dashboard/" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</dialog>

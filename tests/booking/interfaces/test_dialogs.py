@@ -51,6 +51,14 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_return_not_found_for_unknown_cargo(client):
+    response = client.get('/admin/cargo/MISSING1/destination/')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_destination_dialog_shows_current_values_and_excludes_origin_and_destination(client):
     call_command('seed_sample_data')
 
@@ -83,9 +91,13 @@ def test_destination_dialog_keeps_the_backing_location_list_stable():
 
     first = destination(request, 'DEF789').content
     second = destination(request, 'DEF789').content
+    first_options = re.search(rb'<select\b[^>]*>(.*?)</select>', first, re.DOTALL)
+    second_options = re.search(rb'<select\b[^>]*>(.*?)</select>', second, re.DOTALL)
 
     assert locations == initial_locations
-    assert first == second
+    assert first_options is not None
+    assert second_options is not None
+    assert first_options.group(1) == second_options.group(1)
 
 
 @pytest.mark.django_db
@@ -98,11 +110,14 @@ def test_destination_dialog_rejects_an_origin_as_a_destination(client):
     response = client.post(
         '/admin/cargo/DEF789/destination/',
         {'destination': 'CNHKG'},
+        HTTP_HX_REQUEST='true',
     )
     cargo_after = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
     assert 'Select a valid destination.' in response.content.decode()
+    assert response['HX-Retarget'] == '#edit-dialog'
+    assert response['HX-Reswap'] == 'innerHTML'
     assert cargo_after is not None
     assert cargo_after.route_specification == cargo_before.route_specification
 
@@ -126,9 +141,9 @@ def test_destination_dialog_updates_cargo_refreshes_rows_and_completes_without_w
     assert 'Not Routed Cargo' in content
     assert 'data-tracking-id="DEF789"' in content
     assert 'New York' in content
-    assert '11/08/2026' not in content or cargo_before.route_specification.arrival_deadline
+    assert f'{cargo_before.route_specification.arrival_deadline:%m/%d/%Y}' in content
     assert 'Widget for var' not in content
-    assert 'id="edit-dialog"></div>' in content
+    assert '<div id="edit-dialog" aria-live="polite"></div>' in content
     assert cargo_after is not None
     assert cargo_after.route_specification.origin == cargo_before.route_specification.origin
     assert cargo_after.route_specification.destination.unlocode.value == 'USNYC'
@@ -151,9 +166,7 @@ def test_deadline_dialog_shows_initial_specification_values(client):
     assert response.status_code == 200
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
-    assert (
-        f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in content
-    )
+    assert f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in content
     assert 'Change deadline' in content
 
 
@@ -167,6 +180,7 @@ def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client):
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
         {'deadline': 'not-a-date'},
+        HTTP_HX_REQUEST='true',
     )
     cargo_after = cargo_repository.find(TrackingId('DEF789'))
     content = response.content.decode()
@@ -174,8 +188,11 @@ def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client):
     assert response.status_code == 200
     assert 'Enter a valid arrival deadline.' in content
     assert 'id="deadline-error"' in content
+    assert 'aria-describedby="deadline-error"' in content
     assert 'aria-invalid="true"' in content
     assert 'value="not-a-date"' in content
+    assert response['HX-Retarget'] == '#edit-dialog'
+    assert response['HX-Reswap'] == 'innerHTML'
     assert cargo_after is not None
     assert cargo_after.route_specification == cargo_before.route_specification
 
@@ -200,10 +217,10 @@ def test_deadline_dialog_updates_cargo_refreshes_rows_and_completes_without_warn
     assert 'data-tracking-id="DEF789"' in content
     assert '01/15/2027' in content
     assert 'Widget for var' not in content
-    assert 'id="edit-dialog"></div>' in content
+    assert '<div id="edit-dialog" aria-live="polite"></div>' in content
     assert cargo_after is not None
     assert cargo_after.route_specification.origin == cargo_before.route_specification.origin
-    assert cargo_after.route_specification.destination == cargo_before.route_specification.destination
-    assert cargo_after.route_specification.arrival_deadline == datetime(
-        2027, 1, 15, tzinfo=UTC
+    assert (
+        cargo_after.route_specification.destination == cargo_before.route_specification.destination
     )
+    assert cargo_after.route_specification.arrival_deadline == datetime(2027, 1, 15, tzinfo=UTC)
