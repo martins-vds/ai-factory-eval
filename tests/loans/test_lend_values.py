@@ -1,9 +1,37 @@
-from datetime import timedelta
+from datetime import date, timedelta
+from types import SimpleNamespace
 
 import pytest
 from django.utils import timezone
 
 from src.loans.models import Loan
+from src.loans.services import LoanApplication
+
+
+class RecordingLoanRepository:
+    def next_id(self):
+        return 'L4'
+
+    def create(self, **fields):
+        self.created = fields
+        return SimpleNamespace(**fields)
+
+
+class FixedClock:
+    def today(self):
+        return date(2026, 11, 18)
+
+
+def test_lending_use_case_passes_member_and_isbn_unchanged():
+    repository = RecordingLoanRepository()
+    application = LoanApplication(repository, FixedClock())
+
+    loan = application.lend(' m1 ', ' 978-0 ')
+
+    assert loan.member == ' m1 '
+    assert loan.isbn == ' 978-0 '
+    assert repository.created['member'] == ' m1 '
+    assert repository.created['isbn'] == ' 978-0 '
 
 
 @pytest.mark.django_db
