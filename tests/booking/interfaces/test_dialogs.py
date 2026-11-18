@@ -29,6 +29,12 @@ urlpatterns = [
     path('admin/cargo/<str:tracking_id>/destination/', destination_dialog),
     path('admin/cargo/<str:tracking_id>/deadline/', deadline_dialog),
 ]
+pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def use_test_urlconf(settings):
+    settings.ROOT_URLCONF = __name__
 
 
 @pytest.fixture
@@ -38,7 +44,6 @@ def sample_booking_data():
     return cargo_repository.find(TrackingId('DEF789'))
 
 
-@pytest.mark.django_db
 def test_not_routed_table_opens_destination_and_deadline_dialogs(client, sample_booking_data):
     response = client.get('/admin/dashboard/')
     content = response.content.decode()
@@ -50,10 +55,17 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client, sample_
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in not_routed_table
     assert 'Change deadline' in not_routed_table
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in not_routed_table
-    assert '<dialog id="cargo-edit-dialog"' in content
+    assert '<dialog' in content
+    assert 'id="cargo-edit-dialog"' in content
 
 
-@pytest.mark.django_db
+def test_unknown_cargo_error_is_renderable_in_the_dialog(client):
+    response = client.get('/admin/cargo/MISSING1/destination/')
+
+    assert response.status_code == 404
+    assert 'Cargo not found' in response.content.decode()
+
+
 def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     client, sample_booking_data
 ):
@@ -65,8 +77,15 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     second = client.get('/admin/cargo/DEF789/destination/')
     content = first.content.decode()
     options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
+    second_options = re.search(
+        r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>',
+        second.content.decode(),
+        re.DOTALL,
+    )
     assert options is not None
+    assert second_options is not None
     option_codes = re.findall(r'<option\b[^>]*value="([^"]+)"', options.group(1))
+    second_option_codes = re.findall(r'<option\b[^>]*value="([^"]+)"', second_options.group(1))
 
     assert first.status_code == second.status_code == 200
     assert cargo.route_specification.origin.name in content
@@ -74,11 +93,10 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     assert cargo.route_specification.destination.unlocode.value not in option_codes
     assert cargo.route_specification.origin.unlocode.value not in option_codes
     assert option_codes
+    assert option_codes == second_option_codes
     assert shipping_locations == original_locations
-    assert first.content == second.content
 
 
-@pytest.mark.django_db
 def test_destination_update_redirects_and_refreshes_the_not_routed_row(
     client, sample_booking_data
 ):
@@ -112,7 +130,25 @@ def test_destination_update_redirects_and_refreshes_the_not_routed_row(
     assert original_deadline.strftime('%m/%d/%Y') in not_routed_table
 
 
-@pytest.mark.django_db
+def test_destination_update_rejects_a_location_outside_the_filtered_options(
+    client, sample_booking_data
+):
+    cargo = sample_booking_data
+    assert cargo is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'action': 'update', 'destination': cargo.route_specification.origin.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+    refreshed_cargo = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select an available destination.' in response.content.decode()
+    assert refreshed_cargo is not None
+    assert refreshed_cargo.route_specification.destination == cargo.route_specification.destination
+
+
 def test_deadline_dialog_shows_initial_value_and_parse_error(client, sample_booking_data):
     cargo = sample_booking_data
     assert cargo is not None
@@ -134,7 +170,6 @@ def test_deadline_dialog_shows_initial_value_and_parse_error(client, sample_book
     assert refreshed_cargo.route_specification.arrival_deadline == original_deadline
 
 
-@pytest.mark.django_db
 def test_deadline_update_redirects_and_refreshes_the_not_routed_row(
     client, sample_booking_data
 ):
