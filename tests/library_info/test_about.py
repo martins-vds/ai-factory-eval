@@ -1,23 +1,21 @@
+import json
+from pathlib import Path
+
 from playwright.sync_api import sync_playwright
 
-LEGACY_ABOUT_HTML = """<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><title>About the Lending Library</title></head>
-<body>
-  <h1>About the Lending Library</h1>
-  <p>Open Monday to Saturday, 9:00 to 18:00. Books are lent for 14 days.</p>
-  <p>Contact: desk@lending-library.invalid</p>
-</body>
-</html>
-"""
+HTTP_GOLDEN_PATH = (
+    Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
+)
+HTTP_GOLDENS = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))
 
 
 def test_legacy_about_response_is_unchanged(client):
-    response = client.get('/about')
+    expected = HTTP_GOLDENS['GET /about']['response']
+    response = client.get(HTTP_GOLDENS['GET /about']['request']['path'])
 
-    assert response.status_code == 200
-    assert response.headers['Content-Type'] == 'text/html'
-    assert response.content.decode() == LEGACY_ABOUT_HTML
+    assert response.status_code == expected['status']
+    assert response.headers['Content-Type'] == expected['content_type']
+    assert response.content.decode() == expected['body']
 
 
 def test_about_pages_only_allow_get(client):
