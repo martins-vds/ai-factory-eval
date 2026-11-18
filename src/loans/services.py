@@ -20,7 +20,7 @@ class Clock(Protocol):
 class LoanInputError(ValueError):
     def __init__(self, field_errors):
         self.field_errors = field_errors
-        super().__init__('member and isbn are required')
+        super().__init__(field_errors)
 
 
 class LoanNotFound(LookupError):

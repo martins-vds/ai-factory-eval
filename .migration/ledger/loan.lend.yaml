@@ -31,6 +31,7 @@ evidence:
   - tests/loans/test_circulation.py::test_lend_endpoint_rejects_blank_or_missing_required_fields
   - tests/loans/test_circulation.py::test_browser_lend_form_renders_field_errors_for_blank_values
   - tests/loans/test_circulation.py::test_full_page_lend_form_renders_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_full_page_lend_form_preserves_isbn_when_member_is_missing
   - tests/loans/test_circulation.py::test_browser_lend_form_creates_a_loan_with_htmx
 rules:
   - id: member-required
