@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from types import SimpleNamespace
 
 import pytest
+from django.utils.formats import date_format
 from django.utils import timezone
 
 from src.loans.services import (
@@ -170,6 +171,7 @@ def test_full_page_lending_creates_and_displays_the_new_loan(client):
     assert b'Books in good company.' in response.content
     assert b'Loan L4 has been added.' in response.content
     assert b'Loan L4' in response.content
+    assert b'Loan L1' in response.content
 
 
 @pytest.mark.django_db
@@ -236,6 +238,7 @@ def test_open_loan_detail_offers_a_return_action_on_the_ui_route(client):
 
 @pytest.mark.django_db
 def test_ui_return_rejects_repeated_returns_and_preserves_the_original_date(client):
+    returned_on = timezone.localdate()
     first = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
     repeated = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
     current_record = client.get('/loans/L1')
@@ -245,7 +248,13 @@ def test_ui_return_rejects_repeated_returns_and_preserves_the_original_date(clie
     assert b'Returned on' in first.content
     assert repeated.status_code == 409
     assert b'already been returned' in repeated.content
-    assert b'Returned on' in repeated.content
+    assert (
+        b'<p role="alert" class="text-[#a94e37]">This loan has already been returned.</p>'
+        in repeated.content
+    )
+    expected_date = date_format(returned_on, 'M j, Y')
+    assert f'<p>Returned on {expected_date}</p>'.encode() in repeated.content
+    assert b'The Lending Library' not in repeated.content
     assert current_record.content.decode().endswith(f'{timezone.localdate().isoformat()}\n')
 
 
@@ -262,12 +271,13 @@ def test_ui_return_renders_unknown_loan_error_as_an_htmx_fragment(client):
     response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
-    assert b'No such loan.' in response.content
+    assert b'<p role="alert" class="text-[#a94e37]">No such loan.</p>' in response.content
     assert b'The Lending Library' not in response.content
 
 
 @pytest.mark.django_db
 def test_full_page_return_redirects_then_displays_repeated_return_details(client):
+    returned_on = timezone.localdate()
     first = client.post('/ui/loans/L1/return/')
     repeated = client.post('/ui/loans/L1/return/')
 
@@ -275,8 +285,9 @@ def test_full_page_return_redirects_then_displays_repeated_return_details(client
     assert first['Location'] == '/ui/loans/L1/'
     assert repeated.status_code == 409
     assert b'Loan record \xc2\xb7 L1' in repeated.content
-    assert b'This loan has already been returned.' in repeated.content
-    assert b'Returned on' in repeated.content
+    assert b'<p role="alert">This loan has already been returned.</p>' in repeated.content
+    expected_date = date_format(returned_on, 'M j, Y')
+    assert f'<p>Returned on {expected_date}</p>'.encode() in repeated.content
 
 
 @pytest.mark.django_db
