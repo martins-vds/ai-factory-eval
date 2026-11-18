@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -97,8 +98,12 @@ def test_route_selection_renders_populated_candidates_and_numbered_legs(client):
 
     response = client.get(f'/admin/cargo/{tracking_id.value}/route/')
     content = response.content.decode()
+    token = re.search(r'name="candidate" value="([^"]+)"', content).group(1)
+    candidate = signing.loads(token, salt='booking.route_selection')
 
     assert response.status_code == 200
+    assert candidate['tracking_id'] == tracking_id.value
+    assert len(candidate['legs']) == 2
     assert f'Routing Details for Cargo {tracking_id.value}' in content
     assert 'Potential routes:' in content
     assert '<dd>2</dd>' in content
@@ -125,15 +130,16 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert itinerary_response.status_code == 200
     route_content = route_response.content.decode()
     itinerary_content = itinerary_response.content.decode()
-    assert 'No routes found that satisfy the route specification.' in route_content
+    assert (
+        'No routes found that satisfy the route specification. '
+        'Try setting an arrival deadline further into the future.'
+    ) in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
-    assert 'No routes found that satisfy the route specification.' in itinerary_content
     assert (
+        'No routes found that satisfy the route specification. '
         'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
-    )
+    ) in itinerary_content
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
 
@@ -196,6 +202,42 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_candidate_that_no_longer_satisfies_the_specification(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    token = re.search(r'name="candidate" value="([^"]+)"', route_content).group(1)
+    candidate = signing.loads(token, salt='booking.route_selection')
+    candidate['legs'][-1]['unload_time'] = '2030-11-06T00:00:00+00:00'
+    stale_token = signing.dumps(candidate, salt='booking.route_selection')
+    request = RequestFactory().post(route_url, {'candidate': stale_token})
+
+    with pytest.raises(Http404) as error:
+        route_view(request, tracking_id.value)
+    assert error.value.args == ('The selected route no longer satisfies the route specification.',)
+
+
+@pytest.mark.django_db
+def test_route_assignment_for_unknown_cargo_returns_not_found():
+    request = RequestFactory().post('/admin/cargo/MISSING1/route/')
+
+    with pytest.raises(Http404) as error:
+        route_view(request, 'MISSING1')
+    assert error.value.args == ('Cargo with tracking ID MISSING1 not found.',)
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_without_a_candidate_returns_not_found(client):
+    tracking_id = _create_cargo(_candidate_paths())
+
+    response = client.post(f'/admin/cargo/{tracking_id.value}/route/')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
     route_response = client.put(f'/admin/cargo/{tracking_id.value}/route/')
@@ -209,5 +251,6 @@ def test_route_screens_reject_unsupported_http_methods(client):
 def test_route_selection_raises_not_found_for_unknown_cargo():
     request = RequestFactory().get('/admin/cargo/MISSING1/route/')
 
-    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
+    with pytest.raises(Http404) as error:
         route_view(request, 'MISSING1')
+    assert error.value.args == ('Cargo with tracking ID MISSING1 not found.',)
