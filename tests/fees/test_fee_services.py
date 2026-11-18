@@ -33,6 +33,16 @@ class PaymentGateway:
         raise AssertionError('fee calculation must not charge a payment')
 
 
+class RecordingPaymentGateway:
+    def __init__(self, result):
+        self.result = result
+        self.charged_loan_ids = []
+
+    def charge(self, loan_id):
+        self.charged_loan_ids.append(loan_id)
+        return self.result
+
+
 def test_fee_calculation_waives_the_first_two_days_and_charges_the_third():
     loan = Loan(id='L1', due_on=date(2026, 11, 16))
     application = FeeApplication(LoanRepository(loan), Clock(), PaymentGateway())
@@ -67,6 +77,32 @@ def test_fee_calculation_clamps_days_before_the_due_date_to_zero():
 
     assert fee.days_late == 0
     assert fee.amount == Decimal('0.00')
+
+
+def test_fee_application_returns_none_for_an_unknown_loan():
+    loan = Loan(id='L1', due_on=date(2026, 11, 18))
+    application = FeeApplication(LoanRepository(loan), Clock(), PaymentGateway())
+
+    assert application.calculate('missing') is None
+
+
+def test_fee_application_does_not_charge_for_an_unknown_loan():
+    loan = Loan(id='L1', due_on=date(2026, 11, 18))
+    gateway = RecordingPaymentGateway(PaymentResult(200, 'charged\n'))
+    application = FeeApplication(LoanRepository(loan), Clock(), gateway)
+
+    assert application.pay('missing') is None
+    assert gateway.charged_loan_ids == []
+
+
+def test_fee_application_returns_the_gateway_result_for_an_existing_loan():
+    loan = Loan(id='L1', due_on=date(2026, 11, 18))
+    result = PaymentResult(502, 'declined\n')
+    gateway = RecordingPaymentGateway(result)
+    application = FeeApplication(LoanRepository(loan), Clock(), gateway)
+
+    assert application.pay(loan.id) == result
+    assert gateway.charged_loan_ids == [loan.id]
 
 
 def test_fee_and_payment_results_are_immutable():
