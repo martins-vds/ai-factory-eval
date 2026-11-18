@@ -9,8 +9,8 @@ from .services import (
     LoanNotFound,
     get_loan,
     get_loan_text,
-    list_loans,
     lend_loan,
+    list_loans,
     list_loans_text,
     loan_line,
     return_loan,
@@ -51,7 +51,11 @@ def loan_lend_page(request):
             'isbn': request.POST.get('isbn', ''),
             'errors': error.field_errors,
         }
-        template = 'loans/_lend_form.html' if request.headers.get('HX-Request') == 'true' else 'loans/new.html'
+        template = (
+            'loans/_lend_form.html'
+            if request.headers.get('HX-Request') == 'true'
+            else 'loans/new.html'
+        )
         return render(request, template, context, status=400)
     if request.headers.get('HX-Request') == 'true':
         return render(request, 'loans/_lend_success.html', {'loan': loan}, status=201)

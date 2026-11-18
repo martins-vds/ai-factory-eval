@@ -4,7 +4,13 @@ import pytest
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
-from src.loans.services import LoanAlreadyReturned, LoanInputError, LoanNotFound, lend_loan, return_loan
+from src.loans.services import (
+    LoanAlreadyReturned,
+    LoanInputError,
+    LoanNotFound,
+    lend_loan,
+    return_loan,
+)
 
 
 class FixedClock:
