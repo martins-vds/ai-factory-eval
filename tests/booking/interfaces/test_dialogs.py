@@ -214,3 +214,89 @@ def test_deadline_update_completes_dialog_and_refreshes_table(client):
     )
     assert cargo_after.route_specification.arrival_deadline == new_deadline
     assert '04/05/2030' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialog_pages_render_form_actions_without_errors(client):
+    _seed_booking_data()
+
+    destination = client.get('/admin/cargo/DEF789/destination/')
+    deadline = client.get('/admin/cargo/DEF789/deadline/')
+
+    assert destination.status_code == 200
+    assert 'action="/admin/cargo/DEF789/destination/"' in destination.content.decode()
+    assert 'role="alert"' not in destination.content.decode()
+    assert deadline.status_code == 200
+    assert 'action="/admin/cargo/DEF789/deadline/"' in deadline.content.decode()
+    assert 'role="alert"' not in deadline.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_only_allow_get_and_post(client):
+    _seed_booking_data()
+
+    for endpoint in ('destination', 'deadline'):
+        response = client.put(f'/admin/cargo/DEF789/{endpoint}/')
+
+        assert response.status_code == 405
+        assert response['Allow'] == 'GET, POST'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_missing_dialog_values_show_field_errors(client):
+    _seed_booking_data()
+
+    destination = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    deadline = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    destination_content = destination.content.decode()
+    deadline_content = deadline.content.decode()
+
+    assert destination.status_code == 200
+    assert 'Select a valid destination.' in destination_content
+    assert 'aria-describedby="destination-error"' in destination_content
+    assert 'aria-invalid="true"' in destination_content
+    assert deadline.status_code == 200
+    assert 'Enter a valid arrival deadline.' in deadline_content
+    assert 'aria-describedby="deadline-error"' in deadline_content
+    assert 'aria-invalid="true"' in deadline_content
+    assert 'value=""' in deadline_content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_return_not_found_for_unknown_cargo(client):
+    _seed_booking_data()
+
+    assert client.get('/admin/cargo/UNKNOWN/destination/').status_code == 404
+    assert client.get('/admin/cargo/UNKNOWN/deadline/').status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_non_htmx_updates_redirect_to_dashboard(client):
+    _seed_booking_data()
+
+    destination = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'USDAL'},
+    )
+    deadline = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': '2030-04-05'},
+    )
+
+    assert destination.status_code == 302
+    assert destination['Location'] == '/admin/dashboard/'
+    assert deadline.status_code == 302
+    assert deadline['Location'] == '/admin/dashboard/'
