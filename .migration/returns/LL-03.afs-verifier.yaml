@@ -1,0 +1,67 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#1477
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1496
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 8.3
+  mutation_changed: 0.948
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings: []
+tests_added:
+  - tests/fees/test_gateway.py::test_gateway_rejects_http_url_without_a_host
+  - tests/fees/test_views.py::test_unknown_ui_payment_renders_error_fragment
+  - tests/fees/test_views.py::test_htmx_payment_failure_renders_an_error_fragment
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+rules:
+  - capability: fees.calculation
+    rule: Late days use returnedOn or today and are clamped at zero.
+    use_case: calculate_late_fee
+    test: tests/fees/test_services.py::test_fee_uses_return_date_and_never_counts_early_days_as_late
+    enforced: true
+    ledger_rule: fee-calculation
+  - capability: fees.calculation
+    rule: The first two late days are waived and fees cap at $10.
+    use_case: calculate_late_fee
+    test: tests/fees/test_services.py::test_fee_waives_up_to_two_days_and_caps_at_ten_dollars
+    enforced: true
+    ledger_rule: fee-calculation
+  - capability: fees.calculation
+    rule: Days beyond the grace period accrue at $0.25 each.
+    use_case: calculate_late_fee
+    test: tests/fees/test_services.py::test_fee_is_twenty_five_cents_per_day_after_grace_period
+    enforced: true
+    ledger_rule: fee-calculation
+  - capability: fees.page
+    rule: An unknown loan has no fee quote and the page returns the characterized 404 response.
+    use_case: FeeApplication.quote
+    test: tests/fees/test_services.py::test_fee_use_case_returns_no_quote_for_an_unknown_loan
+    enforced: true
+    ledger_rule: missing-loan
+  - capability: integration.payment-gateway
+    rule: A payment requires an existing loan and does not call the gateway otherwise.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_services.py::test_payment_use_case_does_not_call_gateway_for_an_unknown_loan
+    enforced: true
+    ledger_rule: loan-required
+  - capability: integration.payment-gateway
+    rule: Only gateway HTTP 200 succeeds; non-200 responses fail payment.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_services.py::test_payment_use_case_maps_non_success_gateway_response_to_failure
+    enforced: true
+    ledger_rule: gateway-failures
+  - capability: integration.payment-gateway
+    rule: An interrupted gateway call becomes a payment failure without losing its cause.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_services.py::test_payment_use_case_preserves_gateway_interruption_as_a_failure
+    enforced: true
+    ledger_rule: gateway-failures
+no_rules: {}
+inherited: []
