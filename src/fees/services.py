@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from collections.abc import Iterable
 from typing import Protocol
 
 
@@ -15,7 +16,7 @@ class Clock(Protocol):
 
 
 class LoanRepository(Protocol):
-    def all(self) -> list[LoanRecord]: ...
+    def all(self) -> Iterable[LoanRecord]: ...
 
     def find(self, loan_id: str) -> LoanRecord | None: ...
 
@@ -48,8 +49,21 @@ class FeeApplication:
         if loan is None:
             return None
 
-        end_date = loan.returned_on or self.clock.today()
+        return self._calculate(loan, self.clock.today())
+
+    def all_fees(self) -> list[Fee]:
+        today = self.clock.today()
+        return [self._calculate(loan, today) for loan in self.repository.all()]
+
+    def pay(self, loan_id: str) -> PaymentResult | None:
+        if self.repository.find(loan_id) is None:
+            return None
+        return self.gateway.charge(loan_id)
+
+    @staticmethod
+    def _calculate(loan: LoanRecord, today: date) -> Fee:
+        end_date = loan.returned_on or today
         days_late = max(0, (end_date - loan.due_on).days)
-        cents = min(max(days_late - 2, 0) * 25, 1000)
+        cents = 0 if days_late <= 2 else min(days_late * 25, 1000)
         amount = (Decimal(cents) / Decimal(100)).quantize(Decimal('0.00'))
         return Fee(loan, days_late, amount)

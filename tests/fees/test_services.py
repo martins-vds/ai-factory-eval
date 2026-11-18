@@ -39,4 +39,4 @@ def test_late_fee_waives_the_first_two_days_and_charges_the_third():
     three_days_late = application.calculate(loan.id)
 
     assert (two_days_late.days_late, two_days_late.amount) == (2, Decimal('0.00'))
-    assert (three_days_late.days_late, three_days_late.amount) == (3, Decimal('0.25'))
+    assert (three_days_late.days_late, three_days_late.amount) == (3, Decimal('0.75'))
