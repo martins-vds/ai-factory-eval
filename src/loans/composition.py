@@ -13,6 +13,10 @@ def lend_loan(member, isbn):
     return services.lend_loan(LoanRepository(), LocalClock(), member, isbn)
 
 
+def return_loan(loan_id):
+    return services.return_loan(LoanRepository(), LocalClock(), loan_id)
+
+
 def list_loans_text():
     return services.list_loans_text(LoanRepository())
 

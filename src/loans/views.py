@@ -1,8 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 
-from .composition import get_loan_text, lend_loan, list_loans_text, loan_line
+from .composition import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
 from .forms import LoanForm
 from .models import Loan
 
@@ -43,3 +43,13 @@ def loan_collection(request):
         return HttpResponse(loan_line(loan), status=201, content_type='text/plain')
 
     return HttpResponse(list_loans_text(), content_type='text/plain')
+
+
+@require_POST
+def loan_return(request, loan_id):
+    loan, updated = return_loan(loan_id)
+    if loan is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    if not updated:
+        return HttpResponse('already returned\n', status=409, content_type='text/plain')
+    return HttpResponse(loan_line(loan), content_type='text/plain')

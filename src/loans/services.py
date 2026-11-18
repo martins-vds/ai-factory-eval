@@ -27,6 +27,8 @@ class LoanRepositoryPort(Protocol):
 
     def next_id(self) -> str: ...
 
+    def mark_returned(self, loan_id: str, returned_on: date) -> tuple[LoanRecord | None, bool]: ...
+
 
 def lend_loan(repository: LoanRepositoryPort, clock: Clock, member: str, isbn: str) -> LoanRecord:
     return repository.create(
@@ -35,6 +37,12 @@ def lend_loan(repository: LoanRepositoryPort, clock: Clock, member: str, isbn: s
         isbn=isbn,
         lent_on=clock.today(),
     )
+
+
+def return_loan(
+    repository: LoanRepositoryPort, clock: Clock, loan_id: str
+) -> tuple[LoanRecord | None, bool]:
+    return repository.mark_returned(loan_id, clock.today())
 
 
 def loan_line(loan: LoanRecord) -> str:
