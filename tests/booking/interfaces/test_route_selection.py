@@ -1,3 +1,4 @@
+import re
 from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 
@@ -11,12 +12,13 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.un_locode import UnLocode
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.application.routing import SAMPLE_VOYAGE_NUMBERS, RoutingService
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
-from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 
 cargo_repository = DjangoCargoRepository()
 route_service = RoutingService()
@@ -82,3 +84,79 @@ def test_route_page_renders_candidate_properties_and_numbered_legs(client, not_r
             previous.unload_time < following.load_time
             for previous, following in pairwise(itinerary.legs)
         )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_select_itinerary_renders_candidates_when_present(client, not_routed_cargo):
+    response = client.get(f'/admin/cargo/{not_routed_cargo}/itineraries/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select Itinerary for Cargo' in content
+    assert 'Potential routes:' in content
+    assert 'Itinerary 1' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_select_itinerary_keeps_no_routes_guidance_when_candidates_are_empty(
+    client, not_routed_cargo, monkeypatch
+):
+    monkeypatch.setattr(route_service, 'find_shortest_paths', lambda origin, destination: ())
+
+    response = client.get(f'/admin/cargo/{not_routed_cargo}/itineraries/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'No routes found that satisfy the route specification.' in content
+    assert 'Try setting an arrival deadline further into the future' in re.sub(
+        r'\s+', ' ', content
+    )
+    assert 'Itinerary 1' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_assigning_candidate_redirects_to_cargo_details_and_persists_selected_route(
+    client, not_routed_cargo, monkeypatch
+):
+    calls = []
+    find_shortest_paths = route_service.find_shortest_paths
+
+    def find_paths(origin, destination):
+        calls.append((origin, destination))
+        return find_shortest_paths(origin, destination)
+
+    monkeypatch.setattr(route_service, 'find_shortest_paths', find_paths)
+    route_url = f'/admin/cargo/{not_routed_cargo}/route/'
+    route_page = client.get(route_url)
+    selected_itinerary = route_page.context['route_candidates'][0]['itinerary']
+    token = re.search(rb'name="route_token" value="([^"]+)"', route_page.content)
+    assert token is not None
+
+    response = client.post(route_url, {'route_token': token.group(1).decode()}, follow=True)
+    content = response.content.decode()
+    stored_cargo = cargo_repository.find(TrackingId(str(not_routed_cargo)))
+
+    assert response.status_code == 200
+    assert response.redirect_chain == [(f'/admin/cargo/{not_routed_cargo}/', 302)]
+    assert 'Routing Details for Cargo' in content
+    assert all(leg.voyage.voyage_number.value in content for leg in selected_itinerary.legs)
+    assert stored_cargo is not None
+    assert stored_cargo.itinerary == selected_itinerary
+    assert len(calls) == 1
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_invalid_route_selection_token_is_rejected_without_assignment(client, not_routed_cargo):
+    response = client.post(
+        f'/admin/cargo/{not_routed_cargo}/route/',
+        {'route_token': 'not-a-signed-route'},
+    )
+    stored_cargo = cargo_repository.find(TrackingId(str(not_routed_cargo)))
+
+    assert response.status_code == 400
+    assert stored_cargo is not None
+    assert not stored_cargo.itinerary.legs

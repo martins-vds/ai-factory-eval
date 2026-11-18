@@ -48,6 +48,14 @@
             </tbody>
           </table>
         </div>
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <input type="hidden" name="route_token" value="{{ candidate.token }}">
+          <button
+            type="submit"
+            class="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+          >Assign itinerary {{ forloop.counter }}</button>
+        </form>
       </li>
     {% endfor %}
   </ol>
