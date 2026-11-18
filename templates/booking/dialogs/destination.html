@@ -1,0 +1,48 @@
+<section class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+  <h2 id="destination-dialog-title" class="mb-4 text-xl font-semibold text-slate-900">Change destination</h2>
+  <dl class="mb-4">
+    <dt class="font-medium">Origin</dt>
+    <dd>{{ cargo.route_specification.origin.name }}</dd>
+    <dt class="mt-2 font-medium">Current destination</dt>
+    <dd>{{ cargo.route_specification.destination.name }}</dd>
+  </dl>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-target="#cargo-edit-dialog"
+    hx-swap="innerHTML"
+    class="flex flex-col gap-4"
+  >
+    {% csrf_token %}
+    <div>
+      <label for="destination" class="mb-1 block font-medium">New destination</label>
+      <select
+        id="destination"
+        name="destination"
+        required
+        aria-describedby="{% if error %}destination-error{% endif %}"
+        {% if error %}aria-invalid="true"{% endif %}
+        class="select select-bordered w-full"
+      >
+        <option value="">Select a destination</option>
+        {% for location in available_destinations %}
+          <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+        {% endfor %}
+      </select>
+      {% if error %}
+        <p id="destination-error" role="alert" class="mt-2 text-red-700">{{ error }}</p>
+      {% endif %}
+    </div>
+    <div class="flex justify-end gap-3">
+      <button type="submit" class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800">
+        Update
+      </button>
+    </div>
+  </form>
+  <form method="dialog" class="mt-3 flex justify-end">
+    <button type="submit" class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100">
+      Cancel
+    </button>
+  </form>
+</section>
