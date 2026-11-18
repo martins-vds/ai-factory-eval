@@ -21,8 +21,7 @@
         id="destination"
         name="destination"
         required
-        aria-describedby="{% if error %}destination-error{% endif %}"
-        {% if error %}aria-invalid="true"{% endif %}
+        {% if error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
         class="select select-bordered w-full"
       >
         <option value="">Select a destination</option>

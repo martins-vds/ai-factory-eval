@@ -11,3 +11,24 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T03:51:36+00:00 | behavior-table-actions | 0 | 2.3 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `9a777c8cb819b44d` |  |  |
 | 2026-11-18T03:52:55+00:00 | behavior-destination-red | 2 | 1.01 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `61bef741f07540ef` | __________ ERROR collecting tests/booking/interfaces/test_dialogs.py ___________ |  |
 | 2026-11-18T03:53:54+00:00 | behavior-destination | 0 | 2.79 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `fcd5f4644057ac59` |  |  |
+| 2026-11-18T03:54:45+00:00 | behavior-destination-updates | 0 | 4.74 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `3043b238ba5b8844` |  |  |
+| 2026-11-18T03:55:09+00:00 | behavior-deadline-red | 2 | 0.99 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `41619cd1318dffb5` | __________ ERROR collecting tests/booking/interfaces/test_dialogs.py ___________ |  |
+| 2026-11-18T03:55:34+00:00 | behavior-deadline-initial | 0 | 5.03 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `7e8e945dbb6219c8` |  |  |
+| 2026-11-18T03:55:59+00:00 | behavior-dialogs | 0 | 8.01 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `e7c1a0070ecbccc0` |  |  |
+| 2026-11-18T03:56:30+00:00 | behavior-dialogs-final | 0 | 8.97 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `90dfd59e3d9fb9c5` |  |  |
+| 2026-11-18T03:56:36+00:00 | behavior-dashboard-regression | 0 | 2.95 | `pytest -q tests/booking/interfaces/test_dashboard.py` | `67aae16ad4ff2d2c` |  |  |
+| 2026-11-18T03:58:12+00:00 | behavior-dialogs-final | 0 | 8.88 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `9f517c6534fa8ebc` |  |  |
+| 2026-11-18T03:58:18+00:00 | behavior-dashboard-regression | 0 | 2.83 | `pytest -q tests/booking/interfaces/test_dashboard.py` | `9394ef6123ea1f3c` |  |  |
+| 2026-11-18T03:58:31+00:00 | build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T03:58:37+00:00 | build-check | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T03:58:40+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T03:58:44+00:00 | idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `a9ac37a3f51c960d` | 104 \|     assert 'HX-Redirect' not in response |  |
+| 2026-11-18T03:58:52+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `3accebe6ea89f2c7` |  |  |
+| 2026-11-18T03:58:56+00:00 | idiom-layers | 0 | 0.18 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T03:58:59+00:00 | idiom-ui | 1 | 0.5 | `python .migration/harness/tools/check_ui.py` | `23e021ebb8229a1d` | templates/booking/dashboard/not_routed_table.html:35: sends an htmx request ('hx-get'), but nothing handles error respon | gate=ui scope="templates changed since b48a8ddc1d07a13c5e0259d739c638666327226b" templates=3 findings=3 |
+| 2026-11-18T03:59:50+00:00 | behavior-dialog-errors-red | 1 | 2.93 | `pytest -q tests/booking/interfaces/test_dialogs.py -k not_found` | `f66f53b4f3f98d14` | assert response.status_code == 404 |  |
+| 2026-11-18T04:00:20+00:00 | behavior-dialogs-final | 0 | 8.84 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `bf38e8cd47c004f5` |  |  |
+| 2026-11-18T04:00:24+00:00 | idiom-ui | 0 | 0.51 | `python .migration/harness/tools/check_ui.py` | `0b96b646f2a107e0` |  | gate=ui scope="templates changed since b48a8ddc1d07a13c5e0259d739c638666327226b" templates=4 findings=0 |
+| 2026-11-18T04:00:40+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:00:44+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `3accebe6ea89f2c7` |  |  |
+| 2026-11-18T04:00:48+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
