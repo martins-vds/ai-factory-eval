@@ -57,3 +57,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T14:05:32+00:00 | final-migration-validation | 0 | 3.21 | `python .migration/harness/tools/validate.py .migration` | `ef34805838431398` |  |  |
 | 2026-11-18T15:42:57+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T15:47:12+00:00 | verifier-focused-tests | 0 | 6.55 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `70acccac6515761f` |  |  |
+| 2026-11-18T15:47:37+00:00 | verifier-build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:47:37+00:00 | verifier-build-django-check | 0 | 0.33 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T15:47:45+00:00 | verifier-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T15:47:46+00:00 | verifier-idiom-ruff-format | 1 | 0.02 | `ruff format --check` | `9a8245aea6f40ac7` | 114 \|     assert ( |  |
+| 2026-11-18T15:47:46+00:00 | verifier-idiom-layers | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T15:47:46+00:00 | verifier-idiom-ui | 0 | 0.4 | `python .migration/harness/tools/check_ui.py` | `0b2fb4bd5013f20c` |  | gate=ui scope="templates changed since 0e7957db18c6fb70b7245b24e4a6ac8e854abe5f" templates=4 findings=0 |
+| 2026-11-18T15:47:56+00:00 | verifier-idiom-ruff-format-recheck | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T15:48:52+00:00 | verifier-behavior-tests | 0 | 51.26 | `pytest -q` | `cd4ec921d34eb303` |  |  |
+| 2026-11-18T15:49:39+00:00 | verifier-regression-full-suite | 0 | 47.13 | `pytest -q` | `2d8d05968420c947` |  |  |
+| 2026-11-18T15:50:31+00:00 | verifier-crap-pytest | 0 | 46.1 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `af3c2f6630d4530b` |  |  |
+| 2026-11-18T15:50:31+00:00 | verifier-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:50:31+00:00 | verifier-crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `6d739c2b1aec51ac` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |

@@ -1,0 +1,42 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-eval#1470
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1486
+verdict: blocked
+blocked_reason: "mutation_changed: stopped after over 40 minutes at the operator's request; no result"
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: null
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: minor
+    where: templates/booking/dialogs/deadline.html:22
+    what: "The min=today input restriction is absent from the source deadline dialog and may prevent changing a deadline to a past date."
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_swaps_dialog_error_responses
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_use_case_rejects_origin_as_destination
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-pilot-target#234
+  - martins-vds/ai-factory-pilot-target#235
+  - martins-vds/ai-factory-pilot-target#251
+rules:
+  - capability: booking.dialog-deadline
+    rule: "Deadline updates must receive a parsed datetime; invalid date strings are rejected."
+    use_case: CargoSpecification.change_deadline
+    test: tests/booking/interfaces/test_dialogs.py::test_deadline_update_use_case_rejects_an_unparsed_value
+    enforced: true
+    ledger_rule: well-formed-date
+  - capability: booking.dialog-destination
+    rule: "A route specification must have different origin and destination locations."
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/interfaces/test_dialogs.py::test_destination_update_use_case_rejects_origin_as_destination
+    enforced: true
+no_rules:
+  booking.dialog-chain: "Dialog opening, completion, and table refresh are presentation coordination, not use-case business rules."
+handoff: .migration/handoffs/BK-05G.md

@@ -112,8 +112,7 @@ def test_not_routed_table_swaps_dialog_error_responses(client):
 
     assert response.status_code == 200
     assert (
-        'hx-on::before-swap="if (event.detail.xhr.status >= 400) '
-        'event.detail.shouldSwap = true"'
+        'hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"'
     ) in response.content.decode()
 
 
