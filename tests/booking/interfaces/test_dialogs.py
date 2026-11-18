@@ -51,7 +51,9 @@ def test_destination_dialog_shows_current_route_specification_and_filtered_optio
     assert 'Change destination' in content
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
+    assert response.context['destination_error'] == ''
     assert options is not None
+    assert 'USNYC' in options.group(1)
     assert 'CNHKG' not in options.group(1)
     assert 'AUMEL' not in options.group(1)
 
@@ -102,6 +104,18 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialog_returns_not_found_for_unknown_cargo(client, dialog):
+    call_command('seed_sample_data')
+
+    response = client.get(f'/admin/cargo/UNKNOWN/{dialog}/')
+
+    assert response.status_code == 404
+    assert 'UNKNOWN' in response.content.decode()
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_destination_dialog_rejects_origin_without_changing_route(client):
     call_command('seed_sample_data')
@@ -114,6 +128,7 @@ def test_destination_dialog_rejects_origin_without_changing_route(client):
     cargo = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
+    assert response.context['destination_error'] == 'Select a valid destination.'
     assert 'Select a valid destination.' in response.content.decode()
     assert 'aria-invalid="true"' in response.content.decode()
     assert cargo is not None
@@ -156,6 +171,17 @@ def test_destination_dialog_updates_destination_preserves_route_and_refreshes_ta
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_redirects_after_non_htmx_update(client):
+    call_command('seed_sample_data')
+
+    response = client.post('/admin/cargo/DEF789/destination/', {'destination': 'USNYC'})
+
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/admin/dashboard/'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_shows_current_route_specification_and_deadline(client):
     call_command('seed_sample_data')
     cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
@@ -168,6 +194,8 @@ def test_deadline_dialog_shows_current_route_specification_and_deadline(client):
     assert 'Change arrival deadline' in content
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
+    assert response.context['deadline_error'] == ''
+    assert f'min="{response.context["today"].isoformat()}"' in content
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
 
 
@@ -188,10 +216,23 @@ def test_deadline_dialog_shows_parse_error_without_changing_deadline(client):
     updated_cargo = cargo_repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
+    assert response.context['deadline_error'] == 'Enter a valid arrival deadline.'
     assert 'Enter a valid arrival deadline.' in content
     assert 'aria-invalid="true"' in content
     assert updated_cargo is not None
     assert updated_cargo.route_specification.arrival_deadline == original_deadline
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_keeps_an_empty_value_when_deadline_is_missing(client):
+    call_command('seed_sample_data')
+
+    response = client.post('/admin/cargo/DEF789/deadline/', {}, HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert response.context['deadline_value'] == ''
+    assert response.context['deadline_error'] == 'Enter a valid arrival deadline.'
 
 
 @pytest.mark.django_db

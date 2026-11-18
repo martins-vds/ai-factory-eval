@@ -29,3 +29,16 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:52:54+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-18T13:53:57+00:00 | focused-dialog-tests | 1 | 3.23 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `d1505eba75da152e` | E       AssertionError: Regex pattern did not match. |  |
 | 2026-11-18T13:54:05+00:00 | focused-dialog-tests | 0 | 3.27 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `bf52e4e51d0f2814` |  |  |
+| 2026-11-18T13:55:50+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T13:55:50+00:00 | build-django-check | 0 | 0.21 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T13:55:54+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T13:55:54+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T13:55:54+00:00 | idiom-layers | 0 | 0.09 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T13:55:54+00:00 | idiom-ui | 0 | 0.27 | `python .migration/harness/tools/check_ui.py` | `0b2fb4bd5013f20c` |  | gate=ui scope="templates changed since 0e7957db18c6fb70b7245b24e4a6ac8e854abe5f" templates=4 findings=0 |
+| 2026-11-18T13:56:29+00:00 | full-tests | 0 | 32.1 | `pytest -q` | `c0da0f03398460ff` |  |  |
+| 2026-11-18T13:57:08+00:00 | crap-pytest | 0 | 32.91 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `1d44ac13729415ec` |  |  |
+| 2026-11-18T13:57:08+00:00 | crap-lizard | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T13:57:08+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `30fa8e1a459b6241` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-18T13:58:38+00:00 | changed-mutation | 1 | 85.39 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `253271dc691504d1` | afs-mutation: FAILED score=0.679 threshold=0.8 killed=36 survived=17 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.679 threshold=0.8 killed=36 survived=17 files=1 base=origin/main |
+| 2026-11-18T13:59:39+00:00 | focused-dialog-tests | 0 | 4.17 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `0569c803c842924d` |  |  |
+| 2026-11-18T14:01:11+00:00 | changed-mutation | 0 | 88.63 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `e57962d7d34c962b` |  | gate=mutation score=0.981 threshold=0.8 killed=52 survived=1 files=1 base=origin/main |
