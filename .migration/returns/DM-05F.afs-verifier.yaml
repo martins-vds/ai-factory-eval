@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#1343
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1348
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+findings: []
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  data.cargo: "The ledger records table fidelity, not a use-case rule. DM-05F checks loaded delivery-state consistency in tests/data_migration/test_invariants.py::test_loaded_cargo_delivery_matches_its_handling_history."
+  data.leg: "Itinerary connectivity is a loaded-data consistency invariant, not a rule a use case rejects; checked in tests/data_migration/test_invariants.py::test_loaded_itinerary_legs_connect."
+  data.handling-event: "Foreign-key integrity is a loaded-data consistency invariant, not a rule a use case rejects; checked in tests/data_migration/test_invariants.py::test_loaded_handling_events_reference_existing_voyages_and_locations."
+  data.location: "Referenced by the handling-event integrity check; the ledger declares no use-case business rule."
+  data.voyage: "Referenced by the handling-event integrity check and carrier-movement schedule check; the ledger declares no use-case business rule."
+  data.carrier-movement: "Schedule chronology is a loaded-data consistency invariant, not a rule a use case rejects; checked in tests/data_migration/test_invariants.py::test_loaded_voyage_carrier_movements_are_in_schedule_order."
+inherited:
+  - where: src/cargotracker/data_migration/management/commands/export_data_snapshot.py (missing)
+    what: The configured target export command is unavailable, so independent snapshot reconciliation could not run; snapshot validation and loading passed.
+    origin: DM-05D
+    evidence: "run: verify-data-export"
