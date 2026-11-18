@@ -32,6 +32,7 @@ def _render_not_routed_table(request: HttpRequest, cargo_dashboard: CargoDashboa
 
 def create_destination_dialog_view(
     cargo_dashboard: CargoDashboard,
+    cargo_specification: CargoSpecification,
     list_shipping_locations: Callable[[], list[Location]],
 ) -> Callable[[HttpRequest, str], HttpResponse]:
     def destination_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
@@ -45,10 +46,34 @@ def create_destination_dialog_view(
                 cargo.route_specification.destination,
             )
         ]
+        destination_value = request.POST.get('destination', '')
+        destination_error = ''
+        if request.method == 'POST':
+            destination = next(
+                (
+                    location
+                    for location in destination_options
+                    if location.unlocode.value == destination_value
+                ),
+                None,
+            )
+            if destination is None:
+                destination_error = 'Choose a valid destination.'
+            else:
+                try:
+                    cargo_specification.change_destination(TrackingId(tracking_id), destination)
+                except LookupError as error:
+                    raise Http404(str(error)) from error
+                return _render_not_routed_table(request, cargo_dashboard)
         return render(
             request,
             'booking/dialogs/destination.html',
-            {'cargo': cargo, 'destination_options': destination_options},
+            {
+                'cargo': cargo,
+                'destination_options': destination_options,
+                'destination_value': destination_value,
+                'destination_error': destination_error,
+            },
         )
 
     return destination_dialog

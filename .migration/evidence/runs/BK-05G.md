@@ -13,3 +13,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:46:00+00:00 | deadline-validation-red | 2 | 0.95 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `1ec4f25e9da991e2` | __________ ERROR collecting tests/booking/interfaces/test_dialogs.py ___________ |  |
 | 2026-11-18T12:46:26+00:00 | deadline-validation-green | 0 | 3.3 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `16ea4f870f6be017` |  |  |
 | 2026-11-18T12:46:52+00:00 | deadline-update-green | 0 | 3.8 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `8e75ad31b1f8847b` |  |  |
+| 2026-11-18T12:47:21+00:00 | destination-update-red | 2 | 0.97 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `6bcb2598bff2f6b2` | __________ ERROR collecting tests/booking/interfaces/test_dialogs.py ___________ |  |
+| 2026-11-18T12:47:42+00:00 | destination-update-green | 1 | 4.3 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `8ec3e89232996f26` | assert response.status_code == 200 |  |
+| 2026-11-18T12:47:54+00:00 | destination-update-green-retry | 0 | 4.3 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `a3cda5da27ccfe0a` |  |  |
