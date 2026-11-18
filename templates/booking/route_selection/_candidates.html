@@ -1,0 +1,60 @@
+<section aria-labelledby="candidate-routes-heading" class="space-y-4">
+  <h2 class="text-xl font-semibold text-gray-900" id="candidate-routes-heading">
+    Potential routes: {{ candidates|length }}
+  </h2>
+  {% if candidates %}
+    <ol class="space-y-6">
+      {% for itinerary in candidates %}
+        <li class="rounded border border-gray-200 p-4">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
+            <h3 class="text-lg font-semibold text-gray-900">Route option #{{ forloop.counter }}</h3>
+            <form action="{{ assignment_url }}" method="post">
+              {% csrf_token %}
+              <input name="route_index" type="hidden" value="{{ forloop.counter0 }}">
+              <button
+                class="rounded bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800"
+                type="submit"
+              >Select route option {{ forloop.counter }}</button>
+            </form>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+              <thead>
+                <tr class="border-b border-gray-300">
+                  <th class="p-3" scope="col">Leg</th>
+                  <th class="p-3" scope="col">Voyage</th>
+                  <th class="p-3" scope="col">Load</th>
+                  <th class="p-3" scope="col">Date</th>
+                  <th class="p-3" scope="col">Unload</th>
+                  <th class="p-3" scope="col">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for leg in itinerary.legs %}
+                  <tr class="border-b border-gray-200">
+                    <th class="p-3" scope="row">Leg {{ forloop.counter }}</th>
+                    <td class="p-3 text-red-800">{{ leg.voyage.voyage_number.value }}</td>
+                    <td class="p-3">
+                      {{ leg.load_location.name }}<br>
+                      <span class="text-sm text-gray-600">{{ leg.load_location.unlocode.value }}</span>
+                    </td>
+                    <td class="p-3">{{ leg.load_time|date:"m/d/Y" }}</td>
+                    <td class="p-3">
+                      {{ leg.unload_location.name }}<br>
+                      <span class="text-sm text-gray-600">{{ leg.unload_location.unlocode.value }}</span>
+                    </td>
+                    <td class="p-3">{{ leg.unload_time|date:"m/d/Y" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="rounded border border-amber-300 bg-amber-50 p-4 text-gray-900">
+      {{ empty_message }}
+    </p>
+  {% endif %}
+</section>
