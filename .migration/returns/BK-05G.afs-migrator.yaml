@@ -1,0 +1,38 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-eval#1386
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1390
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.935
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_specification_and_stable_filtered_options
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_specification_and_deadline
+  - tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo
+  - tests/booking/interfaces/test_dialogs.py::test_missing_destination_shows_error_and_keeps_empty_option_selected
+  - tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_without_updating_cargo
+  - tests/booking/interfaces/test_dialogs.py::test_missing_deadline_shows_error_and_keeps_field_empty
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_fields_and_refreshes_table
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_route_fields_and_refreshes_table
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_both_dialogs_and_renders_htmx_errors
+  - tests/booking/interfaces/test_dialogs.py::test_dashboard_dialog_flows_update_cargo_and_refreshed_table
+  - tests/booking/interfaces/test_dialogs.py::test_stale_dialog_request_renders_an_error_fragment
+  - tests/booking/interfaces/test_dialogs.py::test_dialogs_reject_unsupported_methods
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+  - .migration/evidence/mutants/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+quirk_tickets:
+  - martins-vds/ai-factory-pilot-target#234
+  - martins-vds/ai-factory-pilot-target#235
+  - martins-vds/ai-factory-pilot-target#251
+new_tickets: []
+handoff: none
