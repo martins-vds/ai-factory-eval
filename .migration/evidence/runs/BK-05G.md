@@ -69,3 +69,11 @@ native destination form submission redirected to the dashboard and updated the c
 server and database were removed afterward. The development server did not have its generated
 Tailwind CSS asset, so visual styling was not assessed.
 | 2026-11-18T04:15:08+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:17:20+00:00 | verify-idiom-ruff | 0 | 0.04 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:17:20+00:00 | verify-build-compile | 0 | 0.12 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:17:20+00:00 | verify-idiom-format | 0 | 0.03 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T04:17:20+00:00 | verify-idiom-layers | 0 | 0.14 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T04:17:21+00:00 | verify-idiom-ui | 0 | 0.43 | `python .migration/harness/tools/check_ui.py` | `a714778f54361a26` |  | gate=ui scope="templates changed since 2dbd64cba4409e8976ce92a552eacc0b1ca691f7" templates=4 findings=0 |
+| 2026-11-18T04:17:22+00:00 | verify-build-django-check | 0 | 1.64 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T04:18:45+00:00 | verify-behavior-full | 0 | 75.58 | `pytest -q` | `1254f99396b81e4a` |  |  |
+| 2026-11-18T04:19:29+00:00 | verify-dialog-usecase-rules | 0 | 2.81 | `pytest -q tests/booking/interfaces/test_dialogs.py -k cargo_specification` | `5a40ad9ea320a369` |  |  |
