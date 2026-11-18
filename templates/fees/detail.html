@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee for {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The lending desk · {{ loan.id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ loan.id }}</h1>
+      <p class="mt-2">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">Days late</dt><dd>{{ quote.days_late }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">Late fee</dt><dd>Fee: ${{ fee_amount }}</dd></div>
+      </dl>
+      {% if payment_error %}<p role="alert">{{ payment_error }}</p>{% endif %}
+      {% if quote.amount_cents %}
+      <div id="payment-status" class="mt-6">
+        <form method="post" action="/ui/payments/{{ loan.id }}/"
+              hx-post="/ui/payments/{{ loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">Pay late fee</button>
+        </form>
+      </div>
+      {% else %}
+      <p class="mt-6" role="status">No late fee is due.</p>
+      {% endif %}
+      <a class="link link-hover mt-6 text-[#a94e37]" href="/ui/loans/{{ loan.id }}/">View this loan</a>
+    </div>
+  </article>
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true;
+  });
+</script>
+{% endblock %}
