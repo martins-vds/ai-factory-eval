@@ -26,13 +26,37 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.origin.unlocode.value }}</span>
             </td>
             <td class="p-3">
-              {{ cargo.route_specification.destination.name }}<br>
-              <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                type="button"
+                class="text-left text-blue-700 underline"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+              >
+                {{ cargo.route_specification.destination.name }}<br>
+                <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              </button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <button
+                type="button"
+                class="text-blue-700 underline"
+                aria-label="Change deadline for cargo {{ cargo.tracking_id.value }}"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+              >{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog
+    id="cargo-edit-dialog"
+    class="modal rounded-lg border-0 p-0 shadow-xl"
+    aria-label="Edit cargo"
+    hx-on::after-swap="if (!this.open) this.showModal()"
+  ></dialog>
 </section>
