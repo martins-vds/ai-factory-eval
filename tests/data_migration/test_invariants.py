@@ -9,7 +9,6 @@ import pytest
 from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
-from cargotracker.cargo.infrastructure.models import CargoRecord, LegRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -200,9 +199,10 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_
 
 
 def test_loaded_voyage_carrier_movements_are_in_schedule_order(loaded_snapshot):
-    assert CargoRecord.objects.exists()
-    assert LegRecord.objects.exists()
-    for voyage in VoyageRecord.objects.order_by('pk'):
+    voyages = list(VoyageRecord.objects.order_by('pk'))
+    assert voyages
+    assert CarrierMovementRecord.objects.exists()
+    for voyage in voyages:
         movements = list(
             CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
