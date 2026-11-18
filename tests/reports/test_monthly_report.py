@@ -5,6 +5,7 @@ from io import StringIO
 import pytest
 from django.core.management import call_command
 from django.utils import timezone
+
 from src.loans.models import Loan as DjangoLoan
 from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
 

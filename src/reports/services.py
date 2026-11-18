@@ -56,7 +56,9 @@ class MonthlyReportApplication:
                     member_totals.late_fees_cents += min(1000, days_late * 25)
 
         report = [
-            MemberMonthlyReport(member, values.loans_started, values.late_returns, values.late_fees_cents)
+            MemberMonthlyReport(
+                member, values.loans_started, values.late_returns, values.late_fees_cents
+            )
             for member, values in totals.items()
             if values.loans_started
         ]
