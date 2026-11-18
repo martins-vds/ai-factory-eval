@@ -7,7 +7,7 @@
   class="space-y-5"
 >
   {% csrf_token %}
-  <h2 class="text-xl font-semibold text-slate-900">
+  <h2 id="cargo-edit-dialog-title" class="text-xl font-semibold text-slate-900">
     Change destination for cargo {{ cargo.tracking_id.value }}
   </h2>
   <p>

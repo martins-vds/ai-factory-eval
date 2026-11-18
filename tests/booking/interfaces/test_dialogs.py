@@ -7,6 +7,7 @@ from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
+from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import (
     create_deadline_dialog_view,
     create_destination_dialog_view,
@@ -24,9 +25,11 @@ destination_view = create_destination_dialog_view(
     dashboard, specification, location_repository.find_all
 )
 deadline_view = create_deadline_dialog_view(dashboard, specification)
+dashboard_view, _ = create_booking_views(dashboard)
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/destination/', destination_view),
     path('admin/cargo/<str:tracking_id>/deadline/', deadline_view),
+    path('admin/dashboard/', dashboard_view),
 ]
 
 
@@ -147,3 +150,22 @@ def test_destination_update_refreshes_table_and_preserves_other_specification_fi
         == original_cargo.route_specification.arrival_deadline
     )
     assert updated_cargo.route_specification.destination.unlocode.value == 'USNYC'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_not_routed_table_opens_edit_dialogs_without_changing_route_link(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/dashboard/')
+    not_routed_table = response.content.decode().split('id="not-routed-cargo"', 1)[1].split(
+        '</section>', 1
+    )[0]
+
+    assert response.status_code == 200
+    assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
+    assert 'hx-get="/admin/cargo/DEF789/destination/"' in not_routed_table
+    assert 'hx-get="/admin/cargo/DEF789/deadline/"' in not_routed_table
+    assert 'aria-label="Change destination for cargo DEF789"' in not_routed_table
+    assert 'aria-label="Change deadline for cargo DEF789"' in not_routed_table
+    assert 'id="cargo-edit-dialog"' in not_routed_table
