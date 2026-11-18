@@ -79,7 +79,7 @@ def payment_page(request, loan_id):
             {'message': 'Payment received.', 'success': True},
         )
     if gateway_response.status_code == 200:
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect('fee_page', loan_id=loan_id)
     message = gateway_response.body.strip() or 'Payment gateway unavailable.'
     return _payment_failure(request, loan_id, message)
 

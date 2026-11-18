@@ -6,6 +6,7 @@ from pathlib import Path
 from threading import Thread
 
 import pytest
+from django.urls import reverse
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
@@ -200,6 +201,25 @@ def test_fee_page_uses_reading_room_layout_and_supports_htmx_payment(client):
     assert b'Fee: $4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'htmx:beforeSwap' in response.content
+
+
+@pytest.mark.django_db
+def test_payment_redirect_keeps_loan_id_inside_the_fee_page_route(
+    client,
+    payment_gateway,
+):
+    loan_id = 'https:attacker.example'
+    Loan.objects.create(
+        id=loan_id,
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 1, 1),
+    )
+
+    response = client.post(f'/ui/payments/{loan_id}/')
+
+    assert response.status_code == 302
+    assert response['Location'] == reverse('fee_page', kwargs={'loan_id': loan_id})
 
 
 @pytest.mark.django_db
