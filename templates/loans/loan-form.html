@@ -1,0 +1,16 @@
+<form class="mt-6 grid gap-4" method="post" action="/ui/loans/"
+      hx-post="/ui/loans/" hx-target="#loan-feedback" hx-swap="innerHTML"
+      hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+  {% csrf_token %}
+  <label class="form-control">
+    <span class="label-text">Member</span>
+    {{ form.member }}
+    {% for error in form.member.errors %}<span class="mt-2 text-sm text-[#a94e37]">{{ error }}</span>{% endfor %}
+  </label>
+  <label class="form-control">
+    <span class="label-text">ISBN</span>
+    {{ form.isbn }}
+    {% for error in form.isbn.errors %}<span class="mt-2 text-sm text-[#a94e37]">{{ error }}</span>{% endfor %}
+  </label>
+  <button class="btn btn-primary justify-self-start" type="submit">Record this loan</button>
+</form>
