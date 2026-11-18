@@ -10,6 +10,7 @@
     hx-post="/ui/loans/{{ loan.id }}/return/"
     hx-target="#loan-status"
     hx-swap="outerHTML"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
   >
     {% csrf_token %}
     <button class="btn btn-primary" type="submit">Return book</button>

@@ -8,10 +8,32 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
 boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1391]
+target:
+  components:
+    - src.loans.services.lend_loan
+    - src.loans.views.loan_lend
+    - src.loans.views.loan_lend_page
+    - src.loans.repository.LoanRepository
+    - src.loans.services.loan_line
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lending_use_case_rejects_missing_or_blank_fields
+  - tests/loans/test_circulation.py::test_lending_use_case_creates_a_loan_for_the_supplied_date
+  - tests/loans/test_circulation.py::test_lending_api_returns_the_characterized_record
+  - tests/loans/test_circulation.py::test_lending_api_rejects_blank_fields
+  - tests/loans/test_circulation.py::test_lending_page_renders_field_errors_for_blank_values
+  - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
+notes: "Blank-value rejection follows #39; delimiter-safe export follows #43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - {id: member-required, rule: "member must be present and contain a non-whitespace character", source: martins-vds/ai-factory-synthetic-target#39}
+  - {id: isbn-required, rule: "ISBN must be present and contain a non-whitespace character", source: martins-vds/ai-factory-synthetic-target#39}
+  - {id: lending-date, rule: "a new loan is recorded on the server's current local date", source: "legacy/src/main/java/lib/LoanRepository.java:27-34"}

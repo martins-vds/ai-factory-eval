@@ -8,10 +8,29 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1391]
+target:
+  components:
+    - src.loans.services.return_loan
+    - src.loans.repository.LoanRepository.save
+    - src.loans.models.Loan.returned_on
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_page
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_records_the_supplied_date
+  - tests/loans/test_circulation.py::test_return_use_case_preserves_the_original_date_on_repeat
+  - tests/loans/test_circulation.py::test_return_api_marks_an_unreturned_loan_and_rejects_a_repeat
+  - tests/loans/test_circulation.py::test_return_page_updates_status_and_rejects_repeated_or_unknown_returns
+notes: "The approved #41 ruling rejects a repeated return and preserves its original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - {id: return-once, rule: "a returned loan cannot be returned again or have its return date replaced", source: martins-vds/ai-factory-synthetic-target#41}
+  - {id: return-date, rule: "the first successful return records the server's current local date", source: "legacy/src/main/java/lib/LoanRepository.java:36-44"}

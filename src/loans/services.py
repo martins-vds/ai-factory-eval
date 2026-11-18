@@ -2,7 +2,7 @@ import csv
 from datetime import date
 from io import StringIO
 
-from .ports import LoanRepositoryPort, LoanRecord
+from .ports import LoanRecord, LoanRepositoryPort
 
 
 class LoanInputError(Exception):
