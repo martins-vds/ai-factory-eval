@@ -1,0 +1,65 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-eval#1370
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1436
+verdict: changes-required
+handoff: .migration/handoffs/BK-05G.md
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: not run, handed off"
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/specification.py:24-31
+    what: The use case accepts a destination excluded from the offered options, so callers can bypass the dialog restriction.
+    evidence: tests/booking/interfaces/test_dialogs.py::test_application_rejects_current_destination_not_offered
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_application_rejects_destination_matching_origin
+  - tests/booking/interfaces/test_dialogs.py::test_application_rejects_current_destination_not_offered
+  - tests/booking/interfaces/test_dialogs.py::test_application_rejects_unparsed_deadline_value
+ledger_issues: []
+quirk_tickets: []
+inherited: []
+rules:
+  - capability: booking.dialog-chain
+    rule: Successful dialog updates require an existing cargo; unknown cargo is refused before completion.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/application/test_specification.py::test_change_destination_raises_lookup_error_for_unknown_cargo
+    enforced: true
+    ledger_rule: successful-update-completes-dialog
+  - capability: booking.dialog-deadline
+    rule: An unparseable arrival deadline is refused before the cargo is updated.
+    use_case: CargoSpecification.change_deadline
+    test: tests/booking/interfaces/test_dialogs.py::test_application_rejects_unparsed_deadline_value
+    enforced: true
+    ledger_rule: deadline-must-parse
+  - capability: booking.dialog-deadline
+    rule: Changing the arrival deadline preserves the cargo origin and destination.
+    use_case: CargoSpecification.change_deadline
+    test: tests/booking/application/test_specification.py::test_change_deadline_preserves_other_specification_fields_and_resets_route_state
+    enforced: true
+    ledger_rule: deadline-preserves-route-fields
+  - capability: booking.dialog-destination
+    rule: A destination equal to the cargo origin or current destination is not an allowed selection.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/interfaces/test_dialogs.py::test_application_rejects_current_destination_not_offered
+    enforced: false
+    ledger_rule: destination-options-filtered
+  - capability: booking.dialog-destination
+    rule: A submitted destination must be one of the currently offered shipping locations.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/interfaces/test_dialogs.py::test_application_rejects_current_destination_not_offered
+    enforced: false
+    ledger_rule: destination-must-be-offered
+  - capability: booking.dialog-destination
+    rule: Changing the destination preserves the cargo origin and arrival deadline.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/application/test_specification.py::test_change_destination_preserves_other_specification_fields_and_resets_route_state
+    enforced: true
+    ledger_rule: destination-preserves-route-fields
+no_rules: {}

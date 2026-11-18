@@ -47,3 +47,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:00:44+00:00 | crap-coverage-final | 0 | 33.0 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `056486e0c070d641` |  |  |
 | 2026-11-18T13:00:44+00:00 | crap-lizard-final | 0 | 0.08 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T13:00:44+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `568138dadd34e9db` |  | gate=crap max=26.0 threshold=30 over=0 methods=207 |
+| 2026-11-18T14:07:02+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:11:13+00:00 | verifier-rule-tests | 0 | 10.59 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `d570f75143a405ca` |  |  |
+| 2026-11-18T14:12:23+00:00 | verifier-build-compileall | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:12:23+00:00 | verifier-build-django-check | 0 | 0.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T14:12:23+00:00 | verifier-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T14:12:23+00:00 | verifier-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T14:12:23+00:00 | verifier-idiom-layers | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T14:12:24+00:00 | verifier-idiom-ui | 0 | 0.4 | `python .migration/harness/tools/check_ui.py` | `074b6e638d75912f` |  | gate=ui scope="templates changed since 9b190a54b0f0e1fcba9c9daa4ad85ce07f4c27c9" templates=4 findings=0 |
+| 2026-11-18T14:13:25+00:00 | verifier-behavior | 0 | 60.95 | `pytest -q` | `6f28ea48a1339d62` |  |  |
+| 2026-11-18T14:14:27+00:00 | verifier-crap-coverage | 0 | 61.82 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `d7c6b683522dca10` |  |  |
+| 2026-11-18T14:14:27+00:00 | verifier-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:14:27+00:00 | verifier-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `568138dadd34e9db` |  | gate=crap max=26.0 threshold=30 over=0 methods=207 |
