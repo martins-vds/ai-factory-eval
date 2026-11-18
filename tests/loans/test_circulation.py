@@ -107,6 +107,8 @@ def test_lending_api_returns_the_characterized_record(client):
 @pytest.mark.parametrize(
     'fields',
     [
+        {'isbn': '123'},
+        {'member': 'reader'},
         {'member': '', 'isbn': '123'},
         {'member': 'reader', 'isbn': '   '},
         {'member': '', 'isbn': ''},
@@ -168,6 +170,22 @@ def test_lending_page_renders_field_errors_for_blank_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('fields', 'error'),
+    [
+        ({'isbn': '123'}, b'Member is required.'),
+        ({'member': 'reader'}, b'ISBN is required.'),
+        ({'member': '', 'isbn': '123'}, b'Member is required.'),
+    ],
+)
+def test_lending_page_renders_required_field_errors(client, fields, error):
+    response = client.post('/ui/loans/new/', fields)
+
+    assert response.status_code == 200
+    assert error in response.content
+
+
+@pytest.mark.django_db
 def test_htmx_lending_page_renders_blank_field_errors(client):
     response = client.post(
         '/ui/loans/new/',
@@ -189,6 +207,18 @@ def test_lending_page_creates_a_loan_and_redirects_to_its_details(client):
 
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L4/'
+
+
+@pytest.mark.django_db
+def test_lending_page_preserves_nonblank_whitespace(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': ' dee ', 'isbn': ' 123 '},
+    )
+    assert response.status_code == 302
+    detail = client.get(response['Location'])
+
+    assert b' dee  \xc2\xb7 ISBN  123 ' in detail.content
 
 
 @pytest.mark.django_db
