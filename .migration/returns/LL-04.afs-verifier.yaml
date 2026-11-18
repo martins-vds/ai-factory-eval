@@ -1,0 +1,38 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-eval#1293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1353
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.977
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings: []
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  about.page: The public About page is static information with no business rules or state transitions.
+inherited:
+  - where: src/loans/views.py:12
+    what: Mutation survivors #1 and #2 change the catalog template and context key; existing tests do not detect either change.
+    origin: LL-01
+    evidence: "run: verifier-mutation-changed"
+  - where: src/loans/forms.py:8
+    what: Mutation survivor #77 sets the LoanForm model to None without existing tests detecting the change.
+    origin: LL-02
+    evidence: "run: verifier-mutation-changed"
+  - where: src/loans/urls.py:9
+    what: Mutation survivor #42 changes the catalog route without existing tests detecting the change.
+    origin: LL-01
+    evidence: "run: verifier-mutation-changed"
+  - where: src/fees/services.py:24,31
+    what: Mutation survivors #1 and #3 remove immutability from Fee and GatewayResponse without existing tests detecting the change.
+    origin: LL-03
+    evidence: "run: verifier-mutation-changed"
