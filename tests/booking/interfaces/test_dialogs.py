@@ -104,6 +104,19 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
 
 
 @pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_not_routed_table_swaps_dialog_error_responses(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/dashboard/')
+
+    assert response.status_code == 200
+    assert (
+        'hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"'
+    ) in response.content.decode()
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize('dialog', ['destination', 'deadline'])
 @override_settings(ROOT_URLCONF=__name__)
 def test_dialog_returns_not_found_for_unknown_cargo(client, dialog):
@@ -242,6 +255,20 @@ def test_deadline_update_use_case_rejects_an_unparsed_value():
 
     with pytest.raises(TypeError, match='Arrival deadline must be a datetime'):
         specification.change_deadline(TrackingId('DEF789'), 'not-a-date')
+
+
+@pytest.mark.django_db
+def test_destination_update_use_case_rejects_origin_as_destination():
+    call_command('seed_sample_data')
+    cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
+    assert cargo is not None
+    specification = CargoSpecification(cargo_repository, DjangoHandlingEventRepository())
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(
+            cargo.tracking_id,
+            cargo.route_specification.origin,
+        )
 
 
 @pytest.mark.django_db
