@@ -1,0 +1,27 @@
+role: afs-verifier
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#1473
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1490
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+findings: []
+tests_added: []
+ledger_issues:
+  - "DM-05F declares no plan capabilities, and no data.* ledger entry links to this ticket."
+quirk_tickets: []
+rules: []
+no_rules:
+  data-migration: "No use-case refusal rules are recorded for DM-05F; its four explicit requirements are post-load data invariants covered by the tests."
+inherited:
+  - where: src/cargotracker/data_migration/management/commands/export_data_snapshot.py
+    what: The profile declares export_data_snapshot, but the management command is absent; independent reconciliation cannot run.
+    origin: DM-05D
+    evidence: "run: data-export"
