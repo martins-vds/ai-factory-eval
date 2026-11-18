@@ -30,4 +30,4 @@ rules:
   - id: report-ordering
     rule: Sort by total late fees descending, then member id ascending.
     source: legacy/docs/reports-spec.md:5
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable. The report reuses fees.calculation, so unreturned loans include fees as of the local report date."
