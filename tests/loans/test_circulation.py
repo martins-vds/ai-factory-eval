@@ -5,7 +5,7 @@ from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
-from src.loans.services import InvalidLoan, LoanUseCases
+from src.loans.services import InvalidLoan, LoanAlreadyReturned, LoanUseCases, loan_line
 
 
 class LoanRecorder:
@@ -14,6 +14,17 @@ class LoanRecorder:
 
     def lend(self, member, isbn, lent_on):
         self.requests.append((member, isbn, lent_on))
+
+
+class ReturnRecorder:
+    def __init__(self, loan, updated):
+        self.loan = loan
+        self.updated = updated
+        self.requests = []
+
+    def mark_returned(self, loan_id, returned_on):
+        self.requests.append((loan_id, returned_on))
+        return self.loan, self.updated
 
 
 class FixedClock:
@@ -60,7 +71,9 @@ def test_lend_endpoint_rejects_missing_or_blank_fields(client, fields):
 @pytest.mark.parametrize(
     ('member', 'isbn', 'expected_fields'),
     [
+        ('', '123', {'member': 'This field is required.'}),
         ('   ', '123', {'member': 'This field is required.'}),
+        ('reader', '', {'isbn': 'This field is required.'}),
         ('reader', '   ', {'isbn': 'This field is required.'}),
         (
             '   ',
@@ -83,6 +96,74 @@ def test_lend_use_case_reports_each_blank_field_before_creating_a_loan(
 
     assert error.value.fields == expected_fields
     assert repository.requests == []
+
+
+def test_lend_use_case_uses_the_clock_date():
+    repository = LoanRecorder()
+    use_cases = LoanUseCases(repository, FixedClock())
+
+    use_cases.lend('reader', '123')
+
+    assert repository.requests == [('reader', '123', date(2026, 11, 18))]
+
+
+def test_lend_use_case_preserves_surrounding_whitespace_in_nonblank_values():
+    repository = LoanRecorder()
+    use_cases = LoanUseCases(repository, FixedClock())
+
+    use_cases.lend(' reader ', ' 123 ')
+
+    assert repository.requests == [(' reader ', ' 123 ', date(2026, 11, 18))]
+
+
+def test_loan_line_escapes_field_delimiters_quotes_and_line_breaks():
+    loan = Loan(
+        id='L9',
+        member='Reader; Example\nSecond line',
+        isbn='978"xyz',
+        lent_on=date(2026, 3, 1),
+    )
+
+    assert loan_line(loan) == (
+        'L9;"Reader; Example\nSecond line";"978""xyz";2026-03-01;2026-03-15;\n'
+    )
+
+
+def test_return_use_case_uses_the_clock_date_for_a_first_return():
+    loan = Loan(id='L1', member='reader', isbn='123', lent_on=date(2026, 1, 2))
+    repository = ReturnRecorder(loan, True)
+    use_cases = LoanUseCases(repository, FixedClock())
+
+    assert use_cases.return_loan('L1') is loan
+    assert repository.requests == [('L1', date(2026, 11, 18))]
+
+
+def test_return_use_case_rejects_repeated_return_without_replacing_the_date():
+    original_return_date = date(2026, 1, 20)
+    loan = Loan(
+        id='L2',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 1, 10),
+        returned_on=original_return_date,
+    )
+    repository = ReturnRecorder(loan, False)
+    use_cases = LoanUseCases(repository, FixedClock())
+
+    with pytest.raises(LoanAlreadyReturned) as error:
+        use_cases.return_loan('L2')
+
+    assert error.value.loan is loan
+    assert repository.requests == [('L2', date(2026, 11, 18))]
+    assert loan.returned_on == original_return_date
+
+
+def test_return_use_case_reports_unknown_loan_without_a_return():
+    repository = ReturnRecorder(None, False)
+    use_cases = LoanUseCases(repository, FixedClock())
+
+    assert use_cases.return_loan('unknown') is None
+    assert repository.requests == [('unknown', date(2026, 11, 18))]
 
 
 @pytest.mark.django_db
