@@ -21,6 +21,7 @@ characterization_tier: C
 evidence:
   - tests/reports/test_monthly_report.py::test_monthly_report_lists_member_totals_for_the_previous_month
   - tests/reports/test_monthly_report.py::test_monthly_report_uses_calendar_months_and_counts_accrued_fees
+  - tests/reports/test_monthly_report.py::test_monthly_report_caps_each_loan_fee
   - .migration/evidence/runs/LL-05.md
 rules:
   - id: prior-calendar-month
