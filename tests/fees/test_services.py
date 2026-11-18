@@ -4,7 +4,12 @@ from decimal import Decimal
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import (
+    FeeApplication,
+    PaymentApplication,
+    PaymentGatewayError,
+    PaymentResult,
+)
 
 
 @dataclass
@@ -72,3 +77,45 @@ def test_fee_calculation_returns_none_for_an_unknown_loan():
     application = FeeApplication(LoanRepository(None), FixedClock(date(2026, 1, 1)))
 
     assert application.calculate('unknown') is None
+
+
+class PaymentGateway:
+    def __init__(self, result=None, error=None):
+        self.result = result
+        self.error = error
+        self.calls = []
+
+    def charge(self, loan_id):
+        self.calls.append(loan_id)
+        if self.error:
+            raise self.error
+        return self.result
+
+
+def test_payment_requires_an_existing_loan_before_calling_the_gateway():
+    gateway = PaymentGateway()
+    application = PaymentApplication(LoanRepository(None), gateway)
+
+    assert application.pay('unknown') is None
+    assert gateway.calls == []
+
+
+def test_payment_returns_the_gateway_status_and_body():
+    loan = Loan('L1', date(2026, 1, 1))
+    gateway_result = PaymentResult(503, 'declined\n')
+    gateway = PaymentGateway(result=gateway_result)
+    application = PaymentApplication(LoanRepository(loan), gateway)
+
+    assert application.pay('L1') == gateway_result
+    assert gateway.calls == ['L1']
+
+
+def test_payment_preserves_an_interrupted_gateway_call_as_the_failure_cause():
+    loan = Loan('L1', date(2026, 1, 1))
+    interruption = InterruptedError('payment request interrupted')
+    application = PaymentApplication(LoanRepository(loan), PaymentGateway(error=interruption))
+
+    with pytest.raises(PaymentGatewayError) as error:
+        application.pay('L1')
+
+    assert error.value.__cause__ is interruption
