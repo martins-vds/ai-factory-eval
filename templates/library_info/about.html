@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}About the Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">A place for curious readers</p>
+  <h1 class="mt-2 text-5xl">About the Lending Library</h1>
+  <p class="mt-6 text-xl">A neighborhood collection, kept in motion by the people who read it.</p>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p>Open Monday to Saturday, 9:00 to 18:00.</p>
+      <p>Books are lent for 14 days.</p>
+      <p>
+        Contact:
+        <a class="link link-hover text-[#a94e37]" href="mailto:desk@lending-library.invalid">
+          desk@lending-library.invalid
+        </a>
+      </p>
+    </div>
+  </article>
+</section>
+{% endblock %}

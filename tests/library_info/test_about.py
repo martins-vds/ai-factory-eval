@@ -20,6 +20,13 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.content.decode() == expected['body']
 
 
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_only_allow_get(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_real_browser_renders_the_reading_room_about_page(live_server):
     with sync_playwright() as playwright:
@@ -36,6 +43,9 @@ def test_real_browser_renders_the_reading_room_about_page(live_server):
             assert page.get_by_role('link', name='desk@lending-library.invalid').get_attribute(
                 'href'
             ) == 'mailto:desk@lending-library.invalid'
+            assert page.locator('link[href="/static/css/tailwind.css"]').count() == 1
+            assert page.locator('link[href*="daisyui@4.12.24"]').count() == 1
+            assert page.locator('script[src*="htmx.org@2.0.11"]').count() == 1
             assert page.locator('body').get_attribute('class') == (
                 'min-h-screen bg-[#f5f0e5] text-[#2f3428] font-serif'
             )
