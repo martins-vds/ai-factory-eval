@@ -1,0 +1,43 @@
+<form
+  method="post"
+  action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+  hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+  hx-target="#cargo-edit-dialog-content"
+  hx-swap="innerHTML"
+  class="space-y-5"
+>
+  {% csrf_token %}
+  <h2 id="cargo-edit-dialog-title" class="text-xl font-semibold text-slate-900">
+    Change destination for cargo {{ cargo.tracking_id.value }}
+  </h2>
+  <p>
+    {{ cargo.route_specification.origin.name }} to
+    {{ cargo.route_specification.destination.name }}
+  </p>
+  <label class="block font-medium" for="destination">Destination</label>
+  {% if destination_error %}
+    <p id="destination-error" role="alert" class="text-red-700">{{ destination_error }}</p>
+  {% endif %}
+  <select
+    id="destination"
+    name="destination"
+    {% if destination_error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
+    class="select select-bordered w-full focus-visible:ring-2 focus-visible:ring-blue-600"
+  >
+    {% for location in destination_options %}
+      <option
+        value="{{ location.unlocode.value }}"
+      >{{ location.name }} ({{ location.unlocode.value }})</option>
+    {% endfor %}
+  </select>
+  <div class="flex justify-end gap-3">
+    <button type="submit" class="btn btn-primary min-h-11 focus-visible:ring-2 focus-visible:ring-blue-600">
+      Update
+    </button>
+  </div>
+</form>
+<form method="dialog" class="mt-3 flex justify-end">
+  <button type="submit" class="btn btn-ghost min-h-11 focus-visible:ring-2 focus-visible:ring-blue-600">
+    Cancel
+  </button>
+</form>

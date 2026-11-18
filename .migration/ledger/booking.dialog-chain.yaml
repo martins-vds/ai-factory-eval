@@ -5,16 +5,22 @@ source:
   graph_node: class:src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:ChangeDestinationDialog
   location: src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:15-43
   risk: {crap: 2, complexity: 1, coverage: 0.0}
-boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
+boundary: "The not-routed table opens destination and deadline dialogs; updates call the booking specification use cases and refresh the table, while Cancel closes the native dialog."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: ["martins-vds/ai-factory-pilot-target#294"]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_destination_dialog_view
+    - cargotracker.booking.interfaces.dialogs.views.create_deadline_dialog_view
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
-  - ".migration/characterization/booking/source-tests.json"
-  - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_edit_dialogs_without_changing_route_link"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_refreshes_table_and_preserves_other_specification_fields"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_refreshes_not_routed_table_and_preserves_route"
+  - ".migration/evidence/runs/BK-05G.md"
+  - ".migration/evidence/mutants/BK-05G.md"
+no_rules: "Dialog opening, cancellation, and table refresh are interaction wiring; destination and deadline business rules remain in their specification capabilities."
