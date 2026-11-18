@@ -6,19 +6,22 @@ from django.test import override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
+from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dialogs.views import (
     create_deadline_dialog_view,
     create_destination_dialog_view,
 )
-from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
 cargo_repository = DjangoCargoRepository()
 location_repository = DjangoLocationRepository()
 dashboard = CargoDashboard(cargo_repository)
+specification = CargoSpecification(cargo_repository, DjangoHandlingEventRepository())
 destination_view = create_destination_dialog_view(dashboard, location_repository.find_all)
-deadline_view = create_deadline_dialog_view(dashboard)
+deadline_view = create_deadline_dialog_view(dashboard, specification)
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/destination/', destination_view),
     path('admin/cargo/<str:tracking_id>/deadline/', deadline_view),
@@ -61,3 +64,22 @@ def test_deadline_dialog_shows_current_route_and_deadline(client):
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_invalid_deadline_renders_field_error_without_updating_cargo(client):
+    call_command('seed_sample_data')
+    original_deadline = dashboard.get_cargo_details(TrackingId('DEF789')).route_specification.arrival_deadline
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': 'not-a-date'},
+        HTTP_HX_REQUEST='true',
+    )
+    updated_cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Enter a valid arrival deadline.' in response.content.decode()
+    assert 'aria-invalid="true"' in response.content.decode()
+    assert updated_cargo.route_specification.arrival_deadline == original_deadline
