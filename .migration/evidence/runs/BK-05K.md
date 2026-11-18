@@ -30,3 +30,18 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T22:25:53+00:00 | focused-expired-cargo | 0 | 4.14 | `pytest -q tests/test_htmx_errors.py` | `7ded2b4efd0963a6` |  |  |
 | 2026-11-18T22:25:58+00:00 | ruff-check-post-review | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-18T22:27:28+00:00 | regression-post-review | 0 | 85.3 | `pytest -q` | `eefdf9d8c6b07f3f` |  |  |
+| 2026-11-18T22:30:50+00:00 | red-default-catchall | 1 | 4.13 | `pytest -q tests/test_htmx_errors.py` | `e6d4c22d349e6fa5` | assert response.status_code == 500 |  |
+| 2026-11-18T22:31:10+00:00 | focused-final | 0 | 4.0 | `pytest -q tests/test_htmx_errors.py` | `0f03d454dd7d0a3a` |  |  |
+| 2026-11-18T22:31:15+00:00 | ui-all-final | 0 | 0.35 | `python .migration/harness/tools/check_ui.py --all` | `0cb805740bfb2d16` |  | gate=ui scope="every template" templates=21 findings=0 |
+| 2026-11-18T22:31:20+00:00 | build-compile-final | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T22:31:24+00:00 | build-check-final | 0 | 0.39 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T22:31:28+00:00 | ruff-check-final-v2 | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T22:31:33+00:00 | ruff-format-final-v2 | 0 | 0.01 | `ruff format --check` | `02bed28762c49640` |  |  |
+| 2026-11-18T22:31:37+00:00 | layers-final | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `59bfd54275a9b5a4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T22:31:42+00:00 | ui-changed-final | 0 | 0.38 | `python .migration/harness/tools/check_ui.py` | `ce9e0484bc0f7c63` |  | gate=ui scope="templates changed since origin/main" templates=2 findings=0 |
+| 2026-11-18T22:33:04+00:00 | behavior-final-v2 | 0 | 77.08 | `pytest -q` | `cccd3629c0d1340d` |  |  |
+| 2026-11-18T22:34:25+00:00 | crap-coverage-final-v2 | 0 | 76.0 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `4b31854015afacd6` |  |  |
+| 2026-11-18T22:34:30+00:00 | crap-lizard-final-v2 | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T22:34:34+00:00 | crap-score-final-v2 | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `dbeb57242d6b2a6b` |  | gate=crap max=26.0 threshold=30 over=0 methods=213 |
+| 2026-11-18T22:34:39+00:00 | mutation-changed-final-v2 | 0 | 0.08 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-18T22:36:02+00:00 | regression-final-v2 | 0 | 76.09 | `pytest -q` | `cb860d3b6d428cb1` |  |  |
