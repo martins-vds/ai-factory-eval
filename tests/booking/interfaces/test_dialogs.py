@@ -146,7 +146,10 @@ def test_destination_dialog_rejects_locations_outside_the_filtered_options(clien
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select an available destination.' in content
+    assert re.search(
+        r'<p\b[^>]*role="alert"[^>]*>Select an available destination\.</p>',
+        content,
+    )
     assert 'role="alert"' in content
     assert 'Hong Kong' in content and 'Melbourne' in content
     assert re.search(r'<option\s+value="USNYC"', content)
@@ -236,13 +239,19 @@ def test_deadline_dialog_prefills_value_and_shows_parse_error(client):
     invalid_content = invalid_response.content.decode()
 
     assert invalid_response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in invalid_content
+    assert re.search(
+        r'<p\b[^>]*role="alert"[^>]*>Enter a valid arrival deadline\.</p>',
+        invalid_content,
+    )
     assert 'aria-invalid="true"' in invalid_content
     assert 'aria-describedby="deadline-error"' in invalid_content
 
     missing_response = client.post('/admin/cargo/DEF789/deadline/')
     assert 'value=""' in missing_response.content.decode()
-    assert 'Enter a valid arrival deadline.' in missing_response.content.decode()
+    assert re.search(
+        r'<p\b[^>]*role="alert"[^>]*>Enter a valid arrival deadline\.</p>',
+        missing_response.content.decode(),
+    )
 
 
 @pytest.mark.django_db
