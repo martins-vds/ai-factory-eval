@@ -114,6 +114,19 @@ def test_fee_calculation_uses_return_date_instead_of_today():
     assert fee.amount_cents == 75
 
 
+def test_fee_calculation_clamps_days_before_due_date():
+    due_on = date(2026, 1, 1)
+    fees = FeeApplication(
+        FakeLoanRepository(LoanRecord('L1', due_on)),
+        FixedClock(due_on - timedelta(days=3)),
+    )
+
+    fee = fees.calculate('L1')
+
+    assert fee.late_days == 0
+    assert fee.amount_cents == 0
+
+
 def test_fee_calculation_returns_none_for_unknown_loan():
     fees = FeeApplication(FakeLoanRepository(None), FixedClock(date(2026, 1, 1)))
 
@@ -235,3 +248,27 @@ def test_unknown_payment_result_is_not_found_without_gateway_call():
     assert result.body == 'no such loan\n'
     assert result.failure is None
     assert result.loan is None
+
+
+@pytest.mark.parametrize(
+    ('gateway_status', 'expected_status'),
+    [(200, 200), (503, 502)],
+)
+def test_payment_application_maps_gateway_status_and_preserves_body(
+    gateway_status, expected_status
+):
+    loan = LoanRecord('L1', date(2026, 1, 1))
+
+    class RespondingGateway:
+        def charge(self, loan_id):
+            return GatewayResponse(gateway_status, 'gateway response\n')
+
+    result = PaymentApplication(
+        FakeLoanRepository(loan),
+        RespondingGateway(),
+    ).pay('L1')
+
+    assert result.status_code == expected_status
+    assert result.body == 'gateway response\n'
+    assert result.failure is None
+    assert result.loan is loan
