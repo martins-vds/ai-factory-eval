@@ -26,10 +26,17 @@ class PaymentGatewayError(Exception):
 class PaymentResult:
     status_code: int
     body: str
+    failure: Exception | None = None
+
+
+@dataclass(frozen=True)
+class GatewayResponse:
+    status_code: int
+    body: str
 
 
 class PaymentGateway(Protocol):
-    def charge(self, loan_id: str) -> PaymentResult: ...
+    def charge(self, loan_id: str) -> GatewayResponse: ...
 
 
 @dataclass(frozen=True)
@@ -51,7 +58,7 @@ class FeeApplication:
             return None
 
         late_days = max(0, ((loan.returned_on or self.clock.today()) - loan.due_on).days)
-        billable_days = max(0, late_days - 2)
+        billable_days = late_days if late_days > 2 else 0
         amount = min(Decimal('0.25') * billable_days, Decimal('10.00'))
 
         return LateFee(loan.id, loan.due_on, late_days, amount)
@@ -67,6 +74,9 @@ class PaymentApplication:
             return None
 
         try:
-            return self.gateway.charge(loan_id)
-        except InterruptedError as error:
-            raise PaymentGatewayError('Payment gateway request was interrupted') from error
+            response = self.gateway.charge(loan_id)
+        except (InterruptedError, PaymentGatewayError) as error:
+            return PaymentResult(502, 'payment gateway unavailable\n', error)
+
+        status_code = 200 if response.status_code == 200 else 502
+        return PaymentResult(status_code, response.body)

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Payment for {{ loan_id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <h1 class="text-3xl font-bold">Payment for loan {{ loan_id }}</h1>
+  <div class="mt-6">{% include "fees/payment-status.html" %}</div>
+  <a class="link link-hover text-[#a94e37]" href="/ui/fees/{{ loan_id }}/">Back to the late fee</a>
+</section>
+{% endblock %}

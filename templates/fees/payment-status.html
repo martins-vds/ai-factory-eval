@@ -1,0 +1,5 @@
+{% if succeeded %}
+<p class="alert mt-4" role="status">{{ payment_body }}</p>
+{% else %}
+<p class="alert alert-error mt-4" role="alert">{{ payment_body }}</p>
+{% endif %}

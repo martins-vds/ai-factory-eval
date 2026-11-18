@@ -6,6 +6,7 @@ import pytest
 
 from src.fees.services import (
     FeeApplication,
+    GatewayResponse,
     PaymentApplication,
     PaymentGatewayError,
     PaymentResult,
@@ -40,8 +41,8 @@ class FixedClock:
     [
         (0, Decimal('0.00')),
         (2, Decimal('0.00')),
-        (3, Decimal('0.25')),
-        (42, Decimal('10.00')),
+        (3, Decimal('0.75')),
+        (40, Decimal('10.00')),
         (60, Decimal('10.00')),
     ],
 )
@@ -100,22 +101,36 @@ def test_payment_requires_an_existing_loan_before_calling_the_gateway():
     assert gateway.calls == []
 
 
-def test_payment_returns_the_gateway_status_and_body():
+def test_payment_passes_a_successful_gateway_response_through():
     loan = Loan('L1', date(2026, 1, 1))
-    gateway_result = PaymentResult(503, 'declined\n')
-    gateway = PaymentGateway(result=gateway_result)
+    gateway = PaymentGateway(result=GatewayResponse(200, 'charged\n'))
     application = PaymentApplication(LoanRepository(loan), gateway)
 
-    assert application.pay('L1') == gateway_result
+    assert application.pay('L1') == PaymentResult(200, 'charged\n')
+
+
+@pytest.mark.parametrize('status_code', [201, 502, 503])
+def test_payment_maps_every_non_success_gateway_status_to_bad_gateway(status_code):
+    loan = Loan('L1', date(2026, 1, 1))
+    gateway_response = GatewayResponse(status_code, 'declined\n')
+    gateway = PaymentGateway(result=gateway_response)
+    application = PaymentApplication(LoanRepository(loan), gateway)
+
+    assert application.pay('L1') == PaymentResult(502, 'declined\n')
     assert gateway.calls == ['L1']
 
 
-def test_payment_preserves_an_interrupted_gateway_call_as_the_failure_cause():
+@pytest.mark.parametrize(
+    'failure',
+    [
+        InterruptedError('payment request interrupted'),
+        PaymentGatewayError('Payment gateway is unavailable'),
+    ],
+)
+def test_payment_returns_gateway_failure_without_losing_the_exception(failure):
     loan = Loan('L1', date(2026, 1, 1))
-    interruption = InterruptedError('payment request interrupted')
-    application = PaymentApplication(LoanRepository(loan), PaymentGateway(error=interruption))
+    application = PaymentApplication(LoanRepository(loan), PaymentGateway(error=failure))
 
-    with pytest.raises(PaymentGatewayError) as error:
-        application.pay('L1')
+    result = application.pay('L1')
 
-    assert error.value.__cause__ is interruption
+    assert result == PaymentResult(502, 'payment gateway unavailable\n', failure)
