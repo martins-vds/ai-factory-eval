@@ -1,0 +1,23 @@
+role: afs-migrator
+ticket: BK-05K
+issue: martins-vds/ai-factory-pilot-target#501
+pr: martins-vds/ai-factory-pilot-target#502
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05K.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty: ui
+specialty_evidence:
+  - .migration/evidence/runs/BK-05K.md
+  - tests/test_htmx_errors.py
+rules: []
+no_rules: {}

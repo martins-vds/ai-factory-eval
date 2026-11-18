@@ -22,6 +22,12 @@ def _assert_page_handles_error_swaps(page, target, fragment=None):
     assert b'id="' + target_id + b'"' in target_content
 
 
+@pytest.fixture
+def dashboard_page(client):
+    call_command('seed_sample_data')
+    return client.get('/admin/dashboard/')
+
+
 @pytest.mark.django_db
 def test_live_map_page_swaps_failed_marker_response(client, monkeypatch):
     page = client.get('/admin/live-map/')
@@ -37,28 +43,24 @@ def test_live_map_page_swaps_failed_marker_response(client, monkeypatch):
     response = client.get('/admin/live-map/markers/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 500
-    assert response.content
+    assert b'Server Error (500)' in response.content
     _assert_page_handles_error_swaps(page, '#live-map-markers')
 
 
 @pytest.mark.django_db
-def test_not_routed_table_page_swaps_unknown_cargo_response(client):
-    call_command('seed_sample_data')
-    page = client.get('/admin/dashboard/')
+def test_not_routed_table_page_swaps_unknown_cargo_response(client, dashboard_page):
     response = client.get(
         '/admin/cargo/UNKNOWN/destination/',
         HTTP_HX_REQUEST='true',
     )
 
     assert response.status_code == 404
-    assert response.content
-    _assert_page_handles_error_swaps(page, '#cargo-edit-dialog-content')
+    assert b'The requested resource was not found on this server.' in response.content
+    _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
 
 
 @pytest.mark.django_db
-def test_deadline_dialog_page_swaps_invalid_deadline_error(client):
-    call_command('seed_sample_data')
-    page = client.get('/admin/dashboard/')
+def test_deadline_dialog_page_swaps_invalid_deadline_error(client, dashboard_page):
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
         {'deadline': 'not-a-date'},
@@ -67,13 +69,11 @@ def test_deadline_dialog_page_swaps_invalid_deadline_error(client):
 
     assert response.status_code == 200
     assert b'Enter a valid arrival deadline.' in response.content
-    _assert_page_handles_error_swaps(page, '#cargo-edit-dialog-content')
+    _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
 
 
 @pytest.mark.django_db
-def test_destination_dialog_page_swaps_invalid_destination_error(client):
-    call_command('seed_sample_data')
-    page = client.get('/admin/dashboard/')
+def test_destination_dialog_page_swaps_invalid_destination_error(client, dashboard_page):
     response = client.post(
         '/admin/cargo/DEF789/destination/',
         {'destination': 'UNKNOWN'},
@@ -82,7 +82,7 @@ def test_destination_dialog_page_swaps_invalid_destination_error(client):
 
     assert response.status_code == 200
     assert b'Select a valid destination.' in response.content
-    _assert_page_handles_error_swaps(page, '#cargo-edit-dialog-content')
+    _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
 
 
 @pytest.mark.django_db

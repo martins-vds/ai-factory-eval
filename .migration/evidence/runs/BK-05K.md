@@ -23,3 +23,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T22:14:27+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `dbeb57242d6b2a6b` |  | gate=crap max=26.0 threshold=30 over=0 methods=213 |
 | 2026-11-18T22:14:32+00:00 | mutation-changed | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-18T22:16:05+00:00 | regression | 0 | 76.14 | `pytest -q` | `c2aab12ea8c91682` |  |  |
+| 2026-11-18T22:18:37+00:00 | focused-assertions | 0 | 4.0 | `pytest -q tests/test_htmx_errors.py` | `0f03d454dd7d0a3a` |  |  |
+| 2026-11-18T22:18:41+00:00 | ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T22:18:45+00:00 | ruff-format-final | 0 | 0.01 | `ruff format --check` | `02bed28762c49640` |  |  |
+| 2026-11-18T22:20:07+00:00 | regression-final | 0 | 75.53 | `pytest -q` | `b9b679cd673b15eb` |  |  |
