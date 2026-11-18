@@ -28,11 +28,45 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <a
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                class="btn btn-sm min-h-11"
+                aria-haspopup="dialog"
+                aria-controls="booking-dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#booking-dialog-content"
+                hx-swap="innerHTML"
+                hx-on::response-error="document.getElementById('booking-dialog-content').textContent = 'Unable to load the destination dialog.'; if (!document.getElementById('booking-dialog').open) document.getElementById('booking-dialog').showModal()"
+              >
+                Change destination
+              </a>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+              <a
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                class="btn btn-sm min-h-11"
+                aria-haspopup="dialog"
+                aria-controls="booking-dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#booking-dialog-content"
+                hx-swap="innerHTML"
+                hx-on::response-error="document.getElementById('booking-dialog-content').textContent = 'Unable to load the deadline dialog.'; if (!document.getElementById('booking-dialog').open) document.getElementById('booking-dialog').showModal()"
+              >
+                Change deadline
+              </a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog
+    id="booking-dialog"
+    class="modal"
+    aria-labelledby="booking-dialog-heading"
+    hx-on::after-swap="if (!this.open) this.showModal()"
+  >
+    <div id="booking-dialog-content" class="modal-box"></div>
+  </dialog>
 </section>
