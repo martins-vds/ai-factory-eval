@@ -12,6 +12,7 @@ tickets:
 target:
   components:
     - config.settings.INSTALLED_APPS
+    - src.reports.composition.monthly_report_application
     - src.reports.services.MonthlyReportApplication
     - src.reports.repository.DjangoMonthlyReportRepository
     - src.reports.management.commands.monthly_report.Command
@@ -25,16 +26,16 @@ evidence:
   - .migration/evidence/runs/LL-05.md
 rules:
   - id: prior-calendar-month
-    rule: "Report the prior calendar month using a half-open date range in the server's default time zone."
+    rule: "Select loans started in the prior calendar month using a half-open date range in the server's default time zone; the external operator runs the command on the month's first day."
     source: ".migration/plan/monthly-report.md"
   - id: member-aggregation
     rule: "Emit one row for each member with at least one loan started in the report month, count those loans, and omit other members."
     source: "legacy/docs/reports-spec.md:6-9"
   - id: late-returns
-    rule: "Count in-month loans returned after their due date as late returns."
+    rule: "Count each loan started in the report month that has been returned after its due date by report generation time."
     source: "legacy/docs/reports-spec.md:7; .migration/references/characterization-SY-05.md"
   - id: late-fees
-    rule: "Sum late fees in cents for in-month loans, waiving up to two late days, charging 25 cents per later day, and capping each loan at 1000 cents."
+    rule: "Sum fees in cents for report-month loans using each loan's return date or the report date if still open; waive up to two late days, charge 25 cents per later day, and cap each loan at 1000 cents."
     source: ".migration/references/characterization-SY-05.md; legacy/src/main/java/lib/LateFeeView.java:31-37"
   - id: ordering
     rule: "Sort by total late fees descending, then member id ascending."
