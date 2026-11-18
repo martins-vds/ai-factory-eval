@@ -42,3 +42,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:25:00+00:00 | mutation-changed | 0 | 491.33 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `108a5fc02c75c6d3` |  | gate=mutation score=0.954 threshold=0.8 killed=83 survived=4 files=1 base=origin/main |
 | 2026-11-18T13:29:32+00:00 | dialogs-targeted | 0 | 7.66 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `038e5c12b982dbf5` |  |  |
 | 2026-11-18T14:17:16+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:19:40+00:00 | verifier-build-compileall | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:19:45+00:00 | verifier-build-django-check | 0 | 1.23 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T14:19:48+00:00 | verifier-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T14:19:51+00:00 | verifier-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T14:19:54+00:00 | verifier-idiom-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T14:19:57+00:00 | verifier-idiom-ui | 0 | 0.51 | `python .migration/harness/tools/check_ui.py` | `66b28d168bd5bf98` |  | gate=ui scope="templates changed since 07c357cf95f91dfffaf2334a0675068b38745e1d" templates=4 findings=0 |
+| 2026-11-18T14:21:07+00:00 | verifier-behavior | 0 | 65.98 | `pytest -q` | `0309a319f05d75b1` |  |  |
