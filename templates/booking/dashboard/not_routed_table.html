@@ -1,4 +1,9 @@
-<section id="not-routed-cargo" aria-labelledby="not-routed-cargo-heading">
+<section
+  id="not-routed-cargo"
+  aria-labelledby="not-routed-cargo-heading"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+  {% if out_of_band %}hx-swap-oob="outerHTML"{% endif %}
+>
   <h2 id="not-routed-cargo-heading" class="mb-3 text-xl font-semibold text-gray-900">Not Routed Cargo</h2>
   <div class="overflow-x-auto">
     <table class="w-full border-collapse text-left">
@@ -8,6 +13,7 @@
           <th scope="col" class="p-3">Origin</th>
           <th scope="col" class="p-3">Destination</th>
           <th scope="col" class="p-3">Deadline</th>
+          <th scope="col" class="p-3">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -30,9 +36,35 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <button
+                type="button"
+                class="btn btn-sm"
+                aria-haspopup="dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#booking-dialog"
+                hx-swap="innerHTML"
+              >
+                Change destination
+              </button>
+              <button
+                type="button"
+                class="btn btn-sm"
+                aria-haspopup="dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#booking-dialog"
+                hx-swap="innerHTML"
+              >
+                Change deadline
+              </button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <div
+    id="booking-dialog"
+    hx-on::after-swap="this.querySelector('dialog')?.showModal()"
+  ></div>
 </section>
