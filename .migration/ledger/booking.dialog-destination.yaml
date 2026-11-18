@@ -8,13 +8,31 @@ source:
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/dialog.html
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_specification_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_invalid_destination_is_reported_without_changing_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_completes_dialog_and_refreshes_table"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: destination-options-filtered
+    rule: Destination choices exclude the cargo origin and current destination without mutating the backing location list.
+    source: "martins-vds/ai-factory-pilot-target#235"
+  - id: destination-must-be-offered
+    rule: A submitted destination must be one of the currently offered shipping locations.
+    source: ".migration/plan/booking.md:94; martins-vds/ai-factory-pilot-target#235"
+  - id: destination-preserves-route-fields
+    rule: Changing the destination preserves the cargo origin and arrival deadline.
+    source: ".migration/plan/booking.md:95; src/cargotracker/booking/application/specification.py:24-33"
+notes: "The legacy test covers service state, not modal options or refresh behavior. The target returns stable filtered choices under #235 and drops the unavailable-widget warning under ruling #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]

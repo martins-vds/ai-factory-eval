@@ -1,0 +1,70 @@
+<dialog id="cargo-edit-dialog" class="modal" open aria-labelledby="edit-dialog-title">
+  <div class="modal-box">
+    <h2 id="edit-dialog-title" class="text-xl font-semibold text-gray-900">
+      {% if dialog_type == "destination" %}Change destination{% else %}Change deadline{% endif %}
+    </h2>
+    <p class="mt-2 text-gray-700">
+      Origin: {{ cargo.route_specification.origin.name }}
+      · Destination: {{ cargo.route_specification.destination.name }}
+    </p>
+    {% if dialog_type == "destination" %}
+      <form method="post" action="{{ action_url }}" hx-post="{{ action_url }}" hx-target="#cargo-edit-dialog" hx-swap="outerHTML" class="mt-5 space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="label mb-1 block font-medium text-slate-800" for="destination">New destination</label>
+          <select
+            class="select select-bordered w-full"
+            id="destination"
+            name="destination"
+            required
+            aria-describedby="{% if error %}destination-error{% else %}destination-help{% endif %}"
+            {% if error %}aria-invalid="true"{% endif %}
+          >
+            <option value="" disabled {% if not selected_destination %}selected{% endif %}>Choose a destination</option>
+            {% for location in destinations %}
+              <option value="{{ location.unlocode.value }}" {% if selected_destination == location.unlocode.value %}selected{% endif %}>
+                {{ location.name }} ({{ location.unlocode.value }})
+              </option>
+            {% endfor %}
+          </select>
+          <p id="destination-help" class="sr-only">Choose a destination other than the origin or current destination.</p>
+          {% if error %}
+            <p id="destination-error" class="mt-2 text-red-700" role="alert">{{ error }}</p>
+          {% endif %}
+        </div>
+        <div class="modal-action">
+          <a class="btn btn-ghost" href="/admin/dashboard/">Cancel</a>
+          <button class="btn btn-primary" type="submit">Update destination</button>
+        </div>
+      </form>
+    {% else %}
+      <p class="mt-2 text-sm text-gray-600">
+        Current deadline: {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+      </p>
+      <form method="post" action="{{ action_url }}" hx-post="{{ action_url }}" hx-target="#cargo-edit-dialog" hx-swap="outerHTML" class="mt-5 space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="label mb-1 block font-medium text-slate-800" for="deadline">Arrival deadline</label>
+          <input
+            class="input input-bordered w-full"
+            type="date"
+            id="deadline"
+            name="deadline"
+            value="{{ deadline_value }}"
+            aria-describedby="{% if error %}deadline-error{% else %}deadline-help{% endif %}"
+            {% if error %}aria-invalid="true"{% endif %}
+            required
+          >
+          <p id="deadline-help" class="sr-only">Enter the cargo arrival deadline.</p>
+          {% if error %}
+            <p id="deadline-error" class="mt-2 text-red-700" role="alert">{{ error }}</p>
+          {% endif %}
+        </div>
+        <div class="modal-action">
+          <a class="btn btn-ghost" href="/admin/dashboard/">Cancel</a>
+          <button class="btn btn-primary" type="submit">Update deadline</button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+</dialog>
