@@ -14,9 +14,10 @@ class LoanRepository:
 
     @transaction.atomic
     def create(self, **fields):
-        with connection.cursor() as cursor:
-            cursor.execute('SELECT pg_advisory_xact_lock(%s)', [_LOAN_ID_LOCK])
-        fields['id'] = f'L{Loan.objects.count() + 1}'
+        if 'id' not in fields:
+            with connection.cursor() as cursor:
+                cursor.execute('SELECT pg_advisory_xact_lock(%s)', [_LOAN_ID_LOCK])
+            fields['id'] = f'L{Loan.objects.count() + 1}'
         return Loan.objects.create(**fields)
 
     @transaction.atomic
