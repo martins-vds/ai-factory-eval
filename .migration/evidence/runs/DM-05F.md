@@ -53,3 +53,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:10:57+00:00 | behavior | 0 | 49.31 | `pytest -q` | `518edc79ceaef887` |  |  |
 | 2026-11-18T13:11:45+00:00 | regression | 0 | 47.21 | `pytest -q` | `05f04b74015cef79` |  |  |
 | 2026-11-18T13:15:22+00:00 | regression | 0 | 47.87 | `pytest -q` | `ac082027ee84ceb4` |  |  |
+| 2026-11-18T14:10:10+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
