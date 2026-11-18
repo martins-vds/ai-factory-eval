@@ -55,9 +55,7 @@ def test_monthly_report_aggregates_prior_month_and_orders_members_by_fees_then_i
     )
     application = MonthlyReportApplication(
         repository,
-        FeeCalculator(
-            {'L1': Fee(1000), 'L2': Fee(75), 'L3': Fee(75), 'L6': Fee(75), 'L7': Fee(0)}
-        ),
+        FeeCalculator({'L1': Fee(1000), 'L2': Fee(75), 'L3': Fee(75), 'L6': Fee(75), 'L7': Fee(0)}),
     )
 
     report = application.monthly_report_for(date(2026, 3, 1))
