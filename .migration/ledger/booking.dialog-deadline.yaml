@@ -5,16 +5,29 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml:src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml
   location: src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml:9-33
   risk: {crap: 6, complexity: 2, coverage: 0.0}
-boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "Deadline dialog receives trackingId, displays origin/destination and the current deadline, shows parse errors beside the field, and updates/refreshes the not-routed row on success."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-eval#1418]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_deadline_dialog_view
+    - templates/booking/dialogs/deadline.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_route_specification_and_deadline"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_parse_error_without_changing_deadline"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_use_case_rejects_an_unparsed_value"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_deadline_preserves_route_and_refreshes_table"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: well-formed-date
+    rule: "Deadline updates must receive a parsed datetime; invalid date strings are rejected."
+    source: "martins-vds/ai-factory-pilot-target#234"
+notes: "The #234 ruling requires a visible field error for unparseable dates. Successful updates preserve origin and destination and omit the #251 unavailable-widget warning."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]
