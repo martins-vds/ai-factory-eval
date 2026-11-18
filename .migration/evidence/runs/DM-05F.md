@@ -37,3 +37,22 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T03:10:12+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
 | 2026-11-18T03:10:12+00:00 | mutation-changed-final | 0 | 0.06 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
 | 2026-11-18T04:10:06+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:12:35+00:00 | snapshot-check-verifier | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-18T04:12:35+00:00 | reconcile-help-verifier | 0 | 0.05 | `python .migration/harness/tools/data_reconcile.py reconcile --help` | `65858aae107bd91e` |  |  |
+| 2026-11-18T04:12:45+00:00 | verify-build-compile | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:12:47+00:00 | verify-build-check | 0 | 1.53 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T04:12:47+00:00 | verify-idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:12:47+00:00 | verify-idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `9eb349efea514fbe` |  |  |
+| 2026-11-18T04:12:47+00:00 | verify-idiom-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T04:12:48+00:00 | verify-idiom-ui | 0 | 0.56 | `python .migration/harness/tools/check_ui.py` | `2e16617a69bea314` |  | gate=ui scope="templates changed since 01f1f08050b982e5e0fdd5b4e3dfb6bfaec9417f" templates=0 findings=0 |
+| 2026-11-18T04:13:36+00:00 | verify-behavior-regression | 0 | 48.15 | `pytest -q` | `cdc7c1d45969cfdb` |  |  |
+| 2026-11-18T04:14:16+00:00 | verify-crap-coverage | 0 | 39.64 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `d84a8b37954011eb` |  |  |
+| 2026-11-18T04:14:16+00:00 | verify-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:14:16+00:00 | verify-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
+| 2026-11-18T04:24:10+00:00 | verify-data-load | 1 | 0.65 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `39d84694036a43bc` | Traceback (most recent call last): |  |
+| 2026-11-18T04:24:31+00:00 | verify-database-migrate | 0 | 0.98 | `python manage.py migrate --noinput` | `56d728c244009843` |  |  |
+| 2026-11-18T04:24:32+00:00 | verify-data-load-after-migrate | 0 | 0.76 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
+| 2026-11-18T04:24:33+00:00 | verify-data-export | 1 | 0.7 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export` | `31ae69b6b6c19fa7` |  |  |
+| 2026-11-18T04:25:59+00:00 | verify-mutation-pr-base | 0 | 0.07 | `python .migration/harness/tools/afs-mutation --changed-since b10082d00318c43cacceb295c2d5d12c1be2980b` | `096af3d365fe0177` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=b10082d00318c43cacceb295c2d5d12c1be2980b |
+| 2026-11-18T04:26:12+00:00 | invariant-negative-fixture | 1 | 1.72 | `pytest -q tests/data_migration/test_invariants.py::test_loaded_itinerary_legs_connect` | `a1b38751a823eab5` | assert cargoes |  |
+| 2026-11-18T04:26:28+00:00 | invariants-restored | 0 | 1.94 | `pytest -q tests/data_migration/test_invariants.py` | `cc06388cc39e2f3b` |  |  |
