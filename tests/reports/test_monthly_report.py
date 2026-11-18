@@ -49,6 +49,14 @@ def test_monthly_report_aggregates_prior_month_activity_and_escapes_csv_fields()
                 Loan('L5', 'mia', date(2026, 11, 15), date(2026, 11, 29), date(2026, 12, 2)),
                 Loan('L6', 'dee', date(2026, 11, 15), date(2026, 11, 29), date(2027, 1, 1)),
                 Loan('L7', 'amy', date(2027, 1, 1), date(2027, 1, 15), date(2027, 1, 20)),
+                Loan('L8', 'zara', date(2026, 12, 1), date(2026, 12, 15), None),
+                Loan(
+                    'L9',
+                    'zara',
+                    date(2026, 10, 1),
+                    date(2026, 10, 15),
+                    date(2026, 12, 31),
+                ),
             ]
         ),
         FixedClock(),
@@ -56,4 +64,4 @@ def test_monthly_report_aggregates_prior_month_activity_and_escapes_csv_fields()
 
     report = application.generate()
 
-    assert report == '"zee;north";1;2;150\namy;1;1;0\ndee;1;1;0\n'
+    assert report == 'zara;1;1;1000\n"zee;north";1;2;150\namy;1;1;0\ndee;1;1;0\n'

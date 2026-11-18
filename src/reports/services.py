@@ -1,7 +1,7 @@
 import csv
 from collections import defaultdict
 from collections.abc import Iterable
-from datetime import date
+from datetime import date, timedelta
 from io import StringIO
 from typing import Protocol
 
@@ -28,7 +28,7 @@ class MonthlyReport:
 
     def generate(self) -> str:
         end = self.clock.today().replace(day=1)
-        start = date(end.year - (end.month == 1), end.month - 1 or 12, 1)
+        start = (end - timedelta(days=1)).replace(day=1)
         metrics = defaultdict(lambda: [0, 0, 0])
 
         for loan in self.loans.all():
