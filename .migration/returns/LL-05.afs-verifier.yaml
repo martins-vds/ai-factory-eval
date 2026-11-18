@@ -1,0 +1,54 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1445
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1450
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings: []
+tests_added:
+  - tests/reports/test_monthly_report.py::test_report_use_case_uses_previous_calendar_month_and_omits_nonstarters
+  - tests/reports/test_monthly_report.py::test_report_use_case_counts_only_late_returns_and_sums_their_fees
+  - tests/reports/test_monthly_report.py::test_report_use_case_sorts_by_fees_then_member_id
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: Report the previous calendar month relative to the injected server-date clock.
+    use_case: MonthlyReportApplication.rows
+    test: tests/reports/test_monthly_report.py::test_report_use_case_uses_previous_calendar_month_and_omits_nonstarters
+    enforced: true
+    ledger_rule: prior-calendar-month
+  - capability: reports.monthly-spec
+    rule: Include only members with at least one report-month start and count all such starts.
+    use_case: MonthlyReportApplication.rows
+    test: tests/reports/test_monthly_report.py::test_report_use_case_uses_previous_calendar_month_and_omits_nonstarters
+    enforced: true
+    ledger_rule: member-inclusion
+  - capability: reports.monthly-spec
+    rule: Count only loans returned after their due date during the report month.
+    use_case: MonthlyReportApplication.rows
+    test: tests/reports/test_monthly_report.py::test_report_use_case_counts_only_late_returns_and_sums_their_fees
+    enforced: true
+    ledger_rule: late-returns
+  - capability: reports.monthly-spec
+    rule: Sum the fee calculator's cents only for late returns in the report month.
+    use_case: MonthlyReportApplication.rows
+    test: tests/reports/test_monthly_report.py::test_report_use_case_counts_only_late_returns_and_sums_their_fees
+    enforced: true
+    ledger_rule: late-fees
+  - capability: reports.monthly-spec
+    rule: Sort by total late fees descending, then member id ascending.
+    use_case: MonthlyReportApplication.rows
+    test: tests/reports/test_monthly_report.py::test_report_use_case_sorts_by_fees_then_member_id
+    enforced: true
+    ledger_rule: row-order
+no_rules: {}
+inherited: []
