@@ -208,12 +208,13 @@ def test_loaded_itinerary_legs_connect_in_order(loaded_snapshot):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
+def test_loaded_handling_events_reference_existing_cargo_voyages_and_locations(loaded_snapshot):
     events = list(HandlingEventRecord.objects.all())
     assert events
     assert any(event.voyage_id is not None for event in events)
 
     for event in events:
+        assert CargoRecord.objects.filter(pk=event.cargo_id).exists()
         assert LocationRecord.objects.filter(pk=event.location_id).exists()
         if event.voyage_id is not None:
             assert VoyageRecord.objects.filter(pk=event.voyage_id).exists()
