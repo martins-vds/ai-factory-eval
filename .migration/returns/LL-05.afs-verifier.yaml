@@ -1,0 +1,45 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1485
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1500
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.963
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings: []
+tests_added:
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_excludes_loans_outside_the_previous_month
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: Include loans started on or after the first day of the previous calendar month and before the first day of the current month.
+    use_case: src.reports.services.MonthlyReportApplication.monthly_report_for
+    test: tests/reports/test_monthly_report.py::test_monthly_report_application_excludes_loans_outside_the_previous_month
+    enforced: true
+    ledger_rule: prior-month-window
+  - capability: reports.monthly-spec
+    rule: Produce one row per member with loan counts, late-return counts, and late fees in cents, omitting members without qualifying loans.
+    use_case: src.reports.services.MonthlyReportApplication.monthly_report_for
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members_by_fees_then_id
+    enforced: true
+    ledger_rule: member-aggregation
+  - capability: reports.monthly-spec
+    rule: Sort rows by total late fees descending, then member id ascending.
+    use_case: src.reports.services.MonthlyReportApplication.monthly_report_for
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members_by_fees_then_id
+    enforced: true
+    ledger_rule: report-ordering
+  - capability: reports.monthly-spec
+    rule: Count a loan as returned late only when it has a return date later than its due date.
+    use_case: src.reports.services.MonthlyReportApplication.monthly_report_for
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members_by_fees_then_id
+    enforced: true
+no_rules: {}
+inherited: []
