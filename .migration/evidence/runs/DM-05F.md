@@ -54,3 +54,21 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:11:45+00:00 | regression | 0 | 47.21 | `pytest -q` | `05f04b74015cef79` |  |  |
 | 2026-11-18T13:15:22+00:00 | regression | 0 | 47.87 | `pytest -q` | `ac082027ee84ceb4` |  |  |
 | 2026-11-18T14:10:10+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:11:58+00:00 | verify-snapshot | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-18T14:12:02+00:00 | verify-load | 1 | 1.18 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `39d84694036a43bc` | Traceback (most recent call last): |  |
+| 2026-11-18T14:12:15+00:00 | verify-schema | 0 | 0.5 | `python manage.py migrate --noinput` | `56d728c244009843` |  |  |
+| 2026-11-18T14:12:18+00:00 | verify-load | 0 | 0.43 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
+| 2026-11-18T14:12:23+00:00 | verify-export | 1 | 0.35 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export` | `31ae69b6b6c19fa7` |  |  |
+| 2026-11-18T14:12:52+00:00 | verify-build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:12:52+00:00 | verify-build-check | 0 | 0.37 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T14:12:56+00:00 | verify-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T14:12:56+00:00 | verify-format | 0 | 0.02 | `ruff format --check` | `9eb349efea514fbe` |  |  |
+| 2026-11-18T14:12:56+00:00 | verify-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T14:12:57+00:00 | verify-ui | 0 | 0.51 | `python .migration/harness/tools/check_ui.py` | `4bb50f56ce3cb94f` |  | gate=ui scope="templates changed since eb1a34bde78d1032d64b46b30e4fe650290f317f" templates=0 findings=0 |
+| 2026-11-18T14:13:14+00:00 | verify-focused | 0 | 3.3 | `pytest -q tests/data_migration/test_invariants.py` | `b2dbdcf691b44ca3` |  |  |
+| 2026-11-18T14:14:11+00:00 | verify-behavior | 0 | 50.42 | `pytest -q` | `34a29ddaa5179bc8` |  |  |
+| 2026-11-18T14:16:56+00:00 | verify-crap-coverage | 0 | 46.9 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `9d1bd3115a7eccf9` |  |  |
+| 2026-11-18T14:16:56+00:00 | verify-crap-lizard | 0 | 0.15 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T14:16:56+00:00 | verify-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
+| 2026-11-18T14:20:47+00:00 | verify-reconcile | 1 | 0.15 | `python .migration/harness/tools/data_reconcile.py reconcile --snapshot .migration/data/snapshot --target .migration/data/target-export --mapping .migration/data/mapping.yaml --report /tmp/DM-05F-reconciliation.md` | `4fc8ebcf21352d2a` | ::error::location: .migration/data/target-export/location.csv: missing | gate=data-reconcile tables=6 rows=0 mismatched_tables=6 |
+| 2026-11-18T14:31:29+00:00 | verify-regression | 0 | 123.24 | `pytest -q` | `0d0aa67c643b9907` |  |  |
