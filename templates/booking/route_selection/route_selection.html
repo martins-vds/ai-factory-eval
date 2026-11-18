@@ -27,7 +27,7 @@
     {% endif %}
     {% if candidates %}
       <ol class="space-y-6">
-        {% for itinerary in candidates %}
+        {% for candidate in candidates %}
           <li class="rounded border border-gray-300 p-4">
             <h3 class="mb-3 text-lg font-semibold">Itinerary {{ forloop.counter }}</h3>
             <div class="overflow-x-auto">
@@ -43,7 +43,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  {% for leg in itinerary.legs %}
+                  {% for leg in candidate.itinerary.legs %}
                     <tr class="border-b border-gray-200">
                       <th scope="row" class="p-3 font-medium">Leg {{ forloop.counter }}</th>
                       <td class="p-3">{{ leg.voyage.voyage_number.value }}</td>
@@ -62,7 +62,7 @@
             </div>
             <form method="post" class="mt-4">
               {% csrf_token %}
-              <input type="hidden" name="candidate_index" value="{{ forloop.counter0 }}">
+              <input type="hidden" name="candidate_token" value="{{ candidate.token }}">
               <button
                 type="submit"
                 class="min-h-11 rounded bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"

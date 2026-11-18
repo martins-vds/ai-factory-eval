@@ -1,10 +1,12 @@
 import random
+import re
 from datetime import UTC, datetime, timedelta
 from itertools import pairwise
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -26,8 +28,10 @@ SAMPLE_VOYAGES = {'0100S', '0200T', '0300A', '0400S', '0301S'}
 class CandidateRoutingService:
     def __init__(self):
         self.candidates = ()
+        self.requests = []
 
     def find_shortest_paths(self, origin, destination):
+        self.requests.append((origin, destination))
         return self.candidates
 
 
@@ -53,6 +57,7 @@ urlpatterns = [
 @pytest.fixture(autouse=True)
 def reset_routing_candidates():
     candidate_routing_service.candidates = ()
+    candidate_routing_service.requests.clear()
 
 
 def _edge(voyage, from_port, to_port, departure_day, arrival_day):
@@ -104,6 +109,7 @@ def test_route_and_select_itinerary_render_candidate_properties(client, seeded_c
         assert 'Candidate routes (2)' in content
         assert 'Itinerary 1' in content
         assert 'Leg 1' in content
+        assert 'Leg 2' in content
         assert '0100S' in content
         assert 'Rotterdam (NLRTM)' in content
         assert 'Itinerary 2' in content
@@ -120,7 +126,7 @@ def test_route_page_displays_candidate_routes_with_path_properties(client, seede
     ).find_shortest_paths('CNHKG', 'AUMEL')
 
     response = client.get('/admin/cargo/DEF789/route/')
-    candidates = response.context['candidates']
+    candidates = [candidate['itinerary'] for candidate in response.context['candidates']]
     content = response.content.decode()
 
     assert response.status_code == 200
@@ -163,14 +169,23 @@ def test_route_and_select_itinerary_show_empty_candidate_guidance(client, seeded
 @override_settings(ROOT_URLCONF=__name__)
 def test_assigning_candidate_redirects_to_details_with_selected_itinerary(client, seeded_cargo):
     candidate_routing_service.candidates = _candidate_paths()
+    route_response = client.get('/admin/cargo/DEF789/route/')
+    tokens = re.findall(
+        r'name="candidate_token" value="([^"]+)"',
+        route_response.content.decode(),
+    )
+    assert len(tokens) == 2
+    requested_routes = len(candidate_routing_service.requests)
+    candidate_routing_service.candidates = (TransitPath((_edge('0400S', 'CNHKG', 'AUMEL', 7, 8),)),)
 
     response = client.post(
         '/admin/cargo/DEF789/route/',
-        {'candidate_index': '1'},
+        {'candidate_token': tokens[1]},
     )
 
     assert response.status_code == 302
     assert response['Location'] == '/admin/cargo/DEF789/'
+    assert len(candidate_routing_service.requests) == requested_routes
 
     details_response = client.get(response['Location'])
     details_content = details_response.content.decode()
@@ -179,6 +194,7 @@ def test_assigning_candidate_redirects_to_details_with_selected_itinerary(client
     assert 'Itinerary' in details_content
     assert '0300A' in details_content
     assert '0100S' not in details_content
+    assert '0400S' not in details_content
     assert 'Not routed' not in details_content
 
 
@@ -189,11 +205,26 @@ def test_invalid_candidate_selection_does_not_assign_a_route(client, seeded_carg
 
     response = client.post(
         '/admin/cargo/DEF789/route/',
-        {'candidate_index': '2'},
+        {'candidate_token': 'invalid'},
     )
 
     assert response.status_code == 200
-    assert 'Select a valid itinerary' in response.content.decode()
+    assert response.context['selection_error'] == 'Select a valid itinerary.'
 
     details_response = client.get('/admin/cargo/DEF789/')
     assert '<strong>Not routed</strong>' in details_response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unknown_cargo_route_selection_raises_not_found():
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        route_view(RequestFactory().get('/admin/cargo/UNKNOWN/route/'), 'UNKNOWN')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_unsupported_methods(client):
+    response = client.put('/admin/cargo/DEF789/route/')
+
+    assert response.status_code == 405
