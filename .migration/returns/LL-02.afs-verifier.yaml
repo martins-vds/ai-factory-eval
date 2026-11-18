@@ -1,0 +1,98 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1354
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1360
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 10.0
+  mutation_changed: 'n/a: baseline fails on the reported fidelity difference'
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:36
+    what: 'Lend strips surrounding whitespace from valid member and ISBN values, unlike the source; ruling #39 approves rejecting blank values but not normalizing valid values.'
+    evidence: tests/loans/test_circulation.py::test_lend_use_case_preserves_surrounding_whitespace_in_nonblank_values
+  - severity: minor
+    where: .migration/ledger/loan.lend.yaml:12-27
+    what: Duplicate top-level status, verification, and evidence keys are silently overwritten by YAML last-key-wins parsing in the LL-02 ledger entries.
+tests_added:
+  - tests/loans/test_circulation.py::test_lend_use_case_reports_each_blank_field_before_creating_a_loan
+  - tests/loans/test_circulation.py::test_lend_use_case_uses_the_clock_date
+  - tests/loans/test_circulation.py::test_lend_use_case_creates_a_fourteen_day_loan_with_the_next_identity
+  - tests/loans/test_circulation.py::test_lend_use_case_preserves_surrounding_whitespace_in_nonblank_values
+  - tests/loans/test_circulation.py::test_loan_line_escapes_field_delimiters_quotes_and_line_breaks
+  - tests/loans/test_circulation.py::test_return_use_case_uses_the_clock_date_for_a_first_return
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_repeated_return_without_replacing_the_date
+  - tests/loans/test_circulation.py::test_return_use_case_reports_unknown_loan_without_a_return
+ledger_issues:
+  - Duplicate top-level status, verification, and evidence keys in loan.lend.yaml, loan.return-date.yaml, and loan.return.yaml are silently overwritten by YAML parsing.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+rules:
+  - capability: loan.lend
+    rule: Member must be nonblank after trimming; otherwise lending is rejected with a field error and no loan is created.
+    use_case: LoanUseCases.lend
+    test: tests/loans/test_circulation.py::test_lend_use_case_reports_each_blank_field_before_creating_a_loan
+    enforced: true
+    ledger_rule: member-required
+  - capability: loan.lend
+    rule: ISBN must be nonblank after trimming; otherwise lending is rejected with a field error and no loan is created.
+    use_case: LoanUseCases.lend
+    test: tests/loans/test_circulation.py::test_lend_use_case_reports_each_blank_field_before_creating_a_loan
+    enforced: true
+    ledger_rule: isbn-required
+  - capability: loan.lend
+    rule: A new loan uses today's date in the server's default time zone.
+    use_case: LoanUseCases.lend
+    test: tests/loans/test_circulation.py::test_lend_use_case_uses_the_clock_date
+    enforced: true
+    ledger_rule: local-lending-date
+  - capability: loan.lend
+    rule: Lend creates the next L<count+1> identity with a due date 14 calendar days after lending.
+    use_case: LoanUseCases.lend
+    test: tests/loans/test_circulation.py::test_lend_use_case_creates_a_fourteen_day_loan_with_the_next_identity
+    enforced: true
+  - capability: loan.lend
+    rule: Semicolons, quotes, and line breaks in loan fields are escaped in text exports.
+    use_case: loan_line
+    test: tests/loans/test_circulation.py::test_loan_line_escapes_field_delimiters_quotes_and_line_breaks
+    enforced: true
+    ledger_rule: export-escaping
+  - capability: loan.lend
+    rule: Nonblank member and ISBN values are persisted exactly as submitted.
+    use_case: LoanUseCases.lend
+    test: tests/loans/test_circulation.py::test_lend_use_case_preserves_surrounding_whitespace_in_nonblank_values
+    enforced: false
+  - capability: loan.return-date
+    rule: A successful first return records today's date in the server's default time zone.
+    use_case: LoanUseCases.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_uses_the_clock_date_for_a_first_return
+    enforced: true
+    ledger_rule: return-date-is-local-today
+  - capability: loan.return-date
+    rule: A repeated return is rejected and leaves the original returned_on date unchanged.
+    use_case: LoanUseCases.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeated_return_without_replacing_the_date
+    enforced: true
+    ledger_rule: preserve-original-return-date
+  - capability: loan.return
+    rule: Returning an unknown loan is rejected without changing loan state; the view translates absence to the characterized 404 response.
+    use_case: LoanUseCases.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_reports_unknown_loan_without_a_return
+    enforced: true
+    ledger_rule: unknown-loan
+  - capability: loan.return
+    rule: Only an unreturned loan can be returned; a repeated return is rejected without changing the saved date.
+    use_case: LoanUseCases.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeated_return_without_replacing_the_date
+    enforced: true
+    ledger_rule: one-time-return
+no_rules: {}
+inherited: []
