@@ -1,7 +1,7 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Protocol
-from collections.abc import Iterable
 
 
 class LoanRecord(Protocol):
@@ -70,7 +70,9 @@ class MonthlyReportApplication:
                 summary.late_fees_cents += fee.amount_cents
 
         return [
-            MonthlyReportRow(member_id, summary.loans_started, summary.late_returns, summary.late_fees_cents)
+            MonthlyReportRow(
+                member_id, summary.loans_started, summary.late_returns, summary.late_fees_cents
+            )
             for member_id, summary in sorted(
                 members.items(),
                 key=lambda item: (-item[1].late_fees_cents, item[0]),

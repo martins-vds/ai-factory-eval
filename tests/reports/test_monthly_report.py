@@ -62,3 +62,21 @@ def test_monthly_report_summarizes_the_previous_calendar_month(monkeypatch):
         'alice,1,1,0\n'
         'bob,1,0,0\n'
     )
+
+
+@pytest.mark.django_db
+def test_monthly_report_previous_month_crosses_the_year_boundary(monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2027, 1, 1))
+    Loan.objects.bulk_create(
+        [
+            Loan(id='R9', member='december', isbn='9', lent_on=date(2026, 12, 31)),
+            Loan(id='R10', member='january', isbn='10', lent_on=date(2027, 1, 1)),
+        ]
+    )
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert output.getvalue() == (
+        'member_id,loans_started,late_returns,late_fees_cents\ndecember,1,0,0\n'
+    )
