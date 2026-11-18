@@ -27,3 +27,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T22:18:41+00:00 | ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-18T22:18:45+00:00 | ruff-format-final | 0 | 0.01 | `ruff format --check` | `02bed28762c49640` |  |  |
 | 2026-11-18T22:20:07+00:00 | regression-final | 0 | 75.53 | `pytest -q` | `b9b679cd673b15eb` |  |  |
+| 2026-11-18T22:25:53+00:00 | focused-expired-cargo | 0 | 4.14 | `pytest -q tests/test_htmx_errors.py` | `7ded2b4efd0963a6` |  |  |
+| 2026-11-18T22:25:58+00:00 | ruff-check-post-review | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T22:27:28+00:00 | regression-post-review | 0 | 85.3 | `pytest -q` | `eefdf9d8c6b07f3f` |  |  |

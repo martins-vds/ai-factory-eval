@@ -60,15 +60,11 @@ def test_not_routed_table_page_swaps_unknown_cargo_response(client, dashboard_pa
 
 
 @pytest.mark.django_db
-def test_deadline_dialog_page_swaps_invalid_deadline_error(client, dashboard_page):
-    response = client.post(
-        '/admin/cargo/DEF789/deadline/',
-        {'deadline': 'not-a-date'},
-        HTTP_HX_REQUEST='true',
-    )
+def test_deadline_dialog_page_swaps_expired_cargo_response(client, dashboard_page):
+    response = client.get('/admin/cargo/STALE1/deadline/', HTTP_HX_REQUEST='true')
 
-    assert response.status_code == 200
-    assert b'Enter a valid arrival deadline.' in response.content
+    assert response.status_code == 404
+    assert b'The requested resource was not found on this server.' in response.content
     _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
 
 

@@ -18,6 +18,11 @@ handoff: none
 specialty: ui
 specialty_evidence:
   - .migration/evidence/runs/BK-05K.md
-  - tests/test_htmx_errors.py
+  - tests/test_htmx_errors.py::test_live_map_page_swaps_failed_marker_response
+  - tests/test_htmx_errors.py::test_not_routed_table_page_swaps_unknown_cargo_response
+  - tests/test_htmx_errors.py::test_deadline_dialog_page_swaps_expired_cargo_response
+  - tests/test_htmx_errors.py::test_destination_dialog_page_swaps_invalid_destination_error
+  - tests/test_htmx_errors.py::test_booking_deadline_form_swaps_expired_deadline_error
+  - tests/test_htmx_errors.py::test_tracking_page_swaps_unknown_tracking_id_error
 rules: []
 no_rules: {}
