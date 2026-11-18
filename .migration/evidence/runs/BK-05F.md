@@ -91,3 +91,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T04:04:57+00:00 | migration-validation | 1 | 4.54 | `python .migration/harness/tools/validate.py .migration` | `f419df73852a0066` | 195 file(s) checked, 4 error(s) |  |
 | 2026-11-18T04:06:55+00:00 | migration-validation-after-ledger | 0 | 4.47 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
 | 2026-11-18T04:07:30+00:00 | final-migration-validation | 0 | 4.39 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-18T04:08:30+00:00 | postcommit-final-validation | 0 | 4.47 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
