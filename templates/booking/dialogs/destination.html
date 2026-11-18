@@ -1,0 +1,49 @@
+<div
+  class="modal modal-open"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="destination-dialog-title"
+>
+  <div class="modal-box">
+    <h2 id="destination-dialog-title" class="mb-4 text-xl font-semibold">Change cargo destination</h2>
+    <p>
+      Origin: {{ cargo.route_specification.origin.name }}
+      ({{ cargo.route_specification.origin.unlocode.value }})
+    </p>
+    <p class="mb-4">
+      Current destination: {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </p>
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+      hx-on::before-swap="if (event.detail.xhr.status === 404) event.detail.shouldSwap = true"
+    >
+      {% csrf_token %}
+      <label class="label mb-1 block font-medium" for="destination">Destination</label>
+      <select
+        class="select select-bordered w-full"
+        id="destination"
+        name="destination"
+        {% if destination_error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
+        required
+      >
+        {% for location in locations %}
+          <option value="{{ location.unlocode.value }}">
+            {{ location.name }} ({{ location.unlocode.value }})
+          </option>
+        {% endfor %}
+      </select>
+      {% if destination_error %}
+        <p class="mt-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+      {% endif %}
+      <div class="modal-action">
+        <button class="btn btn-primary" type="submit">Update</button>
+        <a class="btn" href="/admin/dashboard/">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>

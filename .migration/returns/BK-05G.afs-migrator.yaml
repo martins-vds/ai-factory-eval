@@ -1,0 +1,10 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1305
+gates: {build: 0, behavior: 0, idiom: 0, crap: 0, mutation_changed: 1.0, regression: 0}
+evidence_logs: [.migration/evidence/runs/BK-05G.md]
+ledger_updated: [booking.dialog-chain, booking.dialog-destination, booking.dialog-deadline]
+quirk_tickets: []
+new_tickets: []
+handoff: none
