@@ -35,6 +35,40 @@ def test_monthly_report_lists_february_activity_by_fees_then_member_in_local_tim
         lent_on=date(2026, 2, 2),
     )
     Loan.objects.create(
+        id='L25',
+        member='alpha',
+        isbn='25',
+        lent_on=date(2026, 2, 3),
+        returned_on=date(2026, 2, 22),
+    )
+    Loan.objects.create(
+        id='L26',
+        member='gamma',
+        isbn='26',
+        lent_on=date(2026, 2, 1),
+        returned_on=date(2026, 2, 20),
+    )
+    Loan.objects.create(
+        id='L27',
+        member='boundary',
+        isbn='27',
+        lent_on=date(2026, 2, 1),
+        returned_on=date(2026, 2, 18),
+    )
+    Loan.objects.create(
+        id='L28',
+        member='start-boundary',
+        isbn='28',
+        lent_on=date(2026, 1, 17),
+        returned_on=date(2026, 2, 1),
+    )
+    Loan.objects.create(
+        id='L29',
+        member='start-boundary',
+        isbn='29',
+        lent_on=date(2026, 2, 2),
+    )
+    Loan.objects.create(
         id='L23',
         member='not-started-in-month',
         isbn='23',
@@ -61,8 +95,11 @@ def test_monthly_report_lists_february_activity_by_fees_then_member_in_local_tim
 
     assert list(csv.reader(StringIO(output.getvalue()))) == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
-        ['alpha', '2', '1', '125'],
+        ['alpha', '3', '2', '250'],
         ['beta', '1', '1', '125'],
+        ['gamma', '1', '1', '125'],
+        ['boundary', '1', '1', '75'],
+        ['start-boundary', '1', '1', '0'],
     ]
 
 
@@ -89,6 +126,13 @@ def test_monthly_report_counts_late_returns_and_caps_fees():
         lent_on=date(2025, 12, 1),
         returned_on=date(2026, 2, 28),
     )
+    Loan.objects.create(
+        id='L33',
+        member='on-time',
+        isbn='33',
+        lent_on=date(2026, 2, 1),
+        returned_on=date(2026, 2, 15),
+    )
 
     output = StringIO()
     with (
@@ -104,4 +148,5 @@ def test_monthly_report_counts_late_returns_and_caps_fees():
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
         ['capped', '1', '1', '1000'],
         ['grace', '1', '1', '0'],
+        ['on-time', '1', '0', '0'],
     ]
