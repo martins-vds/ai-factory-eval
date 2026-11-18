@@ -5,7 +5,7 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from .services import GatewayResponse, GatewayUnavailable
 
-DEFAULT_GATEWAY_URL = 'http://localhost:9999'
+DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
 class NoRedirectHandler(HTTPRedirectHandler):
