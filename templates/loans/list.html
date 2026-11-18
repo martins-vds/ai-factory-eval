@@ -51,4 +51,12 @@
     </div>
   </aside>
 </section>
+<script>
+  htmx.config.responseHandling.forEach((response) => {
+    if (response.code === '4..' || response.code === '5..') {
+      response.swap = true;
+      response.error = false;
+    }
+  });
+</script>
 {% endblock %}

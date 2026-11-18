@@ -9,12 +9,14 @@ from src.loans.models import Loan
 def test_lending_api_creates_a_loan_with_a_fourteen_day_due_date(client, monkeypatch):
     monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 18))
 
-    response = client.post('/loans', {'member': 'dee', 'isbn': '123'})
+    response = client.post('/loans', {'member': ' dee ', 'isbn': ' 123 '})
 
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == 'L4;dee;123;2026-11-18;2026-12-02;\n'
+    assert response.content.decode() == 'L4; dee ; 123 ;2026-11-18;2026-12-02;\n'
     loan = Loan.objects.get(pk='L4')
+    assert loan.member == ' dee '
+    assert loan.isbn == ' 123 '
     assert loan.lent_on == date(2026, 11, 18)
     assert loan.due_on == date(2026, 12, 2)
 
@@ -109,6 +111,7 @@ def test_reading_room_lend_form_uses_htmx_and_reflects_a_successful_lend(client,
     assert page.status_code == 200
     assert b'Lend a book' in page.content
     assert b'hx-post="/ui/loans/new/"' in page.content
+    assert b'hx-post="/ui/loans/L1/return/"' in page.content
 
     response = client.post(
         '/ui/loans/new/',

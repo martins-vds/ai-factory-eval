@@ -7,11 +7,44 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans requires nonblank member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record. The browser flow is available at /ui/loans/new/."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1407]
+target:
+  components:
+    - src.loans.forms.LoanLendForm
+    - src.loans.repository.LoanRepository.lend
+    - src.loans.services.lend_loan
+    - src.loans.services.loan_line
+    - src.loans.views.loan_lend
+    - src.loans.views.loan_lend_browser
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lending_api_creates_a_loan_with_a_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lending_browser_shows_field_errors_for_blank_values
+  - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
+notes: "Approved divergences: blank values are rejected under martins-vds/ai-factory-synthetic-target#39; delimiter-containing fields are escaped under #43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#39
+  reason: "Approved fix: reject blank member and ISBN values. The #43 ruling to escape delimiters is also implemented."
+rules:
+  - id: member-isbn-required
+    rule: "Member and ISBN must be nonblank; whitespace-only values are rejected with field errors, while nonblank values are stored as submitted."
+    source: "legacy/src/main/java/lib/LoanResource.java:37-43; martins-vds/ai-factory-synthetic-target#39"
+  - id: due-date
+    rule: "The due date is 14 calendar days after the lending date."
+    source: "legacy/src/main/java/lib/Loan.java:44-46; .migration/plan/loan-circulation.md"
+  - id: loan-id
+    rule: "A new loan receives the id L<count+1>."
+    source: "legacy/src/main/java/lib/LoanRepository.java:27-34; .migration/characterization/source/goldens/http.json"
+  - id: delimited-export
+    rule: "Semicolons, quotes and record delimiters in exported fields are escaped so each loan remains one parseable row."
+    source: "martins-vds/ai-factory-synthetic-target#43"

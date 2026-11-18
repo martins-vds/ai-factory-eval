@@ -45,9 +45,7 @@ def loan_detail(request, loan_id):
 
 
 def loan_lend(request):
-    form = LoanLendForm(request.POST or None)
-    if request.method == 'GET':
-        return loan_catalog(request, form=form)
+    form = LoanLendForm(request.POST)
     if not form.is_valid():
         return HttpResponse(
             'member and isbn are required\n',
@@ -109,7 +107,7 @@ def loan_return(request, loan_id):
 def loan_return_browser(request, loan_id):
     result = return_loan(LoanRepository(), loan_id, timezone.localdate())
     if result is None:
-        return HttpResponse('no such loan\n', status=404)
+        return loan_catalog(request, feedback='No such loan.', status=404)
     _, updated = result
     if updated:
         if request.headers.get('HX-Request') != 'true':

@@ -7,11 +7,32 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "The first successful return persists the server's current local date; repeated returns are rejected and preserve the original date."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1407]
+target:
+  components:
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.services.return_loan
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_browser
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_api_keeps_the_first_return_date_and_rejects_repeats
+  - tests/loans/test_circulation.py::test_repeated_browser_return_is_visible_and_does_not_change_the_date
+notes: "Approved divergence under martins-vds/ai-factory-synthetic-target#41: a repeated return is rejected and the original return date is retained."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#41
+  reason: "Approved fix: a repeat return is rejected and the original return date is retained."
+rules:
+  - id: returned-once
+    rule: "The first successful return sets the returned date to the server's current local date; subsequent returns do not change it."
+    source: "legacy/src/main/java/lib/LoanRepository.java:36-44; martins-vds/ai-factory-synthetic-target#41"
