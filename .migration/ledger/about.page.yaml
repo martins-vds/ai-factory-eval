@@ -25,6 +25,7 @@ evidence:
   - .migration/characterization/source/goldens/browser.json
   - .migration/evidence/runs/LL-04.md
   - tests/library_info/test_about.py::test_about_endpoint_matches_characterized_response
+  - tests/library_info/test_about.py::test_about_pages_only_allow_get_requests
   - tests/library_info/test_about.py::test_about_page_presents_library_information_in_a_browser
 status: migrated
 no_rules: "Static public information only; there are no business rules or state transitions."

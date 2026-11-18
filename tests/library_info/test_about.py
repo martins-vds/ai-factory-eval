@@ -18,6 +18,11 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.content.decode() == ABOUT_GOLDEN['body']
 
 
+def test_about_pages_only_allow_get_requests(client):
+    for path in ('/about', '/ui/about/'):
+        assert client.post(path).status_code == 405
+
+
 def test_about_page_presents_library_information_in_a_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
