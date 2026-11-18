@@ -6,22 +6,16 @@ from django.test import override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
-from cargotracker.booking.application.specification import CargoSpecification
-from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_views
+from cargotracker.booking.interfaces.dialogs.views import create_destination_dialog_view
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
-from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
 cargo_repository = DjangoCargoRepository()
 location_repository = DjangoLocationRepository()
 dashboard = CargoDashboard(cargo_repository)
-specification = CargoSpecification(cargo_repository, DjangoHandlingEventRepository())
-destination_view, deadline_view = create_booking_dialog_views(
-    dashboard, specification, location_repository.find_all
-)
+destination_view = create_destination_dialog_view(dashboard, location_repository.find_all)
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/destination/', destination_view),
-    path('admin/cargo/<str:tracking_id>/deadline/', deadline_view),
 ]
 
 
