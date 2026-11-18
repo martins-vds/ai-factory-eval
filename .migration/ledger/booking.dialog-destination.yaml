@@ -5,16 +5,40 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeDestination.xhtml:src/main/webapp/admin/dialogs/changeDestination.xhtml
   location: src/main/webapp/admin/dialogs/changeDestination.xhtml:9-40
   risk: {crap: 20, complexity: 4, coverage: 0.0}
-boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "The not-routed table destination control opens a dialog with origin and current destination; choices exclude both without mutating the backing locations, and a valid update refreshes the dashboard."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_destination_dialog_view
+    - templates/booking/dashboard/not_routed_table.html
+    - templates/booking/dialogs/destination.html
+    - templates/booking/dialogs/not_found.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_excludes_origin_and_current_destination_without_mutating_locations"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_unavailable_destinations_without_updating_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_refreshes_dashboard"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_use_case_rejects_origin_as_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_render_not_found_for_unknown_cargo"
+  - "tests/booking/application/test_specification.py::test_change_destination_raises_lookup_error_for_unknown_cargo"
+  - "tests/booking/application/test_specification.py::test_change_destination_preserves_other_specification_fields_and_resets_route_state"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: cargo-exists
+    rule: A destination change only applies to an existing cargo.
+    source: src/cargotracker/booking/application/specification.py:54-58
+  - id: different-from-origin
+    rule: The cargo destination cannot be its origin.
+    source: src/cargotracker/cargo/domain/route_specification.py:23-24
+  - id: preserve-route
+    rule: Changing the destination preserves the cargo's origin and arrival deadline.
+    source: src/cargotracker/booking/application/specification.py:24-30
+notes: "Destination choices exclude the origin and current destination and are rebuilt without mutating the available-location list per #235; successful updates omit the unavailable-widget warning per #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]

@@ -26,13 +26,42 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.origin.unlocode.value }}</span>
             </td>
             <td class="p-3">
-              {{ cargo.route_specification.destination.name }}<br>
-              <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                type="button"
+                class="min-h-11 text-left text-blue-700 underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+                aria-haspopup="dialog"
+                aria-controls="cargo-edit-dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+              >
+                {{ cargo.route_specification.destination.name }}<br>
+                <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              </button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <button
+                type="button"
+                class="min-h-11 text-blue-700 underline focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+                aria-label="Change deadline for cargo {{ cargo.tracking_id.value }}"
+                aria-haspopup="dialog"
+                aria-controls="cargo-edit-dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+              >{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog
+    id="cargo-edit-dialog"
+    class="modal rounded-lg border-0 p-0 shadow-xl"
+    aria-label="Edit cargo"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+    hx-on::after-swap="if (!this.open) this.showModal()"
+  ></dialog>
 </section>
