@@ -11,15 +11,16 @@ RESPONSE_HANDLING = (
 )
 
 
-def _assert_page_handles_error_swaps(page, target):
+def _assert_page_handles_error_swaps(page, target, fragment=None):
     content = page.content
+    target_content = (fragment or page).content
     target_id = target.removeprefix('#').encode()
 
     assert page.status_code == 200
     assert b'name="htmx-config"' in content
     assert RESPONSE_HANDLING in content
-    assert f'hx-target="{target}"'.encode() in content
-    assert b'id="' + target_id + b'"' in content
+    assert f'hx-target="{target}"'.encode() in target_content
+    assert b'id="' + target_id + b'"' in target_content
 
 
 @pytest.mark.django_db
@@ -88,6 +89,7 @@ def test_destination_dialog_page_swaps_invalid_destination_error(client):
 @pytest.mark.django_db
 def test_booking_deadline_form_swaps_expired_deadline_error(client, monkeypatch):
     call_command('seed_sample_data')
+    page = client.get('/booking/')
     today = date(2026, 11, 18)
     monkeypatch.setattr(timezone, 'localdate', lambda: today)
     response = client.post(
@@ -103,7 +105,7 @@ def test_booking_deadline_form_swaps_expired_deadline_error(client, monkeypatch)
 
     assert response.status_code == 200
     assert b'Arrival deadline cannot be before today.' in response.content
-    _assert_page_handles_error_swaps(response, '#deadline-form')
+    _assert_page_handles_error_swaps(page, '#deadline-form', response)
 
 
 @pytest.mark.django_db
