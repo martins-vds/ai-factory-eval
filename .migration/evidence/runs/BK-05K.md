@@ -47,3 +47,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T22:36:02+00:00 | regression-final-v2 | 0 | 76.09 | `pytest -q` | `cb860d3b6d428cb1` |  |  |
 | 2026-11-18T22:39:20+00:00 | verification-ui-all | 0 | 0.37 | `python .migration/harness/tools/check_ui.py --all` | `0cb805740bfb2d16` |  | gate=ui scope="every template" templates=21 findings=0 |
 | 2026-11-18T22:40:54+00:00 | verification-regression | 0 | 90.92 | `pytest -q` | `0d7a19316c816193` |  |  |
+| 2026-11-18T23:54:12+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
