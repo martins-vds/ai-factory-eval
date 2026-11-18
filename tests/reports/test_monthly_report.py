@@ -34,6 +34,7 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
         [
             Loan('L1', 'amy', date(2026, 2, 3), date(2026, 2, 10), date(2026, 2, 16)),
             Loan('L2', 'amy', date(2026, 2, 4), date(2026, 2, 10), date(2026, 2, 11)),
+            Loan('L8', 'amy', date(2026, 2, 1), date(2026, 1, 29), date(2026, 2, 1)),
             Loan('L3', 'ben', date(2026, 2, 1), date(2026, 2, 2), date(2026, 2, 4)),
             Loan('L4', 'zoe', date(2026, 2, 2), date(2026, 2, 8), date(2026, 2, 8)),
             Loan('L5', 'max', date(2026, 2, 2), date(2025, 11, 7), date(2026, 2, 15)),
@@ -48,7 +49,7 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
     assert repository.requested_period == (date(2026, 2, 1), date(2026, 3, 1))
     assert report == [
         MemberMonthlyReport('max', 1, 1, 1000),
-        MemberMonthlyReport('amy', 2, 2, 150),
+        MemberMonthlyReport('amy', 3, 3, 225),
         MemberMonthlyReport('ben', 1, 1, 0),
         MemberMonthlyReport('zoe', 1, 0, 0),
     ]
