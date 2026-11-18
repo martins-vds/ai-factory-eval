@@ -31,6 +31,9 @@ def test_about_page_presents_library_information_in_a_browser(live_server):
             assert page.get_by_role('heading', name='About the Lending Library').is_visible()
             assert page.get_by_text('Monday to Saturday', exact=False).is_visible()
             assert page.get_by_text('14-day lending period', exact=False).is_visible()
+            assert page.locator('link[href="/static/css/tailwind.css"]').count() == 1
+            assert page.locator('link[href*="daisyui@4.12.24"]').count() == 1
+            assert page.locator('script[src*="htmx.org@2.0.11"]').count() == 1
             assert page.get_by_role(
                 'link', name='desk@lending-library.invalid'
             ).get_attribute('href') == 'mailto:desk@lending-library.invalid'
