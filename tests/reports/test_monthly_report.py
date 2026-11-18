@@ -55,6 +55,25 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
     ]
 
 
+def test_monthly_report_waives_two_late_days_and_excludes_next_month_returns():
+    repository = LoanRepository(
+        [
+            Loan('L1', 'grace', date(2026, 2, 1), date(2026, 2, 10), date(2026, 2, 12)),
+            Loan('L2', 'charge', date(2026, 2, 1), date(2026, 2, 10), date(2026, 2, 13)),
+            Loan('L3', 'next-month', date(2026, 2, 1), date(2026, 2, 10), date(2026, 3, 1)),
+        ]
+    )
+    application = MonthlyReportApplication(repository)
+
+    report = application.generate(date(2026, 3, 1))
+
+    assert report == [
+        MemberMonthlyReport('charge', 1, 1, 75),
+        MemberMonthlyReport('grace', 1, 1, 0),
+        MemberMonthlyReport('next-month', 1, 0, 0),
+    ]
+
+
 @pytest.mark.django_db
 def test_monthly_report_command_reads_persisted_loans(monkeypatch):
     as_of = date(2099, 3, 1)
