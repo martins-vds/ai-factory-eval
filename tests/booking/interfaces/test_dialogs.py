@@ -39,9 +39,9 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
     call_command('seed_sample_data')
 
     response = client.get('/admin/dashboard/')
-    not_routed_table = response.content.decode().split('id="not-routed-cargo"', 1)[1].split(
-        '</section>', 1
-    )[0]
+    not_routed_table = (
+        response.content.decode().split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+    )
 
     assert response.status_code == 200
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
@@ -113,9 +113,11 @@ def test_destination_dialog_updates_cargo_and_refreshes_the_dashboard(client):
     )
     updated_cargo = repository.find(cargo.tracking_id)
     dashboard_response = client.get('/admin/dashboard/')
-    not_routed_table = dashboard_response.content.decode().split('id="not-routed-cargo"', 1)[
-        1
-    ].split('</section>', 1)[0]
+    not_routed_table = (
+        dashboard_response.content.decode()
+        .split('id="not-routed-cargo"', 1)[1]
+        .split('</section>', 1)[0]
+    )
 
     assert response.status_code == 204
     assert response['HX-Redirect'] == '/admin/dashboard/'
@@ -186,6 +188,8 @@ def test_dialogs_return_not_found_for_unknown_cargo(client, path):
     response = client.get(path)
 
     assert response.status_code == 404
+    assert 'role="alert"' in response.content.decode()
+    assert 'Cargo with tracking ID MISSING1 not found.' in response.content.decode()
 
 
 @pytest.mark.django_db
@@ -231,9 +235,11 @@ def test_deadline_dialog_updates_cargo_and_refreshes_the_dashboard(client):
     )
     updated_cargo = repository.find(cargo.tracking_id)
     dashboard_response = client.get('/admin/dashboard/')
-    not_routed_table = dashboard_response.content.decode().split('id="not-routed-cargo"', 1)[
-        1
-    ].split('</section>', 1)[0]
+    not_routed_table = (
+        dashboard_response.content.decode()
+        .split('id="not-routed-cargo"', 1)[1]
+        .split('</section>', 1)[0]
+    )
 
     assert response.status_code == 204
     assert response['HX-Redirect'] == '/admin/dashboard/'

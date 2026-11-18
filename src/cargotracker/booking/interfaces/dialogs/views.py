@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from datetime import datetime, time
 
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotAllowed
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
@@ -19,6 +19,15 @@ def _dialog_completion_response(request: HttpRequest) -> HttpResponse:
     return redirect('/admin/dashboard/')
 
 
+def _not_found_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
+    return render(
+        request,
+        'booking/dialogs/not_found.html',
+        {'tracking_id': tracking_id},
+        status=404,
+    )
+
+
 def create_destination_dialog_view(
     cargo_dashboard: CargoDashboard,
     specification: CargoSpecification,
@@ -30,21 +39,20 @@ def create_destination_dialog_view(
 
         cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
         if cargo is None:
-            raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+            return _not_found_dialog(request, tracking_id)
         available_locations = list(list_shipping_locations())
         locations = [
             location
             for location in available_locations
-            if location not in (
+            if location
+            not in (
                 cargo.route_specification.origin,
                 cargo.route_specification.destination,
             )
         ]
         selected_destination = request.POST.get('destination', '')
         if request.method == 'POST':
-            destination_by_code = {
-                location.unlocode.value: location for location in locations
-            }
+            destination_by_code = {location.unlocode.value: location for location in locations}
             destination = destination_by_code.get(selected_destination)
             if destination is None:
                 return render(
@@ -83,13 +91,11 @@ def create_deadline_dialog_view(
 
         cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
         if cargo is None:
-            raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+            return _not_found_dialog(request, tracking_id)
         deadline_value = (
             request.POST.get('deadline', '')
             if request.method == 'POST'
-            else timezone.localtime(cargo.route_specification.arrival_deadline).strftime(
-                '%Y-%m-%d'
-            )
+            else timezone.localtime(cargo.route_specification.arrival_deadline).strftime('%Y-%m-%d')
         )
         deadline_error = ''
         if request.method == 'POST':
