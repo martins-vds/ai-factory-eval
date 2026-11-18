@@ -89,7 +89,9 @@ def reset_candidate_routing():
 @pytest.fixture
 def seeded_route_candidates(monkeypatch):
     now = datetime(2026, 11, 7, tzinfo=UTC)
-    monkeypatch.setattr('cargotracker.cargo.management.commands.seed_sample_data.timezone.now', lambda: now)
+    monkeypatch.setattr(
+        'cargotracker.cargo.management.commands.seed_sample_data.timezone.now', lambda: now
+    )
     call_command('seed_sample_data')
     candidate_routing_service.candidates = _candidate_paths()
     return cargo_repository.find(TrackingId('DEF789'))
@@ -105,7 +107,8 @@ def test_route_page_displays_candidate_count_and_numbered_itinerary_legs(
 
     assert response.status_code == 200
     assert 'Routing Details for Cargo DEF789' in content
-    assert 'Potential routes: 2' in content
+    assert 'Potential routes:' in content
+    assert 'aria-live="polite">2</span>' in content
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
     assert 'Leg 1' in content and 'Leg 2' in content
     assert '0300A' in content and '0200T' in content
@@ -114,10 +117,91 @@ def test_route_page_displays_candidate_count_and_numbered_itinerary_legs(
     assert candidate_routing_service.requested_route == (ORIGIN, DESTINATION)
     assert candidates
     assert all(candidate.legs for candidate in candidates)
-    assert all(candidate.legs[0].load_location == seeded_route_candidates.route_specification.origin for candidate in candidates)
-    assert all(candidate.legs[-1].unload_location == seeded_route_candidates.route_specification.destination for candidate in candidates)
+    assert all(
+        candidate.legs[0].load_location == seeded_route_candidates.route_specification.origin
+        for candidate in candidates
+    )
+    assert all(
+        candidate.legs[-1].unload_location
+        == seeded_route_candidates.route_specification.destination
+        for candidate in candidates
+    )
     assert all(
         first.unload_location == second.load_location
         for candidate in candidates
         for first, second in zip(candidate.legs, candidate.legs[1:])
     )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_assigning_candidate_redirects_to_details_and_persists_that_itinerary(
+    client, seeded_route_candidates
+):
+    response = client.get('/admin/cargo/DEF789/route/')
+    selected_itinerary = response.context['routes'][1]['itinerary']
+    candidate_token = response.context['routes'][1]['token']
+
+    assigned_response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate': candidate_token},
+        follow=True,
+    )
+    assigned_cargo = cargo_repository.find(TrackingId('DEF789'))
+
+    assert assigned_response.redirect_chain == [('/admin/cargo/DEF789/', 302)]
+    assert assigned_response.status_code == 200
+    assert 'Routing Details for Cargo DEF789' in assigned_response.content.decode()
+    assert '0400S' in assigned_response.content.decode()
+    assert assigned_cargo is not None
+    assert assigned_cargo.itinerary == selected_itinerary
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_select_itinerary_renders_populated_candidates(seeded_route_candidates, client):
+    response = client.get('/admin/cargo/DEF789/itineraries/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select an Itinerary for Cargo DEF789' in content
+    assert 'Potential routes:' in content
+    assert 'Itinerary 1' in content and 'Itinerary 2' in content
+    assert 'No routes found' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_and_select_itinerary_show_no_route_guidance(seeded_route_candidates, client):
+    candidate_routing_service.candidates = ()
+
+    route_response = client.get('/admin/cargo/DEF789/route/')
+    selection_response = client.get('/admin/cargo/DEF789/itineraries/')
+
+    assert 'Potential routes:' in route_response.content.decode()
+    assert '0</span>' in route_response.content.decode()
+    assert (
+        'Try setting an arrival deadline further into the future.'
+        in route_response.content.decode()
+    )
+    assert 'a few weeks at least' in selection_response.content.decode()
+    assert 'Assign itinerary' not in selection_response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_invalid_candidate_token_does_not_assign_a_route(client, seeded_route_candidates):
+    response = client.get('/admin/cargo/DEF789/route/')
+    token = response.context['routes'][0]['token']
+    tampered_token = f'X{token[1:]}'
+
+    assignment_response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate': tampered_token},
+    )
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+
+    assert assignment_response.status_code == 400
+    assert 'Choose a valid route.' in assignment_response.content.decode()
+    assert cargo is not None
+    assert not cargo.itinerary.legs

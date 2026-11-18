@@ -7,9 +7,13 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "CargoDetails and ItinerarySelection call BookingServiceFacade, DefaultBookingService, RoutingService and the configured graph-traversal endpoint; assignment maps route DTOs to JPA Voyage/Location entities and stores Cargo."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-eval#1401]
+target:
+  components:
+    - cargotracker.booking.application.routing.CargoRouting
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
@@ -17,4 +21,11 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_page_displays_candidate_count_and_numbered_itinerary_legs"
+  - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_and_persists_that_itinerary"
+  - ".migration/evidence/runs/BK-05F.md"
+rules:
+  - id: selected-candidate
+    rule: "Only a server-issued candidate for this cargo that still satisfies its current route specification can be assigned."
+    source: "ItinerarySelection.java:64-69; approved ruling martins-vds/ai-factory-pilot-target#236"
+notes: "Decision #89 selects in-process routing in the target while preserving random routes. Assignment redirects to cargo details under ruling #236."
