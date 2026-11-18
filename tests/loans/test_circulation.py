@@ -1,6 +1,10 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
+from threading import Barrier
 
 import pytest
+from django.db import close_old_connections
+from django.test import Client
 
 
 @pytest.mark.parametrize(
@@ -37,6 +41,29 @@ def test_lending_creates_a_persisted_fourteen_day_loan(client):
     saved_loan = client.get('/loans/L4')
     assert saved_loan.status_code == 200
     assert saved_loan.content == response.content
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_lending_allocates_distinct_ids():
+    requests_started = Barrier(8)
+
+    def lend(index):
+        close_old_connections()
+        try:
+            requests_started.wait()
+            return Client().post(
+                '/loans',
+                {'member': f'reader-{index}', 'isbn': str(index)},
+            )
+        finally:
+            close_old_connections()
+
+    with ThreadPoolExecutor(max_workers=8) as workers:
+        responses = list(workers.map(lend, range(8)))
+
+    assert all(response.status_code == 201 for response in responses)
+    loan_ids = {response.content.decode().split(';', 1)[0] for response in responses}
+    assert loan_ids == {f'L{number}' for number in range(4, 12)}
 
 
 @pytest.mark.django_db

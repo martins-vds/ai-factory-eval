@@ -20,5 +20,6 @@ class LoanRepository:
 
     @transaction.atomic
     def create(self, **fields):
+        Loan.objects.select_for_update().order_by('pk').first()
         fields.setdefault('id', f'L{Loan.objects.count() + 1}')
         return Loan.objects.create(**fields)
