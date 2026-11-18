@@ -62,36 +62,39 @@ def fee_page(request, loan_id):
 
 @require_POST
 def payment_page(request, loan_id):
-    gateway_error = False
     try:
         gateway_response = payment_application.charge(loan_id)
     except GatewayFailure as error:
         logger.warning('Payment gateway request failed', exc_info=error)
-        gateway_response = None
-        gateway_error = True
-
-    if gateway_response is None and not gateway_error:
+        return _payment_failure(request, loan_id, 'Payment gateway unavailable.')
+    if gateway_response is None:
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
-
-    if gateway_error or gateway_response.status_code != 200:
-        status = 502
-        message = (
-            'Payment gateway unavailable.'
-            if gateway_error or not gateway_response.body.strip()
-            else gateway_response.body.strip()
-        )
-        template = 'fees/payment-status.html'
-        context = {'message': message, 'success': False}
-    else:
-        status = 200
-        template = 'fees/payment-status.html'
-        context = {'message': 'Payment received.', 'success': True}
-
     if request.headers.get('HX-Request') == 'true':
-        return render(request, template, context, status=status)
-    if status == 200:
+        if gateway_response.status_code != 200:
+            message = gateway_response.body.strip() or 'Payment gateway unavailable.'
+            return _payment_failure(request, loan_id, message)
+        return render(
+            request,
+            'fees/payment-status.html',
+            {'message': 'Payment received.', 'success': True},
+        )
+    if gateway_response.status_code == 200:
         return redirect(f'/ui/fees/{loan_id}/')
+    message = gateway_response.body.strip() or 'Payment gateway unavailable.'
+    return _payment_failure(request, loan_id, message)
+
+
+def _payment_failure(request, loan_id, message):
+    if request.headers.get('HX-Request') == 'true':
+        return render(
+            request,
+            'fees/payment-status.html',
+            {'message': message, 'success': False},
+            status=502,
+        )
     quote = fee_application.quote(loan_id)
+    if quote is None:
+        return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
     return render(
         request,
         'fees/detail.html',
@@ -99,7 +102,7 @@ def payment_page(request, loan_id):
             'quote': quote,
             'loan': quote.loan,
             'fee_amount': f'{quote.amount_cents // 100}.{quote.amount_cents % 100:02d}',
-            'payment_error': context['message'],
+            'payment_error': message,
         },
-        status=status,
+        status=502,
     )
