@@ -5,10 +5,17 @@ title: Produce the specified monthly lending report
 source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
-boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
+boundary: "The monthly_report command emits a CSV row per qualifying member with loans started, late returns, and late fees in cents, sorted by fees descending then member id."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.reports.management.commands.monthly_report.Command, src.reports.services.MonthlyReportApplication, src.reports.repository.DjangoMonthlyReportRepository]
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/LL-05.md, tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_month_loans, tests/reports/test_monthly_report.py::test_monthly_report_prior_month_window_crosses_year_boundary]
+rules:
+  - { id: report-period, rule: "The report covers the prior calendar month using a half-open date range in the server's local date.", source: "legacy/docs/reports-spec.md:3; .migration/plan/monthly-report.md:5-12" }
+  - { id: monthly-starts, rule: "Count loans started in the report month and include only members with at least one such loan.", source: "legacy/docs/reports-spec.md:4,7; .migration/plan/monthly-report.md:5-12" }
+  - { id: late-returns-and-fees, rule: "Count returned loans in the report month only when the return date is after the due date, and sum their calculated fees in cents.", source: "legacy/docs/reports-spec.md:3-4; legacy/src/main/java/lib/LateFeeView.java:31-37" }
+  - { id: report-order, rule: "Order rows by total late fees descending, then member id ascending.", source: "legacy/docs/reports-spec.md:5" }
+notes: "The source has no executable report module; target behavior is derived from its tier-C specification and the approved slice plan."
