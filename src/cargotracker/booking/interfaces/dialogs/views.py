@@ -53,11 +53,7 @@ def create_booking_dialog_views(
         locations = _destination_options(list_shipping_locations(), cargo)
         selected_destination = request.POST.get('destination', '')
         destination = next(
-            (
-                location
-                for location in locations
-                if location.unlocode.value == selected_destination
-            ),
+            (location for location in locations if location.unlocode.value == selected_destination),
             None,
         )
         destination_error = ''

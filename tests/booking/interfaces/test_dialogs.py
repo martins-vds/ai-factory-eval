@@ -97,9 +97,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     assert shipping_locations == original_locations
 
 
-def test_destination_update_redirects_and_refreshes_the_not_routed_row(
-    client, sample_booking_data
-):
+def test_destination_update_redirects_and_refreshes_the_not_routed_row(client, sample_booking_data):
     cargo = sample_booking_data
     assert cargo is not None
     destination = next(
@@ -170,14 +168,14 @@ def test_deadline_dialog_shows_initial_value_and_parse_error(client, sample_book
     assert refreshed_cargo.route_specification.arrival_deadline == original_deadline
 
 
-def test_deadline_update_redirects_and_refreshes_the_not_routed_row(
-    client, sample_booking_data
-):
+def test_deadline_update_redirects_and_refreshes_the_not_routed_row(client, sample_booking_data):
     cargo = sample_booking_data
     assert cargo is not None
     original_origin = cargo.route_specification.origin
     original_destination = cargo.route_specification.destination
-    updated_deadline = datetime(2030, 1, 2, tzinfo=cargo.route_specification.arrival_deadline.tzinfo)
+    updated_deadline = datetime(
+        2030, 1, 2, tzinfo=cargo.route_specification.arrival_deadline.tzinfo
+    )
 
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
