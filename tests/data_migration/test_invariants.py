@@ -160,9 +160,7 @@ def test_loaded_handling_event_references_exist(tmp_path):
     assert events
     assert any(event.voyage_id is not None for event in events)
     assert all(event.location_id in location_ids for event in events)
-    assert all(
-        event.voyage_id is None or event.voyage_id in voyage_ids for event in events
-    )
+    assert all(event.voyage_id is None or event.voyage_id in voyage_ids for event in events)
 
 
 @pytest.mark.django_db(transaction=True)
