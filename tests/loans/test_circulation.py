@@ -65,9 +65,22 @@ def test_lend_api_creates_a_loan_with_the_characterized_response(client):
     )
 
 
+@pytest.mark.django_db
+def test_lend_api_escapes_semicolons_in_created_loan_fields(client):
+    lent_on = timezone.localdate()
+    response = client.post('/loans', {'member': 'reader;one', 'isbn': '123;456'})
+
+    assert response.status_code == 201
+    assert response.content.decode() == (
+        f'L4;"reader;one";"123;456";{lent_on.isoformat()};'
+        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+    )
+
+
 @pytest.mark.parametrize(
     'form',
     [
+        {'isbn': '123'},
         {'member': 'reader'},
         {'member': '', 'isbn': '123'},
         {'member': ' \t ', 'isbn': '123'},

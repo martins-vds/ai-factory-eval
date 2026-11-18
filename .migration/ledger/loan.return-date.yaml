@@ -7,11 +7,32 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "A successful first return assigns the server's local date to returnedOn and persists it; a repeated return is rejected without replacing the original date."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1422]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/loans/test_circulation.py::test_return_use_case_records_the_requested_date
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_a_repeat_and_preserves_the_original_date
+  - tests/loans/test_circulation.py::test_return_api_records_date_and_rejects_repeated_returns
+  - tests/loans/test_circulation.py::test_ui_return_rejects_repeated_returns_and_preserves_the_original_date
+  - .migration/evidence/runs/LL-02.md
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components: [src.loans.services.return_loan, src.loans.repository.LoanRepository.return_if_unreturned]
+rules:
+  - id: record-first-return
+    rule: The first successful return stores the supplied server-local return date.
+    source: legacy/src/main/java/lib/LoanRepository.java:36-44
+  - id: preserve-original-return-date
+    rule: A repeated return must be rejected and must not replace the first return date.
+    source: martins-vds/ai-factory-synthetic-target#41
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#41
+  reason: Approved fix rejects repeat returns and preserves the original return date.
