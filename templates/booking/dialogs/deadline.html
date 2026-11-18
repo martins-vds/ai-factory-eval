@@ -20,8 +20,7 @@
     name="deadline"
     type="date"
     value="{{ deadline_value }}"
-    aria-describedby="deadline-error"
-    {% if deadline_error %}aria-invalid="true"{% endif %}
+    {% if deadline_error %}aria-describedby="deadline-error" aria-invalid="true"{% endif %}
     class="input input-bordered w-full focus-visible:ring-2 focus-visible:ring-blue-600"
   >
   {% if deadline_error %}

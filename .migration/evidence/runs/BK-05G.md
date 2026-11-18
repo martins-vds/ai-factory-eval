@@ -18,3 +18,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:47:54+00:00 | destination-update-green-retry | 0 | 4.3 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `a3cda5da27ccfe0a` |  |  |
 | 2026-11-18T12:48:22+00:00 | table-dialog-triggers-red | 1 | 2.35 | `pytest -q tests/booking/interfaces/test_dialogs.py -k not_routed_table_opens` | `32e51df1d31a4fcc` | assert response.status_code == 200 |  |
 | 2026-11-18T12:48:50+00:00 | dialogs-and-dashboard-green | 0 | 5.78 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `846032b0b45931c5` |  |  |
+| 2026-11-18T12:49:31+00:00 | destination-reject-invalid | 0 | 5.23 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `bd46483470296c83` |  |  |
+| 2026-11-18T12:50:23+00:00 | dialogs-dashboard-regression | 0 | 6.17 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `0eeaff76b71bd83d` |  |  |

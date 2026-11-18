@@ -154,6 +154,28 @@ def test_destination_update_refreshes_table_and_preserves_other_specification_fi
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_destination_update_rejects_locations_outside_the_offered_choices(client):
+    call_command('seed_sample_data')
+    original_destination = dashboard.get_cargo_details(
+        TrackingId('DEF789')
+    ).route_specification.destination
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'CNHKG'},
+        HTTP_HX_REQUEST='true',
+    )
+    updated_cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Choose a valid destination.' in content
+    assert 'aria-invalid="true"' in content
+    assert updated_cargo.route_specification.destination == original_destination
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_not_routed_table_opens_edit_dialogs_without_changing_route_link(client):
     call_command('seed_sample_data')
 

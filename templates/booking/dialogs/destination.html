@@ -21,8 +21,7 @@
   <select
     id="destination"
     name="destination"
-    aria-describedby="{% if destination_error %}destination-error{% endif %}"
-    {% if destination_error %}aria-invalid="true"{% endif %}
+    {% if destination_error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
     class="select select-bordered w-full focus-visible:ring-2 focus-visible:ring-blue-600"
   >
     {% for location in destination_options %}

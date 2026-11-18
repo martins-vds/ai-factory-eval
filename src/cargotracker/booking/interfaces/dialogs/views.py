@@ -6,11 +6,12 @@ from django.shortcuts import redirect, render
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
+from cargotracker.cargo.domain.cargo import Cargo
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.location.domain.location import Location
 
 
-def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str):
+def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo:
     cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
     if cargo is None:
         raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
