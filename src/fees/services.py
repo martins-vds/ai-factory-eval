@@ -1,7 +1,7 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
-from collections.abc import Iterable
 from typing import Protocol
 
 
