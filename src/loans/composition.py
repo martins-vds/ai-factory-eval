@@ -2,9 +2,13 @@ from .clock import SystemClock
 from .repository import LoanRepository
 from .services import (
     get_loan_text as get_loan_text_use_case,
+)
+from .services import (
     lend_loan,
-    list_loans_text as list_loans_text_use_case,
     return_loan,
+)
+from .services import (
+    list_loans_text as list_loans_text_use_case,
 )
 
 

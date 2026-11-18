@@ -10,4 +10,12 @@
   <p class="mb-8 text-[#66705b]">Add a reader and a book to the neighborhood collection.</p>
   <div id="loan-form">{% include "loans/form.html" %}</div>
 </section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
 {% endblock %}

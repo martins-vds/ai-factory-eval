@@ -36,8 +36,6 @@ def loan_detail(request, loan_id):
 
 
 def loan_lend(request):
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
     try:
         loan = lend(request.POST.get('member'), request.POST.get('isbn'))
     except LoanInputError:

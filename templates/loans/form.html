@@ -1,7 +1,7 @@
 <form class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm" method="post" action="/ui/loans/new/"
       hx-post="/ui/loans/new/" hx-target="#loan-form" hx-swap="innerHTML">
   {% csrf_token %}
-  <div class="card-body gap-5">
+  <div class="card-body gap-4">
     <div>
       <label class="label" for="id_member"><span class="label-text font-semibold">Member</span></label>
       <input class="input input-bordered" id="id_member" name="member" value="{{ member|default:'' }}"

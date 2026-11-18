@@ -26,4 +26,12 @@
     </div>
   </aside>
 </section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
 {% endblock %}

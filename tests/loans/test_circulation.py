@@ -3,6 +3,8 @@ from datetime import date, timedelta
 
 import pytest
 
+from src.loans.models import Loan
+from src.loans.repository import LoanRepository
 from src.loans.services import (
     LoanAlreadyReturned,
     LoanInputError,
@@ -30,7 +32,7 @@ class MemoryLoanRepository:
         self.loans = {loan.id: loan for loan in loans}
 
     def next_id(self):
-        return f"L{len(self.loans) + 1}"
+        return f'L{len(self.loans) + 1}'
 
     def create(self, **fields):
         loan = LoanRecord(**fields)
@@ -74,12 +76,11 @@ def test_lend_rejects_missing_or_blank_member_and_isbn_with_field_errors():
             lend_loan(MemoryLoanRepository(), FixedClock(), member, isbn)
 
         assert expected_field in error.value.field_errors
+        assert error.value.field_errors[expected_field] == 'This field is required.'
 
 
 def test_return_records_the_clock_date():
-    repository = MemoryLoanRepository(
-        [LoanRecord('L1', 'reader', '123', date(2026, 11, 1))]
-    )
+    repository = MemoryLoanRepository([LoanRecord('L1', 'reader', '123', date(2026, 11, 1))])
 
     returned = return_loan(repository, FixedClock(), 'L1')
 
@@ -102,6 +103,31 @@ def test_return_rejects_an_already_returned_loan_without_changing_its_date():
 def test_return_rejects_an_unknown_loan():
     with pytest.raises(LoanNotFound):
         return_loan(MemoryLoanRepository(), FixedClock(), 'missing')
+
+
+def test_return_rejects_a_concurrent_return_and_keeps_its_date():
+    class ConcurrentReturnRepository(MemoryLoanRepository):
+        def mark_returned(self, loan_id, returned_on):
+            loan = self.find(loan_id)
+            loan.returned_on = date(2026, 11, 17)
+
+    repository = ConcurrentReturnRepository([LoanRecord('L1', 'reader', '123', date(2026, 11, 1))])
+
+    with pytest.raises(LoanAlreadyReturned):
+        return_loan(repository, FixedClock(), 'L1')
+
+    assert repository.find('L1').returned_on == date(2026, 11, 17)
+
+
+def test_return_reports_a_loan_deleted_during_the_return_attempt():
+    class DeletedLoanRepository(MemoryLoanRepository):
+        def mark_returned(self, loan_id, returned_on):
+            self.loans.pop(loan_id)
+
+    repository = DeletedLoanRepository([LoanRecord('L1', 'reader', '123', date(2026, 11, 1))])
+
+    with pytest.raises(LoanNotFound):
+        return_loan(repository, FixedClock(), 'L1')
 
 
 @pytest.mark.django_db
@@ -141,9 +167,7 @@ def test_return_endpoint_persists_the_return_date(client, monkeypatch):
 
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
-    assert response.content.decode() == (
-        'L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-18\n'
-    )
+    assert response.content.decode() == ('L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-18\n')
     assert client.get('/loans/L1').content.decode().endswith(';2026-11-18\n')
 
 
@@ -190,6 +214,22 @@ def test_browser_lending_page_renders_field_errors_for_blank_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    'form, error_id',
+    [
+        ({'isbn': '123'}, b'id="error-member"'),
+        ({'member': 'reader'}, b'id="error-isbn"'),
+    ],
+)
+def test_browser_lending_page_renders_errors_for_missing_fields(client, form, error_id):
+    response = client.post('/ui/loans/new/', form)
+
+    assert response.status_code == 200
+    assert error_id in response.content
+    assert b'This field is required.' in response.content
+
+
+@pytest.mark.django_db
 def test_browser_lending_redirects_to_collection_after_success(client, monkeypatch):
     monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 11, 18))
 
@@ -198,6 +238,20 @@ def test_browser_lending_redirects_to_collection_after_success(client, monkeypat
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/'
     assert b'L4;reader;123;2026-11-18;2026-12-02;' in client.get('/loans').content
+
+
+@pytest.mark.django_db
+def test_browser_htmx_lending_redirects_to_collection(client, monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 11, 18))
+
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'reader', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert response['HX-Redirect'] == '/ui/loans/'
 
 
 @pytest.mark.django_db
@@ -223,6 +277,17 @@ def test_browser_return_replaces_loan_row_with_return_date(client, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_browser_return_redirects_to_collection_without_htmx(client, monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 11, 18))
+
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    assert client.get('/loans/L1').content.decode().endswith(';2026-11-18\n')
+
+
+@pytest.mark.django_db
 def test_browser_repeat_return_renders_error_and_preserves_return_date(client):
     response = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
 
@@ -230,6 +295,17 @@ def test_browser_repeat_return_renders_error_and_preserves_return_date(client):
     assert b'role="alert"' in response.content
     assert b'This loan has already been returned.' in response.content
     assert b'Returned Jan 20, 2026' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_repeat_return_without_htmx_renders_collection_error(client):
+    response = client.post('/ui/loans/L2/return/')
+
+    assert response.status_code == 200
+    assert b'Books in good company.' in response.content
+    assert b'role="alert"' in response.content
+    assert b'This loan has already been returned.' in response.content
+    assert b'Loan L1' in response.content
 
 
 @pytest.mark.django_db
@@ -248,3 +324,36 @@ def test_browser_htmx_return_not_found_renders_an_error_fragment(client):
     assert response.status_code == 200
     assert b'role="alert"' in response.content
     assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_return_not_found_renders_a_library_page(client):
+    response = client.post('/ui/loans/missing/return/')
+
+    assert response.status_code == 404
+    assert b'Loan not found' in response.content
+    assert b'Back to the collection' in response.content
+
+
+@pytest.mark.django_db
+def test_return_repository_rolls_back_if_the_updated_loan_cannot_be_loaded(monkeypatch):
+    def fail_to_load(self, loan_id):
+        raise RuntimeError('load failed')
+
+    with pytest.raises(RuntimeError, match='load failed'), monkeypatch.context() as patch:
+        patch.setattr(LoanRepository, 'find', fail_to_load)
+        LoanRepository().mark_returned('L1', date(2026, 11, 18))
+
+    assert Loan.objects.get(pk='L1').returned_on is None
+
+
+@pytest.mark.django_db
+def test_api_routes_reject_unsupported_methods(client):
+    assert client.put('/loans').headers['Allow'] == 'GET, POST'
+    assert client.get('/loans/L1/return').headers['Allow'] == 'POST'
+
+
+@pytest.mark.django_db
+def test_browser_routes_reject_unsupported_methods(client):
+    assert client.put('/ui/loans/new/').headers['Allow'] == 'GET, POST'
+    assert client.get('/ui/loans/L1/return/').headers['Allow'] == 'POST'
