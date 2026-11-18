@@ -1,0 +1,89 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#1357
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1362
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.957
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: minor
+    where: src/fees/services.py:75-78
+    what: InterruptedError and OSError handlers duplicate the same result and retention logic; consider consolidating the catches.
+tests_added:
+  - tests/fees/test_fees.py::test_fee_application_clamps_days_at_zero_and_uses_clock_when_not_returned
+  - tests/fees/test_fees.py::test_fee_application_waives_two_days_and_charges_twenty_five_cents_per_day
+  - tests/fees/test_fees.py::test_fee_application_caps_amount_at_ten_dollars
+  - tests/fees/test_fees.py::test_fee_application_returns_none_for_unknown_loan
+  - tests/fees/test_fees.py::test_fee_application_returns_fields_required_by_fee_page
+  - tests/fees/test_payments.py::test_payment_application_sends_characterized_request_to_gateway
+  - tests/fees/test_payments.py::test_payment_application_does_not_call_gateway_for_unknown_loan
+  - tests/fees/test_payments.py::test_payment_application_maps_gateway_status_and_preserves_body
+  - tests/fees/test_payments.py::test_payment_application_maps_io_failure_to_gateway_unavailable
+  - tests/fees/test_payments.py::test_browser_displays_gateway_failure_from_htmx_payment_action
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+inherited: []
+rules:
+  - capability: fees.calculation
+    rule: Late days are clamped at zero and use the return date when present, otherwise today's server date.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fees.py::test_fee_application_clamps_days_at_zero_and_uses_clock_when_not_returned
+    enforced: true
+    ledger_rule: nonnegative-late-days
+  - capability: fees.calculation
+    rule: A fee is waived when late by two days or fewer; after that, charge 25 cents for every late day.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fees.py::test_fee_application_waives_two_days_and_charges_twenty_five_cents_per_day
+    enforced: true
+    ledger_rule: two-day-grace
+  - capability: fees.calculation
+    rule: The calculated fee is capped at $10.00.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fees.py::test_fee_application_caps_amount_at_ten_dollars
+    enforced: true
+    ledger_rule: ten-dollar-cap
+  - capability: fees.page
+    rule: An unknown loan returns HTTP 404 with the exact HTML fragment <p>No such loan.</p>.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fees.py::test_fee_application_returns_none_for_unknown_loan
+    enforced: true
+    ledger_rule: missing-loan
+  - capability: fees.page
+    rule: A known loan displays its id, due date, late-day count, and two-decimal dollar fee.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fees.py::test_fee_application_returns_fields_required_by_fee_page
+    enforced: true
+    ledger_rule: fee-content
+  - capability: integration.payment-gateway
+    rule: An unknown loan returns HTTP 404 and must not invoke the payment gateway.
+    use_case: PaymentApplication.charge
+    test: tests/fees/test_payments.py::test_payment_application_does_not_call_gateway_for_unknown_loan
+    enforced: true
+    ledger_rule: require-existing-loan
+  - capability: integration.payment-gateway
+    rule: Charge by POSTing an empty body to /charge?loan={id} at PAYMENT_GATEWAY_URL or https://payments.lending-library.invalid.
+    use_case: PaymentApplication.charge
+    test: tests/fees/test_payments.py::test_payment_application_sends_characterized_request_to_gateway
+    enforced: true
+    ledger_rule: gateway-charge-request
+  - capability: integration.payment-gateway
+    rule: A gateway HTTP 200 returns 200 with its body; every other HTTP status returns 502 with the gateway body.
+    use_case: PaymentApplication.charge
+    test: tests/fees/test_payments.py::test_payment_application_maps_gateway_status_and_preserves_body
+    enforced: true
+    ledger_rule: gateway-response-map
+  - capability: integration.payment-gateway
+    rule: I/O and interrupted gateway calls return HTTP 502 with payment gateway unavailable and retain the interruption.
+    use_case: PaymentApplication.charge
+    test: tests/fees/test_payments.py::test_payment_application_retains_interrupted_gateway_error
+    enforced: true
+    ledger_rule: gateway-transport-failure
+no_rules: {}

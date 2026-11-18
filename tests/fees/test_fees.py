@@ -1,9 +1,102 @@
-from datetime import timedelta
+from datetime import date, timedelta
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 import pytest
 from django.utils import timezone
 
+from src.fees.services import FeeApplication
 from src.loans.models import Loan
+
+
+@pytest.mark.parametrize(
+    ('returned_on', 'today', 'expected_late_days', 'expected_amount_cents'),
+    [
+        (date(2025, 1, 1), date(2025, 1, 21), 0, 0),
+        (None, date(2025, 1, 21), 19, 475),
+    ],
+)
+def test_fee_application_clamps_days_at_zero_and_uses_clock_when_not_returned(
+    returned_on, today, expected_late_days, expected_amount_cents
+):
+    loan = SimpleNamespace(
+        id='L1',
+        due_on=date(2025, 1, 2),
+        returned_on=returned_on,
+    )
+    repository = Mock()
+    repository.find.return_value = loan
+    clock = Mock()
+    clock.today.return_value = today
+
+    fee = FeeApplication(repository, clock).calculate('L1')
+
+    assert fee.late_days == expected_late_days
+    assert fee.amount_cents == expected_amount_cents
+
+
+@pytest.mark.parametrize(
+    ('late_days', 'expected_amount_cents'),
+    [(2, 0), (3, 75)],
+)
+def test_fee_application_waives_two_days_and_charges_twenty_five_cents_per_day(
+    late_days, expected_amount_cents
+):
+    loan = SimpleNamespace(
+        id='L1',
+        due_on=date(2025, 1, 1),
+        returned_on=date(2025, 1, 1) + timedelta(days=late_days),
+    )
+    repository = Mock()
+    repository.find.return_value = loan
+
+    fee = FeeApplication(repository, Mock()).calculate('L1')
+
+    assert fee.amount_cents == expected_amount_cents
+
+
+@pytest.mark.parametrize('late_days', [40, 41])
+def test_fee_application_caps_amount_at_ten_dollars(late_days):
+    loan = SimpleNamespace(
+        id='L1',
+        due_on=date(2025, 1, 1),
+        returned_on=date(2025, 1, 1) + timedelta(days=late_days),
+    )
+    repository = Mock()
+    repository.find.return_value = loan
+
+    fee = FeeApplication(repository, Mock()).calculate('L1')
+
+    assert fee.amount_cents == 1000
+
+
+def test_fee_application_returns_none_for_unknown_loan():
+    repository = Mock()
+    repository.find.return_value = None
+
+    fee = FeeApplication(repository, Mock()).calculate('unknown')
+
+    assert fee is None
+
+
+def test_fee_application_returns_fields_required_by_fee_page():
+    due_on = date(2025, 1, 1)
+    loan = SimpleNamespace(
+        id='L1',
+        due_on=due_on,
+        returned_on=date(2025, 1, 4),
+    )
+    repository = Mock()
+    repository.find.return_value = loan
+
+    fee = FeeApplication(repository, Mock()).calculate('L1')
+
+    assert (fee.loan_id, fee.due_on, fee.late_days, fee.formatted_amount) == (
+        'L1',
+        due_on,
+        3,
+        '0.75',
+    )
 
 
 @pytest.mark.django_db
