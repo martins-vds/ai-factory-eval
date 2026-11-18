@@ -1,0 +1,80 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1453
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1458
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 4.0
+  mutation_changed: "n/a: mutmut could not test mutants because the direct-use-case tests expose LL-02 defects"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:30-31
+    what: "lend_loan accepts empty and whitespace-only member or ISBN values when called directly; the required-fields rule is enforced only by the form/view."
+    evidence: tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_member_or_isbn
+  - severity: major
+    where: templates/loans/list.html:55-58; templates/loans/detail.html:28-31
+    what: "The htmx handler compares response.code to '4..'/'5..', but htmx 2.0.11 uses '[45]..'; 4xx/5xx responses remain unswapped, hiding the browser's not-found message."
+    evidence: tests/loans/test_circulation.py::test_unknown_browser_return_renders_htmx_error_response
+tests_added:
+  - tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_member_or_isbn
+  - tests/loans/test_circulation.py::test_lend_use_case_assigns_next_loan_id_and_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lend_use_case_escapes_delimiters_and_record_breaks
+  - tests/loans/test_circulation.py::test_return_use_case_reports_unknown_loan
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_return_date
+  - tests/loans/test_circulation.py::test_unknown_browser_return_renders_htmx_error_response
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited: []
+rules:
+  - capability: loan.lend
+    rule: "Member and ISBN must be nonblank; whitespace-only values are rejected."
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_member_or_isbn
+    enforced: false
+    ledger_rule: member-isbn-required
+  - capability: loan.lend
+    rule: "The due date is 14 calendar days after the lending date."
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lend_use_case_assigns_next_loan_id_and_fourteen_day_due_date
+    enforced: true
+    ledger_rule: due-date
+  - capability: loan.lend
+    rule: "A new loan receives id L<count+1>."
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lend_use_case_assigns_next_loan_id_and_fourteen_day_due_date
+    enforced: true
+    ledger_rule: loan-id
+  - capability: loan.lend
+    rule: "Semicolons, quotes and record delimiters in exported fields are escaped."
+    use_case: lend_loan and loan_line
+    test: tests/loans/test_circulation.py::test_lend_use_case_escapes_delimiters_and_record_breaks
+    enforced: true
+    ledger_rule: delimited-export
+  - capability: loan.return-date
+    rule: "The first return sets the date; subsequent returns do not change it."
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_return_date
+    enforced: true
+    ledger_rule: returned-once
+  - capability: loan.return
+    rule: "Returning an unknown loan is rejected."
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_reports_unknown_loan
+    enforced: true
+    ledger_rule: known-loan
+  - capability: loan.return
+    rule: "A loan can be returned only once; repeated returns do not alter its return date."
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_return_date
+    enforced: true
+    ledger_rule: return-once
+no_rules: {}
