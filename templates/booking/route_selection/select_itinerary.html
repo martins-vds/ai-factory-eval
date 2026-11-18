@@ -1,0 +1,11 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Select Itinerary | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-6 text-2xl font-semibold text-gray-900">
+    Select Itinerary for Cargo {{ cargo.tracking_id.value }}
+  </h1>
+  {% include "booking/route_selection/_cargo_details.html" %}
+  {% include "booking/route_selection/_candidates.html" %}
+{% endblock %}
