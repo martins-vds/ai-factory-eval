@@ -83,3 +83,13 @@ Tailwind CSS asset, so visual styling was not assessed.
 | 2026-11-18T04:19:55+00:00 | verifier-idiom-format | 1 | 0.01 | `ruff format --check` | `5885e2903349adc3` | 191 \|     assert unchanged is not None |  |
 | 2026-11-18T04:20:17+00:00 | verifier-idiom-format-corrected | 1 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `4109d361c53a67af` | 192 \|     assert ( |  |
 | 2026-11-18T04:20:26+00:00 | verifier-idiom-format-corrected-2 | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_dialogs.py` | `fd2299c9f1c6dc86` |  |  |
+| 2026-11-18T04:21:07+00:00 | verifier-behavior-full | 0 | 72.36 | `pytest -q` | `81df0ebd5dc9cf6f` |  |  |
+| 2026-11-18T04:21:16+00:00 | verifier-final-build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:21:16+00:00 | verifier-final-build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T04:21:17+00:00 | verifier-final-idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:21:17+00:00 | verifier-final-idiom-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T04:21:17+00:00 | verifier-final-idiom-layers | 0 | 0.14 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T04:21:17+00:00 | verifier-final-idiom-ui | 0 | 0.42 | `python .migration/harness/tools/check_ui.py` | `a714778f54361a26` |  | gate=ui scope="templates changed since 2dbd64cba4409e8976ce92a552eacc0b1ca691f7" templates=4 findings=0 |
+| 2026-11-18T04:22:35+00:00 | verifier-final-crap-coverage | 0 | 70.03 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `b145a867ae037bf7` |  |  |
+| 2026-11-18T04:22:36+00:00 | verifier-final-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:22:36+00:00 | verifier-final-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `3f312c166bbf236c` |  | gate=crap max=26.0 threshold=30 over=0 methods=209 |
