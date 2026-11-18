@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
-
 LEGACY_ABOUT_HTML = """<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>About the Lending Library</title></head>

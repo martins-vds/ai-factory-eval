@@ -1,6 +1,5 @@
 from playwright.sync_api import sync_playwright
 
-
 LEGACY_ABOUT_HTML = """<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>About the Lending Library</title></head>
@@ -21,6 +20,11 @@ def test_legacy_about_response_is_unchanged(client):
     assert response.content.decode() == LEGACY_ABOUT_HTML
 
 
+def test_about_pages_only_allow_get(client):
+    assert client.post('/about').status_code == 405
+    assert client.post('/ui/about/').status_code == 405
+
+
 def test_about_page_renders_reading_room_information_in_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -31,7 +35,9 @@ def test_about_page_renders_reading_room_information_in_browser(live_server):
             assert response is not None
             assert response.status == 200
             assert page.get_by_role('heading', name='About the Lending Library').is_visible()
-            assert page.get_by_text('A neighborhood collection, kept in motion by the people who read it.').is_visible()
+            assert page.get_by_text(
+                'A neighborhood collection, kept in motion by the people who read it.'
+            ).is_visible()
             assert page.get_by_text('Open Monday to Saturday, 9:00 to 18:00.').is_visible()
             assert page.get_by_text('Books are lent for 14 days.').is_visible()
             contact = page.get_by_role('link', name='desk@lending-library.invalid')
