@@ -8,10 +8,22 @@ source:
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1377]
+target:
+  components: [src.fees.services.PaymentApplication, src.fees.gateway.HttpPaymentGateway, src.fees.views.payment_api, src.fees.views.payment_page]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, tests/fees/test_views.py::test_payment_api_sends_the_gateway_request_and_forwards_success, tests/fees/test_views.py::test_payment_api_maps_gateway_failure_to_502_and_preserves_body, tests/fees/test_views.py::test_unknown_payment_does_not_call_gateway, tests/fees/test_views.py::test_htmx_payment_action_shows_gateway_failure, tests/fees/test_fee_services.py::test_gateway_failure_retains_interruption, tests/fees/test_fee_services.py::test_payment_application_maps_and_retains_interrupted_gateway_failure, .migration/evidence/runs/LL-03.md]
+rules:
+  - id: existing-loan
+    rule: "A missing loan returns 404 and must not call the payment gateway."
+    source: "FinePayments.java:30-31"
+  - id: gateway-response
+    rule: "POST an empty body to /charge?loan=<id>; only HTTP 200 remains 200, while other gateway statuses become 502 and retain their bodies."
+    source: "FinePayments.java:33-37"
+  - id: gateway-interruption
+    rule: "Gateway transport failures return 502; an interruption remains available as the failure's cause."
+    source: "FinePayments.java:33-40; martins-vds/ai-factory-synthetic-target#40"
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+notes: "LL-03 preserves the interruption as the gateway failure's cause while returning 502, per the approved fix ruling."
