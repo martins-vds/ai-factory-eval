@@ -201,33 +201,33 @@
       ]
     },
     "event_types": {
-      "assistant.message": 107,
-      "assistant.turn_end": 58,
-      "assistant.turn_start": 59,
+      "assistant.message": 118,
+      "assistant.turn_end": 67,
+      "assistant.turn_start": 67,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 219,
-      "hook.start": 220,
-      "permission.completed": 115,
-      "permission.requested": 115,
+      "hook.end": 242,
+      "hook.start": 243,
+      "permission.completed": 125,
+      "permission.requested": 125,
       "session.start": 1,
-      "session.usage_record": 59,
+      "session.usage_record": 67,
       "skill.context_delivered_ref": 12,
       "skill.invoked": 10,
       "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 135,
-      "tool.execution_start": 136,
+      "tool.execution_complete": 146,
+      "tool.execution_start": 146,
       "user.message": 3
     },
-    "events": 1264,
+    "events": 1388,
     "usage_fields": []
   },
-  "ended_at": "2026-11-18T13:31:59.672Z",
+  "ended_at": "2026-11-18T13:33:17.958Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -256,7 +256,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 2,
+      "count": 3,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -276,7 +276,7 @@
       "tool": "data_reconcile.py"
     },
     {
-      "count": 2,
+      "count": 3,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -290,11 +290,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 107
+      "requests": 118
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-18T13:32:08+00:00",
+  "recorded_at": "2026-11-18T13:33:51+00:00",
   "schema": "afs-cost/1",
   "session_id": "e70c4da5-059c-468b-8064-00827d1cf066",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -342,6 +342,5 @@
   ],
   "started_at": "2026-11-18T13:20:51.494Z",
   "surface": "coding-agent",
-  "trigger_id": "f9f7545d-3d2c-4d2e-b8e1-957ff5a61473",
   "usage_source": "assistant.message (output only, partial)"
 }
