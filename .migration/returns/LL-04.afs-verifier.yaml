@@ -1,0 +1,23 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-eval#1478
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1492
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.976
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings: []
+tests_added:
+  - tests/library_info/test_about.py::test_legacy_about_response_is_unchanged
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  about.page: "The capability serves static library information and has no validation or state transition."
+inherited: []
