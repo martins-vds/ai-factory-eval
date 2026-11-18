@@ -1,0 +1,53 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1350
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1356
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 8.0
+  mutation_changed: 0.966
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings: []
+tests_added:
+  - tests/reports/test_monthly_report_application.py::test_generate_uses_half_open_previous_calendar_month
+  - tests/reports/test_monthly_report_application.py::test_generate_omits_members_without_a_loan_started_in_the_report_month
+  - tests/reports/test_monthly_report_application.py::test_generate_counts_only_late_returns_and_sums_calculated_fees
+  - tests/reports/test_monthly_report_application.py::test_generate_orders_by_fees_descending_then_member_id
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: reports.monthly-spec
+    rule: The report covers the prior calendar month using a half-open date range in the server's local date.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_generate_uses_half_open_previous_calendar_month
+    enforced: true
+    ledger_rule: report-period
+  - capability: reports.monthly-spec
+    rule: Include only members with at least one loan started in the report month.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_generate_omits_members_without_a_loan_started_in_the_report_month
+    enforced: true
+    ledger_rule: monthly-starts
+  - capability: reports.monthly-spec
+    rule: Count only returned loans in the report month returned after the due date and sum their calculated fees in cents.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_generate_counts_only_late_returns_and_sums_calculated_fees
+    enforced: true
+    ledger_rule: late-returns-and-fees
+  - capability: reports.monthly-spec
+    rule: Order report rows by late fees descending, then member ID ascending.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_generate_orders_by_fees_descending_then_member_id
+    enforced: true
+    ledger_rule: report-order
+  - capability: reports.monthly-spec
+    rule: A late return without a fee result still counts as a late return but adds no fee amount.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_generate_counts_only_late_returns_and_sums_calculated_fees
+    enforced: true
+no_rules: {}
