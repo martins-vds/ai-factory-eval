@@ -18,3 +18,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T14:03:21+00:00 | idiom-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
 | 2026-11-18T14:03:25+00:00 | idiom-ui | 0 | 0.53 | `python .migration/harness/tools/check_ui.py` | `d10fc1a749bf95c7` |  | gate=ui scope="templates changed since 46add748bf3d7705ba555495eaa7df98b4efd538" templates=3 findings=0 |
 | 2026-11-18T14:04:15+00:00 | tests-focused-final | 0 | 5.43 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `23b853f8c249cc9f` |  |  |
+| 2026-11-18T14:07:44+00:00 | tests-template-review | 0 | 5.39 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `aff3af738e4765da` |  |  |
+| 2026-11-18T14:07:50+00:00 | idiom-ui-final | 0 | 0.53 | `python .migration/harness/tools/check_ui.py` | `df17627363e4fdab` |  | gate=ui scope="templates changed since 46add748bf3d7705ba555495eaa7df98b4efd538" templates=4 findings=0 |
