@@ -16,7 +16,6 @@
         <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
       </dl>
       <div class="mt-6">
-        {% if error %}<p class="mb-4 text-error" role="alert">{{ error }}</p>{% endif %}
         {% include "loans/_return_status.html" %}
       </div>
     </div>

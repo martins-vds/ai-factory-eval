@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods, require_POST
 
@@ -27,10 +27,13 @@ def loan_catalog(request):
 
 
 def loan_catalog_detail(request, loan_id):
-    loan = get_object_or_404(Loan, pk=loan_id)
+    loan = Loan.objects.filter(pk=loan_id).first()
+    if loan is None:
+        return render(request, 'loans/not_found.html', status=404)
     return render(request, 'loans/detail.html', {'loan': loan})
 
 
+@require_http_methods(['GET', 'POST'])
 def loan_list(request):
     if request.method == 'POST':
         return loan_lend(request)

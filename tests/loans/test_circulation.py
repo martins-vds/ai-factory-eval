@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.utils import timezone
@@ -35,6 +35,15 @@ def test_lending_use_case_rejects_missing_or_blank_fields(member, isbn, field):
 
 
 @pytest.mark.django_db
+def test_lending_use_case_creates_a_loan_for_the_supplied_date():
+    loan = lend_loan('dee', '123', LoanRepository(), date(2026, 3, 1))
+
+    assert loan.id == 'L4'
+    assert loan.lent_on == date(2026, 3, 1)
+    assert loan.due_on == date(2026, 3, 15)
+
+
+@pytest.mark.django_db
 def test_return_use_case_rejects_unknown_loan():
     with pytest.raises(LoanNotFound):
         return_loan('unknown', LoanRepository(), date(2026, 3, 1))
@@ -51,6 +60,14 @@ def test_return_use_case_preserves_the_original_date_on_repeat():
 
 
 @pytest.mark.django_db
+def test_return_use_case_records_the_supplied_date():
+    loan = return_loan('L1', LoanRepository(), date(2026, 3, 1))
+
+    assert loan.returned_on == date(2026, 3, 1)
+    assert Loan.objects.get(pk='L1').returned_on == date(2026, 3, 1)
+
+
+@pytest.mark.django_db
 def test_lending_api_returns_the_characterized_record(client):
     response = client.post('/loans', {'member': 'dee', 'isbn': '123'})
     today = timezone.localdate()
@@ -58,7 +75,7 @@ def test_lending_api_returns_the_characterized_record(client):
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
-        f'L4;dee;123;{today.isoformat()};{date.fromordinal(today.toordinal() + 14).isoformat()};\n'
+        f'L4;dee;123;{today.isoformat()};{(today + timedelta(days=14)).isoformat()};\n'
     )
 
 
@@ -85,8 +102,11 @@ def test_return_api_marks_an_unreturned_loan_and_rejects_a_repeat(client):
     repeated = client.post('/loans/L1/return')
 
     assert first.status_code == 200
-    assert first.content.decode().startswith('L1;ana;9780134685991;2026-01-02;2026-01-16;')
+    assert first.content.decode() == (
+        f'L1;ana;9780134685991;2026-01-02;2026-01-16;{timezone.localdate().isoformat()}\n'
+    )
     assert repeated.status_code == 409
+    assert repeated.content.decode() == 'loan already returned\n'
     assert Loan.objects.get(pk='L1').returned_on == returned_on
 
 
@@ -113,6 +133,19 @@ def test_lending_page_renders_field_errors_for_blank_values(client):
 
 
 @pytest.mark.django_db
+def test_htmx_lending_page_renders_blank_field_errors(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': '   ', 'isbn': '   '},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'Member is required.' in response.content
+    assert b'ISBN is required.' in response.content
+
+
+@pytest.mark.django_db
 def test_lending_page_creates_a_loan_and_redirects_to_its_details(client):
     response = client.post(
         '/ui/loans/new/',
@@ -121,6 +154,27 @@ def test_lending_page_creates_a_loan_and_redirects_to_its_details(client):
 
     assert response.status_code == 302
     assert response['Location'] == '/ui/loans/L4/'
+
+
+@pytest.mark.django_db
+def test_lending_page_is_linked_from_the_reading_room_list(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'href="/ui/loans/new/"' in response.content
+
+    lending_page = client.get('/ui/loans/new/')
+
+    assert lending_page.status_code == 200
+    assert b'hx-post="/ui/loans/new/"' in lending_page.content
+
+
+@pytest.mark.django_db
+def test_unknown_loan_detail_renders_the_reading_room_not_found_page(client):
+    response = client.get('/ui/loans/unknown/')
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
 
 
 @pytest.mark.django_db
@@ -136,6 +190,24 @@ def test_return_page_updates_status_and_rejects_repeated_or_unknown_returns(clie
     assert b'already been returned' in repeated.content
     assert Loan.objects.get(pk='L1').returned_on == returned_on
     assert unknown.status_code == 404
+    assert b'No such loan' in unknown.content
+
+
+@pytest.mark.django_db
+def test_htmx_return_errors_render_without_changing_the_return_date(client):
+    repeated = client.post(
+        '/ui/loans/L2/return/',
+        HTTP_HX_REQUEST='true',
+    )
+    unknown = client.post(
+        '/ui/loans/unknown/return/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert repeated.status_code == 200
+    assert b'already been returned' in repeated.content
+    assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+    assert unknown.status_code == 200
     assert b'No such loan' in unknown.content
 
 
