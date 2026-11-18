@@ -14,11 +14,8 @@ class NoRedirectHandler(HTTPRedirectHandler):
 
 
 class HttpPaymentGateway:
-    def __init__(self, gateway_url=None):
-        self.gateway_url = gateway_url
-
     def charge(self, loan_id: str) -> GatewayResponse:
-        gateway_url = self.gateway_url or os.environ.get(
+        gateway_url = os.environ.get(
             'PAYMENT_GATEWAY_URL',
             DEFAULT_GATEWAY_URL,
         )

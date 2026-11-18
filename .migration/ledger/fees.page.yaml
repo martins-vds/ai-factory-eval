@@ -13,7 +13,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_fee_use_case_returns_no_quote_for_an_unknown_loan, tests/fees/test_views.py::test_fee_api_matches_the_characterized_html, tests/fees/test_views.py::test_fee_api_returns_the_characterized_not_found_response, tests/fees/test_views.py::test_fee_page_uses_reading_room_layout_and_posts_to_ui_payment_path, tests/fees/test_views.py::test_browser_can_pay_from_fee_page]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_fee_use_case_returns_no_quote_for_an_unknown_loan, tests/fees/test_views.py::test_fee_api_matches_the_characterized_html, tests/fees/test_views.py::test_fee_api_formats_a_capped_fee_as_ten_dollars, tests/fees/test_views.py::test_fee_api_returns_the_characterized_not_found_response, tests/fees/test_views.py::test_fee_page_uses_reading_room_layout_and_posts_to_ui_payment_path, tests/fees/test_views.py::test_browser_can_pay_from_fee_page]
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
 rules:
   - id: missing-loan

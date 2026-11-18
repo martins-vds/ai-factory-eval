@@ -16,7 +16,7 @@ def test_interrupted_gateway_call_surfaces_as_failure_without_losing_interrupt(
 
     monkeypatch.setattr('src.fees.gateway.build_opener', lambda *handlers: Opener())
     with pytest.raises(GatewayUnavailable) as failure:
-        HttpPaymentGateway('http://127.0.0.1:1').charge('L3')
+        HttpPaymentGateway().charge('L3')
 
     assert failure.value.body == b'payment gateway unavailable\n'
     assert isinstance(failure.value.__cause__, InterruptedError)
