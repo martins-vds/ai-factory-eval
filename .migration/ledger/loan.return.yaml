@@ -7,11 +7,42 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns the formatted updated loan, 404 for an unknown id, and 409 for a repeated return; the reading-room flow has equivalent full-page and htmx outcomes."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1290]
+target:
+  components:
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_page
+    - src.loans.repository.LoanRepository.mark_returned
+    - templates/loans/detail.html
+    - templates/loans/return-status.html
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_api_return_records_today_and_persists_the_return_date
+  - tests/loans/test_circulation.py::test_api_repeated_return_is_rejected_without_replacing_the_original_date
+  - tests/loans/test_circulation.py::test_api_return_of_unknown_loan_is_not_found
+  - tests/loans/test_circulation.py::test_browser_can_return_a_loan_with_htmx
+  - tests/loans/test_circulation.py::test_browser_regular_return_redirects_to_the_updated_loan
+  - tests/loans/test_circulation.py::test_browser_repeated_htmx_return_keeps_original_date
+  - tests/loans/test_circulation.py::test_browser_regular_repeated_return_shows_original_record_and_date
+  - tests/loans/test_circulation.py::test_browser_return_of_unknown_loan_is_not_found
+  - tests/loans/test_circulation.py::test_real_browser_can_lend_and_return_a_book
+rules:
+  - id: unknown-loan
+    rule: A return request for an unknown loan returns 404 with `no such loan` and does not create a record.
+    source: "legacy/src/main/java/lib/LoanResource.java:45-50"
+  - id: repeat-return
+    rule: A repeated return returns 409 and preserves the original return date.
+    source: "Approved fix in martins-vds/ai-factory-synthetic-target#41"
+  - id: return-method
+    rule: Loan return endpoints accept POST only.
+    source: "legacy/src/main/java/lib/LoanResource.java:45-50"
+notes: "The approved fix in #41 prevents the legacy repeated-return date overwrite."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
