@@ -68,6 +68,41 @@
         "promptRequest",
         "requestId"
       ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
       "session.start": [
         "alreadyInUse",
         "context",
@@ -202,33 +237,35 @@
       ]
     },
     "event_types": {
-      "assistant.message": 233,
-      "assistant.turn_end": 139,
-      "assistant.turn_start": 140,
-      "external_tool.completed": 2,
-      "external_tool.requested": 2,
-      "hook.end": 449,
-      "hook.start": 450,
-      "permission.completed": 240,
-      "permission.requested": 240,
+      "assistant.message": 322,
+      "assistant.turn_end": 201,
+      "assistant.turn_start": 202,
+      "external_tool.completed": 3,
+      "external_tool.requested": 3,
+      "hook.end": 630,
+      "hook.start": 631,
+      "permission.completed": 342,
+      "permission.requested": 342,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 140,
-      "skill.context_delivered_ref": 14,
-      "skill.invoked": 8,
-      "skill.invoked_ref": 6,
-      "subagent.completed": 5,
-      "subagent.configured": 6,
-      "subagent.selected": 7,
-      "subagent.started": 6,
-      "system.message": 7,
-      "tool.execution_complete": 263,
-      "tool.execution_start": 264,
-      "user.message": 7
+      "session.usage_record": 202,
+      "skill.context_delivered_ref": 18,
+      "skill.invoked": 9,
+      "skill.invoked_ref": 9,
+      "subagent.completed": 7,
+      "subagent.configured": 8,
+      "subagent.selected": 9,
+      "subagent.started": 8,
+      "system.message": 9,
+      "tool.execution_complete": 369,
+      "tool.execution_start": 370,
+      "user.message": 9
     },
-    "events": 2629,
+    "events": 3706,
     "usage_fields": []
   },
-  "ended_at": "2026-11-18T22:30:03.939Z",
+  "ended_at": "2026-11-18T22:39:40.297Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -237,17 +274,17 @@
       "tool": "afs-finish-check"
     },
     {
-      "count": 1,
+      "count": 2,
       "exit": 0,
       "tool": "afs-mutation"
     },
     {
-      "count": 23,
+      "count": 38,
       "exit": 0,
       "tool": "afs-run"
     },
     {
-      "count": 4,
+      "count": 5,
       "exit": 1,
       "tool": "afs-run"
     },
@@ -262,7 +299,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 5,
+      "count": 6,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -272,12 +309,12 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 2,
+      "count": 5,
       "exit": 0,
       "tool": "check_ui.py"
     },
     {
-      "count": 5,
+      "count": 6,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -291,11 +328,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 233
+      "requests": 322
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-18T22:30:11+00:00",
+  "recorded_at": "2026-11-18T22:39:44+00:00",
   "schema": "afs-cost/1",
   "session_id": "8642c678-c156-44c0-b077-c802ea110f25",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -331,10 +368,14 @@
     {
       "count": 1,
       "skill": "ui-ux-pro-max"
+    },
+    {
+      "count": 1,
+      "skill": "verification-before-completion"
     }
   ],
   "started_at": "2026-11-18T22:04:19.088Z",
   "surface": "coding-agent",
-  "trigger_id": "0f730784-8c17-4303-ad51-67e64d1a3d09",
+  "trigger_id": "65c6cf12-f217-4691-a481-1605117c3c97",
   "usage_source": "assistant.message (output only, partial)"
 }
