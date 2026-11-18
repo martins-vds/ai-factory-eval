@@ -181,8 +181,9 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(tmp_pat
 def test_loaded_carrier_movement_schedules_are_in_order(tmp_path):
     _load_snapshot(tmp_path)
     for voyage in VoyageRecord.objects.all():
-        movements = list(CarrierMovementRecord.objects.filter(voyage=voyage).order_by('pk'))
-        movements = list(CarrierMovementRecord.objects.filter(voyage=voyage).order_by('pk'))
+        movements = list(
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
+        )
         assert all(movement.departure_time < movement.arrival_time for movement in movements)
         assert all(
             previous.arrival_time <= following.departure_time
