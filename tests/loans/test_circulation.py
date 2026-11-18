@@ -18,6 +18,7 @@ def test_lending_rejects_missing_or_blank_fields(client, form_data):
     response = client.post('/loans', form_data)
 
     assert response.status_code == 400
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'member and isbn are required\n'
     assert len(client.get('/loans').content.decode().splitlines()) == 3
 
@@ -113,6 +114,35 @@ def test_browser_lending_shows_field_errors_for_blank_values(client, form_data, 
 
 
 @pytest.mark.django_db
+def test_browser_lending_shows_both_field_errors_when_fields_are_missing(client):
+    response = client.post('/ui/loans/new/', {})
+
+    assert response.status_code == 400
+    assert (
+        b'<span class="mt-1 text-sm text-[#a94e37]" role="alert">'
+        b'Enter a member name; blank values are not accepted.</span>'
+    ) in response.content
+    assert (
+        b'<span class="mt-1 text-sm text-[#a94e37]" role="alert">'
+        b'Enter an ISBN; blank values are not accepted.</span>'
+    ) in response.content
+    assert response.content.count(b'value=""') == 2
+
+
+@pytest.mark.django_db
+def test_htmx_lending_redirects_to_the_collection(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'reader', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 204
+    assert response['HX-Redirect'] == '/ui/loans/'
+    assert client.get('/loans/L4').status_code == 200
+
+
+@pytest.mark.django_db
 def test_browser_return_keeps_original_date_on_repeat(client):
     today = date.today()
     first_return = client.post('/ui/loans/L1/return/')
@@ -125,5 +155,35 @@ def test_browser_return_keeps_original_date_on_repeat(client):
     repeat = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
 
     assert repeat.status_code == 409
-    assert b'This loan was already returned; the original date was kept.' in repeat.content
+    assert (
+        b'role="status">This loan was already returned; the original date was kept.</div>'
+        in repeat.content
+    )
     assert f'Returned {today:%b} {today.day}, {today.year}'.encode() in repeat.content
+
+
+@pytest.mark.django_db
+def test_browser_return_of_an_unknown_loan_renders_not_found_feedback(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'role="status">No such loan.</div>' in response.content
+
+
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/ui/loans/'),
+        ('post', '/ui/loans/L1/'),
+        ('put', '/ui/loans/new/'),
+        ('get', '/ui/loans/L1/return/'),
+        ('put', '/loans'),
+        ('post', '/loans/L1'),
+        ('get', '/loans/L1/return'),
+    ],
+)
+@pytest.mark.django_db
+def test_circulation_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405

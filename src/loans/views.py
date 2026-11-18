@@ -12,17 +12,13 @@ from .services import (
     get_loan_text,
     lend_loan,
     list_loans_text,
+    loan_line,
     return_loan,
 )
 
 
 def _catalog_page(request, **context):
-    page_context = {
-        'loans': Loan.objects.all(),
-        'form_values': {'member': '', 'isbn': ''},
-        'errors': {},
-        'feedback': '',
-    }
+    page_context = {'loans': Loan.objects.all()}
     page_context.update(context)
     return render(request, 'loans/list.html', page_context, status=context.get('status', 200))
 
@@ -85,7 +81,9 @@ def loan_list(request):
                 date.today(),
             )
         except InvalidLoan:
-            return HttpResponse('member and isbn are required\n', status=400, content_type='text/plain')
+            return HttpResponse(
+                'member and isbn are required\n', status=400, content_type='text/plain'
+            )
         return HttpResponse(
             get_loan_text(LoanRepository(), loan.id),
             status=201,
@@ -110,4 +108,4 @@ def loan_return(request, loan_id):
         return HttpResponse('loan already returned\n', status=409, content_type='text/plain')
     if loan is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-    return HttpResponse(get_loan_text(LoanRepository(), loan.id), content_type='text/plain')
+    return HttpResponse(loan_line(loan), content_type='text/plain')

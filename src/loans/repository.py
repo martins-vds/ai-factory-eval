@@ -10,10 +10,11 @@ class LoanRepository:
     def find(self, loan_id):
         return Loan.objects.filter(pk=loan_id).first()
 
-    @transaction.atomic
     def mark_returned(self, loan_id, returned_on):
         return (
-            Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(returned_on=returned_on)
+            Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(
+                returned_on=returned_on
+            )
             == 1
         )
 
