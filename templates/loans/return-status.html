@@ -1,0 +1,5 @@
+{% if updated %}
+<p role="status">Loan {{ loan.id }} was marked returned on {{ loan.returned_on|date:"M j, Y" }}.</p>
+{% else %}
+<p role="status">Loan {{ loan.id }} has already been returned on {{ loan.returned_on|date:"M j, Y" }}. The original return date is unchanged.</p>
+{% endif %}

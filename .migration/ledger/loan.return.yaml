@@ -15,3 +15,26 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components:
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_page
+    - src.loans.services.LoanUseCases.return_loan
+status: migrated
+verification: differential
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_endpoint_persists_the_return_date
+  - tests/loans/test_circulation.py::test_return_endpoint_rejects_unknown_loans
+  - tests/loans/test_circulation.py::test_return_endpoint_rejects_a_repeat_without_replacing_the_date
+  - tests/loans/test_circulation.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_circulation.py::test_browser_repeat_return_shows_original_date_and_preserves_it
+  - tests/loans/test_circulation.py::test_htmx_repeat_return_renders_a_swappable_status
+rules:
+  - id: unknown-loan
+    rule: Returning an unknown loan is rejected with HTTP 404 and the plain-text body no such loan followed by a newline.
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
+  - id: one-time-return
+    rule: Only an unreturned loan can be returned; a repeated return is rejected with HTTP 409 and does not change the stored return date.
+    source: martins-vds/ai-factory-synthetic-target#41

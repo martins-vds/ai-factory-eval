@@ -15,3 +15,24 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components:
+    - src.loans.services.LoanUseCases.return_loan
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.clock.SystemClock.today
+status: migrated
+verification: differential
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_endpoint_persists_the_return_date
+  - tests/loans/test_circulation.py::test_return_endpoint_rejects_a_repeat_without_replacing_the_date
+  - tests/loans/test_circulation.py::test_browser_repeat_return_shows_original_date_and_preserves_it
+  - tests/loans/test_circulation.py::test_htmx_repeat_return_renders_a_swappable_status
+rules:
+  - id: return-date-is-local-today
+    rule: A successful first return records today's date in the server's default time zone.
+    source: legacy/src/main/java/lib/LoanRepository.java:36-44
+  - id: preserve-original-return-date
+    rule: A repeated return is rejected and leaves the original returned_on date unchanged.
+    source: martins-vds/ai-factory-synthetic-target#41

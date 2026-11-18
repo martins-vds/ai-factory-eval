@@ -15,3 +15,34 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+target:
+  components:
+    - src.loans.services.LoanUseCases.lend
+    - src.loans.repository.LoanRepository.lend
+    - src.loans.views.loan_list
+    - src.loans.views.loan_lend_page
+    - src.loans.clock.SystemClock.today
+status: migrated
+verification: differential
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lend_endpoint_creates_a_loan_with_a_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_circulation.py::test_lending_page_uses_the_reading_room_form_and_ui_route
+  - tests/loans/test_circulation.py::test_lending_page_shows_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_browser_lending_creates_a_loan_and_redirects_to_its_record
+  - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
+rules:
+  - id: member-required
+    rule: Member must be nonblank after trimming; otherwise lending is rejected with a field error and no loan is created.
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: isbn-required
+    rule: ISBN must be nonblank after trimming; otherwise lending is rejected with a field error and no loan is created.
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: local-lending-date
+    rule: A new loan uses today's date in the server's default time zone.
+    source: legacy/src/main/java/lib/LoanResource.java:37-43
+  - id: export-escaping
+    rule: Semicolons, quotes, and line breaks in loan fields are escaped in text exports.
+    source: martins-vds/ai-factory-synthetic-target#43

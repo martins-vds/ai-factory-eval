@@ -1,10 +1,48 @@
 import csv
 from io import StringIO
 
-from .repository import LoanRepository
+from .ports import Clock, LoanRecord, LoanRepository
 
 
-def loan_line(loan):
+class InvalidLoan(ValueError):
+    def __init__(self, fields):
+        self.fields = fields
+
+
+class LoanAlreadyReturned(ValueError):
+    def __init__(self, loan):
+        self.loan = loan
+
+
+class LoanUseCases:
+    def __init__(self, loans: LoanRepository, clock: Clock):
+        self._loans = loans
+        self._clock = clock
+
+    def all(self):
+        return self._loans.all()
+
+    def find(self, loan_id: str) -> LoanRecord | None:
+        return self._loans.find(loan_id)
+
+    def lend(self, member: str, isbn: str) -> LoanRecord:
+        fields = {}
+        if not member or not member.strip():
+            fields['member'] = 'This field is required.'
+        if not isbn or not isbn.strip():
+            fields['isbn'] = 'This field is required.'
+        if fields:
+            raise InvalidLoan(fields)
+        return self._loans.lend(member.strip(), isbn.strip(), self._clock.today())
+
+    def return_loan(self, loan_id: str) -> LoanRecord | None:
+        loan, updated = self._loans.mark_returned(loan_id, self._clock.today())
+        if loan is not None and not updated:
+            raise LoanAlreadyReturned(loan)
+        return loan
+
+
+def loan_line(loan: LoanRecord) -> str:
     output = StringIO(newline='')
     writer = csv.writer(output, delimiter=';', lineterminator='\n')
     writer.writerow(
@@ -20,10 +58,9 @@ def loan_line(loan):
     return output.getvalue()
 
 
-def list_loans_text():
-    return ''.join(loan_line(loan) for loan in LoanRepository().all())
+def list_loans_text(loans):
+    return ''.join(loan_line(loan) for loan in loans)
 
 
-def get_loan_text(loan_id):
-    loan = LoanRepository().find(loan_id)
+def get_loan_text(loan):
     return loan_line(loan) if loan else None

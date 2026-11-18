@@ -10,11 +10,23 @@
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan record · {{ loan.id }}</p>
       <h1 class="card-title mt-2 text-4xl">A book in good company.</h1>
       <p class="mt-2">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+      {% if return_error %}
+      <p class="mt-6 text-[#a94e37]" role="alert">This loan has already been returned. The original return date is unchanged.</p>
+      {% endif %}
       <dl class="mt-6 grid gap-4 sm:grid-cols-2">
         <div><dt class="text-sm text-[#66705b]">Lent</dt><dd>{{ loan.lent_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
       </dl>
+      {% if not loan.returned_on %}
+      <form class="mt-6" method="post" action="/ui/loans/{{ loan.id }}/return/"
+            hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Mark as returned</button>
+      </form>
+      {% endif %}
+      <div id="return-status" aria-live="polite"
+           hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"></div>
     </div>
   </article>
 </section>
