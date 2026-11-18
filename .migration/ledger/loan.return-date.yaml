@@ -24,8 +24,10 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_return_use_case_rejects_repeated_return_without_replacing_the_date
+  - tests/loans/test_circulation.py::test_repository_return_locks_and_persists_the_loan
   - tests/loans/test_circulation.py::test_return_endpoint_returns_a_loan_and_rejects_repeated_or_unknown_returns
   - tests/loans/test_circulation.py::test_browser_return_updates_status_and_renders_a_repeated_return_error
+  - tests/loans/test_circulation.py::test_full_page_return_redirects_to_the_returned_loan
 rules:
   - id: returned-on-today
     rule: A successful return persists the current date in the server's default time zone.

@@ -24,6 +24,7 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
+  - tests/loans/test_circulation.py::test_api_routes_reject_unsupported_methods
   - tests/loans/test_circulation.py::test_return_endpoint_returns_a_loan_and_rejects_repeated_or_unknown_returns
   - tests/loans/test_circulation.py::test_browser_return_updates_status_and_renders_a_repeated_return_error
   - tests/loans/test_circulation.py::test_browser_return_renders_an_error_for_an_unknown_loan

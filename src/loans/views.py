@@ -31,11 +31,7 @@ def loan_catalog_detail(request, loan_id):
 
 def loan_lend_page(request):
     if request.method == 'GET':
-        return render(
-            request,
-            'loans/new.html',
-            {'member': '', 'isbn': '', 'errors': {}},
-        )
+        return render(request, 'loans/new.html')
     if request.method != 'POST':
         return HttpResponseNotAllowed(['GET', 'POST'])
     try:

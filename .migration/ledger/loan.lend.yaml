@@ -26,9 +26,11 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - tests/loans/test_circulation.py::test_lend_use_case_assigns_the_next_id_and_clock_date
   - tests/loans/test_circulation.py::test_lend_endpoint_creates_a_loan_with_a_fourteen_day_due_date
   - tests/loans/test_circulation.py::test_lend_endpoint_rejects_blank_or_missing_required_fields
   - tests/loans/test_circulation.py::test_browser_lend_form_renders_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_full_page_lend_form_renders_field_errors_for_blank_values
   - tests/loans/test_circulation.py::test_browser_lend_form_creates_a_loan_with_htmx
 rules:
   - id: member-required
