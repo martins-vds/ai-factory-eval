@@ -7,14 +7,34 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets:
+  - martins-vds/ai-factory-pilot-target#225
+  - martins-vds/ai-factory-pilot-target#294
+target:
+  components:
+    - src/cargotracker/booking/interfaces/dialogs/views.py
+    - templates/booking/dialogs/_destination_dialog.html
+    - templates/booking/dialogs/destination.html
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_filters_options_without_mutating_them"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_destination_and_preserves_other_route_fields"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_refuses_route_location_as_new_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_requires_destination_when_field_is_missing"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_supports_full_page_fallback"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: eligible-destination
+    rule: "Available destinations exclude the cargo origin and current destination; a submitted value outside that set is refused."
+    source: "BK-05G #235; ChangeDestinationDialog.java:15-43"
+  - id: preserve-route-fields
+    rule: "A successful destination change preserves the cargo origin and arrival deadline."
+    source: "DefaultBookingService.java:72-85"
+notes: "Destination options are filtered without mutating the supplied location list, and updates go through CargoSpecification.change_destination. Successful updates refresh the dashboard; the unavailable-widget warning is omitted under #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]

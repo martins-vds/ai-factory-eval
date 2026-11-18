@@ -1,0 +1,95 @@
+[
+  {
+    "at": "2026-11-18T13:26:11Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20417,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05G",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/BK-05G.md",
+      ".migration/ledger/booking.dialog-chain.yaml",
+      ".migration/ledger/booking.dialog-deadline.yaml",
+      ".migration/ledger/booking.dialog-destination.yaml",
+      ".migration/ledger/booking.screen-not-routed-table.yaml",
+      "src/cargotracker/booking/interfaces/dialogs/views.py",
+      "src/cargotracker/booking/interfaces/dialogs/views.py.bak",
+      "templates/booking/dashboard/not_routed_table.html",
+      "templates/booking/dialogs/_deadline_dialog.html",
+      "templates/booking/dialogs/_destination_dialog.html",
+      "templates/booking/dialogs/_dialog_error.html",
+      "templates/booking/dialogs/deadline.html",
+      "templates/booking/dialogs/destination.html",
+      "tests/booking/interfaces/test_dialogs.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05G.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05G`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05G.md`). See afs-migration-contract \u2192 Return files.",
+      "[scope] These files are outside ticket BK-05G's planned files: `.migration/ledger/booking.screen-not-routed-table.yaml`, `src/cargotracker/booking/interfaces/dialogs/views.py.bak`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-18T13:26:58Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20827,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05G",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/ca9a7da1-1925-4f54-b882-44dc559aa0c4.json",
+      ".migration/evidence/runs/BK-05G.md",
+      ".migration/ledger/booking.dialog-chain.yaml",
+      ".migration/ledger/booking.dialog-deadline.yaml",
+      ".migration/ledger/booking.dialog-destination.yaml",
+      ".migration/ledger/booking.screen-not-routed-table.yaml",
+      "src/cargotracker/booking/interfaces/dialogs/views.py",
+      "src/cargotracker/booking/interfaces/dialogs/views.py.bak",
+      "templates/booking/dashboard/not_routed_table.html",
+      "templates/booking/dialogs/_deadline_dialog.html",
+      "templates/booking/dialogs/_destination_dialog.html",
+      "templates/booking/dialogs/_dialog_error.html",
+      "templates/booking/dialogs/deadline.html",
+      "templates/booking/dialogs/destination.html",
+      "tests/booking/interfaces/test_dialogs.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05G.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05G`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05G.md`). See afs-migration-contract \u2192 Return files.",
+      "[scope] These files are outside ticket BK-05G's planned files: `.migration/ledger/booking.screen-not-routed-table.yaml`, `src/cargotracker/booking/interfaces/dialogs/views.py.bak`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/BK-05G.md"
+  }
+]

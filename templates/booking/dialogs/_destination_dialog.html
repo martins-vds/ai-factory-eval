@@ -1,0 +1,38 @@
+<section class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+  <h2 id="destination-dialog-heading" class="mb-4 text-xl font-semibold">Change cargo destination</h2>
+  <p class="mb-4">
+    Cargo {{ tracking_id }} from {{ cargo.route_specification.origin.name }} currently destined for {{ current_destination.name }}
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ tracking_id }}/destination/"
+    hx-post="/admin/cargo/{{ tracking_id }}/destination/"
+    hx-target="#booking-dialog"
+    hx-swap="innerHTML"
+    class="flex flex-col gap-4"
+  >
+    {% csrf_token %}
+    <label class="font-medium" for="destination">New destination</label>
+    {% if destination_error %}
+      <p id="destination-error" class="text-red-700" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <select
+      class="select select-bordered rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+      id="destination"
+      name="destination"
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+      required
+    >
+      <option value="">Choose a destination</option>
+      {% for location in locations %}
+      <option value="{{ location.unlocode.value }}">
+          {{ location.name }} ({{ location.unlocode.value }})
+        </option>
+      {% endfor %}
+    </select>
+    <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+      <a class="btn btn-ghost min-h-11 rounded-md px-5 py-2 focus-visible:outline-2 focus-visible:outline-offset-2" href="/admin/dashboard/">Cancel</a>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" type="submit">Update</button>
+    </nav>
+  </form>
+</section>

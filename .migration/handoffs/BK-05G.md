@@ -16,3 +16,27 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-18T13:27:35Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-not-routed-table-one-more-time  ·  **Last commit:** dc8a5738
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] No return file. Write and commit `.migration/returns/BK-05G.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05G`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05G.md`). See afs-migration-contract → Return files.
+- [ ] These files are outside ticket BK-05G's planned files: `.migration/ledger/booking.screen-not-routed-table.yaml`, `src/cargotracker/booking/interfaces/dialogs/views.py.bak`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 2 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
+
+## Handoff — afs-migrator · 2026-11-18T13:27:42Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-not-routed-table-one-more-time  ·  **Last commit:** dc8a5738
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] No return file. Write and commit `.migration/returns/BK-05G.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05G`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05G.md`). See afs-migration-contract → Return files.
+- [ ] These files are outside ticket BK-05G's planned files: `.migration/ledger/booking.screen-not-routed-table.yaml`, `src/cargotracker/booking/interfaces/dialogs/views.py.bak`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 2 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.

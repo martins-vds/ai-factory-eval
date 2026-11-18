@@ -1,0 +1,31 @@
+<section class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+  <h2 id="deadline-dialog-heading" class="mb-4 text-xl font-semibold">Change arrival deadline</h2>
+  <p class="mb-4">Cargo {{ tracking_id }} from {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}</p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ tracking_id }}/deadline/"
+    hx-post="/admin/cargo/{{ tracking_id }}/deadline/"
+    hx-target="#booking-dialog"
+    hx-swap="innerHTML"
+    class="flex flex-col gap-4"
+  >
+    {% csrf_token %}
+    <label class="font-medium" for="arrival-deadline">Arrival deadline</label>
+    <input
+      class="input input-bordered rounded-md border border-slate-300 px-3 py-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+      id="arrival-deadline"
+      name="deadline"
+      type="date"
+      value="{{ deadline_value }}"
+      {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+      autofocus
+    >
+    {% if deadline_error %}
+      <p id="deadline-error" class="text-red-700" role="alert">{{ deadline_error }}</p>
+    {% endif %}
+    <nav aria-label="Deadline dialog actions" class="flex justify-end gap-3">
+      <a class="btn btn-ghost min-h-11 rounded-md px-5 py-2 focus-visible:outline-2 focus-visible:outline-offset-2" href="/admin/dashboard/">Cancel</a>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 text-white hover:bg-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700" type="submit">Update</button>
+    </nav>
+  </form>
+</section>

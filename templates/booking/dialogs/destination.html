@@ -1,0 +1,9 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Change Cargo Destination | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <dialog open aria-labelledby="destination-dialog-heading" class="fixed inset-0 z-50 m-0 flex h-full w-full max-w-none items-center justify-center bg-slate-950/50 p-4">
+    {% include "booking/dialogs/_destination_dialog.html" %}
+  </dialog>
+{% endblock %}
