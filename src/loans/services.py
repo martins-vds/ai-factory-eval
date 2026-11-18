@@ -10,6 +10,8 @@ class LoanRepository(Protocol):
 
     def create(self, **fields): ...
 
+    def mark_returned(self, loan_id, returned_on): ...
+
 
 class Clock(Protocol):
     def today(self): ...
@@ -21,15 +23,46 @@ class LoanInputError(ValueError):
         super().__init__('member and isbn are required')
 
 
+class LoanNotFound(LookupError):
+    pass
+
+
+class LoanAlreadyReturned(ValueError):
+    pass
+
+
 def lend_loan(member, isbn, repository, clock):
     field_errors = {
-        field: 'This field is required.'
-        for field, value in (('member', member), ('isbn', isbn))
+        field: f'{label} is required.'
+        for field, value, label in (
+            ('member', member, 'Member'),
+            ('isbn', isbn, 'ISBN'),
+        )
         if not isinstance(value, str) or not value.strip()
     }
     if field_errors:
         raise LoanInputError(field_errors)
     return repository.create(member=member, isbn=isbn, lent_on=clock.today())
+
+
+def return_loan(loan_id, repository, clock):
+    loan = repository.find(loan_id)
+    if loan is None:
+        raise LoanNotFound(loan_id)
+    if loan.returned_on is not None:
+        raise LoanAlreadyReturned(loan_id)
+    return repository.mark_returned(loan_id, clock.today())
+
+
+def list_loans(repository):
+    return repository.all()
+
+
+def get_loan(loan_id, repository):
+    loan = repository.find(loan_id)
+    if loan is None:
+        raise LoanNotFound(loan_id)
+    return loan
 
 
 def loan_line(loan):
@@ -53,5 +86,8 @@ def list_loans_text(repository):
 
 
 def get_loan_text(loan_id, repository):
-    loan = repository.find(loan_id)
-    return loan_line(loan) if loan else None
+    try:
+        loan = get_loan(loan_id, repository)
+    except LoanNotFound:
+        return None
+    return loan_line(loan)
