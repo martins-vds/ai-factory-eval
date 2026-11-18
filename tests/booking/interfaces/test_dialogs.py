@@ -1,3 +1,4 @@
+import re
 from datetime import UTC, datetime
 
 import pytest
@@ -8,7 +9,7 @@ from django.urls import path
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
-from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_views
+from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -17,7 +18,7 @@ from cargotracker.location.infrastructure.repository import DjangoLocationReposi
 repository = DjangoCargoRepository()
 dashboard = CargoDashboard(repository)
 locations = []
-destination_dialog, deadline_dialog = create_booking_dialog_views(
+destination_dialog, deadline_dialog = create_dialog_views(
     dashboard,
     CargoSpecification(repository, DjangoHandlingEventRepository()),
     lambda: locations,
@@ -59,6 +60,8 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
 
     first = client.get('/admin/cargo/DEF789/destination/')
     second = client.get('/admin/cargo/DEF789/destination/')
+    first_options = re.findall(r'<option\b[^>]*>.*?</option>', first.content.decode())
+    second_options = re.findall(r'<option\b[^>]*>.*?</option>', second.content.decode())
 
     assert first.status_code == 200
     assert 'Hong Kong' in first.content.decode()
@@ -66,7 +69,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     assert 'value="CNHKG"' not in first.content.decode()
     assert 'value="AUMEL"' not in first.content.decode()
     assert 'value="USNYC"' in first.content.decode()
-    assert first.content == second.content
+    assert first_options == second_options
     assert locations == original_locations
 
 
@@ -148,3 +151,18 @@ def test_deadline_dialog_updates_cargo_and_refreshes_table(client):
     )
     assert updated.itinerary == cargo.itinerary
     assert 'Widget for var' not in response.content.decode()
+
+
+@pytest.mark.parametrize(
+    'url',
+    (
+        '/admin/cargo/MISSING1/destination/',
+        '/admin/cargo/MISSING1/deadline/',
+    ),
+)
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_return_not_found_for_unknown_cargo(client, url):
+    response = client.get(url)
+
+    assert response.status_code == 404

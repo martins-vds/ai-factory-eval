@@ -1,0 +1,40 @@
+<form method="post" action="{{ request.path }}" hx-post="{{ request.path }}" hx-target="#booking-dialog-content" hx-swap="innerHTML">
+  {% csrf_token %}
+  <h2 id="booking-dialog-heading" class="mb-4 text-xl font-semibold">Change destination</h2>
+  <dl class="mb-4 space-y-2">
+    <div>
+      <dt class="font-medium">Origin</dt>
+      <dd>{{ cargo.route_specification.origin.name }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Current destination</dt>
+      <dd>{{ cargo.route_specification.destination.name }}</dd>
+    </div>
+  </dl>
+  <label class="label mb-1 block font-medium" for="destination">Destination</label>
+  {% if destination_error %}
+    <p id="destination-error" class="mb-2 text-red-700" role="alert">{{ destination_error }}</p>
+  {% endif %}
+  <select
+    id="destination"
+    name="destination"
+    class="select select-bordered w-full"
+    required
+    {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+  >
+    <option value="">Select a destination</option>
+    {% for location in potential_destinations %}
+      <option value="{{ location.unlocode.value }}">{{ location.name }}</option>
+    {% endfor %}
+  </select>
+  <div class="mt-6 flex justify-end gap-3">
+    <button
+      type="button"
+      class="btn btn-ghost"
+      hx-on:click="this.closest('dialog').close()"
+    >
+      Cancel
+    </button>
+    <button type="submit" class="btn btn-primary">Update</button>
+  </div>
+</form>
