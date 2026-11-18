@@ -2,6 +2,7 @@ import csv
 import hashlib
 import json
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -122,9 +123,7 @@ def _write_snapshot(snapshot):
         with path.open('w', encoding='utf-8', newline='') as stream:
             writer = csv.writer(stream)
             writer.writerow(header)
-            writer.writerows(
-                [['\\N' if value is None else value for value in row] for row in rows]
-            )
+            writer.writerows([['\\N' if value is None else value for value in row] for row in rows])
         tables[table] = {
             'rows': len(rows),
             'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
@@ -171,9 +170,9 @@ def test_loaded_cargo_delivery_matches_its_handling_history(loaded_snapshot):
         assert cargo.delivery.last_known_location == derived.last_known_location
         assert cargo.delivery.current_voyage == derived.current_voyage
         assert cargo.delivery.misdirected == derived.misdirected
-        assert (
-            cargo.delivery.eta.date() if cargo.delivery.eta is not None else None
-        ) == (derived.eta.date() if derived.eta is not None else None)
+        assert (cargo.delivery.eta.date() if cargo.delivery.eta is not None else None) == (
+            derived.eta.date() if derived.eta is not None else None
+        )
         assert cargo.delivery.next_expected_activity == derived.next_expected_activity
         assert cargo.delivery.unloaded_at_destination == derived.unloaded_at_destination
         assert cargo.delivery.routing_status == derived.routing_status
@@ -189,16 +188,13 @@ def test_loaded_itinerary_legs_connect(loaded_snapshot):
         legs = list(cargo.legs.all())
         assert legs
         assert all(
-            first.unload_location_id == second.load_location_id
-            for first, second in zip(legs, legs[1:])
+            first.unload_location_id == second.load_location_id for first, second in pairwise(legs)
         )
 
 
 @pytest.mark.django_db(transaction=True)
 def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
-    event_references = list(
-        HandlingEventRecord.objects.values_list('voyage_id', 'location_id')
-    )
+    event_references = list(HandlingEventRecord.objects.values_list('voyage_id', 'location_id'))
     voyage_ids = set(VoyageRecord.objects.values_list('pk', flat=True))
     location_ids = set(LocationRecord.objects.values_list('pk', flat=True))
     assert event_references
@@ -221,6 +217,5 @@ def test_loaded_voyage_carrier_movements_are_in_schedule_order(loaded_snapshot):
         assert movements
         assert all(movement.departure_time < movement.arrival_time for movement in movements)
         assert all(
-            first.arrival_time <= second.departure_time
-            for first, second in zip(movements, movements[1:])
+            first.arrival_time <= second.departure_time for first, second in pairwise(movements)
         )
