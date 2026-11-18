@@ -4,6 +4,7 @@ from types import SimpleNamespace
 import pytest
 from django.utils.formats import date_format
 from django.utils import timezone
+from playwright.sync_api import sync_playwright
 
 from src.loans.services import (
     LoanAlreadyReturnedError,
@@ -296,3 +297,21 @@ def test_loan_mutation_endpoints_reject_unsupported_methods(client):
     assert client.get('/loans/L1/return').status_code == 405
     assert client.get('/ui/loans/new/').status_code == 405
     assert client.get('/ui/loans/L1/return/').status_code == 405
+
+
+@pytest.mark.django_db
+def test_reading_room_supports_lending_and_returning_in_a_browser(live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/loans/')
+            page.get_by_label('Member').fill('reader')
+            page.get_by_label('ISBN').fill('123')
+            page.get_by_role('button', name='Lend book').click()
+            page.get_by_text('Loan L4 has been added.').wait_for()
+            page.get_by_role('link', name='Loan L4').click()
+            page.get_by_role('button', name='Return book').click()
+            page.get_by_text(f'Returned on {date_format(timezone.localdate(), "M j, Y")}').wait_for()
+        finally:
+            browser.close()
