@@ -1,0 +1,26 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-eval#1379
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1447
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.976
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings: []
+tests_added: []
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  about.page: "The public About page is static informational content; it accepts no input and enforces no business rules."
+inherited:
+  - where: config/settings.py:117; templates/base.html:8
+    what: "The built Tailwind stylesheet is not discoverable or served: GET /static/css/tailwind.css returns 404, leaving the page without Tailwind styling."
+    origin: "unknown (pre-existing before LL-04)"
+    evidence: "run: inherited-static-css"
