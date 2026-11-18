@@ -1,0 +1,30 @@
+[
+  {
+    "at": "2026-11-18T14:56:52Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21848,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/584192e0-e4d4-44ef-a50b-1b294cec1547.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-verifier.yaml",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]

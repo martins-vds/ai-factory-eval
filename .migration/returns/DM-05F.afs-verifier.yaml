@@ -1,0 +1,27 @@
+role: afs-verifier
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#1451
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1456
+verdict: blocked
+blocked_reason: "behavior: snapshot reconciliation could not finish because the planned export command is absent (run: data-reconcile)"
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+findings: []
+tests_added:
+  - tests/data_migration/test_invariants.py::test_loaded_handling_events_reference_existing_cargo_voyages_and_locations
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules: {}
+inherited:
+  - where: src/cargotracker/data_migration/management/commands/export_data_snapshot.py
+    what: "The planned export_data_snapshot command is unavailable; the data-export run fails with Unknown command, preventing independent reconciliation."
+    origin: DM-05D
+    evidence: "run: data-reconcile"
