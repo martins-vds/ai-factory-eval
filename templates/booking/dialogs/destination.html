@@ -1,0 +1,40 @@
+<dialog open class="modal modal-open" aria-labelledby="destination-dialog-title" aria-modal="true">
+  <div class="modal-box">
+    <h2 id="destination-dialog-title" class="text-xl font-semibold">Change destination</h2>
+    <p class="mt-3">Origin: {{ origin.name }}</p>
+    <p>Current destination: {{ current_destination.name }}</p>
+    <form
+      method="post"
+      action="{{ action_url }}"
+      hx-post="{{ action_url }}"
+      hx-target="#not-routed-cargo"
+      hx-swap="outerHTML"
+      hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+      class="mt-4 space-y-4"
+    >
+      {% csrf_token %}
+      <div>
+        <label for="destination" class="mb-1 block font-medium">New destination</label>
+        <select
+          id="destination"
+          name="destination"
+          required
+          {% if error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
+          class="select select-bordered w-full"
+        >
+          <option value="">Select a destination</option>
+          {% for location in destinations %}
+            <option value="{{ location.unlocode.value }}">
+              {{ location.name }} ({{ location.unlocode.value }})
+            </option>
+          {% endfor %}
+        </select>
+        {% if error %}<p id="destination-error" role="alert" class="mt-1 text-red-700">{{ error }}</p>{% endif %}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit" class="btn btn-primary">Update</button>
+        <a href="/admin/dashboard/" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</dialog>

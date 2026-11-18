@@ -8,7 +8,11 @@ source:
 boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates/booking/dialogs/deadline.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +20,16 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_initial_specification_values"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_a_field_error_for_unparseable_input"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_refreshes_rows_and_completes_without_warning"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: deadline-parse-feedback
+    rule: "Unparseable deadline input is refused with an inline field error and leaves cargo unchanged."
+    source: martins-vds/ai-factory-pilot-target#234
+  - id: deadline-update
+    rule: "A successful deadline update preserves origin and destination and refreshes the not-routed rows."
+    source: .source/src/main/java/org/eclipse/cargotracker/application/internal/DefaultBookingService.java:87-98
+notes: "Deadline input uses an HTML date value; malformed values are retained with an inline, accessible error. Successful updates complete the dialog without the unavailable-widget warning (#251)."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]

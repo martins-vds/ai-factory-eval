@@ -8,7 +8,11 @@ source:
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates/booking/dialogs/destination.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +20,17 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_excludes_origin_and_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_keeps_the_backing_location_list_stable"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_an_origin_as_a_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_refreshes_rows_and_completes_without_warning"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: destination-options
+    rule: "Offer only locations other than the cargo's origin and current destination without mutating the backing location list."
+    source: martins-vds/ai-factory-pilot-target#235
+  - id: destination-update
+    rule: "A successful destination update preserves the origin and deadline and refreshes the not-routed rows."
+    source: .source/src/main/java/org/eclipse/cargotracker/application/internal/DefaultBookingService.java:72-85
+notes: "Destination options are filtered into a new list; an invalid option is refused, and a successful update completes the dialog without the unavailable-widget warning (#251)."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]

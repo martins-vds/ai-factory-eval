@@ -1,0 +1,31 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-eval#1402
+specialty: ui
+pr: martins-vds/ai-factory-eval#1406
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.954
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_excludes_origin_and_destination
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_keeps_the_backing_location_list_stable
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_refreshes_rows_and_completes_without_warning
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_initial_specification_values
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_a_field_error_for_unparseable_input
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_refreshes_rows_and_completes_without_warning
+  - .migration/evidence/runs/BK-05G.md
+  - .migration/evidence/mutants/BK-05G.md
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+quirk_tickets: []
+new_tickets: []
+handoff: none
