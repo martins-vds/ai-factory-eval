@@ -14,7 +14,7 @@ evidence_logs:
 ledger_updated: []
 quirk_tickets: []
 new_tickets: []
-handoff: none
+handoff: .migration/handoffs/BK-05K.md
 specialty: ui
 specialty_evidence:
   - .migration/evidence/runs/BK-05K.md
