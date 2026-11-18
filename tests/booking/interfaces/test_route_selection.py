@@ -1,4 +1,6 @@
+import random
 from datetime import UTC, datetime, timedelta
+from itertools import pairwise
 
 import pytest
 from django.core.management import call_command
@@ -14,9 +16,11 @@ from cargotracker.handling.infrastructure.repository import DjangoHandlingEventR
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
+from cargotracker.pathfinder.application.routing import RoutingService
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
 NOW = datetime(2026, 11, 7, tzinfo=UTC)
+SAMPLE_VOYAGES = {'0100S', '0200T', '0300A', '0400S', '0301S'}
 
 
 class CandidateRoutingService:
@@ -97,7 +101,7 @@ def test_route_and_select_itinerary_render_candidate_properties(client, seeded_c
         assert 'Routing Details for Cargo DEF789' in content
         assert 'Hong Kong (CNHKG)' in content
         assert 'Melbourne (AUMEL)' in content
-        assert '2 candidate routes' in content
+        assert 'Candidate routes (2)' in content
         assert 'Itinerary 1' in content
         assert 'Leg 1' in content
         assert '0100S' in content
@@ -105,6 +109,39 @@ def test_route_and_select_itinerary_render_candidate_properties(client, seeded_c
         assert 'Itinerary 2' in content
         assert '0300A' in content
         assert 'No routes found' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_page_displays_candidate_routes_with_path_properties(client, seeded_cargo):
+    candidate_routing_service.candidates = RoutingService(
+        random_source=random.Random(0),
+        clock=lambda: NOW,
+    ).find_shortest_paths('CNHKG', 'AUMEL')
+
+    response = client.get('/admin/cargo/DEF789/route/')
+    candidates = response.context['candidates']
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 3 <= len(candidates) <= 5
+    assert f'Candidate routes ({len(candidates)})' in content
+    for candidate_index, itinerary in enumerate(candidates, start=1):
+        legs = itinerary.legs
+        assert 1 <= len(legs) - 1 <= 5
+        assert legs[0].load_location.unlocode.value == 'CNHKG'
+        assert legs[-1].unload_location.unlocode.value == 'AUMEL'
+        assert len({leg.load_location for leg in legs[1:]}) == len(legs) - 1
+        assert all(leg.voyage.voyage_number.value in SAMPLE_VOYAGES for leg in legs)
+        assert all(leg.load_time < leg.unload_time for leg in legs)
+        assert all(
+            previous.unload_location == current.load_location
+            and previous.unload_time < current.load_time
+            for previous, current in pairwise(legs)
+        )
+        assert f'Itinerary {candidate_index}' in content
+        for leg_index in range(1, len(legs) + 1):
+            assert f'Leg {leg_index}' in content
 
 
 @pytest.mark.django_db
@@ -117,9 +154,9 @@ def test_route_and_select_itinerary_show_empty_candidate_guidance(client, seeded
     assert select_response.status_code == 200
     for response in (route_response, select_response):
         content = response.content.decode()
+        assert 'Candidate routes (0)' in content
         assert 'No routes found' in content
         assert 'arrival deadline' in content
-        assert 'candidate routes' not in content
 
 
 @pytest.mark.django_db
