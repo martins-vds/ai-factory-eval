@@ -1,0 +1,36 @@
+role: afs-verifier
+ticket: DM-05F
+issue: martins-vds/ai-factory-pilot-target#273
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1487
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+findings: []
+tests_added:
+  - tests/data_migration/test_invariants.py::test_loaded_non_carrier_handling_event_keeps_null_voyage
+ledger_issues: []
+quirk_tickets: []
+rules:
+  - capability: data.handling-event
+    rule: LOAD and UNLOAD events require a voyage.
+    use_case: HandlingEvent(...)
+    test: tests/handling/test_domain.py::test_load_and_unload_events_require_a_voyage
+    enforced: true
+  - capability: data.handling-event
+    rule: RECEIVE, CLAIM, and CUSTOMS events prohibit a voyage.
+    use_case: HandlingEvent(...)
+    test: tests/handling/test_domain.py::test_non_carrier_events_prohibit_a_voyage
+    enforced: true
+no_rules:
+  data.cargo: The ticket verifies persisted delivery against handling history; no use-case input rule is recorded.
+  data.leg: The ticket verifies persisted leg continuity; no use-case input rule is recorded.
+  data.location: The ticket verifies persisted event location references; no use-case input rule is recorded.
+  data.voyage: The ticket verifies persisted voyage references and movement order; no use-case input rule is recorded.
+  data.carrier-movement: The ticket verifies persisted schedule ordering; no use-case input rule is recorded.
