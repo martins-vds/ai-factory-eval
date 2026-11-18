@@ -7,14 +7,33 @@ source:
   risk: {crap: 6, complexity: 2, coverage: 0.0}
 boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets:
+  - martins-vds/ai-factory-pilot-target#225
+  - martins-vds/ai-factory-pilot-target#294
+target:
+  components:
+    - src/cargotracker/booking/interfaces/dialogs/views.py
+    - templates/booking/dialogs/_deadline_dialog.html
+    - templates/booking/dialogs/deadline.html
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_the_current_deadline_and_route_context"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_reports_an_invalid_date_without_changing_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_deadline_and_preserves_other_route_fields"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_refreshes_dashboard_rows_after_update"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: valid-deadline
+    rule: "An invalid or noncanonical deadline is refused with a visible field error and leaves cargo unchanged."
+    source: "BK-05G #234; booking dialog input contract"
+  - id: preserve-route-fields
+    rule: "A successful deadline change preserves the cargo origin and destination."
+    source: "DefaultBookingService.java:87-98"
+notes: "The dialog uses the ISO date input format and delegates updates to CargoSpecification.change_deadline. Successful updates refresh the dashboard; the unavailable-widget warning is omitted under #251."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]
