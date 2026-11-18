@@ -34,6 +34,11 @@ def test_about_ui_preserves_library_information_and_contact_link(client):
     assert b'href="mailto:desk@lending-library.invalid"' in response.content
 
 
+def test_about_pages_reject_non_get_requests(client):
+    for path in ('/about', '/ui/about/'):
+        assert client.post(path).status_code == 405
+
+
 @pytest.mark.django_db
 def test_about_page_renders_in_browser(live_server):
     with sync_playwright() as playwright:
