@@ -40,3 +40,17 @@ def test_late_fee_waives_the_first_two_days_and_charges_the_third():
 
     assert (two_days_late.days_late, two_days_late.amount) == (2, Decimal('0.00'))
     assert (three_days_late.days_late, three_days_late.amount) == (3, Decimal('0.75'))
+
+
+def test_late_fee_uses_return_date_and_never_exceeds_ten_dollars():
+    loan = Loan(
+        id='L1',
+        due_on=date(2026, 1, 1),
+        returned_on=date(2026, 3, 1),
+    )
+    application = FeeApplication(LoanRepository(loan), Clock(), PaymentGateway())
+
+    fee = application.calculate(loan.id)
+
+    assert fee.days_late == 59
+    assert fee.amount == Decimal('10.00')

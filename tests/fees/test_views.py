@@ -1,4 +1,5 @@
 import pytest
+from urllib.error import URLError
 
 
 @pytest.mark.django_db
@@ -11,6 +12,15 @@ def test_fee_endpoint_matches_the_characterized_html(client):
         '<h1>Late fee for L3</h1><p>Due 2025-12-15, 19 day(s) late.</p>'
         '<p class="fee">Fee: $4.75</p>'
     )
+
+
+@pytest.mark.django_db
+def test_fee_endpoint_returns_the_characterized_not_found_response(client):
+    response = client.get('/fees/unknown')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
 
 
 @pytest.mark.django_db
@@ -66,12 +76,57 @@ def test_payment_endpoint_reports_interruption_as_gateway_failure_without_losing
 
 
 @pytest.mark.django_db
+def test_payment_endpoint_maps_connection_error_to_gateway_unavailable(client, monkeypatch):
+    def fail(*args, **kwargs):
+        raise URLError('connection refused')
+
+    monkeypatch.setattr('src.fees.gateway.urlopen', fail)
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
 def test_fee_page_uses_reading_room_layout_and_posts_payment_to_ui_route(client):
     response = client.get('/ui/fees/L3/')
 
     assert response.status_code == 200
-    assert b'<h1>Late fees</h1>' in response.content
+    assert b'Late fees</h1>' in response.content
     assert b'Fee due' in response.content
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'bg-[#f5f0e5]' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_shows_gateway_success(client, payment_gateway):
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'id="payment-status"' in response.content
+    assert b'role="status"' in response.content
+    assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_action_shows_a_decline_without_losing_fee_page(client, payment_gateway):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'id="payment-status"' in response.content
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
