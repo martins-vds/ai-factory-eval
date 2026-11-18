@@ -2,6 +2,7 @@ import csv
 import hashlib
 import json
 import shutil
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -144,9 +145,9 @@ def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
         assert cargo.delivery.last_known_location == derived.last_known_location
         assert cargo.delivery.current_voyage == derived.current_voyage
         assert cargo.delivery.misdirected == derived.misdirected
-        assert (
-            cargo.delivery.eta.date() if cargo.delivery.eta else None
-        ) == (derived.eta.date() if derived.eta else None)
+        assert (cargo.delivery.eta.date() if cargo.delivery.eta else None) == (
+            derived.eta.date() if derived.eta else None
+        )
         assert cargo.delivery.next_expected_activity == derived.next_expected_activity
         assert cargo.delivery.unloaded_at_destination == derived.unloaded_at_destination
         assert cargo.delivery.routing_status == derived.routing_status
@@ -162,7 +163,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
         legs = list(cargo.legs.order_by('load_time', 'pk'))
         assert all(
             previous.unload_location_id == following.load_location_id
-            for previous, following in zip(legs, legs[1:])
+            for previous, following in pairwise(legs)
         )
 
 
@@ -186,5 +187,5 @@ def test_loaded_carrier_movement_schedules_are_in_order(tmp_path):
         assert all(
             previous.arrival_time <= following.departure_time
             and previous.arrival_location_id == following.departure_location_id
-            for previous, following in zip(movements, movements[1:])
+            for previous, following in pairwise(movements)
         )

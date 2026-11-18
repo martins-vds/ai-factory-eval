@@ -7,3 +7,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:33:05+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T12:38:20+00:00 | targeted-tests | 0 | 3.62 | `pytest -q tests/data_migration/test_invariants.py` | `df589a78f8a8b32b` |  |  |
 | 2026-11-18T12:38:45+00:00 | targeted-tests | 0 | 2.15 | `pytest -q tests/data_migration/test_invariants.py` | `8a5170c47238fc99` |  |  |
+| 2026-11-18T12:39:20+00:00 | build-compile | 0 | 0.07 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T12:39:20+00:00 | build-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T12:39:20+00:00 | idiom-ruff | 1 | 0.03 | `ruff check` | `0dfb65272ac2879e` | 163 \|         assert all( |  |
+| 2026-11-18T12:39:21+00:00 | idiom-format | 1 | 0.02 | `ruff format --check` | `e83a00b6452d19f1` | 146 \|         assert cargo.delivery.misdirected == derived.misdirected |  |
+| 2026-11-18T12:39:21+00:00 | idiom-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T12:39:21+00:00 | idiom-ui | 0 | 0.5 | `python .migration/harness/tools/check_ui.py` | `4bb50f56ce3cb94f` |  | gate=ui scope="templates changed since eb1a34bde78d1032d64b46b30e4fe650290f317f" templates=0 findings=0 |
+| 2026-11-18T12:39:37+00:00 | targeted-tests | 0 | 2.14 | `pytest -q tests/data_migration/test_invariants.py` | `8a5170c47238fc99` |  |  |
+| 2026-11-18T12:39:37+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T12:39:37+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `9eb349efea514fbe` |  |  |
