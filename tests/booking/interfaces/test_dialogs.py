@@ -161,6 +161,40 @@ def test_destination_dialog_rejects_origin_as_a_new_destination(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.xfail(
+    strict=True,
+    reason='The application use case accepts a destination excluded by the destination-options rule.',
+)
+def test_cargo_specification_rejects_current_destination():
+    _seed_booking_data()
+    cargo = repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(ValueError):
+        CargoSpecification(repository, DjangoHandlingEventRepository()).change_destination(
+            cargo.tracking_id, cargo.route_specification.destination
+        )
+
+
+@pytest.mark.django_db
+def test_cargo_specification_rejects_non_datetime_deadline():
+    _seed_booking_data()
+    cargo = repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(TypeError, match='Arrival deadline must be a datetime'):
+        CargoSpecification(repository, DjangoHandlingEventRepository()).change_deadline(
+            cargo.tracking_id, 'not-a-date'
+        )
+
+    unchanged = repository.find(cargo.tracking_id)
+    assert unchanged is not None
+    assert (
+        unchanged.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    )
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_shows_initial_value_and_parse_error_without_updating(client):
     _seed_booking_data()
