@@ -14,6 +14,7 @@ verification: differential
 characterization_tier: A
 target:
   components:
+    - src.library_info.urls
     - src.library_info.views.legacy_about
     - src.library_info.views.about_page
     - templates/library_info/about.html
