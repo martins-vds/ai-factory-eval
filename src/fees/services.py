@@ -17,12 +17,31 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
+class GatewayResponse(Protocol):
+    status_code: int
+    body: str
+
+
+class PaymentGateway(Protocol):
+    def charge(self, loan_id: str) -> GatewayResponse: ...
+
+
 @dataclass(frozen=True)
 class FeeQuote:
     loan_id: str
     due_on: date
     days_late: int
     amount_cents: int
+
+
+@dataclass(frozen=True)
+class PaymentResult:
+    status_code: int
+    body: str
+
+
+class PaymentGatewayUnavailable(Exception):
+    pass
 
 
 class FeeApplication:
@@ -39,3 +58,21 @@ class FeeApplication:
         days_late = max(0, (end_date - loan.due_on).days)
         amount_cents = 0 if days_late <= 2 else min(1000, days_late * 25)
         return FeeQuote(loan.id, loan.due_on, days_late, amount_cents)
+
+
+class PaymentApplication:
+    def __init__(self, repository: LoanRepository, gateway: PaymentGateway):
+        self.repository = repository
+        self.gateway = gateway
+
+    def pay(self, loan_id: str) -> PaymentResult:
+        if self.repository.find(loan_id) is None:
+            return PaymentResult(404, 'no such loan\n')
+
+        try:
+            response = self.gateway.charge(loan_id)
+        except OSError as error:
+            raise PaymentGatewayUnavailable from error
+
+        status_code = 200 if response.status_code == 200 else 502
+        return PaymentResult(status_code, response.body)

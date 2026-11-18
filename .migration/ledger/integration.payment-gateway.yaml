@@ -13,5 +13,44 @@ status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+notes: "The target maps interruptions to 502 and logs the retained exception cause, as approved by martins-vds/ai-factory-synthetic-target#40."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+target:
+  components: [src.fees.services.PaymentApplication, src.fees.gateway.HttpPaymentGateway, src.fees.views.payment_api, src.fees.views.payment_page]
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_services.py::test_payment_checks_for_a_loan_before_calling_the_gateway
+  - tests/fees/test_services.py::test_payment_forwards_success_and_maps_other_gateway_status_to_bad_gateway
+  - tests/fees/test_services.py::test_payment_failure_keeps_an_interruption_as_the_gateway_failure_cause
+  - tests/fees/test_services.py::test_payment_failure_keeps_an_io_error_as_the_gateway_failure_cause
+  - tests/fees/test_gateway.py::test_http_payment_gateway_sends_empty_post_to_charge_endpoint
+  - tests/fees/test_gateway.py::test_http_payment_gateway_preserves_non_success_status_and_body
+  - tests/fees/test_gateway.py::test_http_payment_gateway_does_not_follow_redirects
+  - tests/fees/test_gateway.py::test_http_payment_gateway_uses_the_characterized_default_url
+  - tests/fees/test_gateway.py::test_http_payment_gateway_does_not_discard_an_interruption
+  - tests/fees/test_views.py::test_payment_api_gateway_forwards_success
+  - tests/fees/test_views.py::test_payment_api_maps_decline_to_502_and_keeps_body
+  - tests/fees/test_views.py::test_payment_api_rejects_unknown_loan_without_gateway
+  - tests/fees/test_views.py::test_payment_api_maps_an_interrupted_gateway_call_to_502
+  - tests/fees/test_views.py::test_payment_api_maps_a_gateway_io_failure_to_502
+  - tests/fees/test_views.py::test_payment_api_logs_interruption_and_returns_502
+  - tests/fees/test_views.py::test_htmx_payment_success_fragment
+  - tests/fees/test_views.py::test_htmx_payment_gateway_failure_fragment
+  - tests/fees/test_views.py::test_htmx_unknown_payment_shows_error_without_gateway
+  - tests/fees/test_views.py::test_regular_payment_failure_renders_page
+  - tests/fees/test_views.py::test_regular_unknown_payment_renders_not_found
+rules:
+  - id: existing-loan
+    rule: The loan must exist before the payment gateway is called.
+    source: FinePayments.java:29-31
+  - id: gateway-request
+    rule: Charge the configured gateway with an empty POST to /charge?loan=<id>; the default URL is https://payments.lending-library.invalid.
+    source: FinePayments.java:32-33
+  - id: gateway-status
+    rule: Only gateway HTTP 200 stays 200; all other responses, including redirects, become 502 while preserving the response body.
+    source: FinePayments.java:34-35
+  - id: gateway-failure
+    rule: I/O and interrupted gateway calls become HTTP 502; an interruption remains available as the failure cause and is logged.
+    source: FinePayments.java:36-40; martins-vds/ai-factory-synthetic-target#40
