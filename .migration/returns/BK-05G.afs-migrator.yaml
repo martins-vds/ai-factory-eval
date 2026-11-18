@@ -1,0 +1,19 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: null
+specialty: ui
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: "n/a: not run, handed off"
+  regression: null
+specialty_evidence: []
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05G.md
