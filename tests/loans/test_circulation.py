@@ -18,8 +18,10 @@ class FixedClock:
 @pytest.mark.parametrize(
     ('field', 'value'),
     [
+        ('member', None),
         ('member', ''),
         ('member', ' \t'),
+        ('isbn', None),
         ('isbn', ''),
         ('isbn', ' \t'),
     ],
@@ -37,6 +39,14 @@ def test_lend_use_case_rejects_blank_member_and_isbn(field, value):
 
     label = 'ISBN' if field == 'isbn' else 'Member'
     assert error.value.field_errors == {field: f'{label} is required.'}
+
+
+@pytest.mark.django_db
+def test_lend_use_case_assigns_the_next_id_and_clock_date():
+    loan = lend_loan('reader', '123', LoanRepository(), FixedClock())
+
+    assert loan.id == 'L4'
+    assert loan.lent_on == date(2026, 11, 18)
 
 
 @pytest.mark.django_db
@@ -125,6 +135,16 @@ def test_browser_lend_form_renders_field_errors_for_blank_values(client):
 
 
 @pytest.mark.django_db
+def test_full_page_lend_form_renders_field_errors_for_blank_values(client):
+    response = client.post('/ui/loans/new/', {'member': '', 'isbn': ' \t'})
+
+    assert response.status_code == 400
+    assert b'<title>Lend a book' in response.content
+    assert b'Member is required.' in response.content
+    assert b'ISBN is required.' in response.content
+
+
+@pytest.mark.django_db
 def test_browser_lend_form_creates_a_loan_with_htmx(client, monkeypatch):
     monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 18))
 
@@ -150,6 +170,7 @@ def test_browser_return_updates_status_and_renders_a_repeated_return_error(clien
     page = client.get('/ui/loans/L1/')
     response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
     repeated = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
+    repeated_full_page = client.post('/ui/loans/L1/return/')
 
     assert page.status_code == 200
     assert b'hx-post="/ui/loans/L1/return/"' in page.content
@@ -157,6 +178,9 @@ def test_browser_return_updates_status_and_renders_a_repeated_return_error(clien
     assert b'Returned Nov 18, 2026.' in response.content
     assert repeated.status_code == 409
     assert b'already been returned' in repeated.content
+    assert repeated_full_page.status_code == 409
+    assert b'This loan has already been returned.' in repeated_full_page.content
+    assert b'Nov 18, 2026' in repeated_full_page.content
     assert Loan.objects.get(pk='L1').returned_on == date(2026, 11, 18)
 
 
