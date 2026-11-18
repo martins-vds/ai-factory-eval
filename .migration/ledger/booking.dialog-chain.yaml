@@ -25,6 +25,7 @@ evidence:
   - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
   - "tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_error_is_renderable_in_the_dialog"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_redirects_and_refreshes_the_not_routed_row"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_without_htmx_uses_a_dashboard_redirect"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_redirects_and_refreshes_the_not_routed_row"
   - ".migration/evidence/runs/BK-05G.md"
 no_rules: "The dialog lifecycle and full-page refresh are presentation behavior; destination and deadline business rules remain in CargoSpecification."

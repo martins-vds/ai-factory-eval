@@ -23,3 +23,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:47:39+00:00 | crap-pytest | 0 | 59.66 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `599f8eceb7d97c86` |  |  |
 | 2026-11-18T13:47:44+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-18T13:47:47+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-18T13:53:52+00:00 | mutation-changed | 1 | 147.33 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `b8c70daa79653382` | afs-mutation: FAILED score=0.722 threshold=0.8 killed=39 survived=15 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.722 threshold=0.8 killed=39 survived=15 files=1 base=origin/main |
+| 2026-11-18T13:55:43+00:00 | dialogs-targeted | 0 | 5.8 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `846032b0b45931c5` |  |  |

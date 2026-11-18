@@ -25,14 +25,12 @@
     >
       <option value="">Choose a destination</option>
       {% for location in locations %}
-        <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == selected_destination %} selected{% endif %}>
+        <option value="{{ location.unlocode.value }}">
           {{ location.name }} ({{ location.unlocode.value }})
         </option>
       {% endfor %}
     </select>
     <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" name="action" value="update">Update</button>
   </form>
-  <form method="dialog" class="mt-3 flex justify-end">
-    <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="submit">Cancel</button>
-  </form>
+  {% include "booking/dialogs/_cancel_form.html" %}
 </section>

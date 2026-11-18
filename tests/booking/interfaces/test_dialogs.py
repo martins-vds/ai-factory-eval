@@ -60,10 +60,13 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client, sample_
 
 
 def test_unknown_cargo_error_is_renderable_in_the_dialog(client):
-    response = client.get('/admin/cargo/MISSING1/destination/')
+    destination_response = client.get('/admin/cargo/MISSING1/destination/')
+    deadline_response = client.get('/admin/cargo/MISSING1/deadline/')
 
-    assert response.status_code == 404
-    assert 'Cargo not found' in response.content.decode()
+    assert destination_response.status_code == deadline_response.status_code == 404
+    for response in (destination_response, deadline_response):
+        assert 'Cargo not found' in response.content.decode()
+        assert 'MISSING1' in response.content.decode()
 
 
 def test_destination_dialog_shows_current_values_and_stable_filtered_options(
@@ -94,6 +97,8 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     assert cargo.route_specification.origin.unlocode.value not in option_codes
     assert option_codes
     assert option_codes == second_option_codes
+    assert 'Select an available destination.' not in content
+    assert 'Cancel' in content
     assert shipping_locations == original_locations
 
 
@@ -126,6 +131,28 @@ def test_destination_update_redirects_and_refreshes_the_not_routed_row(client, s
     assert destination.name in not_routed_table
     assert original_origin.name in not_routed_table
     assert original_deadline.strftime('%m/%d/%Y') in not_routed_table
+
+
+def test_destination_update_without_htmx_uses_a_dashboard_redirect(client, sample_booking_data):
+    cargo = sample_booking_data
+    assert cargo is not None
+    destination = next(
+        location
+        for location in shipping_locations
+        if location.unlocode
+        not in {
+            cargo.route_specification.origin.unlocode,
+            cargo.route_specification.destination.unlocode,
+        }
+    )
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'action': 'update', 'destination': destination.unlocode.value},
+    )
+
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/admin/dashboard/'
 
 
 def test_destination_update_rejects_a_location_outside_the_filtered_options(
@@ -161,11 +188,26 @@ def test_deadline_dialog_shows_initial_value_and_parse_error(client, sample_book
     refreshed_cargo = cargo_repository.find(TrackingId('DEF789'))
 
     assert initial.status_code == invalid.status_code == 200
-    assert f'value="{original_deadline.date().isoformat()}"' in initial.content.decode()
+    initial_content = initial.content.decode()
+    assert f'value="{original_deadline.date().isoformat()}"' in initial_content
+    assert 'Enter a valid arrival deadline.' not in initial_content
+    assert 'Cancel' in initial_content
     assert 'Enter a valid arrival deadline.' in invalid.content.decode()
     assert 'aria-invalid="true"' in invalid.content.decode()
     assert refreshed_cargo is not None
     assert refreshed_cargo.route_specification.arrival_deadline == original_deadline
+
+
+def test_deadline_update_without_a_value_keeps_the_field_error(client, sample_booking_data):
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'action': 'update'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert 'Enter a valid arrival deadline.' in response.content.decode()
+    assert 'value=""' in response.content.decode()
 
 
 def test_deadline_update_redirects_and_refreshes_the_not_routed_row(client, sample_booking_data):

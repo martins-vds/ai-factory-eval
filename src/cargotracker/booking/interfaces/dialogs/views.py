@@ -27,6 +27,15 @@ def _destination_options(locations: list[Location], cargo: Cargo) -> list[Locati
     return [location for location in locations if location.unlocode.value not in excluded]
 
 
+def _not_found_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
+    return render(
+        request,
+        'booking/dialogs/not_found.html',
+        {'tracking_id': tracking_id},
+        status=404,
+    )
+
+
 def _completion_response(request: HttpRequest) -> HttpResponse:
     if request.headers.get('HX-Request') == 'true':
         response = HttpResponse()
@@ -43,17 +52,12 @@ def create_booking_dialog_views(
     def destination_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         cargo = _cargo_for_dialog(cargo_dashboard, tracking_id)
         if cargo is None:
-            return render(
-                request,
-                'booking/dialogs/not_found.html',
-                {'tracking_id': tracking_id},
-                status=404,
-            )
+            return _not_found_dialog(request, tracking_id)
 
         locations = _destination_options(list_shipping_locations(), cargo)
-        selected_destination = request.POST.get('destination', '')
+        destination_code = request.POST.get('destination', '')
         destination = next(
-            (location for location in locations if location.unlocode.value == selected_destination),
+            (location for location in locations if location.unlocode.value == destination_code),
             None,
         )
         destination_error = ''
@@ -70,7 +74,6 @@ def create_booking_dialog_views(
             {
                 'cargo': cargo,
                 'locations': locations,
-                'selected_destination': selected_destination,
                 'destination_error': destination_error,
             },
         )
@@ -78,12 +81,7 @@ def create_booking_dialog_views(
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         cargo = _cargo_for_dialog(cargo_dashboard, tracking_id)
         if cargo is None:
-            return render(
-                request,
-                'booking/dialogs/not_found.html',
-                {'tracking_id': tracking_id},
-                status=404,
-            )
+            return _not_found_dialog(request, tracking_id)
 
         deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
         deadline_error = ''
