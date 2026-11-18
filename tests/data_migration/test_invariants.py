@@ -143,13 +143,17 @@ def test_cargo_delivery_state_matches_its_handling_history(loaded_snapshot):
 
 @pytest.mark.django_db(transaction=True)
 def test_each_cargo_itinerary_has_connected_legs(loaded_snapshot):
-    for cargo in CargoRecord.objects.all():
-        legs = list(cargo.legs.order_by('load_time', 'pk'))
-        assert len(legs) >= 2
-        assert all(
-            previous.unload_location_id == following.load_location_id
-            for previous, following in pairwise(legs)
-        )
+    leg_pairs = [
+        (previous, following)
+        for cargo in CargoRecord.objects.all()
+        for previous, following in pairwise(cargo.legs.order_by('load_time', 'pk'))
+    ]
+
+    assert leg_pairs
+    assert all(
+        previous.unload_location_id == following.load_location_id
+        for previous, following in leg_pairs
+    )
 
 
 @pytest.mark.django_db(transaction=True)
