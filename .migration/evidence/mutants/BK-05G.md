@@ -13,7 +13,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.852, thr
   +        'XXdestination_errorXX': destination_error,
        }
   ```
-
 - `src/cargotracker/booking/interfaces/dialogs/views.py:42 Mutant #16`
 
   ```diff
@@ -157,4 +156,3 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.852, thr
                return _render_dialog(request, 'booking/dialogs/deadline.html', context)
            try:
   ```
-
