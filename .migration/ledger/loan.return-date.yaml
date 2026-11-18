@@ -7,11 +7,16 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
+boundary: "The first successful return persists today's date as returnedOn; an attempt to return an already-returned loan is rejected and leaves the original date unchanged."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.services.return_loan, src.loans.repository.LoanRepository.mark_returned, src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/loans/test_circulation.py::test_returning_a_loan_persists_today_and_returns_the_formatted_record, tests/loans/test_circulation.py::test_repeat_return_is_rejected_without_replacing_the_original_date, tests/loans/test_circulation.py::test_api_mutations_do_not_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_mutations_still_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_return_keeps_original_date_on_repeat, .migration/evidence/runs/LL-02.md]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - {id: record-first-return, rule: "The first return records the current server date on the loan.", source: "legacy/src/main/java/lib/LoanResource.java:45-50"}
+  - {id: preserve-return-date, rule: "A return attempt on an already-returned loan is rejected without replacing its original return date.", source: "martins-vds/ai-factory-synthetic-target#41"}

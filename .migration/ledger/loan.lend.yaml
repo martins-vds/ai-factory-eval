@@ -7,11 +7,19 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
+boundary: "POST /loans requires nonblank member and ISBN fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record. The /ui/loans/new/ form shows field errors and returns to the reading-room collection."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.services.lend_loan, src.loans.repository.LoanRepository.create, src.loans.views.loan_list, templates/loans/list.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/loans/test_circulation.py::test_lending_creates_a_persisted_fourteen_day_loan, tests/loans/test_circulation.py::test_lending_escapes_delimiters_in_the_loan_record, tests/loans/test_circulation.py::test_concurrent_lending_allocates_distinct_ids, tests/loans/test_circulation.py::test_lending_rejects_missing_or_blank_fields, tests/loans/test_circulation.py::test_api_mutations_do_not_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_mutations_still_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_lending_shows_field_errors_for_blank_values, .migration/evidence/runs/LL-02.md]
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - {id: member-isbn-required, rule: "Missing member or ISBN fields are rejected with HTTP 400.", source: "legacy/src/main/java/lib/LoanResource.java:37-43"}
+  - {id: reject-blank-values, rule: "Empty or whitespace-only member and ISBN values are rejected with field errors.", source: "martins-vds/ai-factory-synthetic-target#39"}
+  - {id: lent-date, rule: "A successful loan is dated with the current server date.", source: "legacy/src/main/java/lib/LoanResource.java:37-43"}
+  - {id: due-date, rule: "A loan is due 14 calendar days after its lending date.", source: "legacy/src/main/java/lib/Loan.java:44-46"}
+  - {id: generated-id, rule: "A new loan id is L followed by the current loan count plus one.", source: "legacy/src/main/java/lib/LoanResource.java:37-43"}

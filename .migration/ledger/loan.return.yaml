@@ -7,11 +7,16 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after its first return, HTTP 404 with `no such loan` and a newline for an absent id, or HTTP 409 when it was already returned. The /ui/loans/{id}/return/ action updates the reading-room collection."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.services.return_loan, src.loans.views.loan_return, src.loans.views.loan_catalog_return, templates/loans/list.html]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/loans/test_circulation.py::test_returning_a_loan_persists_today_and_returns_the_formatted_record, tests/loans/test_circulation.py::test_returning_an_unknown_loan_keeps_the_characterized_not_found_response, tests/loans/test_circulation.py::test_api_mutations_do_not_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_mutations_still_require_a_csrf_token, tests/loans/test_circulation.py::test_browser_return_keeps_original_date_on_repeat, .migration/evidence/runs/LL-02.md]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - {id: known-loan, rule: "Only an existing loan can be returned; an absent id returns HTTP 404 and `no such loan`.", source: "legacy/src/main/java/lib/LoanResource.java:45-50"}
+  - {id: repeat-rejected, rule: "An already-returned loan cannot be returned again; the original date remains unchanged.", source: "martins-vds/ai-factory-synthetic-target#41"}

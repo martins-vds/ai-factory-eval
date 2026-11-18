@@ -10,6 +10,16 @@ class LoanRepository:
     def find(self, loan_id):
         return Loan.objects.filter(pk=loan_id).first()
 
+    def mark_returned(self, loan_id, returned_on):
+        return (
+            Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(
+                returned_on=returned_on
+            )
+            == 1
+        )
+
     @transaction.atomic
     def create(self, **fields):
+        Loan.objects.select_for_update().order_by('pk').first()
+        fields.setdefault('id', f'L{Loan.objects.count() + 1}')
         return Loan.objects.create(**fields)

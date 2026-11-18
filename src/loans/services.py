@@ -1,7 +1,35 @@
 import csv
 from io import StringIO
 
-from .repository import LoanRepository
+
+class InvalidLoan(ValueError):
+    def __init__(self, errors):
+        self.errors = errors
+
+
+class LoanAlreadyReturned(ValueError):
+    pass
+
+
+def lend_loan(repository, member, isbn, lent_on):
+    errors = {}
+    if not member or not member.strip():
+        errors['member'] = 'Enter a member name; blank values are not accepted.'
+    if not isbn or not isbn.strip():
+        errors['isbn'] = 'Enter an ISBN; blank values are not accepted.'
+    if errors:
+        raise InvalidLoan(errors)
+    return repository.create(member=member, isbn=isbn, lent_on=lent_on)
+
+
+def return_loan(repository, loan_id, returned_on):
+    loan = repository.find(loan_id)
+    if loan is None:
+        return None
+    if loan.returned_on is not None or not repository.mark_returned(loan_id, returned_on):
+        raise LoanAlreadyReturned
+    loan.returned_on = returned_on
+    return loan
 
 
 def loan_line(loan):
@@ -20,10 +48,10 @@ def loan_line(loan):
     return output.getvalue()
 
 
-def list_loans_text():
-    return ''.join(loan_line(loan) for loan in LoanRepository().all())
+def list_loans_text(repository):
+    return ''.join(loan_line(loan) for loan in repository.all())
 
 
-def get_loan_text(loan_id):
-    loan = LoanRepository().find(loan_id)
+def get_loan_text(repository, loan_id):
+    loan = repository.find(loan_id)
     return loan_line(loan) if loan else None
