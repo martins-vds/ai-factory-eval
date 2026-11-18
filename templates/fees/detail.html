@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Late fees · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  {% if fee %}
+  <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+  <h1 class="mt-3 mb-8 text-5xl">Late fees</h1>
+  <div class="grid gap-8 md:grid-cols-[1fr_18rem]">
+    <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-[#66705b]">{{ fee.loan.member }} · {{ fee.loan.id }}</p>
+        <h2 class="mt-2 text-3xl">Late fee for {{ fee.loan.id }}</h2>
+        <p class="mt-5">
+          Due {{ fee.loan.due_on|date:"M j, Y" }}{% if fee.loan.returned_on %} · returned {{ fee.loan.returned_on|date:"M j, Y" }}{% endif %}
+        </p>
+        <p class="mt-2">{{ fee.days_late }} late days · first two days waived</p>
+        <p class="mt-7 text-6xl font-bold">${{ fee.amount|floatformat:2 }}</p>
+        <p class="mt-2 text-[#66705b]">25¢ per day after the grace period, capped at $10.00.</p>
+      </div>
+    </article>
+    <aside class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Settle your account</p>
+        <h2 class="mt-2 text-2xl">Pay this fee</h2>
+        <div id="payment-status">
+          <p class="mt-2 text-[#66705b]">Your late fee is {{ fee.amount|floatformat:2 }}.</p>
+          <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
+                hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+            {% csrf_token %}
+            <button class="btn mt-4 w-full bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">
+              Pay late fee
+            </button>
+          </form>
+        </div>
+      </div>
+    </aside>
+  </div>
+  {% else %}
+  <section class="mx-auto max-w-3xl py-8">
+    <h1 class="text-4xl">No such loan.</h1>
+    <p class="mt-4"><a class="link link-hover text-[#a94e37]" href="/ui/loans/">Return to the collection</a></p>
+  </section>
+  {% endif %}
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.target?.id === 'payment-status' && event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+    }
+  });
+</script>
+{% endblock %}
