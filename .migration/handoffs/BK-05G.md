@@ -16,3 +16,23 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-18T12:35:21Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-continue-dialogs-again` / none in evaluation checkout  ·  **Last commit:** `392a9c69`
+### Done
+- Setup checks passed; pinned source SHA is `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`.
+- Setup probe completed with exit 0; journal: `.migration/evidence/runs/BK-05G.md`.
+- Confirmed `CargoSpecification.change_destination` and `change_deadline` exist, but the target has no dialog views, dialog templates, or booking URL configuration. The root URL configuration does not include booking routes.
+- The authorized template `templates/booking/dashboard/not_routed_table.html` currently has no dialog triggers.
+### Remaining
+- [ ] Resolve how the dashboard template can open dialogs when the dialog endpoints and templates are absent from this checkout.
+- [ ] After the required implementation is available and in scope, add focused tests, update the three dialog ledger entries, and run every profile gate through `afs-run`.
+### Decisions made
+- No application or test files were changed: a template-only trigger cannot open a dialog without an existing route and dialog response.
+### Blockers / questions
+- The operator scope extension authorizes only `templates/booking/dashboard/not_routed_table.html`, while this checkout has no `src/cargotracker/booking/interfaces/dialogs/views.py`, `templates/booking/dialogs/`, or booking URL module/registration.
+- Please either provide a checkout containing the dialog endpoints/templates or extend the scope to include the minimum view, template, URL wiring, and tests required to implement and verify them through the application use cases.
+### Failing commands
+- None. Build, behavior, idiom, CRAP, mutation, and regression gates were not run because implementation is blocked.
+### Next step for the next session
+Resume after the dialog endpoint/template implementation is available or the operator explicitly expands scope; then wire the not-routed template and validate the interaction through the existing application use cases.
