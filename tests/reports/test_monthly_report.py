@@ -50,18 +50,21 @@ def test_monthly_report_aggregates_prior_month_and_orders_members_by_fees_then_i
             Loan('L2', 'amy', date(2026, 2, 2), date(2026, 2, 16), date(2026, 2, 19)),
             Loan('L3', 'dee', date(2026, 2, 3), date(2026, 2, 17), date(2026, 2, 20)),
             Loan('L6', 'zara', date(2026, 2, 4), date(2026, 2, 18), date(2026, 2, 21)),
+            Loan('L7', 'zara', date(2026, 2, 5), date(2026, 2, 19), date(2026, 2, 19)),
         ]
     )
     application = MonthlyReportApplication(
         repository,
-        FeeCalculator({'L1': Fee(1000), 'L2': Fee(75), 'L3': Fee(75), 'L6': Fee(75)}),
+        FeeCalculator(
+            {'L1': Fee(1000), 'L2': Fee(75), 'L3': Fee(75), 'L6': Fee(75), 'L7': Fee(0)}
+        ),
     )
 
     report = application.monthly_report_for(date(2026, 3, 1))
 
     assert repository.period == (date(2026, 2, 1), date(2026, 3, 1))
     assert report == [
-        MonthlyReportRow('zara', 2, 2, 1075),
+        MonthlyReportRow('zara', 3, 2, 1075),
         MonthlyReportRow('amy', 1, 1, 75),
         MonthlyReportRow('dee', 1, 1, 75),
     ]
