@@ -1,5 +1,7 @@
+import csv
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
+from io import StringIO
 from threading import Barrier
 
 import pytest
@@ -7,6 +9,8 @@ from django.db import close_old_connections
 from django.test import Client
 
 from src.loans.models import Loan
+from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, loan_line, return_loan
 
 
 @pytest.mark.django_db
@@ -215,6 +219,18 @@ def test_repeated_browser_return_is_visible_and_does_not_change_the_date(client,
 
 
 @pytest.mark.django_db
+def test_unknown_browser_return_renders_htmx_error_response(client):
+    page = client.get('/ui/loans/')
+
+    assert b"response.code === '[45]..'" in page.content
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
+    assert b'role="status"' in response.content
+
+
+@pytest.mark.django_db
 def test_browser_return_route_does_not_change_data_on_get(client, monkeypatch):
     loan = Loan.objects.create(
         id='L9',
@@ -255,3 +271,71 @@ def test_concurrent_lending_allocates_distinct_loan_ids(monkeypatch):
     assert [status for status, _ in results] == [201] * request_count
     loan_ids = [body.split(';', 1)[0] for _, body in results]
     assert len(set(loan_ids)) == request_count
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [
+        ('', '123'),
+        ('   ', '123'),
+        ('reader', ''),
+        ('reader', '   '),
+    ],
+)
+def test_lend_use_case_rejects_blank_member_or_isbn(member, isbn):
+    with pytest.raises(ValueError):
+        lend_loan(LoanRepository(), member, isbn, date(2026, 11, 18))
+
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+def test_lend_use_case_assigns_next_loan_id_and_fourteen_day_due_date():
+    loan = lend_loan(LoanRepository(), 'reader', '123', date(2024, 2, 15))
+
+    assert loan.id == 'L4'
+    assert loan.due_on == date(2024, 2, 29)
+
+
+@pytest.mark.django_db
+def test_lend_use_case_escapes_delimiters_and_record_breaks():
+    member = 'Reader; Example\nSecond line'
+    isbn = '978"xyz'
+    loan = lend_loan(LoanRepository(), member, isbn, date(2026, 3, 1))
+
+    record = next(csv.reader(StringIO(loan_line(loan)), delimiter=';'))
+
+    assert record == ['L4', member, isbn, '2026-03-01', '2026-03-15', '']
+
+
+@pytest.mark.django_db
+def test_return_use_case_reports_unknown_loan():
+    assert return_loan(LoanRepository(), 'unknown', date(2026, 11, 18)) is None
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeat_without_changing_return_date():
+    Loan.objects.create(
+        id='L9',
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 3, 1),
+    )
+
+    first_return, first_updated = return_loan(
+        LoanRepository(),
+        'L9',
+        date(2026, 11, 18),
+    )
+    repeated_return, repeated_updated = return_loan(
+        LoanRepository(),
+        'L9',
+        date(2026, 11, 19),
+    )
+
+    assert first_updated
+    assert not repeated_updated
+    assert first_return.returned_on == date(2026, 11, 18)
+    assert repeated_return.returned_on == date(2026, 11, 18)
+    assert Loan.objects.get(pk='L9').returned_on == date(2026, 11, 18)
