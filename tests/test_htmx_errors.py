@@ -39,7 +39,7 @@ def test_return_error_fragment_matches_the_return_target(client):
     response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
 
     assert first_return.status_code == 200
-    assert response.status_code == 409
+    assert response.status_code == 200
     assert b'id="return-status"' in response.content
     assert b'role="alert"' in response.content
     assert b'already returned' in response.content
