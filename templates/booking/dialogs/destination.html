@@ -27,7 +27,6 @@
     {% for location in destination_options %}
       <option
         value="{{ location.unlocode.value }}"
-        {% if location.unlocode.value == destination_value %}selected{% endif %}
       >{{ location.name }} ({{ location.unlocode.value }})</option>
     {% endfor %}
   </select>

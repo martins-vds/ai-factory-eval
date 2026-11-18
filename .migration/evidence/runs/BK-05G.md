@@ -47,3 +47,21 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:04:51+00:00 | inspect-dialog-import | 1 | 0.03 | `python -c 'import cargotracker.booking.interfaces.dialogs.views as m; print(m.__file__); print(m.create_destination_dialog_view.__code__.co_consts)'` | `077a1b685d3ec0f1` | Traceback (most recent call last): |  |
 | 2026-11-18T13:06:16+00:00 | dialogs-tests-after-mutation-review | 1 | 3.95 | `pytest -q -p no:cacheprovider -o addopts= tests/booking/interfaces/test_dialogs.py` | `eab7c310191b9f9c` | assert response.status_code == 200 |  |
 | 2026-11-18T13:06:31+00:00 | dialogs-tests-after-mutation-review | 0 | 4.06 | `pytest -q -p no:cacheprovider -o addopts= tests/booking/interfaces/test_dialogs.py` | `154d265f2d75809b` |  |  |
+| 2026-11-18T13:07:01+00:00 | ruff-check | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T13:07:01+00:00 | ruff-format-check | 1 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `75b1144179b98c2e` | 184 \|     assert response.status_code == 200 |  |
+| 2026-11-18T13:07:05+00:00 | focused-dialog-tests | 0 | 4.05 | `pytest -q -p no:cacheprovider -o addopts= tests/booking/interfaces/test_dialogs.py` | `22111cb090678635` |  |  |
+| 2026-11-18T13:07:09+00:00 | ruff-format | 0 | 0.01 | `ruff format tests/booking/interfaces/test_dialogs.py src/cargotracker/booking/interfaces/dialogs/views.py` | `10869b88a75066aa` |  |  |
+| 2026-11-18T13:07:13+00:00 | ruff-format-check | 0 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-18T13:07:13+00:00 | ruff-check | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T13:07:17+00:00 | focused-dialog-tests | 0 | 4.05 | `pytest -q -p no:cacheprovider -o addopts= tests/booking/interfaces/test_dialogs.py` | `f63e517ae9c3c5ac` |  |  |
+| 2026-11-18T13:10:42+00:00 | mutation-changed | 0 | 127.53 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `e9d57017a9443eea` |  | gate=mutation score=0.962 threshold=0.8 killed=50 survived=2 files=1 base=origin/main |
+| 2026-11-18T13:11:30+00:00 | idiom-ruff-check | 0 | 0.04 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T13:11:30+00:00 | idiom-ruff-format | 0 | 0.03 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T13:11:30+00:00 | build-compile | 0 | 0.13 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T13:11:31+00:00 | idiom-layers | 0 | 0.29 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T13:11:31+00:00 | build-django-check | 0 | 0.57 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T13:11:31+00:00 | idiom-ui | 0 | 0.84 | `python .migration/harness/tools/check_ui.py` | `028090431a3e6ad6` |  | gate=ui scope="templates changed since 517bb57243bf7ca8848488a0f2ee96259892be95" templates=3 findings=0 |
+| 2026-11-18T13:12:35+00:00 | behavior-full-suite | 0 | 59.6 | `pytest -q` | `772ce95326237f38` |  |  |
+| 2026-11-18T13:13:43+00:00 | crap-coverage | 0 | 62.4 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `6bccbdf27658fec4` |  |  |
+| 2026-11-18T13:13:46+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T13:13:49+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `29c505495ba389f3` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |

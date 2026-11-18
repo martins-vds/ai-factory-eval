@@ -48,9 +48,9 @@ def create_destination_dialog_view(
                 cargo.route_specification.destination,
             )
         ]
-        destination_value = request.POST.get('destination', '')
-        destination_error = ''
+        destination_error = None
         if request.method == 'POST':
+            destination_value = request.POST.get('destination')
             destination = next(
                 (
                     location
@@ -73,7 +73,6 @@ def create_destination_dialog_view(
             {
                 'cargo': cargo,
                 'destination_options': destination_options,
-                'destination_value': destination_value,
                 'destination_error': destination_error,
             },
         )
@@ -88,10 +87,13 @@ def create_deadline_dialog_view(
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         cargo = _find_cargo(cargo_dashboard, tracking_id)
         deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
-        deadline_error = ''
+        submitted_deadline = request.POST.get('deadline')
+        deadline_error = None
         if request.method == 'POST':
             try:
-                arrival_date = datetime.strptime(request.POST.get('deadline', ''), '%Y-%m-%d')
+                if submitted_deadline is None:
+                    raise ValueError
+                arrival_date = datetime.strptime(submitted_deadline, '%Y-%m-%d')
             except ValueError:
                 deadline_error = 'Enter a valid arrival deadline.'
             else:
@@ -108,7 +110,9 @@ def create_deadline_dialog_view(
             'booking/dialogs/deadline.html',
             {
                 'cargo': cargo,
-                'deadline_value': request.POST.get('deadline', deadline_value),
+                'deadline_value': (
+                    submitted_deadline if request.method == 'POST' else deadline_value
+                ),
                 'deadline_error': deadline_error,
             },
         )

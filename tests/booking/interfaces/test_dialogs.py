@@ -182,9 +182,7 @@ def test_destination_update_rejects_locations_outside_the_offered_choices(client
     content = response.content.decode()
 
     assert response.status_code == 200
-    destination_error = re.search(
-        r'<p id="destination-error"[^>]*>(.*?)</p>', content, re.DOTALL
-    )
+    destination_error = re.search(r'<p id="destination-error"[^>]*>(.*?)</p>', content, re.DOTALL)
     assert destination_error is not None
     assert destination_error.group(1).strip() == 'Choose a valid destination.'
     assert 'aria-invalid="true"' in content
