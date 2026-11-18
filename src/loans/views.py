@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
 
 from .composition import get_loan_text, lend_loan, list_loans_text, loan_line, return_loan
@@ -53,3 +53,42 @@ def loan_return(request, loan_id):
     if not updated:
         return HttpResponse('already returned\n', status=409, content_type='text/plain')
     return HttpResponse(loan_line(loan), content_type='text/plain')
+
+
+@require_http_methods(['GET', 'POST'])
+def loan_lend_page(request):
+    form = LoanForm(request.POST if request.method == 'POST' else None)
+    if request.method == 'POST' and form.is_valid():
+        loan = lend_loan(**form.cleaned_data)
+        if request.headers.get('HX-Request') == 'true':
+            return render(request, 'loans/loan-created.html', {'loan': loan})
+        return redirect(f'/ui/loans/{loan.id}/')
+
+    template = (
+        'loans/loan-form.html'
+        if request.method == 'POST' and request.headers.get('HX-Request') == 'true'
+        else 'loans/new.html'
+    )
+    return render(request, template, {'form': form})
+
+
+@require_POST
+def loan_return_page(request, loan_id):
+    loan, updated = return_loan(loan_id)
+    if loan is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+
+    if request.headers.get('HX-Request') == 'true':
+        return render(
+            request,
+            'loans/return-status.html',
+            {'loan': loan, 'updated': updated},
+        )
+    if not updated:
+        return render(
+            request,
+            'loans/detail.html',
+            {'loan': loan, 'return_error': True},
+            status=409,
+        )
+    return redirect(f'/ui/loans/{loan.id}/')
