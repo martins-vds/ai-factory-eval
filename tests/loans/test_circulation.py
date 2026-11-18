@@ -136,6 +136,7 @@ def test_return_api_records_date_and_rejects_repeated_returns(client):
         f'L1;ana;9780134685991;2026-01-02;2026-01-16;{returned_on.isoformat()}\n'
     )
     assert repeated_return.status_code == 409
+    assert repeated_return['Content-Type'] == 'text/plain'
     assert repeated_return.content.decode() == 'loan already returned\n'
     assert loan_record.content.decode().endswith(f'{returned_on.isoformat()}\n')
 
@@ -158,6 +159,17 @@ def test_loan_list_renders_reading_room_lend_form_using_a_ui_route(client):
     assert b'hx-post="/ui/loans/new/"' in response.content
     assert b'name="member"' in response.content
     assert b'name="isbn"' in response.content
+    assert b'Loan L1' in response.content
+
+
+@pytest.mark.django_db
+def test_full_page_lending_creates_and_displays_the_new_loan(client):
+    response = client.post('/ui/loans/new/', {'member': 'reader', 'isbn': '123'})
+
+    assert response.status_code == 201
+    assert b'Books in good company.' in response.content
+    assert b'Loan L4 has been added.' in response.content
+    assert b'Loan L4' in response.content
 
 
 @pytest.mark.django_db
@@ -186,6 +198,31 @@ def test_ui_lending_renders_field_errors_for_full_page_and_htmx_requests(client,
     assert response.status_code == 400
     assert b'Member:' in response.content
     assert b'This field is required.' in response.content
+    if headers:
+        assert b'The Lending Library' not in response.content
+    else:
+        assert b'The Lending Library' in response.content
+        assert b'Loan L1' in response.content
+        assert b'value=" \t "' in response.content
+        assert b'value="123"' in response.content
+
+
+@pytest.mark.parametrize(
+    ('form', 'expected_member', 'expected_isbn'),
+    [
+        ({'isbn': '123'}, b'value=""', b'value="123"'),
+        ({'member': 'reader'}, b'value="reader"', b'value=""'),
+    ],
+)
+@pytest.mark.django_db
+def test_full_page_lending_keeps_empty_defaults_for_missing_fields(
+    client, form, expected_member, expected_isbn
+):
+    response = client.post('/ui/loans/new/', form)
+
+    assert response.status_code == 400
+    assert expected_member in response.content
+    assert expected_isbn in response.content
 
 
 @pytest.mark.django_db
@@ -204,9 +241,11 @@ def test_ui_return_rejects_repeated_returns_and_preserves_the_original_date(clie
     current_record = client.get('/loans/L1')
 
     assert first.status_code == 200
+    assert first['HX-Trigger'] == 'loan-updated'
     assert b'Returned on' in first.content
     assert repeated.status_code == 409
     assert b'already been returned' in repeated.content
+    assert b'Returned on' in repeated.content
     assert current_record.content.decode().endswith(f'{timezone.localdate().isoformat()}\n')
 
 
@@ -216,3 +255,33 @@ def test_ui_return_renders_a_not_found_response_for_unknown_loans(client):
 
     assert response.status_code == 404
     assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_ui_return_renders_unknown_loan_error_as_an_htmx_fragment(client):
+    response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
+    assert b'The Lending Library' not in response.content
+
+
+@pytest.mark.django_db
+def test_full_page_return_redirects_then_displays_repeated_return_details(client):
+    first = client.post('/ui/loans/L1/return/')
+    repeated = client.post('/ui/loans/L1/return/')
+
+    assert first.status_code == 302
+    assert first['Location'] == '/ui/loans/L1/'
+    assert repeated.status_code == 409
+    assert b'Loan record \xc2\xb7 L1' in repeated.content
+    assert b'This loan has already been returned.' in repeated.content
+    assert b'Returned on' in repeated.content
+
+
+@pytest.mark.django_db
+def test_loan_mutation_endpoints_reject_unsupported_methods(client):
+    assert client.put('/loans').status_code == 405
+    assert client.get('/loans/L1/return').status_code == 405
+    assert client.get('/ui/loans/new/').status_code == 405
+    assert client.get('/ui/loans/L1/return/').status_code == 405
