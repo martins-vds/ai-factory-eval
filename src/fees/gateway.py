@@ -20,12 +20,11 @@ class HttpPaymentGateway:
         request = Request(url, data=b'', method='POST')
 
         try:
-            with urlopen(request, timeout=5) as response:
+            with urlopen(request) as response:
                 status = response.status
                 body = response.read().decode()
         except HTTPError as error:
-            status = error.code
-            body = error.read().decode()
+            return PaymentResult(502, error.read().decode())
         except InterruptedError as error:
             raise PaymentInterrupted('payment gateway request was interrupted') from error
         except URLError as error:

@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_late_fee_waives_the_first_two_days_and_charges_the_third, tests/fees/test_services.py::test_late_fee_uses_return_date_and_never_exceeds_ten_dollars, tests/fees/test_views.py::test_fee_endpoint_matches_the_characterized_html]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fee_services.py::test_fee_calculation_waives_the_first_two_days_and_charges_the_third, tests/fees/test_fee_services.py::test_fee_calculation_uses_return_date_and_never_exceeds_ten_dollars, tests/fees/test_fee_services.py::test_fee_calculation_clamps_days_before_the_due_date_to_zero, tests/fees/test_views.py::test_fee_endpoint_matches_the_characterized_html]
 rules:
   - id: late-days
     rule: "Late days are the non-negative difference between the due date and the returned date or today."

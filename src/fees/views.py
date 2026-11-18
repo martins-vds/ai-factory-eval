@@ -50,20 +50,20 @@ def payment(request, loan_id):
 
 @require_POST
 def payment_page(request, loan_id):
+    fee = fee_application.calculate(loan_id)
+    if fee is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+
     result = _charge(loan_id)
     if result is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-
     if request.headers.get('HX-Request') == 'true':
         return render(
             request,
             'fees/payment-status.html',
-            {'loan_id': loan_id, 'result': result},
+            {'result': result},
         )
 
-    fee = fee_application.calculate(loan_id)
-    if fee is None:
-        return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
     return render(
         request,
         'fees/page.html',

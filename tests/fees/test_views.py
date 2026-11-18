@@ -1,7 +1,13 @@
+from datetime import date
+from decimal import Decimal
+from types import SimpleNamespace
 from urllib.error import URLError
 
 import pytest
 from playwright.sync_api import sync_playwright
+
+from src.fees.services import Fee
+from src.fees.views import fee_application
 
 
 @pytest.mark.django_db
@@ -55,6 +61,7 @@ def test_payment_endpoint_does_not_call_gateway_for_an_unknown_loan(client, paym
     response = client.post('/payments/unknown')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'no such loan\n'
     assert payment_gateway.requests == []
 
@@ -74,6 +81,7 @@ def test_payment_endpoint_reports_interruption_as_gateway_failure_without_losing
 
     assert response.status_code == 502
     assert response.content == b'payment gateway unavailable\n'
+    assert 'Payment gateway request was interrupted' in caplog.text
     assert 'InterruptedError: request cancelled' in caplog.text
 
 
@@ -100,6 +108,7 @@ def test_fee_page_uses_reading_room_layout_and_posts_payment_to_ui_route(client)
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'bg-[#f5f0e5]' in response.content
+    assert b'L1 \xc2\xb7 ana' in response.content
 
 
 @pytest.mark.django_db
@@ -116,6 +125,7 @@ def test_htmx_payment_action_shows_gateway_success(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' not in response.content
     assert b'id="payment-status"' in response.content
     assert b'role="status"' in response.content
     assert b'charged' in response.content
@@ -132,6 +142,66 @@ def test_htmx_payment_action_shows_a_decline_without_losing_fee_page(client, pay
     assert b'id="payment-status"' in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_regular_fee_payment_renders_updated_fee_page(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'Late fees</h1>' in response.content
+    assert b'<dt>Fee due</dt>' in response.content
+    assert b'<dd class="font-bold">$10.00</dd>' in response.content
+    assert b'href="/ui/fees/L3/"' in response.content
+    assert b'Payment received: charged' in response.content
+
+
+@pytest.mark.django_db
+def test_payment_page_returns_not_found_for_an_unknown_loan(client, payment_gateway):
+    response = client.post('/ui/payments/unknown/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_payment_page_returns_not_found_if_loan_disappears_before_payment(
+    client,
+    monkeypatch,
+):
+    loan = SimpleNamespace(
+        id='L1',
+        member='ana',
+        due_on=date(2026, 11, 18),
+        returned_on=None,
+    )
+    fee = Fee(loan, days_late=0, amount=Decimal('0.00'))
+    monkeypatch.setattr(fee_application, 'calculate', lambda loan_id: fee)
+    monkeypatch.setattr(fee_application, 'pay', lambda loan_id: None)
+
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L1'),
+        ('post', '/ui/fees/L1/'),
+        ('get', '/payments/L1'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_restrict_http_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
 
 
 @pytest.mark.django_db
