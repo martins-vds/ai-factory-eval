@@ -51,7 +51,7 @@ skills:
     data: [postgresql-code-review, postgresql-optimization]
 gates:
   build: ["python -m compileall -q src", "python manage.py check"]
-  idiom: ["ruff check", "ruff format --check", "python .migration/harness/tools/check_layers.py"]
+  idiom: ["ruff check", "ruff format --check", "python .migration/harness/tools/check_layers.py", "python .migration/harness/tools/check_ui.py"]
   tests: ["pytest -q"]
   crap: ["pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov", "lizard --csv src > .migration/runs/lizard.csv", "python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30"]
   mutation_changed: ["python .migration/harness/tools/afs-mutation --changed-since origin/main"]
@@ -117,3 +117,7 @@ signoff:                     # ADR-0031: whose approving review on the coordinat
 self_heal:                   # ADR-0034: the stop hook sends an agent back to fix what CI would reject
   enabled: true              # operator, 2026-11-07: "Enable self healing"
   max_blocks: 2
+ui_checks:                   # harness ADR-0043: htmx error responses render (check_ui.py, idiom gate; changed templates only)
+  templates: ["templates/**/*.html", "src/**/templates/**/*.html"]
+  scripts: ["static/**/*.js", "assets/**/*.js"]
+  htmx_errors: true
