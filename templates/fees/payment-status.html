@@ -1,0 +1,7 @@
+<div id="payment-status" class="mt-4">
+  {% if result.status == 200 %}
+  <p role="status">{{ result.body|default:"Payment accepted." }}</p>
+  {% else %}
+  <p role="alert">{{ result.body|default:"Payment could not be completed." }}</p>
+  {% endif %}
+</div>

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee for {{ fee.loan_id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/{{ fee.loan_id }}/">← Back to the loan</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Late fee · {{ fee.loan_id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ fee.loan_id }}</h1>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ fee.due_on|date:"Y-m-d" }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">Days late</dt><dd>{{ fee.late_days }}</dd></div>
+      </dl>
+      <p class="mt-6 text-2xl">Fee: ${{ fee.formatted_amount }}</p>
+      <div id="payment-status" class="mt-6">
+        <form method="post" action="/ui/payments/{{ fee.loan_id }}/"
+              hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+          {% csrf_token %}
+          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+        </form>
+      </div>
+    </div>
+  </article>
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.target.id === 'payment-status' && event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+    }
+  });
+</script>
+{% endblock %}
