@@ -8,8 +8,24 @@ source:
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1319]
+target:
+  components: [src.fees.services.FeeApplication]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_fees.py::test_fee_endpoint_displays_characterized_days_and_amount
+  - tests/fees/test_fees.py::test_fee_endpoint_applies_grace_period_and_cap
+  - tests/fees/test_fees.py::test_fee_endpoint_uses_return_date_instead_of_current_date
+rules:
+  - id: nonnegative-late-days
+    rule: Late days are clamped at zero and use the return date when present, otherwise today's server date.
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: two-day-grace
+    rule: A fee is waived when late by two days or fewer; after that, charge 25 cents for every late day.
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: ten-dollar-cap
+    rule: The calculated fee is capped at $10.00.
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
