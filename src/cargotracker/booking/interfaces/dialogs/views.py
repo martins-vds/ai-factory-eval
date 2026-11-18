@@ -35,7 +35,7 @@ def create_deadline_dialog_view(
             return _not_found_dialog(request, tracking_id)
 
         deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
-        deadline_error = ''
+        deadline_error = None
         if request.method == 'POST':
             deadline_value = request.POST.get('deadline', '')
             try:
@@ -87,15 +87,14 @@ def create_destination_dialog_view(
             for location in list_shipping_locations()
             if location not in (origin, current_destination)
         ]
-        destination_value = ''
-        destination_error = ''
+        destination_error = None
         if request.method == 'POST':
-            destination_value = request.POST.get('destination', '')
+            submitted_destination = request.POST.get('destination')
             destination = next(
                 (
                     location
                     for location in locations
-                    if location.unlocode.value == destination_value
+                    if location.unlocode.value == submitted_destination
                 ),
                 None,
             )
@@ -110,7 +109,6 @@ def create_destination_dialog_view(
         context = {
             'cargo': cargo,
             'current_destination': current_destination,
-            'destination_value': destination_value,
             'destination_error': destination_error,
             'locations': locations,
             'tracking_id': tracking_id,
