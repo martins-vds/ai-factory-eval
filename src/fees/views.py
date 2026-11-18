@@ -1,8 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 
-from .composition import fee_application
+from .composition import fee_application, payment_application
+from .services import PaymentInterrupted, PaymentResult
 
 
 @require_GET
@@ -27,4 +28,49 @@ def fee_page(request, loan_id):
         'fees/detail.html',
         {'fee': fee},
         status=404 if fee is None else 200,
+    )
+
+
+@require_POST
+def payment_api(request, loan_id):
+    try:
+        result = payment_application.pay(loan_id)
+    except PaymentInterrupted:
+        return HttpResponse(
+            'payment gateway unavailable\n',
+            status=502,
+            content_type='text/plain',
+        )
+    if result is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    return HttpResponse(result.body, status=result.status, content_type='text/plain')
+
+
+@require_POST
+def payment_page(request, loan_id):
+    try:
+        result = payment_application.pay(loan_id)
+    except PaymentInterrupted:
+        result = PaymentResult(502, b'payment gateway unavailable\n')
+
+    if result is None:
+        result = PaymentResult(404, b'No such loan.')
+
+    context = {
+        'loan_id': loan_id,
+        'success': result.status == 200,
+        'message': result.body.decode('utf-8', errors='replace'),
+    }
+    if request.headers.get('HX-Request') == 'true':
+        return render(
+            request,
+            'fees/payment-status.html',
+            context,
+            status=result.status,
+        )
+    return render(
+        request,
+        'fees/payment-result.html',
+        context,
+        status=result.status,
     )
