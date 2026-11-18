@@ -66,3 +66,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T15:45:50+00:00 | verifier-build-check | 0 | 1.66 | `python manage.py check` | `1e3e63f221bde888` |  |  |
 | 2026-11-18T15:47:12+00:00 | verifier-behavior | 0 | 75.01 | `pytest -q` | `81e1f4271052737c` |  |  |
 | 2026-11-18T15:48:19+00:00 | verifier-regression | 0 | 66.74 | `pytest -q` | `9c95d67ab44af18b` |  |  |
+| 2026-11-18T15:49:06+00:00 | verifier-rule-direct | 0 | 2.05 | `pytest -q tests/booking/application/test_specification.py::test_change_destination_rejects_origin_as_destination` | `67ecf94f55b8e441` |  |  |
+| 2026-11-18T15:49:09+00:00 | verifier-origin-post | 1 | 2.66 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_update_rejects_origin_as_destination_without_updating_cargo` | `cba5c0a9ea935ed9` | assert original is not None |  |
+| 2026-11-18T15:49:29+00:00 | verifier-origin-post-repro | 1 | 2.64 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_destination_update_rejects_origin_as_destination_without_updating_cargo` | `6db22ada00bb9579` | assert original is not None |  |

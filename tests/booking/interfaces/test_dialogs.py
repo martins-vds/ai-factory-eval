@@ -300,6 +300,30 @@ def test_invalid_destination_shows_field_error_without_updating_cargo():
 
 
 @pytest.mark.django_db
+def test_destination_update_rejects_origin_as_destination_without_updating_cargo():
+    call_command('seed_sample_data')
+    cargo_repository = DjangoCargoRepository()
+    change_destination, _ = _create_dialog_views(DjangoLocationRepository().find_all())
+    tracking_id = TrackingId('DEF789')
+    original = cargo_repository.find(tracking_id)
+    assert original is not None
+
+    response = change_destination(
+        RequestFactory().post(
+            '/admin/cargo/DEF789/destination/',
+            {'destination': 'CNHKG'},
+        ),
+        'DEF789',
+    )
+    updated = cargo_repository.find(tracking_id)
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert updated is not None
+    assert updated.route_specification == original.route_specification
+
+
+@pytest.mark.django_db
 def test_missing_destination_shows_error_and_keeps_empty_option_selected():
     call_command('seed_sample_data')
     cargo_repository = DjangoCargoRepository()
