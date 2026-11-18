@@ -4,4 +4,5 @@ from . import views
 
 urlpatterns = [
     path('about', views.legacy_about),
+    path('ui/about/', views.about_page),
 ]
