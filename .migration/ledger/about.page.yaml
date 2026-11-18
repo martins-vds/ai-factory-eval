@@ -27,5 +27,6 @@ evidence:
   - .migration/evidence/runs/LL-04.md
   - tests/library_info/test_page.py::test_legacy_about_response_matches_characterization
   - tests/library_info/test_page.py::test_about_ui_preserves_library_information_and_contact_link
+  - tests/library_info/test_page.py::test_about_pages_reject_non_get_requests
   - tests/library_info/test_page.py::test_about_page_renders_in_browser
 no_rules: "The public About page is static information and enforces no business rules."
