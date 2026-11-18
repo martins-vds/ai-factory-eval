@@ -51,3 +51,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:13:11+00:00 | regression-final2 | 0 | 45.59 | `pytest -q` | `74578b7ba71a8ba7` |  |  |
 | 2026-11-18T13:13:29+00:00 | migration-validate | 0 | 3.9 | `python .migration/harness/tools/validate.py .migration` | `ef34805838431398` |  |  |
 | 2026-11-18T15:42:53+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:44:57+00:00 | verify-build-compile | 0 | 0.08 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:44:59+00:00 | verify-build-check | 0 | 2.13 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T15:46:00+00:00 | verify-behavior | 0 | 60.97 | `pytest -q` | `b44199eabb71a8c8` |  |  |
+| 2026-11-18T15:46:00+00:00 | verify-idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T15:46:00+00:00 | verify-idiom-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T15:46:00+00:00 | verify-idiom-layers | 0 | 0.12 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T15:46:01+00:00 | verify-idiom-ui | 0 | 0.4 | `python .migration/harness/tools/check_ui.py` | `5daa3761371821be` |  | gate=ui scope="templates changed since 99d0c67b9ab328eed52a548a30966c81eef0da87" templates=3 findings=0 |
+| 2026-11-18T15:46:48+00:00 | verify-crap-coverage | 0 | 47.3 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `9cecf4f85b54e04c` |  |  |
+| 2026-11-18T15:46:48+00:00 | verify-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T15:46:48+00:00 | verify-crap-threshold | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `7788b56d36b25d72` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |

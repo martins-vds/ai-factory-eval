@@ -1,0 +1,32 @@
+[
+  {
+    "at": "2026-11-18T15:45:04Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20607,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/evidence/runs/BK-05F.md"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05F.afs-verifier.yaml` with `role: afs-verifier`, `ticket: BK-05F`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05F.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
