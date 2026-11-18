@@ -28,9 +28,9 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
-              <button
-                type="button"
+              <a
                 class="btn btn-sm"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-target="#booking-dialog"
                 hx-swap="innerHTML"
@@ -38,13 +38,13 @@
                 aria-controls="booking-dialog"
               >
                 Edit destination
-              </button>
+              </a>
             </td>
             <td class="p-3">
               {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
-              <button
-                type="button"
+              <a
                 class="btn btn-sm"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-target="#booking-dialog"
                 hx-swap="innerHTML"
@@ -52,7 +52,7 @@
                 aria-controls="booking-dialog"
               >
                 Edit deadline
-              </button>
+              </a>
             </td>
           </tr>
         {% endfor %}
