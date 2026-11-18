@@ -50,10 +50,9 @@ def create_destination_dialog_view(
                 cargo.route_specification.destination,
             )
         ]
-        selected_destination = request.POST.get('destination', '')
         if request.method == 'POST':
             destination_by_code = {location.unlocode.value: location for location in locations}
-            destination = destination_by_code.get(selected_destination)
+            destination = destination_by_code.get(request.POST.get('destination'))
             if destination is None:
                 return render(
                     request,
@@ -61,7 +60,6 @@ def create_destination_dialog_view(
                     {
                         'cargo': cargo,
                         'locations': locations,
-                        'selected_destination': selected_destination,
                         'destination_error': 'Select an available destination.',
                     },
                 )
@@ -74,7 +72,6 @@ def create_destination_dialog_view(
             {
                 'cargo': cargo,
                 'locations': locations,
-                'selected_destination': selected_destination,
             },
         )
 
@@ -97,12 +94,12 @@ def create_deadline_dialog_view(
             if request.method == 'POST'
             else timezone.localtime(cargo.route_specification.arrival_deadline).strftime('%Y-%m-%d')
         )
-        deadline_error = ''
+        context = {'cargo': cargo, 'deadline_value': deadline_value}
         if request.method == 'POST':
             try:
                 arrival_deadline = datetime.strptime(deadline_value, '%Y-%m-%d').date()
             except ValueError:
-                deadline_error = 'Enter a valid arrival deadline.'
+                context['deadline_error'] = 'Enter a valid arrival deadline.'
             else:
                 specification.change_deadline(
                     cargo.tracking_id,
@@ -113,11 +110,7 @@ def create_deadline_dialog_view(
         return render(
             request,
             'booking/dialogs/deadline.html',
-            {
-                'cargo': cargo,
-                'deadline_value': deadline_value,
-                'deadline_error': deadline_error,
-            },
+            context,
         )
 
     return deadline_dialog

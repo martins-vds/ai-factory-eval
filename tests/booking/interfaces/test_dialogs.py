@@ -143,10 +143,13 @@ def test_destination_dialog_rejects_locations_outside_the_filtered_options(clien
         {'destination': cargo.route_specification.origin.unlocode.value},
     )
     updated_cargo = repository.find(cargo.tracking_id)
+    content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select an available destination.' in response.content.decode()
-    assert 'role="alert"' in response.content.decode()
+    assert 'Select an available destination.' in content
+    assert 'role="alert"' in content
+    assert 'Hong Kong' in content and 'Melbourne' in content
+    assert re.search(r'<option\s+value="USNYC"', content)
     assert updated_cargo is not None
     assert updated_cargo.route_specification == cargo.route_specification
 
@@ -192,6 +195,22 @@ def test_dialogs_return_not_found_for_unknown_cargo(client, path):
     assert 'Cargo with tracking ID MISSING1 not found.' in response.content.decode()
 
 
+@pytest.mark.parametrize(
+    'path',
+    (
+        '/admin/cargo/MISSING1/destination/',
+        '/admin/cargo/MISSING1/deadline/',
+    ),
+)
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_reject_unsupported_methods(client, path):
+    response = client.put(path)
+
+    assert response.status_code == 405
+    assert response['Allow'] == 'GET, POST'
+
+
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_prefills_value_and_shows_parse_error(client):
@@ -207,6 +226,8 @@ def test_deadline_dialog_prefills_value_and_shows_parse_error(client):
     assert 'Melbourne' in content and 'AUMEL' in content
     assert f'value="{deadline_value}"' in content
     assert 'hx-post="/admin/cargo/DEF789/deadline/"' in content
+    assert 'Enter a valid arrival deadline.' not in content
+    assert 'role="alert"' not in content
 
     invalid_response = client.post(
         '/admin/cargo/DEF789/deadline/',
@@ -218,6 +239,10 @@ def test_deadline_dialog_prefills_value_and_shows_parse_error(client):
     assert 'Enter a valid arrival deadline.' in invalid_content
     assert 'aria-invalid="true"' in invalid_content
     assert 'aria-describedby="deadline-error"' in invalid_content
+
+    missing_response = client.post('/admin/cargo/DEF789/deadline/')
+    assert 'value=""' in missing_response.content.decode()
+    assert 'Enter a valid arrival deadline.' in missing_response.content.decode()
 
 
 @pytest.mark.django_db

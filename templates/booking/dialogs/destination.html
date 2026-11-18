@@ -32,10 +32,7 @@
         required
       >
         {% for location in locations %}
-          <option
-            value="{{ location.unlocode.value }}"
-            {% if selected_destination == location.unlocode.value %}selected{% endif %}
-          >
+          <option value="{{ location.unlocode.value }}">
             {{ location.name }} ({{ location.unlocode.value }})
           </option>
         {% endfor %}
