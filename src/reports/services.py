@@ -35,19 +35,18 @@ class MonthlyReport:
             if start <= loan.lent_on < end:
                 metrics[loan.member][0] += 1
 
-            if loan.returned_on is not None and start <= loan.returned_on < end:
-                if loan.returned_on > loan.due_on:
-                    metrics[loan.member][1] += 1
-                    days_late = (loan.returned_on - loan.due_on).days
-                    if days_late > 2:
-                        metrics[loan.member][2] += min(1000, days_late * 25)
+            if (
+                loan.returned_on is not None
+                and start <= loan.returned_on < end
+                and loan.returned_on > loan.due_on
+            ):
+                metrics[loan.member][1] += 1
+                days_late = (loan.returned_on - loan.due_on).days
+                if days_late > 2:
+                    metrics[loan.member][2] += min(1000, days_late * 25)
 
         rows = sorted(
-            (
-                (member, *values)
-                for member, values in metrics.items()
-                if values[0] > 0
-            ),
+            ((member, *values) for member, values in metrics.items() if values[0] > 0),
             key=lambda row: (-row[3], row[0]),
         )
         output = StringIO(newline='')

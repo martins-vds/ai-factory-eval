@@ -7,8 +7,36 @@ source:
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+target:
+  components:
+    - src.reports.services.MonthlyReport.generate
+    - src.reports.repository.DjangoReportLoanRepository
+    - src.reports.management.commands.monthly_report.Command
+status: migrated
+evidence:
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_activity_and_escapes_csv_fields
+  - tests/reports/test_command.py::test_monthly_report_command_reads_postgres_for_the_local_prior_month
+  - .migration/evidence/runs/LL-05.md
+quirks: [martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - id: prior-month-window
+    rule: "Restrict report activity to the prior calendar month, using a half-open date range."
+    source: legacy/docs/reports-spec.md:6; .migration/plan/monthly-report.md:5
+  - id: member-inclusion
+    rule: "Include only members with at least one loan started in the report month."
+    source: legacy/docs/reports-spec.md:9; .migration/plan/monthly-report.md:5
+  - id: late-return-activity
+    rule: "Count late returns and their fees only when the loan was returned during the report month."
+    source: legacy/docs/reports-spec.md:6-7
+  - id: late-fee-total
+    rule: "Compute returned-loan fees in cents, waiving up to two days late, then charging 25 cents per day up to 1000 cents."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: row-order
+    rule: "Sort by total late fees descending, then member id ascending."
+    source: legacy/docs/reports-spec.md:8
+  - id: delimiter-escaping
+    rule: "Escape field delimiters in the report export."
+    source: martins-vds/ai-factory-synthetic-target#43
+notes: "The source report module is absent; the monthly report is reconstructed from the surviving tier-C specification."
