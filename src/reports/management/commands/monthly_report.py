@@ -13,9 +13,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         report = MonthlyReportApplication(DjangoReportLoanRepository(), SystemClock()).run()
         writer = csv.writer(self.stdout)
-        writer.writerow(
-            ('member_id', 'loans_started', 'late_returns', 'total_late_fees_cents')
-        )
+        writer.writerow(('member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'))
         for row in report:
             writer.writerow(
                 (row.member_id, row.loans_started, row.late_returns, row.total_late_fees_cents)

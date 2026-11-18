@@ -1,6 +1,6 @@
+import csv
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
-import csv
 from io import StringIO
 from zoneinfo import ZoneInfo
 
@@ -34,8 +34,11 @@ class LoanRepository:
 
 
 class FixedClock:
+    def __init__(self, value=date(2026, 3, 1)):
+        self.value = value
+
     def today(self):
-        return date(2026, 3, 1)
+        return self.value
 
 
 def test_monthly_report_aggregates_previous_month_and_orders_fee_ties_by_member():
@@ -70,6 +73,16 @@ def test_system_clock_uses_server_default_timezone(monkeypatch):
             assert SystemClock().today() == date(2026, 2, 28)
         finally:
             timezone.deactivate()
+
+
+def test_monthly_report_caps_fees_and_uses_report_date_for_unreturned_loans():
+    repository = LoanRepository([Loan('L1', 'ada', date(2026, 2, 1), date(2026, 2, 15))])
+
+    rows = MonthlyReportApplication(repository, FixedClock(date(2026, 3, 31))).run()
+
+    assert rows == [
+        MonthlyReportRow('ada', loans_started=1, late_returns=0, total_late_fees_cents=1000)
+    ]
 
 
 @pytest.mark.django_db

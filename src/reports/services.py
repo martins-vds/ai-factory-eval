@@ -1,6 +1,12 @@
+from collections import defaultdict
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Protocol
+
+LATE_FEE_GRACE_DAYS = 2
+LATE_FEE_CENTS_PER_DAY = 25
+MAX_LATE_FEE_CENTS = 1000
 
 
 class LoanRecord(Protocol):
@@ -11,7 +17,7 @@ class LoanRecord(Protocol):
 
 
 class LoanRepository(Protocol):
-    def started_between(self, start: date, end: date) -> list[LoanRecord]: ...
+    def started_between(self, start: date, end: date) -> Iterable[LoanRecord]: ...
 
 
 class Clock(Protocol):
@@ -26,6 +32,13 @@ class MonthlyReportRow:
     total_late_fees_cents: int
 
 
+@dataclass
+class _MemberTotals:
+    loans_started: int = 0
+    late_returns: int = 0
+    total_late_fees_cents: int = 0
+
+
 class MonthlyReportApplication:
     def __init__(self, loans: LoanRepository, clock: Clock):
         self.loans = loans
@@ -35,20 +48,27 @@ class MonthlyReportApplication:
         today = self.clock.today()
         end = today.replace(day=1)
         start = (end - timedelta(days=1)).replace(day=1)
-        totals = {}
+        totals = defaultdict(_MemberTotals)
 
         for loan in self.loans.started_between(start, end):
-            member_totals = totals.setdefault(loan.member, [0, 0, 0])
-            member_totals[0] += 1
+            member_totals = totals[loan.member]
+            member_totals.loans_started += 1
             fee_date = loan.returned_on or today
             days_late = max(0, (fee_date - loan.due_on).days)
             if loan.returned_on is not None and days_late > 0:
-                member_totals[1] += 1
-            if days_late > 2:
-                member_totals[2] += min(1000, days_late * 25)
+                member_totals.late_returns += 1
+            if days_late > LATE_FEE_GRACE_DAYS:
+                member_totals.total_late_fees_cents += min(
+                    MAX_LATE_FEE_CENTS, days_late * LATE_FEE_CENTS_PER_DAY
+                )
 
         rows = [
-            MonthlyReportRow(member_id, *member_totals)
+            MonthlyReportRow(
+                member_id,
+                member_totals.loans_started,
+                member_totals.late_returns,
+                member_totals.total_late_fees_cents,
+            )
             for member_id, member_totals in totals.items()
         ]
         return sorted(rows, key=lambda row: (-row.total_late_fees_cents, row.member_id))
