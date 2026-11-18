@@ -41,7 +41,11 @@ class LoanStore:
 @pytest.mark.parametrize(
     ('member', 'isbn', 'field'),
     [
+        (None, '123', 'member'),
+        ('', '123', 'member'),
         (' \t', '123', 'member'),
+        ('reader', None, 'isbn'),
+        ('reader', '', 'isbn'),
         ('reader', '\n ', 'isbn'),
     ],
 )
@@ -75,6 +79,18 @@ def test_lend_api_escapes_semicolons_in_created_loan_fields(client):
     assert response.status_code == 201
     assert response.content.decode() == (
         f'L4;"reader;one";"123;456";{lent_on.isoformat()};'
+        f'{(lent_on + timedelta(days=14)).isoformat()};\n'
+    )
+
+
+@pytest.mark.django_db
+def test_lend_api_escapes_record_delimiters_in_created_loan_fields(client):
+    lent_on = timezone.localdate()
+    response = client.post('/loans', {'member': 'reader\none', 'isbn': '123'})
+
+    assert response.status_code == 201
+    assert response.content.decode() == (
+        f'L4;"reader\none";123;{lent_on.isoformat()};'
         f'{(lent_on + timedelta(days=14)).isoformat()};\n'
     )
 
