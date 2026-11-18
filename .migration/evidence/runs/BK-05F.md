@@ -57,3 +57,38 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T23:33:57+00:00 | mutation-changed-security-fix | 1 | 61.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
 | 2026-11-07T23:35:56+00:00 | unknown-route-404-test | 0 | 1.41 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `a558b8376cd28466` |  |  |
 | 2026-11-07T23:37:02+00:00 | mutation-changed-after-404-test | 1 | 61.99 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
+| 2026-11-18T03:40:53+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T03:41:07+00:00 | mutation-changed-2026-11-18 | 0 | 0.26 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-18T03:48:31+00:00 | mutation-diagnostic-route-selection | 0 | 296.31 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `8f2491b815e74391` |  | gate=mutation score=0.823 threshold=0.8 killed=51 survived=11 files=1 base=explicit |
+| 2026-11-18T03:52:31+00:00 | controlled-no-route-mutant | 0 | 1.79 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `dc865d24518196dc` |  |  |
+| 2026-11-18T03:53:23+00:00 | inspect-no-route-page | 0 | 1.85 | `pytest -s -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `0babd4945f841121` |  |  |
+| 2026-11-18T03:53:49+00:00 | no-route-guidance-red | 1 | 1.9 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `ea3f9e4f68b910ce` | assert route_response.status_code == 200 |  |
+| 2026-11-18T03:53:57+00:00 | no-route-guidance-green | 0 | 1.8 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `04602c48c1cf2ef6` |  |  |
+| 2026-11-18T03:54:39+00:00 | itinerary-guidance-red | 1 | 1.82 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `74e70012f604ccaa` | assert route_response.status_code == 200 |  |
+| 2026-11-18T03:54:48+00:00 | no-route-guidance-green-final | 0 | 1.81 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline` | `a76c946c2ce93236` |  |  |
+| 2026-11-18T03:59:45+00:00 | mutation-diagnostic-after-guidance-tests | 0 | 290.59 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `492ee402f25d28f9` |  | gate=mutation score=0.855 threshold=0.8 killed=53 survived=9 files=1 base=explicit |
+| 2026-11-18T04:00:06+00:00 | route-selection-tests | 0 | 2.15 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `979d43bb791f3166` |  |  |
+| 2026-11-18T04:00:10+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:00:13+00:00 | build-django-check | 0 | 0.38 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T04:00:15+00:00 | idiom-ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:00:19+00:00 | idiom-ruff-format | 1 | 0.03 | `ruff format --check` | `42487f75ac82e156` |  |  |
+| 2026-11-18T04:00:31+00:00 | idiom-ruff-format-final | 1 | 0.01 | `ruff format --check` | `1a21aaab15fa6152` |  |  |
+| 2026-11-18T04:00:38+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T04:00:41+00:00 | idiom-layers | 0 | 0.14 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T04:00:46+00:00 | idiom-ui | 0 | 0.41 | `python .migration/harness/tools/check_ui.py` | `5aab2ef023ed995a` |  | gate=ui scope="templates changed since f95eabae0b5677ffed6fa804e78ed8e381a0556c" templates=0 findings=0 |
+| 2026-11-18T04:01:48+00:00 | behavior | 0 | 57.71 | `pytest -q` | `4aaf56f9d2b9d865` |  |  |
+| 2026-11-18T04:02:48+00:00 | crap-coverage | 0 | 55.26 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `e60a516847f774fd` |  |  |
+| 2026-11-18T04:02:52+00:00 | crap-lizard | 0 | 0.14 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:02:56+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-18T04:03:06+00:00 | final-build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T04:03:09+00:00 | final-build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-18T04:03:12+00:00 | final-idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T04:03:15+00:00 | final-idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T04:03:19+00:00 | final-idiom-layers | 0 | 0.15 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T04:03:23+00:00 | final-idiom-ui | 0 | 0.41 | `python .migration/harness/tools/check_ui.py` | `5aab2ef023ed995a` |  | gate=ui scope="templates changed since f95eabae0b5677ffed6fa804e78ed8e381a0556c" templates=0 findings=0 |
+| 2026-11-18T04:03:29+00:00 | final-mutation-changed | 0 | 0.09 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `36603172da4a0d74` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=origin/main |
+| 2026-11-18T04:04:29+00:00 | final-behavior-regression | 0 | 56.66 | `pytest -q` | `e0601ccd4566d792` |  |  |
+| 2026-11-18T04:04:57+00:00 | migration-validation | 1 | 4.54 | `python .migration/harness/tools/validate.py .migration` | `f419df73852a0066` | 195 file(s) checked, 4 error(s) |  |
+| 2026-11-18T04:06:55+00:00 | migration-validation-after-ledger | 0 | 4.47 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-18T04:07:30+00:00 | final-migration-validation | 0 | 4.39 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-18T04:08:30+00:00 | postcommit-final-validation | 0 | 4.47 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
