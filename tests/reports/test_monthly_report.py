@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 from datetime import date
+from io import StringIO
 
+import pytest
+from django.core.management import call_command
+from django.utils import timezone
+from src.loans.models import Loan as DjangoLoan
 from src.reports.services import MemberMonthlyReport, MonthlyReportApplication
 
 
@@ -45,4 +50,32 @@ def test_monthly_report_aggregates_previous_month_and_sorts_by_fees_then_member(
         MemberMonthlyReport('amy', 2, 2, 150),
         MemberMonthlyReport('ben', 1, 1, 0),
         MemberMonthlyReport('zoe', 1, 0, 0),
+    ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_command_reads_persisted_loans(monkeypatch):
+    as_of = date(2099, 3, 1)
+    monkeypatch.setattr(timezone, 'localdate', lambda: as_of)
+    DjangoLoan.objects.create(
+        id='LL05-report-1',
+        member='reader',
+        isbn='report-1',
+        lent_on=date(2099, 2, 2),
+        returned_on=date(2099, 2, 19),
+    )
+    DjangoLoan.objects.create(
+        id='LL05-report-2',
+        member='reader',
+        isbn='report-2',
+        lent_on=date(2099, 2, 4),
+        returned_on=None,
+    )
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert output.getvalue().splitlines() == [
+        'member_id,loans_started,late_returns,late_fees_cents',
+        'reader,2,1,75',
     ]
