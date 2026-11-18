@@ -24,13 +24,15 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_the_current_deadline_and_route_context"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_requires_deadline_when_field_is_missing"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_reports_an_invalid_date_without_changing_cargo"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_deadline_and_preserves_other_route_fields"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_full_page_post_redirects_to_dashboard"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_refreshes_dashboard_rows_after_update"
   - ".migration/evidence/runs/BK-05G.md"
 rules:
   - id: valid-deadline
-    rule: "An invalid or noncanonical deadline is refused with a visible field error and leaves cargo unchanged."
+    rule: "A missing, invalid, or noncanonical deadline is refused with a visible field error and leaves cargo unchanged."
     source: "BK-05G #234; booking dialog input contract"
   - id: preserve-route-fields
     rule: "A successful deadline change preserves the cargo origin and destination."

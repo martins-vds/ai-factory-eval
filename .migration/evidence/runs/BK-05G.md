@@ -38,3 +38,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T13:25:13+00:00 | crap-score | 0 | 0.05 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `eaffb0609a3c6f0b` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-18T13:36:47+00:00 | mutation-changed | 1 | 686.8 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `9e73f49f85fa035d` | afs-mutation: FAILED score=0.709 threshold=0.8 killed=61 survived=25 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.709 threshold=0.8 killed=61 survived=25 files=1 base=origin/main |
 | 2026-11-18T13:39:22+00:00 | behavior-targeted | 0 | 10.46 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `af5ec290740349ca` |  |  |
+| 2026-11-18T13:46:45+00:00 | ledger-validation | 0 | 8.6 | `python .migration/harness/tools/validate.py .migration` | `a3cead9cf227b8af` |  |  |

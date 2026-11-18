@@ -25,7 +25,9 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_filters_options_without_mutating_them"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_destination_and_preserves_other_route_fields"
-  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_refuses_origin_as_new_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_refuses_route_location_as_new_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_requires_destination_when_field_is_missing"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_supports_full_page_fallback"
   - ".migration/evidence/runs/BK-05G.md"
 rules:
   - id: eligible-destination
