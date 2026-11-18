@@ -2,7 +2,13 @@ from collections.abc import Callable
 from datetime import datetime
 
 from django.core import signing
-from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest, HttpResponseNotAllowed
+from django.http import (
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseNotAllowed,
+)
 from django.shortcuts import redirect, render
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -17,6 +23,7 @@ from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
 
 _ROUTE_SELECTION_SALT = 'cargotracker.booking.route-selection'
+
 
 def create_route_selection_views(
     cargo_routing: CargoRouting,

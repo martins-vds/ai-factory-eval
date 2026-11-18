@@ -64,7 +64,15 @@ def test_route_page_renders_candidate_properties_and_numbered_legs(client, not_r
     candidates = [candidate['itinerary'] for candidate in response.context['route_candidates']]
 
     assert response.status_code == 200
+    assert response.context['cargo'].tracking_id.value == str(not_routed_cargo)
     assert 3 <= len(candidates) <= 5
+    assert 'Origin:' in content
+    assert 'New York' in content
+    assert 'USNYC' in content
+    assert 'Destination:' in content
+    assert 'Helsinki' in content
+    assert 'FIHEL' in content
+    assert 'Arrival deadline:' in content
     assert f'Potential routes: {len(candidates)}' in content
     assert 'Itinerary 1' in content
 
@@ -110,10 +118,25 @@ def test_select_itinerary_keeps_no_routes_guidance_when_candidates_are_empty(
 
     assert response.status_code == 200
     assert 'No routes found that satisfy the route specification.' in content
-    assert 'Try setting an arrival deadline further into the future' in re.sub(
-        r'\s+', ' ', content
-    )
+    assert 'Try setting an arrival deadline further into the future' in re.sub(r'\s+', ' ', content)
     assert 'Itinerary 1' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_unknown_cargo_returns_http_404(client):
+    response = client.get('/admin/cargo/UNKNOWN/route/')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_methods_other_than_get_and_post(client, not_routed_cargo):
+    response = client.put(f'/admin/cargo/{not_routed_cargo}/route/')
+
+    assert response.status_code == 405
+    assert response.headers['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
@@ -150,13 +173,30 @@ def test_assigning_candidate_redirects_to_cargo_details_and_persists_selected_ro
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_invalid_route_selection_token_is_rejected_without_assignment(client, not_routed_cargo):
-    response = client.post(
-        f'/admin/cargo/{not_routed_cargo}/route/',
-        {'route_token': 'not-a-signed-route'},
-    )
+@pytest.mark.parametrize('route_token', (None, '', 'not-a-signed-route'))
+def test_invalid_route_selection_token_is_rejected_without_assignment(
+    client, not_routed_cargo, route_token
+):
+    data = {} if route_token is None else {'route_token': route_token}
+    response = client.post(f'/admin/cargo/{not_routed_cargo}/route/', data)
     stored_cargo = cargo_repository.find(TrackingId(str(not_routed_cargo)))
 
     assert response.status_code == 400
+    assert response.content == b'Invalid route selection.'
     assert stored_cargo is not None
     assert not stored_cargo.itinerary.legs
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_token_cannot_be_submitted_for_another_cargo(client, not_routed_cargo):
+    route_page = client.get(f'/admin/cargo/{not_routed_cargo}/route/')
+    token = re.search(rb'name="route_token" value="([^"]+)"', route_page.content)
+    assert token is not None
+
+    response = client.post(
+        '/admin/cargo/OTHER/route/',
+        {'route_token': token.group(1).decode()},
+    )
+
+    assert response.status_code == 400
