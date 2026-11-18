@@ -9,7 +9,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: null
+  mutation_changed: n/a: not run, handed off
   regression: null
 evidence_logs:
   - .migration/evidence/runs/BK-05G.md
