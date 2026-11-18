@@ -47,19 +47,33 @@ def _load_invariant_fixture(tmp_path):
         'CARGO': lambda rows: rows[0].update(
             {
                 'SPEC_DESTINATION_ID': '103',
-                'TRANSPORT_STATUS': 'ONBOARD_CARRIER',
-                'LAST_KNOWN_LOCATION_ID': '101',
-                'CURRENT_VOYAGE_ID': '900',
+                'TRANSPORT_STATUS': 'IN_PORT',
+                'LAST_KNOWN_LOCATION_ID': '102',
+                'CURRENT_VOYAGE_ID': '\\N',
                 'MISDIRECTED': 'false',
                 'ETA': '2026-11-11',
-                'NEXT_EXPECTED_HANDLING_EVENT_TYPE': 'UNLOAD',
-                'NEXT_EXPECTED_LOCATION_ID': '102',
-                'NEXT_EXPECTED_VOYAGE_ID': '900',
+                'NEXT_EXPECTED_HANDLING_EVENT_TYPE': '\\N',
+                'NEXT_EXPECTED_LOCATION_ID': '\\N',
+                'NEXT_EXPECTED_VOYAGE_ID': '\\N',
                 'UNLOADED_AT_DEST': 'false',
                 'ROUTING_STATUS': 'ROUTED',
+                'LAST_EVENT_ID': '72',
             }
         ),
-        'HANDLINGEVENT': lambda rows: rows[0].update({'TYPE': 'LOAD', 'LOCATION_ID': '101'}),
+        'HANDLINGEVENT': lambda rows: (
+            rows[0].update({'TYPE': 'LOAD', 'LOCATION_ID': '101'}),
+            rows.append(
+                {
+                    'ID': '72',
+                    'TYPE': 'CUSTOMS',
+                    'VOYAGE_ID': '\\N',
+                    'LOCATION_ID': '102',
+                    'COMPLETIONTIME': '2026-11-07T11:00:00Z',
+                    'REGISTRATION': '2026-11-07T11:01:00Z',
+                    'CARGO_ID': '13',
+                }
+            ),
+        ),
         'LEG': lambda rows: rows.append(
             {
                 'ID': '82',
@@ -154,8 +168,9 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(tmp_pat
     location_ids = set(LocationRecord.objects.values_list('pk', flat=True))
 
     assert events
+    assert any(event.voyage_id is None for event in events)
     for event in events:
-        assert event.voyage_id in voyage_ids
+        assert event.voyage_id is None or event.voyage_id in voyage_ids
         assert event.location_id in location_ids
 
 
