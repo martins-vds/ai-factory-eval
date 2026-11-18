@@ -12,7 +12,10 @@ gates:
   regression: 0
 evidence_logs:
   - .migration/evidence/runs/LL-05.md
-findings: []
+findings:
+  - severity: minor
+    where: .migration/evidence/mutants/LL-05.md:121
+    what: The Migrator's mutation report has a trailing blank line flagged by git diff --check; left unchanged as unrelated to this verifier's scope.
 tests_added:
   - tests/reports/test_monthly_report_application.py::test_generate_uses_half_open_previous_calendar_month
   - tests/reports/test_monthly_report_application.py::test_generate_omits_members_without_a_loan_started_in_the_report_month
