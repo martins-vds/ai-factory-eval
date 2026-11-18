@@ -1,0 +1,60 @@
+[
+  {
+    "at": "2026-11-18T15:00:25Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20476,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/83ee3ed7-a7f1-4982-b285-1a64449eeba2.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/handoffs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-verifier.yaml"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/DM-05F.afs-verifier.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-18T15:01:28Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21149,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/83ee3ed7-a7f1-4982-b285-1a64449eeba2.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/handoffs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-verifier.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
