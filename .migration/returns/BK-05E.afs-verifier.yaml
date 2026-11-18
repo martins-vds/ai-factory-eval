@@ -1,0 +1,48 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1261
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.922
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:7
+    what: The dashboard adapter imports and uses CargoRepository instead of a booking application use case, violating the ADR-0001 interface boundary.
+    evidence: "run: idiom-layers"
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_unrouted_cargo_details_link_to_route_selection
+  - tests/booking/interfaces/test_cargo_details.py::test_misrouted_cargo_details_offer_reroute_action
+  - tests/booking/interfaces/test_cargo_details.py::test_unknown_cargo_details_raise_not_found_with_tracking_id
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  booking.dashboard-chain: The capability composes read-only dashboard sections and carries no business eligibility, limit, or transition rule.
+  booking.dashboard-filters: The capability groups existing cargo states for display; it does not decide eligibility or change state.
+  booking.screen-dashboard: The capability is static screen composition with no business rule.
+  booking.screen-routed-table: The capability renders existing cargo fields and links with no business rule.
+  booking.screen-not-routed-table: The capability renders existing cargo fields and route links; editing rules belong to BK-05G.
+  booking.screen-claimed-table: The capability renders existing cargo fields and a details link with no business rule.
+  booking.screen-cargo-details: The capability renders existing cargo state and links without changing state.
+  booking.cargo-not-found: The capability maps a read-only missing lookup to HTTP 404 and carries no business state rule.
+inherited:
+  - where: templates/booking/wizard/_deadline_form.html:5
+    what: The htmx deadline form has no 4xx/5xx response swap handling, so its error fragment is not displayed.
+    origin: BK-05D
+    evidence: "run: idiom-ui"
+crap_hotspot:
+  method: src/cargotracker/data_migration/loader.py::_prepare_tables
+  score: 26.0
+  should_split: true
+  rationale: It validates table mappings, resolves model fields, and validates references in one complex routine.
+mutation_survivors:
+  relevant_to_BK-05E: The dashboard not-found message mutant was killed by the added direct exception-message test.
+  outside_ticket: 19 survivors are in the BK-05D wizard views and 2 are in data_migration/exporter.py; none affects BK-05E.
