@@ -1,5 +1,6 @@
 import re
 from datetime import UTC, datetime
+from unittest.mock import Mock, patch
 
 import pytest
 from django.http import Http404
@@ -192,6 +193,46 @@ def test_route_assignment_rejects_a_modified_candidate(client):
     assert response.status_code == 404
     details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
     assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+def test_route_assignment_reports_unknown_cargo():
+    request = RequestFactory().post('/admin/cargo/MISSING1/route/')
+
+    with patch.object(dashboard, 'get_cargo_details', return_value=None):
+        with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
+            route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_candidate_that_no_longer_satisfies_the_specification(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    cargo = Mock()
+    cargo.route_specification.is_satisfied_by.return_value = False
+    request = RequestFactory().post(route_url, {'candidate': candidate_token})
+
+    with patch.object(dashboard, 'get_cargo_details', return_value=cargo):
+        with pytest.raises(
+            Http404,
+            match='The selected route no longer satisfies the route specification\\.',
+        ):
+            route_view(request, tracking_id.value)
+
+
+@pytest.mark.django_db
+def test_route_assignment_rejects_a_missing_candidate(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    request = RequestFactory().post(f'/admin/cargo/{tracking_id.value}/route/')
+
+    with pytest.raises(Http404, match='The selected route is invalid\\.'):
+        route_view(request, tracking_id.value)
 
 
 @pytest.mark.django_db
