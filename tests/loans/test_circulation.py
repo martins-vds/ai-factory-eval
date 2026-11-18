@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from types import SimpleNamespace
 
 import pytest
 from django.test import Client
@@ -32,6 +33,9 @@ def test_lending_use_case_rejects_missing_or_blank_fields(member, isbn, field):
         lend_loan(member, isbn, LoanRepository(), date(2026, 3, 1))
 
     assert field in error.value.errors
+    assert error.value.errors[field] == (
+        'Member is required.' if field == 'member' else 'ISBN is required.'
+    )
     assert Loan.objects.count() == 3
 
 
@@ -77,6 +81,35 @@ def test_return_use_case_records_the_supplied_date():
 
     assert loan.returned_on == date(2026, 3, 1)
     assert Loan.objects.get(pk='L1').returned_on == date(2026, 3, 1)
+
+
+@pytest.mark.parametrize(
+    ('second_lookup', 'expected_error'),
+    [
+        (None, LoanNotFound),
+        (SimpleNamespace(returned_on=date(2026, 3, 1)), LoanAlreadyReturned),
+    ],
+)
+def test_return_use_case_classifies_a_failed_conditional_update(
+    second_lookup,
+    expected_error,
+):
+    class RacingRepository:
+        def __init__(self):
+            self.lookup_results = [SimpleNamespace(returned_on=None), second_lookup]
+
+        def find(self, loan_id):
+            return self.lookup_results.pop(0)
+
+        def record_return(self, loan_id, today):
+            return None
+
+    repository = RacingRepository()
+
+    with pytest.raises(expected_error):
+        return_loan('L1', repository, date(2026, 3, 2))
+
+    assert repository.lookup_results == []
 
 
 @pytest.mark.django_db

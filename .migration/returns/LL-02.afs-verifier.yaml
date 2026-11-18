@@ -1,0 +1,75 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1467
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1481
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 9.9
+  mutation_changed: 0.817
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:5
+    what: 28 mutants survive despite the passing 0.817 score, including response, method-guard, form-boundary, and browser error-rendering changes.
+tests_added:
+  - tests/loans/test_circulation.py::test_lending_use_case_rejects_missing_or_blank_fields
+  - tests/loans/test_circulation.py::test_return_use_case_classifies_a_failed_conditional_update
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+rules:
+  - capability: loan.lend
+    rule: member must be present and contain a non-whitespace character
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_missing_or_blank_fields
+    enforced: true
+    ledger_rule: member-required
+  - capability: loan.lend
+    rule: ISBN must be present and contain a non-whitespace character
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_missing_or_blank_fields
+    enforced: true
+    ledger_rule: isbn-required
+  - capability: loan.lend
+    rule: a new loan is recorded on the server's current local date
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lending_use_case_creates_a_loan_for_the_supplied_date
+    enforced: true
+    ledger_rule: lending-date
+  - capability: loan.return
+    rule: a return request for an unknown loan is rejected with HTTP 404
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan
+  - capability: loan.return
+    rule: a return request cannot replace an existing return date
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_preserves_the_original_date_on_repeat
+    enforced: true
+    ledger_rule: return-once
+  - capability: loan.return-date
+    rule: a returned loan cannot be returned again or have its return date replaced
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_preserves_the_original_date_on_repeat
+    enforced: true
+    ledger_rule: return-once
+  - capability: loan.return-date
+    rule: the first successful return records the server's current local date
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_records_the_supplied_date
+    enforced: true
+    ledger_rule: return-date
+  - capability: loan.return
+    rule: when a conditional return update loses a race, reject as not found if the loan disappeared and as already returned if it remains
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_classifies_a_failed_conditional_update
+    enforced: true
