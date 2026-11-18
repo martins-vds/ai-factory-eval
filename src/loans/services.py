@@ -1,7 +1,35 @@
 import csv
 from io import StringIO
+from typing import Protocol
 
-from .repository import LoanRepository
+
+class LoanRepository(Protocol):
+    def all(self): ...
+
+    def find(self, loan_id): ...
+
+    def create(self, **fields): ...
+
+
+class Clock(Protocol):
+    def today(self): ...
+
+
+class LoanInputError(ValueError):
+    def __init__(self, field_errors):
+        self.field_errors = field_errors
+        super().__init__('member and isbn are required')
+
+
+def lend_loan(member, isbn, repository, clock):
+    field_errors = {
+        field: 'This field is required.'
+        for field, value in (('member', member), ('isbn', isbn))
+        if not isinstance(value, str) or not value.strip()
+    }
+    if field_errors:
+        raise LoanInputError(field_errors)
+    return repository.create(member=member, isbn=isbn, lent_on=clock.today())
 
 
 def loan_line(loan):
@@ -20,10 +48,10 @@ def loan_line(loan):
     return output.getvalue()
 
 
-def list_loans_text():
-    return ''.join(loan_line(loan) for loan in LoanRepository().all())
+def list_loans_text(repository):
+    return ''.join(loan_line(loan) for loan in repository.all())
 
 
-def get_loan_text(loan_id):
-    loan = LoanRepository().find(loan_id)
+def get_loan_text(loan_id, repository):
+    loan = repository.find(loan_id)
     return loan_line(loan) if loan else None
