@@ -1,0 +1,31 @@
+[
+  {
+    "at": "2026-11-18T22:16:42Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 13435,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-08",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-08.md",
+      ".migration/handoffs/LL-08.md",
+      ".migration/returns/LL-08.afs-migrator.yaml",
+      "templates/base.html",
+      "tests/test_htmx_errors.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
