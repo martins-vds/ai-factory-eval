@@ -25,6 +25,7 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_return_api_reports_an_unknown_loan
+  - tests/loans/test_circulation.py::test_return_api_does_not_require_a_browser_csrf_token
   - tests/loans/test_circulation.py::test_return_api_keeps_the_first_return_date_and_rejects_repeats
   - tests/loans/test_circulation.py::test_returning_a_loan_from_the_browser_updates_its_status
 notes: "Approved divergence under martins-vds/ai-factory-synthetic-target#41: repeated returns are rejected without changing the original date."

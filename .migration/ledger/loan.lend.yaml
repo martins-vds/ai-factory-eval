@@ -27,7 +27,9 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_lending_api_creates_a_loan_with_a_fourteen_day_due_date
+  - tests/loans/test_circulation.py::test_lending_api_does_not_require_a_browser_csrf_token
   - tests/loans/test_circulation.py::test_lending_browser_shows_field_errors_for_blank_values
+  - tests/loans/test_circulation.py::test_concurrent_lending_allocates_distinct_loan_ids
   - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
 notes: "Approved divergences: blank values are rejected under martins-vds/ai-factory-synthetic-target#39; delimiter-containing fields are escaped under #43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]

@@ -1,4 +1,4 @@
-from django.db import transaction
+from django.db import IntegrityError, transaction
 
 from .models import Loan
 
@@ -16,13 +16,19 @@ class LoanRepository:
 
     @transaction.atomic
     def lend(self, member, isbn, lent_on):
-        loan_id = f'L{Loan.objects.count() + 1}'
-        return Loan.objects.create(
-            id=loan_id,
-            member=member,
-            isbn=isbn,
-            lent_on=lent_on,
-        )
+        while True:
+            loan_id = f'L{Loan.objects.count() + 1}'
+            try:
+                with transaction.atomic():
+                    return Loan.objects.create(
+                        id=loan_id,
+                        member=member,
+                        isbn=isbn,
+                        lent_on=lent_on,
+                    )
+            except IntegrityError:
+                if not Loan.objects.filter(pk=loan_id).exists():
+                    raise
 
     @transaction.atomic
     def mark_returned(self, loan_id, returned_on):
