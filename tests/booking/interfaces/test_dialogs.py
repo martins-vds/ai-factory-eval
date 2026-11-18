@@ -81,7 +81,9 @@ def test_deadline_dialog_shows_current_route_and_deadline(client):
 @override_settings(ROOT_URLCONF=__name__)
 def test_invalid_deadline_renders_field_error_without_updating_cargo(client):
     call_command('seed_sample_data')
-    original_deadline = dashboard.get_cargo_details(TrackingId('DEF789')).route_specification.arrival_deadline
+    original_deadline = dashboard.get_cargo_details(
+        TrackingId('DEF789')
+    ).route_specification.arrival_deadline
 
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
@@ -182,9 +184,9 @@ def test_not_routed_table_opens_edit_dialogs_without_changing_route_link(client)
     call_command('seed_sample_data')
 
     response = client.get('/admin/dashboard/')
-    not_routed_table = response.content.decode().split('id="not-routed-cargo"', 1)[1].split(
-        '</section>', 1
-    )[0]
+    not_routed_table = (
+        response.content.decode().split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+    )
 
     assert response.status_code == 200
     assert 'href="/admin/cargo/DEF789/route/"' in not_routed_table
@@ -195,4 +197,5 @@ def test_not_routed_table_opens_edit_dialogs_without_changing_route_link(client)
     assert 'id="cargo-edit-dialog"' in not_routed_table
     assert 'aria-label="Edit cargo"' in not_routed_table
     assert 'hx-on::after-swap=' in not_routed_table
+    assert 'hx-on::response-error=' in not_routed_table
     assert 'dialog.showModal()' in not_routed_table
