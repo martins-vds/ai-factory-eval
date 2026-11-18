@@ -89,7 +89,9 @@ def test_destination_dialog_shows_current_specification_and_stable_filtered_opti
     assert 'value="CNHKG"' not in first_options
     assert 'value="AUMEL"' not in first_options
     assert first_options == second_options
-    assert [location.unlocode.value for location in locations_for_dialogs] == original_location_codes
+    assert [
+        location.unlocode.value for location in locations_for_dialogs
+    ] == original_location_codes
 
 
 @pytest.mark.django_db
@@ -208,8 +210,7 @@ def test_deadline_update_completes_dialog_and_refreshes_table(client):
     assert cargo_after is not None
     assert cargo_after.route_specification.origin == cargo_before.route_specification.origin
     assert (
-        cargo_after.route_specification.destination
-        == cargo_before.route_specification.destination
+        cargo_after.route_specification.destination == cargo_before.route_specification.destination
     )
     assert cargo_after.route_specification.arrival_deadline == new_deadline
     assert '04/05/2030' in not_routed_table
