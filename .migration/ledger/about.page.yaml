@@ -14,5 +14,5 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-04.md, tests/library_info/test_endpoints.py::test_about_endpoint_matches_characterized_html, tests/library_info/test_endpoints.py::test_about_page_shows_library_information_in_a_browser]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-04.md, tests/library_info/test_library_info.py::test_about_endpoint_matches_characterized_html, tests/library_info/test_library_info.py::test_about_page_shows_library_information_in_a_browser]
 no_rules: "The informational page accepts no input and has no eligibility checks, limits, or state transitions."
