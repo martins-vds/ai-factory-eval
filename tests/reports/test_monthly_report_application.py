@@ -79,9 +79,9 @@ def test_generate_uses_half_open_previous_calendar_month():
 
     assert repository.started_window == (date(2025, 12, 1), date(2026, 1, 1))
     assert repository.returned_window == (date(2025, 12, 1), date(2026, 1, 1))
-    assert [(report.member_id, report.loans_started, report.late_returns) for report in reports] == [
-        ('december', 2, 0)
-    ]
+    assert [
+        (report.member_id, report.loans_started, report.late_returns) for report in reports
+    ] == [('december', 2, 0)]
 
 
 def test_generate_omits_members_without_a_loan_started_in_the_report_month():
@@ -152,9 +152,7 @@ def test_generate_orders_by_fees_descending_then_member_id():
             ),
         ]
     )
-    fees = FeeCalculator(
-        {'zeta-loan': Fee(100), 'alpha-loan': Fee(100), 'beta-loan': Fee(200)}
-    )
+    fees = FeeCalculator({'zeta-loan': Fee(100), 'alpha-loan': Fee(100), 'beta-loan': Fee(200)})
     application = MonthlyReportApplication(repository, Clock(date(2026, 1, 15)), fees)
 
     reports = application.generate()
