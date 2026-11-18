@@ -81,7 +81,10 @@ SNAPSHOT_TABLES = {
             'REGISTRATION',
             'CARGO_ID',
         ),
-        (('71', 'LOAD', '900', '101', '2026-11-08T13:00:00Z', '2026-11-08T13:01:00Z', '13'),),
+        (
+            ('71', 'LOAD', '900', '101', '2026-11-08T13:00:00Z', '2026-11-08T13:01:00Z', '13'),
+            ('72', 'RECEIVE', None, '101', '2026-11-08T12:30:00Z', '2026-11-08T12:31:00Z', '13'),
+        ),
     ),
     'LEG': (
         (
@@ -200,9 +203,16 @@ def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_
     assert event_references
 
     for voyage_id, location_id in event_references:
-        assert voyage_id is not None
-        assert voyage_id in voyage_ids
+        if voyage_id is not None:
+            assert voyage_id in voyage_ids
         assert location_id in location_ids
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_non_carrier_handling_event_keeps_null_voyage(loaded_snapshot):
+    event = HandlingEventRecord.objects.get(event_type='RECEIVE')
+
+    assert event.voyage_id is None
 
 
 @pytest.mark.django_db(transaction=True)
