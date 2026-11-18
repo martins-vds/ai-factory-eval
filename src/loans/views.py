@@ -5,7 +5,14 @@ from django.shortcuts import get_object_or_404, render
 
 from .models import Loan
 from .repository import LoanRepository
-from .services import InvalidLoan, get_loan_text, lend_loan, list_loans_text
+from .services import (
+    InvalidLoan,
+    LoanAlreadyReturned,
+    get_loan_text,
+    lend_loan,
+    list_loans_text,
+    return_loan,
+)
 
 
 def loan_catalog(request):
@@ -41,3 +48,15 @@ def loan_detail(request, loan_id):
     if body is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
     return HttpResponse(body, content_type='text/plain')
+
+
+def loan_return(request, loan_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+    try:
+        loan = return_loan(LoanRepository(), loan_id, date.today())
+    except LoanAlreadyReturned:
+        return HttpResponse('loan already returned\n', status=409, content_type='text/plain')
+    if loan is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    return HttpResponse(get_loan_text(LoanRepository(), loan.id), content_type='text/plain')

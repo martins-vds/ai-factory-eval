@@ -7,6 +7,10 @@ class InvalidLoan(ValueError):
         self.errors = errors
 
 
+class LoanAlreadyReturned(ValueError):
+    pass
+
+
 def lend_loan(repository, member, isbn, lent_on):
     errors = {}
     if not member or not member.strip():
@@ -16,6 +20,16 @@ def lend_loan(repository, member, isbn, lent_on):
     if errors:
         raise InvalidLoan(errors)
     return repository.create(member=member, isbn=isbn, lent_on=lent_on)
+
+
+def return_loan(repository, loan_id, returned_on):
+    loan = repository.find(loan_id)
+    if loan is None:
+        return None
+    if loan.returned_on is not None or not repository.mark_returned(loan_id, returned_on):
+        raise LoanAlreadyReturned
+    loan.returned_on = returned_on
+    return loan
 
 
 def loan_line(loan):
