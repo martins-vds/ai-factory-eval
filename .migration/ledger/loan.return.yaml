@@ -8,10 +8,31 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1332]
+target:
+  components:
+    - src.loans.services.return_loan
+    - src.loans.views.loan_return
+    - src.loans.views.loan_catalog_return
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_rejects_an_unknown_loan
+  - tests/loans/test_circulation.py::test_return_endpoint_reports_unknown_loan
+  - tests/loans/test_circulation.py::test_return_endpoint_rejects_repeated_returns_without_replacing_the_date
+  - tests/loans/test_circulation.py::test_browser_repeat_return_renders_error_and_preserves_return_date
+rules:
+  - id: loan-must-exist
+    rule: A return for an unknown loan id is rejected.
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
+  - id: first-return-only
+    rule: A loan that already has a return date cannot be returned again.
+    source: martins-vds/ai-factory-synthetic-target#41
+notes: "The human ruling rejects repeated returns and preserves the original date (#41)."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
