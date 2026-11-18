@@ -1,5 +1,5 @@
 <div id="lend-form">
-  <form method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="#lend-form" hx-swap="outerHTML" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+  <form method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="#lend-form" hx-swap="outerHTML">
     {% csrf_token %}
     <div class="mb-4">
       <label class="label" for="member"><span class="label-text">Member</span></label>

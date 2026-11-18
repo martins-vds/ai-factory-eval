@@ -21,7 +21,7 @@
         {% elif loan.returned_on %}
         <p class="text-sm text-[#66705b]">This book has been returned.</p>
         {% else %}
-        <form method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="outerHTML" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+        <form method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="outerHTML">
           {% csrf_token %}
           <button class="btn btn-primary" type="submit">Return this book</button>
         </form>
@@ -30,4 +30,9 @@
     </div>
   </article>
 </section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true;
+  });
+</script>
 {% endblock %}

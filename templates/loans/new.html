@@ -9,4 +9,9 @@
   <p class="mb-6 text-[#66705b]">Add a reader and the book they are taking home.</p>
   {% include "loans/_lend_form.html" %}
 </section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', (event) => {
+    if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true;
+  });
+</script>
 {% endblock %}
