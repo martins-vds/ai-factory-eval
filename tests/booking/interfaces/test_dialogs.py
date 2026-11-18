@@ -83,3 +83,33 @@ def test_invalid_deadline_renders_field_error_without_updating_cargo(client):
     assert 'Enter a valid arrival deadline.' in response.content.decode()
     assert 'aria-invalid="true"' in response.content.decode()
     assert updated_cargo.route_specification.arrival_deadline == original_deadline
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_update_refreshes_not_routed_table_and_preserves_route(client):
+    call_command('seed_sample_data')
+    original_cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
+    new_deadline = '2027-01-15'
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': new_deadline},
+        HTTP_HX_REQUEST='true',
+    )
+    updated_cargo = dashboard.get_cargo_details(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert response.headers['HX-Retarget'] == '#not-routed-cargo'
+    assert response.headers['HX-Reswap'] == 'outerHTML'
+    assert '01/15/2027' in response.content.decode()
+    assert 'DEF789' in response.content.decode()
+    assert 'Widget for var' not in response.content.decode()
+    assert original_cargo is not None
+    assert updated_cargo is not None
+    assert updated_cargo.route_specification.origin == original_cargo.route_specification.origin
+    assert (
+        updated_cargo.route_specification.destination
+        == original_cargo.route_specification.destination
+    )
+    assert updated_cargo.route_specification.arrival_deadline.date().isoformat() == new_deadline
