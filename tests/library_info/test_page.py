@@ -1,0 +1,57 @@
+import pytest
+from playwright.sync_api import sync_playwright
+
+
+def test_legacy_about_response_matches_characterization(client):
+    response = client.get('/about')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == (
+        b'<!doctype html>\n'
+        b'<html lang="en">\n'
+        b'<head><meta charset="utf-8"><title>About the Lending Library</title></head>\n'
+        b'<body>\n'
+        b'  <h1>About the Lending Library</h1>\n'
+        b'  <p>Open Monday to Saturday, 9:00 to 18:00. Books are lent for 14 days.</p>\n'
+        b'  <p>Contact: desk@lending-library.invalid</p>\n'
+        b'</body>\n'
+        b'</html>\n'
+    )
+
+
+def test_about_ui_preserves_library_information_and_contact_link(client):
+    response = client.get('/ui/about/')
+
+    assert response.status_code == 200
+    assert b'About the Lending Library' in response.content
+    assert b'A place for curious readers' in response.content
+    assert (
+        b'A neighborhood collection, kept in motion by the people who read it.' in response.content
+    )
+    assert b'Open Monday to Saturday, 9:00 to 18:00.' in response.content
+    assert b'Books are lent for 14 days.' in response.content
+    assert b'href="mailto:desk@lending-library.invalid"' in response.content
+
+
+def test_about_pages_reject_non_get_requests(client):
+    for path in ('/about', '/ui/about/'):
+        assert client.post(path).status_code == 405
+
+
+@pytest.mark.django_db
+def test_about_page_renders_in_browser(live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            response = page.goto(f'{live_server.url}/ui/about/')
+            assert response is not None
+            assert response.status == 200
+            assert page.get_by_role('heading', name='About the Lending Library').is_visible()
+            assert (
+                page.get_by_role('link', name='desk@lending-library.invalid').get_attribute('href')
+                == 'mailto:desk@lending-library.invalid'
+            )
+        finally:
+            browser.close()
