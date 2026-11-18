@@ -68,8 +68,15 @@ def test_monthly_report_command_reads_persisted_loans(monkeypatch):
         id='LL05-report-2',
         member='reader',
         isbn='report-2',
+        lent_on=date(2099, 1, 30),
+        returned_on=date(2099, 2, 19),
+    )
+    DjangoLoan.objects.create(
+        id='LL05-report-3',
+        member='reader',
+        isbn='report-3',
         lent_on=date(2099, 2, 4),
-        returned_on=None,
+        returned_on=date(2099, 3, 1),
     )
     output = StringIO()
 
@@ -77,5 +84,5 @@ def test_monthly_report_command_reads_persisted_loans(monkeypatch):
 
     assert output.getvalue().splitlines() == [
         'member_id,loans_started,late_returns,late_fees_cents',
-        'reader,2,1,75',
+        'reader,2,2,225',
     ]
