@@ -33,3 +33,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T12:54:40+00:00 | idiom-ui-retry | 0 | 0.53 | `python .migration/harness/tools/check_ui.py` | `028090431a3e6ad6` |  | gate=ui scope="templates changed since 517bb57243bf7ca8848488a0f2ee96259892be95" templates=3 findings=0 |
 | 2026-11-18T12:54:51+00:00 | behavior-after-ui-fix | 0 | 6.23 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `bcca4dc07217a9c1` |  |  |
 | 2026-11-18T12:55:34+00:00 | behavior-unknown-cargo | 0 | 6.09 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `4904a2f52de74e3e` |  |  |
+| 2026-11-18T12:56:01+00:00 | final-idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-18T12:56:04+00:00 | final-idiom-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-18T12:56:07+00:00 | final-idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-18T12:56:11+00:00 | final-idiom-ui | 0 | 0.53 | `python .migration/harness/tools/check_ui.py` | `028090431a3e6ad6` |  | gate=ui scope="templates changed since 517bb57243bf7ca8848488a0f2ee96259892be95" templates=3 findings=0 |
+| 2026-11-18T12:57:20+00:00 | behavior-full-suite | 0 | 64.2 | `pytest -q` | `7b12aa3494a10c05` |  |  |
+| 2026-11-18T12:58:28+00:00 | crap-coverage | 0 | 60.98 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `75c13fa72eb85843` |  |  |
+| 2026-11-18T12:58:32+00:00 | crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T12:58:36+00:00 | crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `b79ea0fd5e90d5b0` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-18T13:01:06+00:00 | mutation-changed | 1 | 145.28 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `ef658d3c3a78e363` | afs-mutation: FAILED score=0.759 threshold=0.8 killed=41 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.759 threshold=0.8 killed=41 survived=13 files=1 base=origin/main |
+| 2026-11-18T13:03:21+00:00 | mutation-coverage-map | 0 | 15.89 | `python -c 'import runpy; module=runpy.run_path(".migration/harness/tools/afs-mutation", run_name="afs_mutation"); print(module["covering_tests"](["src/cargotracker/booking/interfaces/dialogs/views.py"], "src", ["tests/booking"]))'` | `1f5f4daf64f2119b` |  |  |
