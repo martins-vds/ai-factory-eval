@@ -41,3 +41,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T16:00:26+00:00 | behavior-null-voyage-reproducer | 1 | 3.89 | `pytest -q tests/data_migration/test_invariants.py::test_loaded_handling_events_reference_existing_voyages_and_locations` | `b92a846be57336c6` | assert event_references |  |
 | 2026-11-18T16:00:45+00:00 | invariants-null-voyage-fixed | 1 | 5.02 | `pytest -q tests/data_migration/test_invariants.py` | `482c7be0bec152af` | E                   django.core.exceptions.FieldError: Cannot resolve keyword 'type' into field. Choices are: cargo, car |  |
 | 2026-11-18T16:00:59+00:00 | invariants-null-voyage-fixed | 0 | 4.55 | `pytest -q tests/data_migration/test_invariants.py` | `6e5e34b5f4f11c36` |  |  |
+| 2026-11-18T16:02:27+00:00 | invariants-null-voyage-fixed | 0 | 4.13 | `pytest -q tests/data_migration/test_invariants.py` | `f329478ba065a40c` |  |  |

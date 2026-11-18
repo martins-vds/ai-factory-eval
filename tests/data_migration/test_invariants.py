@@ -197,12 +197,15 @@ def test_loaded_itinerary_legs_connect(loaded_snapshot):
 
 @pytest.mark.django_db(transaction=True)
 def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
-    event_references = list(HandlingEventRecord.objects.values_list('voyage_id', 'location_id'))
+    event_references = list(
+        HandlingEventRecord.objects.values_list('event_type', 'voyage_id', 'location_id')
+    )
     voyage_ids = set(VoyageRecord.objects.values_list('pk', flat=True))
     location_ids = set(LocationRecord.objects.values_list('pk', flat=True))
     assert event_references
 
-    for voyage_id, location_id in event_references:
+    for event_type, voyage_id, location_id in event_references:
+        assert (event_type in {'LOAD', 'UNLOAD'}) == (voyage_id is not None)
         if voyage_id is not None:
             assert voyage_id in voyage_ids
         assert location_id in location_ids
