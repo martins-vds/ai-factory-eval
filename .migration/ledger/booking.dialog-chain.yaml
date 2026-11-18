@@ -8,7 +8,12 @@ source:
 boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates/booking/dialogs/
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +22,17 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_return_not_found_for_unknown_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_refreshes_rows_and_completes_without_warning"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_refreshes_rows_and_completes_without_warning"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: unknown-cargo
+    rule: "An unknown cargo ID returns HTTP 404 and presents a visible error in an htmx dialog."
+    source: martins-vds/ai-factory-pilot-target#232
+  - id: successful-completion
+    rule: "A successful update closes the dialog and refreshes the not-routed rows without an unavailable-widget warning."
+    source: martins-vds/ai-factory-pilot-target#251
+notes: "The target opens dialogs from the not-routed table, shows a not-found response for stale cargo IDs, and replaces the table fragment after successful updates."
+quirks: [martins-vds/ai-factory-pilot-target#232, martins-vds/ai-factory-pilot-target#251]

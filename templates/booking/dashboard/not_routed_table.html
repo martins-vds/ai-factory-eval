@@ -34,6 +34,7 @@
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-target="#edit-dialog"
                 hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
                 aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
               >Change destination</a>
             </td>
@@ -44,6 +45,7 @@
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-target="#edit-dialog"
                 hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
                 aria-label="Change deadline for cargo {{ cargo.tracking_id.value }}"
               >Change deadline</a>
             </td>

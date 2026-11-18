@@ -20,10 +20,21 @@ def create_dialog_views(
     Callable[[HttpRequest, str], HttpResponse],
     Callable[[HttpRequest, str], HttpResponse],
 ]:
-    def find_cargo(tracking_id: str) -> Cargo:
+    def find_cargo(request: HttpRequest, tracking_id: str) -> Cargo | HttpResponse:
         cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
         if cargo is None:
-            raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+            message = f'Cargo with tracking ID {tracking_id} not found.'
+            if request.headers.get('HX-Request') == 'true':
+                response = render(
+                    request,
+                    'booking/dialogs/not_found.html',
+                    {'message': message},
+                    status=404,
+                )
+                response['HX-Retarget'] = '#edit-dialog'
+                response['HX-Reswap'] = 'innerHTML'
+                return response
+            raise Http404(message)
         return cargo
 
     def complete_dialog(request: HttpRequest) -> HttpResponse:
@@ -52,20 +63,20 @@ def create_dialog_views(
             if location.unlocode not in {origin.unlocode, current_destination.unlocode}
         ]
         return {
-            'tracking_id': tracking_id,
             'origin': origin,
             'current_destination': current_destination,
             'destinations': destinations,
-            'error': '',
             'action_url': f'/admin/cargo/{tracking_id}/destination/',
         }
 
     @require_http_methods(['GET', 'POST'])
     def destination_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
-        cargo = find_cargo(tracking_id)
+        cargo = find_cargo(request, tracking_id)
+        if isinstance(cargo, HttpResponse):
+            return cargo
         context = destination_context(cargo, tracking_id)
         if request.method == 'POST':
-            selected_code = request.POST.get('destination', '')
+            selected_code = request.POST.get('destination')
             destination = next(
                 (
                     location
@@ -76,7 +87,6 @@ def create_dialog_views(
             )
             if destination is None:
                 context['error'] = 'Select a valid destination.'
-                context['selected_destination'] = selected_code
                 return render_dialog_error(request, 'booking/dialogs/destination.html', context)
             cargo_specification.change_destination(TrackingId(tracking_id), destination)
             return complete_dialog(request)
@@ -84,7 +94,9 @@ def create_dialog_views(
 
     @require_http_methods(['GET', 'POST'])
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
-        cargo = find_cargo(tracking_id)
+        cargo = find_cargo(request, tracking_id)
+        if isinstance(cargo, HttpResponse):
+            return cargo
         deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
         error = ''
         if request.method == 'POST':

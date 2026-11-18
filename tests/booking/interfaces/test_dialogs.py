@@ -53,8 +53,16 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
 @override_settings(ROOT_URLCONF=__name__)
 def test_dialogs_return_not_found_for_unknown_cargo(client):
     response = client.get('/admin/cargo/MISSING1/destination/')
+    htmx_response = client.get(
+        '/admin/cargo/MISSING1/destination/',
+        HTTP_HX_REQUEST='true',
+    )
 
     assert response.status_code == 404
+    assert htmx_response.status_code == 404
+    assert 'Cargo with tracking ID MISSING1 not found.' in htmx_response.content.decode()
+    assert htmx_response['HX-Retarget'] == '#edit-dialog'
+    assert htmx_response['HX-Reswap'] == 'innerHTML'
 
 
 @pytest.mark.django_db
@@ -72,6 +80,9 @@ def test_destination_dialog_shows_current_values_and_excludes_origin_and_destina
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
+    assert 'action="/admin/cargo/DEF789/destination/"' in content
+    assert 'hx-post="/admin/cargo/DEF789/destination/"' in content
+    assert 'destination-error' not in content
     assert 'Change destination' in content
 
 
@@ -155,6 +166,24 @@ def test_destination_dialog_updates_cargo_refreshes_rows_and_completes_without_w
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_without_htmx_redirects_to_the_refreshed_dashboard(client):
+    call_command('seed_sample_data')
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'USNYC'},
+    )
+    dashboard = client.get(response.url)
+
+    assert response.status_code == 302
+    assert response.url == '/admin/dashboard/'
+    not_routed_table = dashboard.content.decode().split('id="not-routed-cargo"', 1)[1]
+    assert 'New York' in not_routed_table
+    assert 'data-tracking-id="DEF789"' in not_routed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_shows_initial_specification_values(client):
     call_command('seed_sample_data')
     cargo = cargo_repository.find(TrackingId('DEF789'))
@@ -167,19 +196,27 @@ def test_deadline_dialog_shows_initial_specification_values(client):
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
     assert f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in content
+    assert 'deadline-error' not in content
+    assert 'action="/admin/cargo/DEF789/deadline/"' in content
+    assert 'hx-post="/admin/cargo/DEF789/deadline/"' in content
     assert 'Change deadline' in content
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client):
+@pytest.mark.parametrize(
+    ('form_data', 'field_value'),
+    [({'deadline': 'not-a-date'}, 'not-a-date'), ({}, '')],
+    ids=('malformed', 'missing'),
+)
+def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client, form_data, field_value):
     call_command('seed_sample_data')
     cargo_before = cargo_repository.find(TrackingId('DEF789'))
     assert cargo_before is not None
 
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
-        {'deadline': 'not-a-date'},
+        form_data,
         HTTP_HX_REQUEST='true',
     )
     cargo_after = cargo_repository.find(TrackingId('DEF789'))
@@ -190,11 +227,21 @@ def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client):
     assert 'id="deadline-error"' in content
     assert 'aria-describedby="deadline-error"' in content
     assert 'aria-invalid="true"' in content
-    assert 'value="not-a-date"' in content
+    assert f'value="{field_value}"' in content
     assert response['HX-Retarget'] == '#edit-dialog'
     assert response['HX-Reswap'] == 'innerHTML'
     assert cargo_after is not None
     assert cargo_after.route_specification == cargo_before.route_specification
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_reject_methods_other_than_get_and_post(client):
+    destination_response = client.put('/admin/cargo/DEF789/destination/')
+    deadline_response = client.put('/admin/cargo/DEF789/deadline/')
+
+    assert destination_response.status_code == 405
+    assert deadline_response.status_code == 405
 
 
 @pytest.mark.django_db
