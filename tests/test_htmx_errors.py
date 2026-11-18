@@ -19,8 +19,14 @@ def htmx_page(live_server):
                 content_type='application/javascript',
             ),
         )
-        yield page
-        browser.close()
+        page.route(
+            'https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css',
+            lambda route: route.abort(),
+        )
+        try:
+            yield page
+        finally:
+            browser.close()
 
 
 def assert_error_fragment_swapped(
@@ -33,10 +39,15 @@ def assert_error_fragment_swapped(
     status,
     target,
     message,
+    fill_inputs=(),
 ):
     request = {}
 
     def respond_with_error(route):
+        if route.request.method != 'POST':
+            route.continue_()
+            return
+
         request['headers'] = route.request.headers
         route.fulfill(
             status=status,
@@ -55,6 +66,9 @@ def assert_error_fragment_swapped(
         ['[45]..', True, True],
         ['...', False, None],
     ]
+
+    for selector, value in fill_inputs:
+        page.locator(selector).fill(value)
 
     with page.expect_response(lambda response: response.url.endswith(request_path)) as response:
         page.get_by_role('button', name=button_name).click()
@@ -104,4 +118,5 @@ def test_lending_error_fragment_replaces_loan_form(htmx_page, live_server):
         status=422,
         target='loan-form',
         message='The lending service is unavailable.',
+        fill_inputs=(('input[name="member"]', 'reader'), ('input[name="isbn"]', '123')),
     )
