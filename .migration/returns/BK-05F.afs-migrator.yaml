@@ -1,0 +1,11 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1572
+pr: null
+gates: null
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
