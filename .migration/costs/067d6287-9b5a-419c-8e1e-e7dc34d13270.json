@@ -200,17 +200,17 @@
       ]
     },
     "event_types": {
-      "assistant.message": 160,
-      "assistant.turn_end": 91,
-      "assistant.turn_start": 92,
+      "assistant.message": 167,
+      "assistant.turn_end": 96,
+      "assistant.turn_start": 96,
       "external_tool.completed": 2,
       "external_tool.requested": 2,
-      "hook.end": 301,
-      "hook.start": 302,
-      "permission.completed": 144,
-      "permission.requested": 144,
+      "hook.end": 312,
+      "hook.start": 313,
+      "permission.completed": 148,
+      "permission.requested": 148,
       "session.start": 1,
-      "session.usage_record": 92,
+      "session.usage_record": 96,
       "skill.context_delivered_ref": 16,
       "skill.invoked": 13,
       "skill.invoked_ref": 3,
@@ -219,14 +219,14 @@
       "subagent.selected": 1,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 174,
-      "tool.execution_start": 175,
+      "tool.execution_complete": 179,
+      "tool.execution_start": 179,
       "user.message": 4
     },
-    "events": 1726,
+    "events": 1785,
     "usage_fields": []
   },
-  "ended_at": "2026-11-19T18:29:40.032Z",
+  "ended_at": "2026-11-19T18:30:58.434Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -260,7 +260,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 4,
+      "count": 5,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -275,7 +275,7 @@
       "tool": "check_ui.py"
     },
     {
-      "count": 3,
+      "count": 4,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -294,11 +294,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 160
+      "requests": 167
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-19T18:30:12+00:00",
+  "recorded_at": "2026-11-19T18:31:33+00:00",
   "schema": "afs-cost/1",
   "session_id": "067d6287-9b5a-419c-8e1e-e7dc34d13270",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -358,6 +358,5 @@
   ],
   "started_at": "2026-11-19T18:13:36.468Z",
   "surface": "coding-agent",
-  "trigger_id": "2e26f569-0e66-4a2d-a186-801cf61a8d87",
   "usage_source": "assistant.message (output only, partial)"
 }
