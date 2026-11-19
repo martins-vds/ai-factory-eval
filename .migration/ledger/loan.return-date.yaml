@@ -8,10 +8,32 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1508]
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+target:
+  components:
+    - src.loans.services.return_loan
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.views.loan_return
+    - src.loans.views.loan_return_page
+status: migrated
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_uses_the_supplied_date
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_a_repeat_and_preserves_the_original_date
+  - tests/loans/test_circulation.py::test_return_endpoint_persists_the_return_date
+  - tests/loans/test_circulation.py::test_return_endpoint_rejects_a_repeat_without_changing_the_date
+rules:
+  - id: store-return-date
+    rule: Returning an unreturned loan persists the supplied return date.
+    source: legacy/src/main/java/lib/LoanRepository.java:36-44
+  - id: preserve-first-return-date
+    rule: A repeated return is rejected and does not replace the original return date.
+    source: martins-vds/ai-factory-synthetic-target#41
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+notes: "The approved fix in martins-vds/ai-factory-synthetic-target#41 rejects repeat returns and preserves the first date."

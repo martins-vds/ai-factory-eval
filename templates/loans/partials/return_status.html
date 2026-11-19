@@ -1,0 +1,7 @@
+<div id="return-status" class="mt-6" aria-live="polite">
+  {% if message %}
+  <p role="alert">{{ message }}</p>
+  {% elif loan %}
+  <p>Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+  {% endif %}
+</div>

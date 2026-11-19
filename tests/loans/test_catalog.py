@@ -172,11 +172,7 @@ def test_browser_detail_page_shows_loan_dates(client):
 @pytest.mark.django_db
 def test_repository_write_rolls_back_failed_transaction():
     with pytest.raises(IntegrityError):
-        LoanRepository().create(
-            id='L1',
-            member='duplicate',
-            isbn='123',
-            lent_on=date(2026, 3, 1),
-        )
+        LoanRepository().create(member='duplicate', isbn='123', lent_on=None)
 
     assert Loan.objects.get(pk='L1').member == 'ana'
+    assert not Loan.objects.filter(pk='L4').exists()
