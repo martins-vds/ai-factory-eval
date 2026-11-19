@@ -47,6 +47,41 @@ def test_fee_is_waived_through_two_days_late_then_charges_the_full_late_days(
     assert (fee.days_late, fee.fee_cents) == (days_late, expected_fee_cents)
 
 
+def test_fee_is_capped_at_ten_dollars():
+    due_on = date(2026, 1, 16)
+    loan = Loan('L1', due_on, returned_on=due_on + timedelta(days=50))
+    application = FeeApplication(LoanRepository(loan), Clock())
+
+    fee = application.calculate_fee('L1')
+
+    assert (fee.days_late, fee.fee_cents) == (50, 1000)
+
+
+def test_early_return_has_no_late_days_or_fee():
+    due_on = date(2026, 1, 16)
+    loan = Loan('L1', due_on, returned_on=due_on - timedelta(days=3))
+    application = FeeApplication(LoanRepository(loan), Clock())
+
+    fee = application.calculate_fee('L1')
+
+    assert (fee.days_late, fee.fee_cents) == (0, 0)
+
+
+def test_unreturned_loan_uses_the_injected_clock():
+    loan = Loan('L1', date(2026, 11, 10))
+    application = FeeApplication(LoanRepository(loan), Clock())
+
+    fee = application.calculate_fee('L1')
+
+    assert (fee.days_late, fee.fee_cents) == (9, 225)
+
+
+def test_unknown_loan_has_no_fee_quote():
+    application = FeeApplication(LoanRepository(None), Clock())
+
+    assert application.calculate_fee('missing') is None
+
+
 def test_missing_loan_is_not_charged():
     class PaymentGateway:
         def charge(self, loan_id):
@@ -55,6 +90,19 @@ def test_missing_loan_is_not_charged():
     application = PaymentApplication(LoanRepository(None), PaymentGateway())
 
     assert application.pay('missing') is None
+
+
+def test_successful_gateway_response_remains_successful():
+    class PaymentGateway:
+        def charge(self, loan_id):
+            return GatewayResponse(200, 'charged\n')
+
+    loan = Loan('L1', date(2026, 1, 16))
+    application = PaymentApplication(LoanRepository(loan), PaymentGateway())
+
+    result = application.pay('L1')
+
+    assert (result.status_code, result.body) == (200, 'charged\n')
 
 
 def test_non_success_gateway_response_becomes_bad_gateway():
