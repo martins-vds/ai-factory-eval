@@ -1,0 +1,10 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1536
+phase: 0
+decisions: []
+dispatched: []
+awaiting_human:
+  - "Restore/install the pinned AFS harness and initialize required setup tools; then restart setup-check."
+next_step: "Restart SY-01 from setup-check once the pinned harness and setup tools are available."
+handoff: .migration/handoffs/SY-01.md
