@@ -26,10 +26,10 @@ evidence:
   - .migration/evidence/runs/SY-05.md
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/gateway.json
-  - tests/fees/test_services.py::test_payment_does_not_call_gateway_when_loan_does_not_exist
-  - tests/fees/test_services.py::test_payment_returns_gateway_success_unchanged
-  - tests/fees/test_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
-  - tests/fees/test_services.py::test_payment_gateway_failure_preserves_interruption
+  - tests/fees/test_fee_services.py::test_payment_does_not_call_gateway_when_loan_does_not_exist
+  - tests/fees/test_fee_services.py::test_payment_returns_gateway_success_unchanged
+  - tests/fees/test_fee_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
+  - tests/fees/test_fee_services.py::test_payment_gateway_failure_preserves_interruption
   - tests/fees/test_gateway.py::test_payment_gateway_sends_post_without_body_and_returns_gateway_response
   - tests/fees/test_gateway.py::test_payment_gateway_returns_non_success_body_for_application_mapping
   - tests/fees/test_gateway.py::test_payment_gateway_does_not_follow_redirects
@@ -39,6 +39,7 @@ evidence:
   - tests/fees/test_views.py::test_payment_api_returns_gateway_success_unchanged
   - tests/fees/test_views.py::test_payment_api_maps_gateway_failure_to_bad_gateway
   - tests/fees/test_views.py::test_payment_api_does_not_call_gateway_for_unknown_loan
+  - tests/fees/test_views.py::test_payment_api_maps_interruption_to_gateway_failure
   - tests/fees/test_views.py::test_htmx_payment_page_renders_gateway_failure_for_swap
   - tests/fees/test_views.py::test_htmx_payment_success_renders_status
   - tests/fees/test_views.py::test_payment_page_response_handles_gateway_interruption

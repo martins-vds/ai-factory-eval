@@ -10,15 +10,15 @@
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The collection · Loan {{ fee.loan_id }}</p>
       <h1 class="card-title mt-2 text-4xl">A small balance in the ledger.</h1>
       <p class="mt-2">Due {{ fee.due_on|date:"Y-m-d" }}, {{ fee.late_days }} day(s) late.</p>
-      <p class="fee mt-4 text-2xl font-semibold">Fee: {{ amount }}</p>
+      <p class="fee mt-2 text-2xl font-semibold">Fee: {{ amount }}</p>
       <div class="mt-6">
         <form method="post" action="/ui/payments/{{ fee.loan_id }}/"
               hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-result" hx-swap="outerHTML"
               hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
           {% csrf_token %}
-          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+          <button class="btn btn-outline text-[#a94e37]" type="submit">Pay late fee</button>
         </form>
-        <div id="payment-result" class="mt-4" aria-live="polite">
+        <div id="payment-result" class="mt-2" aria-live="polite">
           {% if payment_result %}
           {% include "fees/payment-result.html" with body=payment_result.body success=payment_result.success %}
           {% endif %}

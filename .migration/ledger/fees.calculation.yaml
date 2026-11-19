@@ -19,9 +19,9 @@ evidence:
   - .migration/evidence/runs/SY-05.md
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
-  - tests/fees/test_services.py::test_late_fee_uses_two_day_grace_and_caps_at_ten_dollars
-  - tests/fees/test_services.py::test_return_date_takes_precedence_over_the_current_date
-  - tests/fees/test_services.py::test_late_fee_is_missing_when_loan_does_not_exist
+  - tests/fees/test_fee_services.py::test_late_fee_uses_two_day_grace_and_caps_at_ten_dollars
+  - tests/fees/test_fee_services.py::test_return_date_takes_precedence_over_the_current_date
+  - tests/fees/test_fee_services.py::test_late_fee_is_missing_when_loan_does_not_exist
   - tests/fees/test_views.py::test_fee_api_matches_the_characterized_html
   - .migration/evidence/runs/LL-03.md
 rules:

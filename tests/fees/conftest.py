@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+from typing import ClassVar
 
 import pytest
 
@@ -7,7 +8,7 @@ import pytest
 @pytest.fixture
 def local_gateway():
     class Handler(BaseHTTPRequestHandler):
-        requests = []
+        requests: ClassVar[list[tuple[str, str, bytes]]] = []
 
         def do_POST(self):
             body = self.rfile.read(int(self.headers.get('Content-Length', '0')))

@@ -87,6 +87,21 @@ def test_payment_api_does_not_call_gateway_for_unknown_loan(client, monkeypatch)
 
 
 @pytest.mark.django_db
+def test_payment_api_maps_interruption_to_gateway_failure(client, monkeypatch):
+    interruption = InterruptedError('request interrupted')
+    failure = PaymentGatewayError('payment gateway unavailable')
+    failure.__cause__ = interruption
+    gateway = PaymentGateway(error=failure)
+    monkeypatch.setattr(views.payment_application, 'gateway', gateway)
+
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+    assert failure.__cause__ is interruption
+
+
+@pytest.mark.django_db
 def test_fee_page_uses_reading_room_layout_and_offers_htmx_payment(client):
     response = client.get('/ui/fees/L3/')
 
@@ -169,3 +184,23 @@ def test_browser_payment_failure_is_rendered(live_server, local_gateway, monkeyp
             assert requests == [('POST', '/charge?loan=L2', b'')]
         finally:
             browser.close()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/payments/L3', 'get'),
+        ('/ui/fees/L3/', 'post'),
+        ('/ui/payments/L3/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, monkeypatch, path, method):
+    gateway = PaymentGateway()
+    monkeypatch.setattr(views.payment_application, 'gateway', gateway)
+
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert gateway.charge_calls == []
