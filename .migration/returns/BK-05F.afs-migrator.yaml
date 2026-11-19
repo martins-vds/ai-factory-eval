@@ -1,0 +1,40 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1587
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.947
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_page_displays_cargo_details_and_candidate_itinerary_properties
+  - tests/booking/interfaces/test_route_selection.py::test_itinerary_page_renders_candidates_when_present
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_guides_the_user_when_no_candidates_exist
+  - tests/booking/interfaces/test_route_selection.py::test_assignment_persists_the_displayed_candidate_and_opens_cargo_details
+  - tests/booking/interfaces/test_route_selection.py::test_invalid_candidate_selection_is_reported_without_assigning_a_route
+  - tests/booking/interfaces/test_route_selection.py::test_malformed_or_missing_candidate_selection_is_reported
+  - tests/booking/interfaces/test_route_selection.py::test_missing_candidate_snapshot_is_refreshed_before_selection
+  - tests/booking/interfaces/test_route_selection.py::test_corrupt_candidate_snapshot_is_refreshed_before_selection
+  - tests/booking/interfaces/test_route_selection.py::test_unknown_route_selection_raises_the_existing_not_found_error
+  - .migration/evidence/runs/BK-05F.md
+  - .migration/evidence/mutants/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules:
+  booking.routing-chain: "This structural flow coordinates candidate retrieval, selection and assignment; candidate eligibility is enforced by CargoRouting.route_candidates."
+  booking.screen-route: "The screen presents the filtered candidates returned by CargoRouting; business eligibility is enforced by that use case."
+  booking.screen-select-itinerary: "This screen presents candidate routes or no-route guidance; candidate eligibility is enforced by CargoRouting.route_candidates."
+  booking.routing-assign: "Assignment stores the selected, pre-filtered itinerary; route eligibility is enforced by CargoRouting.route_candidates."
