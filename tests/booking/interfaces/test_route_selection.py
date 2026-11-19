@@ -13,6 +13,7 @@ from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -221,3 +222,26 @@ def test_selecting_a_candidate_redirects_to_details_with_the_assigned_itinerary(
     assert '0200T' in details
     assert 'Rotterdam' in details
     assert 'Melbourne' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_encodes_tracking_id_in_details_redirect(seeded_cargo, client):
+    tracking_id = 'DEF#789'
+    CargoRecord.objects.filter(tracking_id=seeded_cargo.value).update(tracking_id=tracking_id)
+    routing_service.candidates = _candidate_paths()
+    route_response = client.get('/admin/cargo/DEF%23789/route/')
+    token_match = re.search(
+        r'name="candidate"\s+value="([^"]+)"',
+        route_response.content.decode(),
+    )
+    assert token_match is not None
+    candidate_token = html.unescape(token_match.group(1))
+
+    response = client.post(
+        '/admin/cargo/DEF%23789/itineraries/',
+        {'candidate': candidate_token},
+    )
+
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/admin/cargo/DEF%23789/'
