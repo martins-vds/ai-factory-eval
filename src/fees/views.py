@@ -52,13 +52,12 @@ def payment_page(request, loan_id):
     result = payment_application.pay(loan_id)
     if result is None:
         status = 404
-        success = False
         message = 'No such loan.'
     else:
         status = result.status_code
-        success = status == 200
         message = result.body.strip()
 
+    success = status == 200
     context = {'success': success, 'message': message}
     template = (
         'fees/payment-status.html'

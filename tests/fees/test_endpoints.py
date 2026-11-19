@@ -151,8 +151,7 @@ def test_htmx_payment_for_an_unknown_loan_returns_an_error_fragment(client):
 
     assert response.status_code == 404
     assert b'<!doctype html>' not in response.content
-    assert b'role="alert"' in response.content
-    assert b'No such loan.' in response.content
+    assert response.content.strip() == b'<p role="alert">No such loan.</p>'
 
 
 @pytest.mark.django_db
