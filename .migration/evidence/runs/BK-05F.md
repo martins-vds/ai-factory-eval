@@ -71,3 +71,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T21:48:34+00:00 | crap-coverage | 0 | 42.16 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `7b371e87cf0f2e3c` |  |  |
 | 2026-11-19T21:48:34+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-19T21:48:34+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-19T21:50:35+00:00 | no-default-salt-test | 0 | 1.49 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_signed_without_route_selection_salt` | `7bc5776d19eed069` |  |  |
+| 2026-11-19T21:51:09+00:00 | cross-cargo-candidate-test | 0 | 1.47 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_for_another_cargo` | `b29404b0332b987b` |  |  |
+| 2026-11-19T21:51:19+00:00 | route-selection-tests | 0 | 1.8 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `22ea68715f88f561` |  |  |
+| 2026-11-19T21:51:28+00:00 | mutation-changed-final | 0 | 0.07 | `python .migration/harness/tools/afs-mutation` | `3f697587559970db` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=97d6d08d94d8b719104de7b149b6ebc4d457f358 |
