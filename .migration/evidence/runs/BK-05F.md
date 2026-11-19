@@ -96,3 +96,14 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T22:12:10+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-19T22:12:42+00:00 | unknown-cargo-exact-test | 0 | 1.49 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `7ed2738ac3dcd8f9` |  |  |
 | 2026-11-19T22:16:22+00:00 | mutation-changed-final | 0 | 214.83 | `python .migration/harness/tools/afs-mutation` | `6eb11dff28bc8a9d` |  | gate=mutation score=0.887 threshold=0.8 killed=55 survived=7 files=1 base=97d6d08d94d8b719104de7b149b6ebc4d457f358 |
+| 2026-11-19T22:20:35+00:00 | mutation-changed-final | 0 | 211.27 | `python .migration/harness/tools/afs-mutation` | `6eb11dff28bc8a9d` |  | gate=mutation score=0.887 threshold=0.8 killed=55 survived=7 files=1 base=97d6d08d94d8b719104de7b149b6ebc4d457f358 |
+| 2026-11-19T22:20:40+00:00 | build-compile-clean | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-19T22:20:40+00:00 | build-django-check-clean | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-19T22:20:40+00:00 | idiom-ruff-clean | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-19T22:20:40+00:00 | idiom-format-clean | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-19T22:20:41+00:00 | idiom-layers-clean | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-19T22:20:41+00:00 | idiom-ui-clean | 0 | 0.42 | `python .migration/harness/tools/check_ui.py` | `3b133abc778f79f3` |  | gate=ui scope="templates changed since 97d6d08d94d8b719104de7b149b6ebc4d457f358" templates=0 findings=0 |
+| 2026-11-19T22:21:26+00:00 | behavior-clean | 0 | 44.72 | `pytest -q` | `ea31d7a80f6c9923` |  |  |
+| 2026-11-19T22:22:11+00:00 | crap-coverage-clean | 0 | 44.71 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `0ce1fb11a512e2eb` |  |  |
+| 2026-11-19T22:22:11+00:00 | crap-lizard-clean | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-19T22:22:11+00:00 | crap-score-clean | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
