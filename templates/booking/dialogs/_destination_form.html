@@ -1,0 +1,32 @@
+<h2 id="dialog-title" class="mb-4 text-xl font-semibold text-slate-900">Change destination</h2>
+<p class="mb-2 text-slate-700">Origin: {{ origin.name }} ({{ origin.unlocode.value }})</p>
+<p class="mb-4 text-slate-700">
+  Current destination: {{ current_destination.name }} ({{ current_destination.unlocode.value }})
+</p>
+<form
+  method="post"
+  action="{{ action }}"
+  hx-post="{{ action }}"
+  hx-target="#booking-dialog-content"
+  class="flex flex-col gap-4"
+>
+  {% csrf_token %}
+  <label class="label mb-1 block font-medium text-slate-800" for="destination">New destination</label>
+  {% if destination_error %}
+    <p id="destination-error" class="text-red-700" role="alert">{{ destination_error }}</p>
+  {% endif %}
+  <select
+    id="destination"
+    name="destination"
+    class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+    {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+  >
+    {% for location in destinations %}
+      <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+    {% endfor %}
+  </select>
+  <div class="flex justify-end gap-3">
+    <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update</button>
+    <a class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" href="/admin/dashboard/">Cancel</a>
+  </div>
+</form>

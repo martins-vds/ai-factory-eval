@@ -7,14 +7,34 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets:
+  - martins-vds/ai-factory-pilot-target#225
+  - martins-vds/ai-factory-eval#1520
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
-quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_initial_route_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_origin_as_a_submitted_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_refreshes_not_routed_rows"
+  - "tests/booking/application/test_specification.py::test_change_destination_preserves_other_specification_fields_and_resets_route_state"
+  - ".migration/evidence/runs/BK-05G.md"
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/_destination_form.html
+rules:
+  - id: distinct-route-ends
+    rule: A cargo destination cannot equal its origin.
+    source: RouteSpecification and booking quirk ruling #235
+  - id: preserve-other-route-fields
+    rule: Changing the destination preserves the cargo's origin and arrival deadline.
+    source: BK-05G plan and CargoSpecification.change_destination
+quirks:
+  - martins-vds/ai-factory-pilot-target#235
+  - martins-vds/ai-factory-pilot-target#251
+notes: "Alternatives exclude the origin and current destination without mutating the available-location list (#235); updates refresh the table without the PrimeFaces widget warning (#251)."

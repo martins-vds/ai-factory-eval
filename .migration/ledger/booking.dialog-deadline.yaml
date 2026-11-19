@@ -7,14 +7,30 @@ source:
   risk: {crap: 6, complexity: 2, coverage: 0.0}
 boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets:
+  - martins-vds/ai-factory-pilot-target#225
+  - martins-vds/ai-factory-eval#1520
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
-quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_initial_value_and_parse_error"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_value_and_refreshes_not_routed_rows"
+  - "tests/booking/application/test_specification.py::test_change_deadline_preserves_other_specification_fields_and_resets_route_state"
+  - ".migration/evidence/runs/BK-05G.md"
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/_deadline_form.html
+rules:
+  - id: preserve-route-ends
+    rule: Changing the arrival deadline preserves the cargo's origin and destination.
+    source: BK-05G plan and CargoSpecification.change_deadline
+quirks:
+  - martins-vds/ai-factory-pilot-target#234
+  - martins-vds/ai-factory-pilot-target#251
+notes: "Parse failures show a field error rather than only logging (#234); successful updates refresh the table without the PrimeFaces widget warning (#251)."
