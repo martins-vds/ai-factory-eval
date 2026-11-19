@@ -25,3 +25,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T14:08:39+00:00 | regression | 0 | 44.43 | `pytest -q` | `607555db017f6beb` |  |  |
 | 2026-11-19T14:13:53+00:00 | mutation-changed | 1 | 306.64 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `72eb7ebff650e590` | afs-mutation: FAILED score=0.741 threshold=0.8 killed=43 survived=15 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.741 threshold=0.8 killed=43 survived=15 files=1 base=origin/main |
 | 2026-11-19T14:14:33+00:00 | test-mutation-regressions | 0 | 3.84 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `18ad384061ea94dc` |  |  |
+| 2026-11-19T14:19:56+00:00 | mutation-changed-final | 0 | 294.07 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `0ecf6ba8f1f5c928` |  | gate=mutation score=0.810 threshold=0.8 killed=47 survived=11 files=1 base=origin/main |

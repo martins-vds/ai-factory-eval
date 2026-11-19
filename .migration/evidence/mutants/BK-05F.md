@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.741, threshold 0.8, killed 43, survived 15. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.810, threshold 0.8, killed 47, survived 11. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:26 Mutant #1`
 
@@ -63,19 +63,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.741, thr
        def select_itinerary(request: HttpRequest, tracking_id: str) -> HttpResponse:
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:36 Mutant #8`
-
-  ```diff
-  @@ -33,7 +33,7 @@
-       def route(request: HttpRequest, tracking_id: str) -> HttpResponse:
-           if request.method not in {'GET', 'HEAD'}:
-               return HttpResponseNotAllowed(('GET', 'HEAD'))
-  -        return _render_candidates(request, tracking_id, select_itinerary=False)
-  +        return _render_candidates(request, tracking_id, select_itinerary=True)
-       def select_itinerary(request: HttpRequest, tracking_id: str) -> HttpResponse:
-           cargo = _get_cargo(tracking_id)
-  ```
-
 - `src/cargotracker/booking/interfaces/route_selection/views.py:39 Mutant #9`
 
   ```diff
@@ -87,20 +74,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.741, thr
            if request.method == 'POST':
                itinerary = _submitted_itinerary(request, tracking_id)
                if itinerary is None:
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:43 Mutant #14`
-
-  ```diff
-  @@ -40,7 +40,7 @@
-           if request.method == 'POST':
-               itinerary = _submitted_itinerary(request, tracking_id)
-               if itinerary is None:
-  -                return HttpResponseBadRequest('Invalid route selection.')
-  +                return HttpResponseBadRequest('XXInvalid route selection.XX')
-               cargo_routing.assign_route(TrackingId(tracking_id), itinerary)
-               return redirect(f'/admin/cargo/{tracking_id}/')
-           if request.method not in {'GET', 'HEAD'}:
   ```
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:46 Mutant #18`
@@ -159,19 +132,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.741, thr
                tracking_id,
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:51 Mutant #22`
-
-  ```diff
-  @@ -48,7 +48,7 @@
-           return _render_candidates(
-               request,
-               tracking_id,
-  -            select_itinerary=True,
-  +            select_itinerary=False,
-               cargo=cargo,
-           )
-  ```
-
 - `src/cargotracker/booking/interfaces/route_selection/views.py:58 Mutant #25`
 
   ```diff
@@ -183,18 +143,5 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.741, thr
   +            raise Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')
            return cargo
        def _render_candidates(
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:94 Mutant #39`
-
-  ```diff
-  @@ -91,7 +91,7 @@
-                   'cargo': cargo,
-                   'candidates': candidates,
-                   'candidate_count': len(candidates),
-  -                'select_itinerary': select_itinerary,
-  +                'XXselect_itineraryXX': select_itinerary,
-               },
-           )
   ```
 
