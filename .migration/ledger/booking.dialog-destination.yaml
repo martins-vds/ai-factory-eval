@@ -7,8 +7,13 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - src/cargotracker/booking/interfaces/dialogs/views.py
+    - templates/booking/dialogs/destination.html
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +21,12 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_excludes_origin_and_current_destination_without_mutating_locations"
+  - "tests/booking/interfaces/test_dialogs.py::test_invalid_destination_is_rejected_without_changing_cargo_or_locations"
+  - "tests/booking/interfaces/test_dialogs.py::test_missing_cargo_returns_not_found_for_both_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_specification_fields_and_redirects"
+  - "tests/booking/interfaces/test_dialogs.py::test_http_flow_opens_updates_and_refreshes_destination_dialog"
+  - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
+no_rules: "Destination option filtering is UI selection behavior; CargoSpecification remains the application use case for destination updates."
+notes: "The target filters a copied location list so repeat renders remain stable per #235; successful updates omit the console warning per #251."

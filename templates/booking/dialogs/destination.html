@@ -22,12 +22,7 @@
       class="w-full rounded border border-gray-300 p-2"
     >
       {% for location in destinations %}
-        <option
-          value="{{ location.unlocode.value }}"
-          {% if location.unlocode.value == destination_value %}selected{% endif %}
-        >
-          {{ location.name }}
-        </option>
+        <option value="{{ location.unlocode.value }}">{{ location.name }}</option>
       {% endfor %}
     </select>
     <div class="mt-6 flex justify-end gap-3">
