@@ -56,6 +56,12 @@ def _candidate_paths():
     )
 
 
+def _assert_selection_error(content):
+    alert = re.search(r'<p\b[^>]*role="alert"[^>]*>(.*?)</p>', content, re.DOTALL)
+    assert alert is not None
+    assert alert.group(1).strip() == 'Select one of the available itineraries.'
+
+
 cargo_repository = DjangoCargoRepository()
 routing_service = CandidateRoutingService()
 cargo_routing = CargoRouting(
@@ -105,6 +111,7 @@ def test_route_page_displays_cargo_details_and_candidate_itinerary_properties(cl
     assert 'Hong Kong' in content and 'CNHKG' in content
     assert 'Melbourne' in content and 'AUMEL' in content
     assert 'Arrival deadline:' in content
+    assert '01/07/2027' in content
     assert 'role="alert"' not in content
     assert 'Potential routes: 2' in content
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
@@ -198,7 +205,7 @@ def test_invalid_candidate_selection_is_reported_without_assigning_a_route(clien
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select one of the available itineraries.' in content
+    _assert_selection_error(content)
     assert 'Potential routes: 2' in content
     assert cargo is not None
     assert not cargo.itinerary.legs
@@ -222,7 +229,7 @@ def test_malformed_or_missing_candidate_selection_is_reported(client, candidate_
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select one of the available itineraries.' in content
+    _assert_selection_error(content)
     assert 'Potential routes: 2' in content
     assert cargo is not None
     assert not cargo.itinerary.legs
@@ -242,7 +249,7 @@ def test_missing_candidate_snapshot_is_refreshed_before_selection(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select one of the available itineraries.' in content
+    _assert_selection_error(content)
     assert 'Potential routes: 2' in content
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
     assert len(response.context['candidates']) == 2
@@ -277,7 +284,7 @@ def test_corrupt_candidate_snapshot_is_refreshed_before_selection():
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select one of the available itineraries.' in content
+    _assert_selection_error(content)
     assert 'Potential routes: 2' in content
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
     assert len(next(iter(request.session.values()))) == 2
