@@ -68,9 +68,7 @@ def create_route_selection_views(
         if request.method == 'POST':
             stored_candidates = request.session.get(session_key)
             try:
-                candidates = tuple(
-                    _deserialize_itinerary(legs) for legs in stored_candidates
-                )
+                candidates = tuple(_deserialize_itinerary(legs) for legs in stored_candidates)
             except (KeyError, TypeError, ValueError):
                 candidates = ()
 
