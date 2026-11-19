@@ -46,12 +46,12 @@ class ResultGateway:
 
 
 @pytest.mark.parametrize(
-    ('late_days', 'fee_cents'),
-    [(0, 0), (2, 0), (3, 75), (50, 1000)],
+    ('days_from_due', 'late_days', 'fee_cents'),
+    [(-3, 0, 0), (0, 0, 0), (2, 2, 0), (3, 3, 75), (50, 50, 1000)],
 )
-def test_fee_application_applies_waiver_daily_rate_and_cap(late_days, fee_cents):
+def test_fee_application_applies_waiver_daily_rate_and_cap(days_from_due, late_days, fee_cents):
     due_on = date(2026, 1, 16)
-    loan = LoanRecord('L1', due_on, due_on + timedelta(days=late_days))
+    loan = LoanRecord('L1', due_on, due_on + timedelta(days=days_from_due))
     application = FeeApplication(LoanRepository(loan), FixedClock(date(2026, 3, 7)))
 
     fee = application.calculate('L1')

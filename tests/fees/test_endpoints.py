@@ -100,6 +100,17 @@ def test_payment_api_does_not_call_gateway_for_an_unknown_loan(payment_gateway, 
 
 
 @pytest.mark.django_db
+def test_payment_api_maps_connection_failure_to_gateway_unavailable(client, monkeypatch):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
 def test_htmx_payment_success_renders_a_status_fragment(payment_gateway, client):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 

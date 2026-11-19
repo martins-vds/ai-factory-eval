@@ -7,11 +7,23 @@ source:
   flow: Pay Late Fee
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
-boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or https://payments.lending-library.invalid; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1527]
+target:
+  components: [src.fees.services.PaymentApplication.pay, src.fees.gateway.HttpPaymentGateway.charge]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_payment_application_does_not_call_gateway_for_an_unknown_loan, tests/fees/test_services.py::test_payment_application_maps_non_success_gateway_status_to_failure, tests/fees/test_services.py::test_payment_application_retains_interruption_while_mapping_gateway_failure, tests/fees/test_gateway.py::test_http_payment_gateway_preserves_interruption_when_wrapping_failure, tests/fees/test_endpoints.py::test_payment_api_forwards_the_gateway_request_and_success, tests/fees/test_endpoints.py::test_payment_api_maps_gateway_decline_to_502_and_preserves_body, tests/fees/test_payment_api_maps_connection_failure_to_gateway_unavailable, tests/fees/test_real_browser_displays_payment_gateway_failures]
+notes: "The approved fix in martins-vds/ai-factory-synthetic-target#40 maps interruptions to 502 while retaining the InterruptedError as the gateway failure cause."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+rules:
+  - id: existing-loan
+    rule: "An unknown loan is rejected before the payment gateway is called."
+    source: FinePayments.java:29-31
+  - id: gateway-status
+    rule: "Only gateway HTTP 200 is a payment success; other gateway responses become HTTP 502 with the gateway body preserved."
+    source: FinePayments.java:32-35
+  - id: gateway-failure
+    rule: "Gateway I/O and interruption failures become HTTP 502; interruption is retained as the failure cause."
+    source: FinePayments.java:35-40; approved fix: martins-vds/ai-factory-synthetic-target#40
