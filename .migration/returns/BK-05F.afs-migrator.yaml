@@ -1,0 +1,39 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1590
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1593
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.900
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_details_count_and_numbered_candidates
+  - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_populated_candidates
+  - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_shows_no_route_guidance_when_candidates_are_empty
+  - tests/booking/interfaces/test_route_selection.py::test_assign_candidate_redirects_to_cargo_details_and_shows_assigned_itinerary
+  - .migration/evidence/runs/BK-05F.md
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: booking.routing-assign
+    rule: Assigning a selected itinerary persists it and recalculates routing status, ETA, and next expected activity.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+    ledger_rule: assigned-itinerary-state
+no_rules:
+  booking.routing-chain: The view orchestrates candidate display and assignment; candidate eligibility is enforced by CargoRouting.
+  booking.screen-route: The page displays cargo details and eligible candidates; it adds no business checks.
+  booking.screen-select-itinerary: The screen displays eligible candidates or no-route guidance; candidate eligibility is enforced by CargoRouting.

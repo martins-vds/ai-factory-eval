@@ -18,4 +18,12 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_details_count_and_numbered_candidates"
+  - ".migration/evidence/runs/BK-05F.md"
+target:
+  components:
+    - src.cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/route_selection.html
+status: migrated
+no_rules: "The page displays cargo details and the eligible candidates supplied by CargoRouting; it adds no business checks."
+notes: "The route page displays cargo details, candidate counts, numbered itinerary legs and assignment controls. Candidate eligibility remains enforced by CargoRouting."
