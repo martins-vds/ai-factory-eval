@@ -12,16 +12,13 @@ class LoanRepository:
         return Loan.objects.filter(pk=loan_id).first()
 
     @transaction.atomic
-    def create(self, member, isbn, lent_on, id=None):
+    def create(self, member, isbn, lent_on):
         while True:
             loan_ids = list(Loan.objects.select_for_update().values_list('pk', flat=True))
-            if id is None:
-                loan_number = len(loan_ids) + 1
-                while Loan.objects.filter(pk=f'L{loan_number}').exists():
-                    loan_number += 1
-                loan_id = f'L{loan_number}'
-            else:
-                loan_id = id
+            loan_number = len(loan_ids) + 1
+            while Loan.objects.filter(pk=f'L{loan_number}').exists():
+                loan_number += 1
+            loan_id = f'L{loan_number}'
             try:
                 with transaction.atomic():
                     return Loan.objects.create(
@@ -31,7 +28,7 @@ class LoanRepository:
                         lent_on=lent_on,
                     )
             except IntegrityError:
-                if id is not None or not Loan.objects.filter(pk=loan_id).exists():
+                if not Loan.objects.filter(pk=loan_id).exists():
                     raise
 
     @transaction.atomic
