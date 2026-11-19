@@ -3,13 +3,14 @@ from datetime import UTC, datetime
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.booking.interfaces.route_selection import views as route_selection_views
 from cargotracker.booking.interfaces.route_selection.views import (
     create_route_selection_views,
 )
@@ -168,6 +169,30 @@ def test_route_selection_rejects_tampered_and_cross_cargo_candidate_tokens(clien
     assert cross_cargo_response.status_code == 400
     assert cargo is not None
     assert not cargo.itinerary.legs
+
+
+def test_route_assignment_redirect_quotes_tracking_id(monkeypatch):
+    class Dashboard:
+        def get_cargo_details(self, tracking_id):
+            return object()
+
+    class Routing:
+        def assign_route(self, tracking_id, itinerary):
+            pass
+
+    monkeypatch.setattr(
+        route_selection_views,
+        '_itinerary_from_token',
+        lambda token, tracking_id: object(),
+    )
+    route_view, _ = create_route_selection_views(Routing(), Dashboard())
+
+    response = route_view(
+        RequestFactory().post('/admin/cargo/%2F%2Fevil.test/route/', {'candidate_token': 'token'}),
+        '//evil.test',
+    )
+
+    assert response['Location'] == '/admin/cargo/%2F%2Fevil.test/'
 
 
 @pytest.mark.django_db
