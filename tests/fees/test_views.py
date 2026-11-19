@@ -89,9 +89,10 @@ def test_fee_page_shows_the_quote_and_htmx_payment_action(client):
 
     assert response.status_code == 200
     assert b'A small nudge, never a surprise' in response.content
-    assert b'Late fees' in response.content
+    assert b'Late fee for ISBN 9781617294945' in response.content
     assert b'19 day(s) late' in response.content
     assert b'$4.75' in response.content
+    assert response.content.index(b'ISBN 9781617294945') < response.content.index(b'$4.75')
     assert b'action="/ui/payments/L3/"' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
 
