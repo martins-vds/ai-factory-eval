@@ -1,0 +1,30 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1519
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1522
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.794
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty: ui
+specialty_evidence:
+  - .migration/evidence/runs/BK-05F.md
+rules: []
+no_rules:
+  booking.routing-chain: Candidate eligibility belongs to booking.routing-candidates; this capability coordinates the route screens and assignment flow.
+  booking.screen-route: This screen presents candidates; candidate eligibility belongs to booking.routing-candidates.
+  booking.screen-select-itinerary: This screen displays candidate routes or no-route guidance; candidate eligibility belongs to booking.routing-candidates.
+  booking.routing-assign: The assignment use case persists the selected itinerary without additional eligibility checks; candidate validity is enforced by booking.routing-candidates.
