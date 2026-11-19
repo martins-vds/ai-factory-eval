@@ -4,11 +4,29 @@ kind: behavioral
 title: Produce the specified monthly lending report
 source:
   graph_node: document:legacy/docs/reports-spec.md
-  location: legacy/docs/reports-spec.md:1-9
+  location: legacy/docs/reports-spec.md:4-7
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication
+    - src.reports.management.commands.monthly_report.Command
+    - src.reports.repository.DjangoReportLoanRepository
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - tests/reports/test_services.py::test_monthly_report_groups_prior_month_loans_and_orders_by_fees_then_member
+  - tests/reports/test_command.py::test_monthly_report_command_outputs_previous_month_as_csv
+  - .migration/evidence/runs/LL-05.md
+rules:
+  - id: prior-month-window
+    rule: Include only loans started in the previous calendar month.
+    source: legacy/docs/reports-spec.md:4-5
+  - id: member-aggregates
+    rule: Report each member's loans started, late returns, and late fee cents; omit members without loans started in the month.
+    source: legacy/docs/reports-spec.md:5,7
+  - id: fee-order
+    rule: Sort rows by total late fees descending, then member id.
+    source: legacy/docs/reports-spec.md:6
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
