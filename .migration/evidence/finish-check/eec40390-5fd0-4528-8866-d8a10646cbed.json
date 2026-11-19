@@ -1,0 +1,33 @@
+[
+  {
+    "at": "2026-11-19T13:59:19Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 23723,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/ea140fa7-019b-4ea6-8b62-ea6a8f928192.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-migrator.yaml",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
