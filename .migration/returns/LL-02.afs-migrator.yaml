@@ -1,0 +1,60 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1708
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1713
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 8.0
+  mutation_changed: 0.968
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN must be present and nonblank (including whitespace-only values) before creating a loan.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation.py::test_lending_rejects_missing_or_blank_fields
+    enforced: true
+    ledger_rule: required-fields
+  - capability: loan.lend
+    rule: Nonblank member and ISBN values are stored exactly as provided; validation does not trim them.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation.py::test_lending_use_case_uses_the_next_id_and_supplied_local_date
+    enforced: true
+    ledger_rule: preserve-values
+  - capability: loan.lend
+    rule: A successful loan receives the next L<count+1> id and the lending date supplied by the server-local clock.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation.py::test_lending_use_case_uses_the_next_id_and_supplied_local_date
+    enforced: true
+    ledger_rule: next-id-and-date
+  - capability: loan.return-date
+    rule: A first return persists the date supplied to the return use case.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_stores_the_supplied_date
+    enforced: true
+    ledger_rule: first-return-date
+  - capability: loan.return-date
+    rule: A returned loan cannot be returned again; the original returnedOn date must remain unchanged.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeated_return_without_changing_the_date
+    enforced: true
+    ledger_rule: immutable-return-date
+  - capability: loan.return
+    rule: A return is allowed only for an existing loan.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan
