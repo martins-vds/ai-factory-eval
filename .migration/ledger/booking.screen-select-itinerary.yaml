@@ -14,5 +14,14 @@ characterization_tier: A
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "This page contains only an empty-route state; the populated candidate table is in route.xhtml. With candidates present, its body is blank (.migration/quirks/booking-select-itinerary-blank-with-candidates.md). No named JUnit class exercises the page."
+  - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_populated_candidates"
+  - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_shows_no_route_guidance_when_candidates_are_empty"
+  - ".migration/evidence/runs/BK-05F.md"
+target:
+  components:
+    - src.cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/route_selection.html
+status: migrated
+no_rules: "This screen displays eligible candidates or no-route guidance; candidate eligibility is enforced by CargoRouting."
+notes: "Ruling #252 approves rendering candidate routes when present. The screen now renders the same candidate itineraries as the route page and retains the characterized empty-state guidance."
 quirks: [martins-vds/ai-factory-pilot-target#252]
