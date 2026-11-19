@@ -1,0 +1,11 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1544
+phase: 0
+decisions:
+  - "Detected source Java 17/Maven/JAX-RS/JPA-Hibernate/H2 and target Python 3.13/Django 5/templates/PostgreSQL 17; see .migration/profile.yaml."
+  - "Selected characterization tier A from a successful build, app launch, and HTTP endpoint probes; exact observations are in .migration/references/characterization.md."
+  - "Applied the operator-approved data-migration waiver from martins-vds/ai-factory-synthetic-target#20."
+dispatched: []
+awaiting_human: []
+next_step: "Dispatcher runs bootstrap.py step 5 using .migration/profile.yaml, .migration/capabilities.yaml, and stacks/java-to-django.json; scaffolding follows."
