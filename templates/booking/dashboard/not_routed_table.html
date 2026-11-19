@@ -37,12 +37,14 @@
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-target="#booking-dialog-content"
                 hx-on::after-request="document.getElementById('booking-dialog').showModal()"
+                class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100"
               >Change destination</a>
               <a
                 href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-target="#booking-dialog-content"
                 hx-on::after-request="document.getElementById('booking-dialog').showModal()"
+                class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100"
               >Change deadline</a>
             </td>
           </tr>
@@ -51,7 +53,11 @@
     </table>
   </div>
 </section>
-<dialog id="booking-dialog" aria-labelledby="dialog-title">
+<dialog
+  id="booking-dialog"
+  class="w-full max-w-3xl rounded-box rounded-lg border border-base-300 border-slate-300 bg-white p-6 shadow-sm"
+  aria-labelledby="dialog-title"
+>
   <div
     id="booking-dialog-content"
     hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
