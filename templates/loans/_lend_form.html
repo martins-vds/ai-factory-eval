@@ -1,0 +1,25 @@
+<form id="loan-form" method="post" action="/ui/loans/new/"
+      hx-post="/ui/loans/new/" hx-target="#loan-form" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <label class="form-control" for="id_member">
+        <span class="label-text">Member</span>
+        {{ form.member }}
+        {% for error in form.member.errors %}
+        <span class="text-[#a94e37]">{{ error }}</span>
+        {% endfor %}
+      </label>
+      <label class="form-control" for="id_isbn">
+        <span class="label-text">ISBN</span>
+        {{ form.isbn }}
+        {% for error in form.isbn.errors %}
+        <span class="text-[#a94e37]">{{ error }}</span>
+        {% endfor %}
+      </label>
+      <div class="card-actions">
+        <button class="btn btn-primary" type="submit">Lend book</button>
+      </div>
+    </div>
+  </div>
+</form>
