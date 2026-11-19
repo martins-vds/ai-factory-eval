@@ -1,0 +1,34 @@
+role: afs-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#1613
+pr: martins-vds/ai-factory-eval#1619
+specialty: data
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.949
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05D.md
+specialty_evidence:
+  - .migration/evidence/runs/DM-05D.md
+  - .migration/evidence/mutants/DM-05D.md
+  - tests/data_migration/test_export.py
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
+equivalent_mutants:
+  - >-
+    exporter.py:39 #17, `and` → `or`: no proxy models are registered in this project, so the model
+    index is unchanged.
+  - >-
+    exporter.py:68 #43 and :69 #44: the PostgreSQL target uses `USE_TZ=True` and `TIME_ZONE='UTC'`;
+    timestamp fields queried by Django are already timezone-aware in UTC.
+  - >-
+    exporter.py:94 #63, `chunk_size=1000` → `1001`: only queryset batching changes; exported rows
+    and their order are unchanged.
