@@ -1,5 +1,6 @@
 import csv
 import hashlib
+import itertools
 import json
 import shutil
 from dataclasses import replace
@@ -9,7 +10,6 @@ import pytest
 from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
-from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.models import CargoRecord, LegRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
@@ -174,7 +174,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
         assert len(legs) >= 2
         assert all(
             current.unload_location_id == following.load_location_id
-            for current, following in zip(legs, legs[1:])
+            for current, following in itertools.pairwise(legs)
         )
 
 
@@ -205,5 +205,5 @@ def test_loaded_voyage_carrier_movements_are_in_schedule_order(tmp_path):
         assert all(
             current.arrival_time <= following.departure_time
             and current.arrival_location_id == following.departure_location_id
-            for current, following in zip(movements, movements[1:])
+            for current, following in itertools.pairwise(movements)
         )
