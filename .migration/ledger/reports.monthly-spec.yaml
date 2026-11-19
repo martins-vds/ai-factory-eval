@@ -16,7 +16,7 @@ status: migrated
 verification: spec-derived
 characterization_tier: C
 evidence:
-  - tests/reports/test_services.py::test_monthly_report_groups_prior_month_loans_and_orders_by_fees_then_member
+  - tests/reports/test_monthly_report_services.py::test_monthly_report_groups_prior_month_loans_and_orders_by_fees_then_member
   - tests/reports/test_command.py::test_monthly_report_command_outputs_previous_month_as_csv
   - .migration/evidence/runs/LL-05.md
 rules:

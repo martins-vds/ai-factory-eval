@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 from collections.abc import Iterable
+from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Protocol
 
@@ -63,8 +63,5 @@ class MonthlyReportApplication:
             fee = self.fees.fee_for(loan.id)
             totals[2] += fee.amount_cents if fee else 0
 
-        rows = [
-            MonthlyReportRow(member_id, *totals)
-            for member_id, totals in members.items()
-        ]
+        rows = [MonthlyReportRow(member_id, *totals) for member_id, totals in members.items()]
         return sorted(rows, key=lambda row: (-row.late_fees_cents, row.member_id))

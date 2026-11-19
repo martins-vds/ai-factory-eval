@@ -43,6 +43,7 @@ def test_monthly_report_groups_prior_month_loans_and_orders_by_fees_then_member(
         [
             Loan('L1', 'Alice', date(2026, 2, 1), date(2026, 2, 18)),
             Loan('L2', 'Alice', date(2026, 2, 1)),
+            Loan('L7', 'Alice', date(2026, 2, 1), date(2026, 2, 15)),
             Loan('L3', 'Charlie', date(2026, 2, 1), date(2026, 3, 4)),
             Loan('L4', 'Bob', date(2026, 2, 1), date(2026, 2, 10)),
             Loan('L5', 'Excluded', date(2026, 1, 31), date(2026, 2, 20)),
@@ -56,10 +57,9 @@ def test_monthly_report_groups_prior_month_loans_and_orders_by_fees_then_member(
     rows = application.generate()
 
     assert [
-        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents)
-        for row in rows
+        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents) for row in rows
     ] == [
-        ('Alice', 2, 1, 425),
+        ('Alice', 3, 1, 425),
         ('Charlie', 1, 1, 425),
         ('Bob', 1, 0, 0),
     ]

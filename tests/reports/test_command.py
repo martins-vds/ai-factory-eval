@@ -40,6 +40,5 @@ def test_monthly_report_command_outputs_previous_month_as_csv():
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,late_fees_cents\n'
-        '"Member, One",1,1,75\n'
+        'member_id,loans_started,late_returns,late_fees_cents\n"Member, One",1,1,75\n'
     )
