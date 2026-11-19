@@ -126,6 +126,19 @@ def test_fee_page_payment_shows_gateway_failure_fragment(client, payment_gateway
     assert b'declined' in response.content
 
 
+@pytest.mark.django_db
+def test_fee_and_payment_routes_enforce_http_methods(client, payment_gateway):
+    assert client.get('/fees/L3').status_code == 200
+    assert client.post('/fees/L3').status_code == 405
+    assert client.post('/payments/L1').status_code == 200
+    assert client.get('/payments/L1').status_code == 405
+
+    assert client.get('/ui/fees/L3/').status_code == 200
+    assert client.post('/ui/fees/L3/').status_code == 405
+    assert client.post('/ui/payments/L1/').status_code == 200
+    assert client.get('/ui/payments/L1/').status_code == 405
+
+
 def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monkeypatch):
     def interrupt(_request):
         raise InterruptedError('request interrupted')
