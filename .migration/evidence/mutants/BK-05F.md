@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `5ec4a4b699c3194294e74243c50dea12b0e76163`): score 0.912, threshold 0.8, killed 52, survived 5. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `5ec4a4b699c3194294e74243c50dea12b0e76163`): score 0.947, threshold 0.8, killed 54, survived 3. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:65 Mutant #21`
 
@@ -39,32 +39,5 @@ Written by `afs-mutation` on its last run (base `5ec4a4b699c3194294e74243c50dea1
            if request.method == 'POST':
                stored_candidates = request.session.get(session_key)
                try:
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:86 Mutant #41`
-
-  ```diff
-  @@ -83,7 +83,7 @@
-                   del request.session[session_key]
-                   return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
-  -            selection_error = 'Select one of the available itineraries.'
-  +            selection_error = 'XXSelect one of the available itineraries.XX'
-               if stored_candidates is None:
-                   candidates = cargo_routing.route_candidates(cargo.tracking_id)
-                   request.session[session_key] = [
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:102 Mutant #48`
-
-  ```diff
-  @@ -99,7 +99,7 @@
-               request,
-               template_name,
-               {
-  -                'cargo': cargo,
-  +                'XXcargoXX': cargo,
-                   'candidates': candidates,
-                   'candidate_count': len(candidates),
-                   'selection_error': selection_error,
   ```
 
