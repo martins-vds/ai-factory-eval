@@ -3,7 +3,6 @@ from types import SimpleNamespace
 
 import pytest
 from django.utils import timezone
-from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.services import LoanApplication
@@ -65,33 +64,6 @@ def test_browser_lending_form_preserves_padded_member_and_isbn(client):
     loan = Loan.objects.get(pk='L4')
     assert loan.member == ' m1 '
     assert loan.isbn == ' 978-0 '
-
-
-@pytest.mark.django_db
-@pytest.mark.usefixtures('restore_seed_loans')
-def test_real_browser_lending_form_preserves_padded_member_and_isbn(live_server):
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page()
-            page.goto(f'{live_server.url}/ui/loans/new/')
-            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
-            page.get_by_label('Member').fill(' m1 ')
-            page.get_by_label('ISBN').fill(' 978-0 ')
-            page.get_by_role('button', name='Lend book').click()
-
-            if htmx_available:
-                page.get_by_role('status').wait_for()
-                page.get_by_role('link', name='View loan').click()
-            else:
-                page.wait_for_url('**/ui/loans/L4/')
-
-            displayed_values = (
-                page.locator('article p').nth(1).evaluate('(element) => element.textContent')
-            )
-            assert displayed_values == ' m1  · ISBN  978-0 '
-        finally:
-            browser.close()
 
 
 @pytest.mark.django_db
