@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from datetime import UTC, date, datetime, time
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
@@ -37,11 +38,7 @@ def create_destination_dialog_view(
         ]
         destination_value = request.POST.get('destination', '')
         selected_destination = next(
-            (
-                location
-                for location in destinations
-                if location.unlocode.value == destination_value
-            ),
+            (location for location in destinations if location.unlocode.value == destination_value),
             None,
         )
         destination_error = ''
@@ -75,3 +72,47 @@ def create_destination_dialog_view(
         )
 
     return destination_dialog
+
+
+def create_deadline_dialog_view(
+    specification: CargoSpecification,
+    cargo_dashboard: CargoDashboard,
+) -> Callable[[HttpRequest, str], HttpResponse]:
+    def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
+        cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
+        if cargo is None:
+            return _not_found(request, tracking_id)
+
+        deadline_value = request.POST.get(
+            'arrival_deadline',
+            cargo.route_specification.arrival_deadline.date().isoformat(),
+        )
+        deadline_error = ''
+        if request.method == 'POST':
+            try:
+                arrival_date = date.fromisoformat(deadline_value)
+            except ValueError:
+                deadline_error = 'Enter a valid arrival deadline.'
+            else:
+                try:
+                    specification.change_deadline(
+                        TrackingId(tracking_id),
+                        datetime.combine(arrival_date, time.min, tzinfo=UTC),
+                    )
+                except LookupError:
+                    return _not_found(request, tracking_id)
+                response = HttpResponse()
+                response['HX-Redirect'] = '/admin/dashboard/'
+                return response
+
+        return render(
+            request,
+            'booking/dialogs/deadline.html',
+            {
+                'cargo': cargo,
+                'deadline_value': deadline_value,
+                'deadline_error': deadline_error,
+            },
+        )
+
+    return deadline_dialog

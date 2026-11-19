@@ -1,0 +1,37 @@
+<section aria-labelledby="deadline-dialog-title">
+  <h2 id="deadline-dialog-title" class="mb-4 text-xl font-semibold text-gray-900">Change arrival deadline</h2>
+  <dl class="mb-4 grid grid-cols-2 gap-2">
+    <dt class="font-medium">Origin</dt>
+    <dd>{{ cargo.route_specification.origin.name }}</dd>
+    <dt class="font-medium">Destination</dt>
+    <dd>{{ cargo.route_specification.destination.name }}</dd>
+  </dl>
+  <form
+    method="post"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-target="#cargo-edit-dialog"
+    hx-swap="innerHTML"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+  >
+    {% csrf_token %}
+    <div class="mb-4">
+      <label for="arrival-deadline" class="mb-1 block font-medium">Arrival deadline</label>
+      <input
+        id="arrival-deadline"
+        name="arrival_deadline"
+        type="date"
+        value="{{ deadline_value }}"
+        class="input input-bordered w-full"
+        {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+        required
+      >
+      {% if deadline_error %}
+        <p id="deadline-error" class="mt-1 text-sm text-red-700" role="alert">{{ deadline_error }}</p>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+  <form method="dialog" class="mt-2">
+    <button type="submit" class="btn btn-ghost">Cancel</button>
+  </form>
+</section>
