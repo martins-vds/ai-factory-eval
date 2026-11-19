@@ -1,0 +1,54 @@
+<dialog
+  open
+  aria-labelledby="change-destination-title"
+  class="modal fixed inset-0 z-50 m-auto w-full max-w-lg bg-transparent p-0 backdrop:bg-black/50"
+>
+  <div class="modal-box w-[calc(100%-2rem)] max-w-lg rounded-lg bg-white p-6 shadow-xl">
+    <h2 id="change-destination-title" class="mb-4 text-xl font-semibold text-slate-900">Change destination</h2>
+    <p class="mb-4 text-slate-700">
+      Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}
+      ({{ cargo.route_specification.origin.unlocode.value }}) currently goes to
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }}).
+    </p>
+    <form
+      id="change-destination-form"
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog-container"
+      hx-swap="innerHTML"
+      class="flex flex-col gap-5"
+    >
+      {% csrf_token %}
+      <div>
+        <label class="label mb-1 block font-medium text-slate-800" for="destination">New destination</label>
+        <select
+          class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-blue-600"
+          id="destination"
+          name="destination"
+          required
+          aria-describedby="destination-help{% if error %} destination-error{% endif %}"
+          {% if error %}aria-invalid="true"{% endif %}
+        >
+          <option value="" {% if not destination_value %}selected{% endif %}>Choose a destination</option>
+          {% for location in destinations %}
+            <option value="{{ location.unlocode.value }}" {% if location.unlocode.value == destination_value %}selected{% endif %}>
+              {{ location.name }} ({{ location.unlocode.value }})
+            </option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-sm text-slate-600" id="destination-help">Choose a destination other than the origin or current destination.</p>
+        {% if error %}
+          <p class="mt-2 text-red-700" id="destination-error">{{ error }}</p>
+        {% endif %}
+      </div>
+    </form>
+    <div class="mt-5 flex justify-end gap-3">
+      <form method="dialog">
+        <button class="btn btn-ghost min-h-11 rounded-md px-4 py-2 font-semibold text-slate-800 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-600" type="submit">Cancel</button>
+      </form>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit" form="change-destination-form">Update</button>
+    </div>
+  </div>
+</dialog>
