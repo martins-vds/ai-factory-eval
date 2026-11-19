@@ -1,0 +1,42 @@
+role: afs-migrator
+ticket: DM-05F
+issue: martins-vds/ai-factory-eval#1566
+pr: martins-vds/ai-factory-eval#1567
+specialty: data
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 'n/a: no mutable code changed'
+  regression: 0
+specialty_evidence:
+  - .migration/evidence/runs/DM-05F.md
+  - tests/data_migration/test_invariants.py
+evidence_logs:
+  - .migration/evidence/runs/DM-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: cargo delivery state
+    rule: Stored delivery fields equal the state re-derived from the cargo handling history.
+    use_case: load_data_snapshot
+    test: tests/data_migration/test_invariants.py::test_loaded_cargo_delivery_state_matches_its_handling_history
+    enforced: true
+  - capability: itinerary
+    rule: Consecutive itinerary legs connect at the same location.
+    use_case: load_data_snapshot
+    test: tests/data_migration/test_invariants.py::test_loaded_itinerary_legs_connect
+    enforced: true
+  - capability: handling events
+    rule: Every handling event references an existing voyage and location.
+    use_case: load_data_snapshot
+    test: tests/data_migration/test_invariants.py::test_loaded_handling_events_reference_existing_voyages_and_locations
+    enforced: true
+  - capability: carrier movement schedule
+    rule: Carrier movements do not overlap and are ordered by departure.
+    use_case: load_data_snapshot
+    test: tests/data_migration/test_invariants.py::test_loaded_carrier_movement_schedules_are_ordered
+    enforced: true
