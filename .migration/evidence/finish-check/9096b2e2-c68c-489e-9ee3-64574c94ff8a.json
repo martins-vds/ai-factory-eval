@@ -60,5 +60,36 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T00:03:59Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 30908,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-08",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/9096b2e2-c68c-489e-9ee3-64574c94ff8a.json",
+      ".migration/evidence/runs/LL-08.md",
+      ".migration/handoffs/LL-08.md",
+      ".migration/returns/LL-08.afs-migrator.yaml",
+      "templates/base.html",
+      "tests/fixtures/htmx-2.0.11.min.js",
+      "tests/test_htmx_errors.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
   }
 ]
