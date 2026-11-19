@@ -7,14 +7,25 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_destination_dialog_view
+    - templates/booking/dialogs/destination.html
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_route_and_excludes_origin_and_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_options_remain_stable_across_renders"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_origin_or_current_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_through_specification_and_refreshes_dashboard"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "The dialog filters selectable destinations as UI state; route-specification invariants are owned by booking.destination-change."
+notes: "The current destination and origin are excluded without mutating the backing list per #235. Updates use CargoSpecification, refresh the dashboard, preserve the other route fields, and omit the unavailable-widget warning per #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
