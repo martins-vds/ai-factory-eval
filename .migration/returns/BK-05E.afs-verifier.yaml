@@ -1,0 +1,45 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1600
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 0
+mutation_survivors: The only BK-05E survivor changes the internal Http404 message; the default 404 response is unaffected. All other survivors are in wizard or data-export code outside this ticket.
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:7
+    what: Dashboard and detail views access the repository directly instead of using the application layer, violating ADR-0001; the layer gate fails on this import.
+    evidence: "run: idiom-layers"
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_cargo_details_render_route_fields_and_itinerary
+  - tests/booking/interfaces/test_cargo_details.py::test_unrouted_cargo_details_link_to_route_selection
+  - tests/booking/interfaces/test_cargo_details.py::test_misdirected_cargo_details_offer_reroute_action
+ledger_issues:
+  - .migration/ledger/booking.screen-dashboard.yaml says no admin-live-map.* entries existed, but those entries were present in the assessed target snapshot ae7d33523ff04917f29de68e464100c467affc89; update the note or clarify its snapshot context.
+quirk_tickets:
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/232
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/233
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/237
+inherited:
+  - where: templates/booking/wizard/_deadline_form.html:5
+    what: The earlier BK-05D htmx form does not configure handling for 4xx/5xx responses.
+    origin: martins-vds/ai-factory-pilot-target#291
+    evidence: "run: idiom-ui"
+rules: []
+no_rules:
+  booking.dashboard-chain: Static dashboard composition; this capability carries no business rule.
+  booking.dashboard-filters: Presentation grouping of cargo by state; no business rule is defined by this capability.
+  booking.screen-dashboard: Static screen composition and table ordering; no business rule.
+  booking.screen-routed-table: Renders routed cargo data; no business rule.
+  booking.screen-not-routed-table: Renders unrouted cargo and navigation; action behavior is covered by the later BK-05G capability.
+  booking.screen-claimed-table: Renders claimed-cargo data and its details link; no business rule.
+  booking.screen-cargo-details: Displays cargo data and state-dependent links; no business rule.
+  booking.cargo-not-found: Maps an absent cargo lookup to an HTTP 404 response; this is boundary behavior, not a business rule.
