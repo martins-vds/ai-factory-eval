@@ -45,6 +45,7 @@
       "hook.end": [
         "hookInvocationId",
         "hookType",
+        "output",
         "parentToolCallId",
         "success"
       ],
@@ -236,35 +237,35 @@
       ]
     },
     "event_types": {
-      "assistant.message": 334,
-      "assistant.turn_end": 196,
-      "assistant.turn_start": 196,
+      "assistant.message": 350,
+      "assistant.turn_end": 205,
+      "assistant.turn_start": 205,
       "external_tool.completed": 2,
       "external_tool.requested": 2,
-      "hook.end": 627,
-      "hook.start": 628,
-      "permission.completed": 304,
-      "permission.requested": 304,
+      "hook.end": 652,
+      "hook.start": 653,
+      "permission.completed": 315,
+      "permission.requested": 315,
       "session.compaction_complete": 1,
       "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 196,
-      "skill.context_delivered_ref": 19,
-      "skill.invoked": 12,
+      "session.usage_record": 205,
+      "skill.context_delivered_ref": 20,
+      "skill.invoked": 13,
       "skill.invoked_ref": 7,
       "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 350,
-      "tool.execution_start": 350,
-      "user.message": 3
+      "tool.execution_complete": 361,
+      "tool.execution_start": 361,
+      "user.message": 4
     },
-    "events": 3545,
+    "events": 3685,
     "usage_fields": []
   },
-  "ended_at": "2026-11-19T18:55:34.020Z",
+  "ended_at": "2026-11-19T18:57:33.068Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -347,11 +348,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 334
+      "requests": 350
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-19T18:56:03+00:00",
+  "recorded_at": "2026-11-19T18:58:01+00:00",
   "schema": "afs-cost/1",
   "session_id": "62ce1e9d-cb88-4636-b5e7-666a49fda9ee",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -359,6 +360,10 @@
     {
       "count": 1,
       "skill": "afs-evidence"
+    },
+    {
+      "count": 1,
+      "skill": "afs-handoff"
     },
     {
       "count": 1,
