@@ -1,0 +1,10 @@
+role: afs-characterizer
+ticket: BL-02
+issue: martins-vds/ai-factory-eval#1550
+tier_used: null
+suite: null
+predicted_vs_observed: null
+ledger_updated: null
+quirk_tickets: []
+review_only_requests: []
+handoff: .migration/handoffs/BL-02.md
