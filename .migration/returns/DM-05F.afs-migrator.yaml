@@ -1,7 +1,7 @@
 role: afs-migrator
 ticket: DM-05F
 issue: martins-vds/ai-factory-eval#1566
-pr: null
+pr: martins-vds/ai-factory-eval#1567
 specialty: data
 gates:
   build: 0
