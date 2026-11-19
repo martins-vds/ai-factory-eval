@@ -180,6 +180,7 @@ def test_new_loan_page_offers_an_htmx_lending_form(client):
     assert response.status_code == 200
     assert catalog.status_code == 200
     assert b'href="/ui/loans/new/"' in catalog.content
+    assert b'Loan L1' in catalog.content
     assert b'hx-post="/ui/loans/"' in response.content
     assert b'name="member"' in response.content
     assert b'name="isbn"' in response.content
@@ -190,7 +191,13 @@ def test_new_loan_page_offers_an_htmx_lending_form(client):
 @pytest.mark.parametrize(
     ('fields', 'error_id', 'retained_value'),
     [
+        ({'member': '', 'isbn': '123'}, 'member-error', b'value="123"'),
         ({'member': ' \t', 'isbn': '123'}, 'member-error', b'value="123"'),
+        (
+            {'member': 'reader', 'isbn': ''},
+            'isbn-error',
+            b'value="reader"',
+        ),
         (
             {'member': 'reader', 'isbn': ' \t'},
             'isbn-error',
@@ -215,6 +222,7 @@ def test_htmx_lending_form_renders_field_errors(
     assert f'id="{error_id}" role="alert"'.encode() in response.content
     assert b'This field is required.' in response.content
     assert retained_value in response.content
+    assert b'value="XXXX"' not in response.content
 
 
 @pytest.mark.django_db
@@ -228,6 +236,7 @@ def test_full_page_lending_form_renders_field_errors(client):
     assert b'<!doctype html>' in response.content
     assert b'id="member-error" role="alert"' in response.content
     assert b'This field is required.' in response.content
+    assert b'value="XXXX"' not in response.content
     assert Loan.objects.count() == 3
 
 
@@ -299,15 +308,22 @@ def test_htmx_return_renders_unknown_and_repeat_errors(client):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ('method', 'path'),
+    ('method', 'path', 'allowed_methods'),
     [
-        ('put', '/ui/loans/'),
-        ('post', '/ui/loans/new/'),
-        ('get', '/loans/L1/return'),
-        ('get', '/ui/loans/L1/return/'),
+        ('put', '/loans', 'GET, POST'),
+        ('put', '/ui/loans/', 'GET, POST'),
+        ('post', '/ui/loans/new/', 'GET'),
+        ('get', '/loans/L1/return', 'POST'),
+        ('get', '/ui/loans/L1/return/', 'POST'),
     ],
 )
-def test_loan_routes_reject_unsupported_methods(client, method, path):
+def test_loan_routes_reject_unsupported_methods(
+    client,
+    method,
+    path,
+    allowed_methods,
+):
     response = getattr(client, method)(path)
 
     assert response.status_code == 405
+    assert response['Allow'] == allowed_methods
