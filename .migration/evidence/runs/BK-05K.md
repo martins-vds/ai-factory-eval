@@ -56,3 +56,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T00:00:01+00:00 | lint-ruling-final | 0 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `de130d5f38e219d6` |  |  |
 | 2026-11-19T00:00:01+00:00 | ui-all-ruling-final | 0 | 0.29 | `python .migration/harness/tools/check_ui.py --all` | `0cb805740bfb2d16` |  | gate=ui scope="every template" templates=21 findings=0 |
 | 2026-11-19T00:00:05+00:00 | focused-ruling-final | 0 | 4.7 | `pytest -q tests/test_htmx_errors.py tests/cargo/interfaces/test_admin_live_map_markers.py tests/cargo/test_tracking.py` | `ac996c6dbbf1d588` |  |  |
+| 2026-11-19T02:20:31+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
