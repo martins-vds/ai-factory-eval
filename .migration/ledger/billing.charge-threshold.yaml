@@ -1,0 +1,15 @@
+id: billing.charge-threshold
+kind: behavioral
+title: Decide whether an invoice is chargeable
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+boundary: "An invoice total of at least $1.00 is chargeable; a lower total is carried over."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1617]
+status: pending
+verification: pending
+rules:
+  - id: minimum-charge
+    rule: A total below $1.00 is not charged, while a total of exactly $1.00 or more is chargeable.
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+quirks: []

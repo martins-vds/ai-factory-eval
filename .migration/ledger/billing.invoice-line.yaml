@@ -1,0 +1,16 @@
+id: billing.invoice-line
+kind: behavioral
+title: Validate invoice line amounts
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceLine.java:5-11
+boundary: "Creating an invoice line rejects a negative amount with IllegalArgumentException; nonnegative amounts are retained."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1617]
+status: pending
+verification: pending
+rules:
+  - id: reject-negative-amount
+    rule: An invoice line with a negative amount is rejected with IllegalArgumentException.
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
+quirks: []
+notes: "The null-amount behavior is captured in .migration/quirks/billing-null-invoice-amount.md pending creation of its tracker issue."

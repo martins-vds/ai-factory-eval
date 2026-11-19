@@ -1,0 +1,21 @@
+id: billing.invoice-total
+kind: behavioral
+title: Calculate invoice totals
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:7-25
+boundary: "InvoiceCalculator.total sums late fees, caps their sum at $25.00, adds a $3.00 monthly fee only for members, then adds 5% tax rounded half-up once to cents."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1617]
+status: pending
+verification: pending
+rules:
+  - id: cap-monthly-late-fees
+    rule: The sum of late fees is capped at $25.00 per invoice; the cap does not include the membership fee.
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:18-22
+  - id: add-member-fee
+    rule: A member's invoice includes a $3.00 monthly fee; a nonmember's invoice does not.
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9,22
+  - id: calculate-tax
+    rule: Tax is 5% of the subtotal, rounded half-up to two decimal places once, and the final total has scale two.
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:10,23-24
+quirks: []

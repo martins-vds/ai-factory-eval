@@ -1,0 +1,19 @@
+id: billing.monthly-run
+kind: behavioral
+title: Process a monthly billing run
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-31
+boundary: "BillingJob.run processes each member entry in map iteration order, calculates a member invoice, charges chargeable totals, and prints either the charge reference or a carry-over message."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1617]
+status: pending
+verification: pending
+rules:
+  - id: process-each-member
+    rule: Each map entry is processed in iteration order and its invoice is calculated as a member invoice.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-17
+  - id: report-charge-outcome
+    rule: Chargeable totals are charged and printed with the returned reference; lower totals are printed as carried over without a card charge.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
+quirks: []
+notes: "Quirk drafts .migration/quirks/billing-hardcoded-main-input.md and .migration/quirks/billing-decline-aborts-batch.md need tracker issues before their references can be added here."

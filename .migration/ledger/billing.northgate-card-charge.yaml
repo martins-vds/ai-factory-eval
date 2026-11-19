@@ -1,0 +1,22 @@
+id: billing.northgate-card-charge
+kind: integration
+title: Charge a member card through Northgate
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:26-28; legacy-billing/src/main/java/billing/CardVault.java:8-22
+boundary: "BillingJob.main reads Northgate credentials from the environment; CardVault sends the member ID and exact whole-cent amount to Northgate in USD, returns an approved charge reference, and throws IllegalStateException when declined."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1617]
+status: pending
+verification: pending
+rules:
+  - id: charge-in-usd-cents
+    rule: The amount is converted to an exact integer number of cents and sent to Northgate with currency USD.
+    source: legacy-billing/src/main/java/billing/CardVault.java:16-17
+  - id: reject-declined-charge
+    rule: A declined charge throws IllegalStateException containing the member ID and decline reason; an approved charge returns its reference.
+    source: legacy-billing/src/main/java/billing/CardVault.java:18-21
+  - id: configure-vault-credentials
+    rule: The executable entry point reads NORTHGATE_MERCHANT and NORTHGATE_KEY from the environment and supplies them to CardVault.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:26-28
+quirks: []
+notes: "The batch effect of an uncaught declined-charge exception is captured in .migration/quirks/billing-decline-aborts-batch.md pending creation of its tracker issue."
