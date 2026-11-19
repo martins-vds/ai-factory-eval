@@ -50,16 +50,16 @@ def create_booking_dialog_views(
             for location in list_shipping_locations()
             if location not in {specification.origin, specification.destination}
         ]
-        destination_error = ''
+        context = {'cargo': cargo, 'destinations': destinations}
 
         if request.method == 'POST':
-            selected_code = request.POST.get('destination', '')
+            selected_code = request.POST.get('destination')
             destination = next(
                 (location for location in destinations if location.unlocode.value == selected_code),
                 None,
             )
             if destination is None:
-                destination_error = 'Select a valid destination.'
+                context['destination_error'] = 'Select a valid destination.'
             else:
                 try:
                     cargo_specification.change_destination(cargo.tracking_id, destination)
@@ -70,11 +70,7 @@ def create_booking_dialog_views(
         return render(
             request,
             'booking/dialogs/destination.html',
-            {
-                'cargo': cargo,
-                'destinations': destinations,
-                'destination_error': destination_error,
-            },
+            context,
         )
 
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
@@ -83,14 +79,14 @@ def create_booking_dialog_views(
 
         cargo = find_cargo(tracking_id)
         deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
-        deadline_error = ''
+        context = {'cargo': cargo, 'deadline_value': deadline_value}
 
         if request.method == 'POST':
             deadline_value = request.POST.get('deadline', '')
             try:
                 deadline = date.fromisoformat(deadline_value)
             except ValueError:
-                deadline_error = 'Enter a valid arrival deadline.'
+                context['deadline_error'] = 'Enter a valid arrival deadline.'
             else:
                 try:
                     cargo_specification.change_deadline(
@@ -100,11 +96,12 @@ def create_booking_dialog_views(
                 except LookupError as error:
                     raise Http404(str(error)) from error
                 return update_response(request)
+            context['deadline_value'] = deadline_value
 
         return render(
             request,
             'booking/dialogs/deadline.html',
-            {'cargo': cargo, 'deadline_value': deadline_value, 'deadline_error': deadline_error},
+            context,
         )
 
     return destination_dialog, deadline_dialog

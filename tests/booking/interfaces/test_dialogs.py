@@ -2,6 +2,7 @@ import re
 
 import pytest
 from django.core.management import call_command
+from django.http import Http404
 from django.template.loader import render_to_string
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -47,10 +48,13 @@ def test_destination_dialog_shows_current_values_and_keeps_filtered_options_stab
     assert locations == original_locations
     for response in responses:
         content = response.content.decode()
-        options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
+        options = re.search(
+            r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL
+        )
         assert response.status_code == 200
         assert 'Hong Kong' in content and 'CNHKG' in content
         assert 'Melbourne' in content and 'AUMEL' in content
+        assert 'destination-error' not in content
         assert options is not None
         assert 'value="CNHKG"' not in options.group(1)
         assert 'value="AUMEL"' not in options.group(1)
@@ -84,6 +88,12 @@ def test_destination_update_preserves_other_route_fields_and_refreshes_not_route
     assert unchanged is not None
     assert unchanged.route_specification == cargo.route_specification
 
+    missing_response = destination_view(
+        RequestFactory().post('/admin/cargo/DEF789/destination/', {}),
+        'DEF789',
+    )
+    assert 'Select a valid destination.' in missing_response.content.decode()
+
     response = destination_view(
         RequestFactory().post(
             '/admin/cargo/DEF789/destination/',
@@ -101,7 +111,19 @@ def test_destination_update_preserves_other_route_fields_and_refreshes_not_route
     assert updated is not None
     assert updated.route_specification.origin == cargo.route_specification.origin
     assert updated.route_specification.destination.unlocode.value == 'USNYC'
-    assert updated.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline == cargo.route_specification.arrival_deadline
+    )
+
+    redirect_response = destination_view(
+        RequestFactory().post(
+            '/admin/cargo/DEF789/destination/',
+            {'destination': 'USDAL'},
+        ),
+        'DEF789',
+    )
+    assert redirect_response.status_code == 302
+    assert redirect_response.url == '/admin/dashboard/'
 
 
 @pytest.mark.django_db
@@ -125,6 +147,7 @@ def test_deadline_dialog_reports_invalid_dates_and_updates_the_not_routed_row():
 
     assert initial_response.status_code == 200
     assert 'Hong Kong' in initial_content and 'Melbourne' in initial_content
+    assert 'deadline-error' not in initial_content
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in (
         initial_content
     )
@@ -143,6 +166,13 @@ def test_deadline_dialog_reports_invalid_dates_and_updates_the_not_routed_row():
     assert cargo_repository.find(cargo.tracking_id).route_specification.arrival_deadline == (
         cargo.route_specification.arrival_deadline
     )
+
+    missing_response = deadline_view(
+        request_factory.post('/admin/cargo/DEF789/deadline/', {}),
+        'DEF789',
+    )
+    assert 'Enter a valid arrival deadline.' in missing_response.content.decode()
+    assert 'value=""' in missing_response.content.decode()
 
     response = deadline_view(
         request_factory.post(
@@ -180,6 +210,26 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs():
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
     assert 'hx-target="#booking-dialog"' in content
     assert 'id="booking-dialog"' in content
+
+
+@pytest.mark.django_db
+def test_dialogs_return_not_found_for_unknown_cargo_and_reject_other_methods():
+    call_command('seed_sample_data')
+    cargo_repository = DjangoCargoRepository()
+    destination_view, deadline_view = create_booking_dialog_views(
+        CargoDashboard(cargo_repository),
+        CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
+        DjangoLocationRepository().find_all,
+    )
+    request_factory = RequestFactory()
+
+    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found.'):
+        destination_view(request_factory.get('/admin/cargo/MISSING1/destination/'), 'MISSING1')
+
+    for view in (destination_view, deadline_view):
+        response = view(request_factory.put('/admin/cargo/DEF789/'), 'DEF789')
+        assert response.status_code == 405
+        assert response.headers['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
