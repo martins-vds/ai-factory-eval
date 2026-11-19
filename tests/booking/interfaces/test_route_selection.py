@@ -45,8 +45,6 @@ cargo_routing = CargoRouting(
 route_selection_view = create_route_selection_view(
     cargo_routing,
     cargo_dashboard,
-    location_repository,
-    voyage_repository,
 )
 _, cargo_details_view = create_booking_views(cargo_dashboard)
 urlpatterns = [
@@ -129,9 +127,7 @@ def test_route_selection_renders_candidate_itinerary_properties_as_target_behavi
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_route_selection_shows_no_route_guidance_when_candidates_are_empty(
-    client, monkeypatch
-):
+def test_route_selection_shows_no_route_guidance_when_candidates_are_empty(client, monkeypatch):
     _seed_sample_data(monkeypatch)
 
     response = client.get('/admin/cargo/DEF789/route/')
@@ -156,9 +152,9 @@ def test_route_selection_assigns_selected_candidate_and_redirects_to_cargo_detai
     routing_service.candidates = _candidate_paths()
     route_url = '/admin/cargo/DEF789/route/'
     response = client.get(route_url)
-    token = re.search(
-        r'name="candidate_token"\s+value="([^"]+)"', response.content.decode()
-    ).group(1)
+    token = re.search(r'name="candidate_token"\s+value="([^"]+)"', response.content.decode()).group(
+        1
+    )
 
     response = client.post(route_url, {'candidate_token': token}, follow=True)
     content = response.content.decode()
