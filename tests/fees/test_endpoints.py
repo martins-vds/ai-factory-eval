@@ -126,6 +126,19 @@ def test_fee_page_payment_shows_gateway_failure_fragment(client, payment_gateway
     assert b'declined' in response.content
 
 
+@pytest.mark.django_db
+def test_fee_and_payment_routes_enforce_http_methods(client, payment_gateway):
+    assert client.get('/fees/L3').status_code == 200
+    assert client.post('/fees/L3').status_code == 405
+    assert client.post('/payments/L1').status_code == 200
+    assert client.get('/payments/L1').status_code == 405
+
+    assert client.get('/ui/fees/L3/').status_code == 200
+    assert client.post('/ui/fees/L3/').status_code == 405
+    assert client.post('/ui/payments/L1/').status_code == 200
+    assert client.get('/ui/payments/L1/').status_code == 405
+
+
 def test_interrupted_gateway_call_is_preserved_as_the_gateway_failure_cause(monkeypatch):
     def interrupt(_request):
         raise InterruptedError('request interrupted')
@@ -178,5 +191,47 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             status.wait_for()
             assert status.inner_text().strip() == 'charged'
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_renders_gateway_failure(live_server, payment_gateway):
+    payment_gateway.status = 503
+    payment_gateway.body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.set_default_timeout(1000)
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+            assert alert.inner_text().strip() == 'declined'
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_renders_unknown_loan_payment_failure(live_server, payment_gateway):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.set_default_timeout(1000)
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.locator('#payment-status form').evaluate(
+                "(form) => { form.action = '/ui/payments/unknown/'; "
+                "form.setAttribute('hx-post', '/ui/payments/unknown/'); }"
+            )
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+            assert alert.inner_text().strip() == 'no such loan'
+            assert payment_gateway.requests == []
         finally:
             browser.close()

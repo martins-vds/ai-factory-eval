@@ -1,0 +1,56 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: martins-vds/ai-factory-eval#1712
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutmut aborted all 6 changed files after the failing UI error test"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "HTMX payment 404/502 responses are ignored by default; the failure response never updates the page's payment status."
+    evidence: tests/fees/test_endpoints.py::test_real_browser_renders_unknown_loan_payment_failure
+  - severity: minor
+    where: templates/fees/payment-form.html:5
+    what: "Built Tailwind CSS omits the button's bg-[#a94e37], text-white, and hover:bg-[#873b2a] utilities, so the intended action styling is absent."
+    evidence: "run: final-idiom-ui"
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_fee_for_early_returned_loan_has_no_late_fee
+  - tests/fees/test_fee_calculation.py::test_pay_for_unknown_loan_does_not_call_gateway
+  - tests/fees/test_endpoints.py::test_fee_and_payment_routes_enforce_http_methods
+  - tests/fees/test_endpoints.py::test_real_browser_renders_gateway_failure
+  - tests/fees/test_endpoints.py::test_real_browser_renders_unknown_loan_payment_failure
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+inherited: []
+rules:
+  - capability: fees.calculation
+    rule: "Early returns cannot accrue negative late days or fees."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_early_returned_loan_has_no_late_fee
+    enforced: true
+  - capability: fees.calculation
+    rule: "Fees are waived through two days late, then accrue at 25 cents per day up to $10."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "An unknown loan has no fee."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "An unknown loan is rejected before any gateway charge."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_calculation.py::test_pay_for_unknown_loan_does_not_call_gateway
+    enforced: true
+no_rules:
+  fees.page: "The fee page is read-only presentation of fee data and has no separate business eligibility or state-transition rule."
