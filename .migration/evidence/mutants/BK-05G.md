@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05G
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.787, threshold 0.8, killed 37, survived 10. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.894, threshold 0.8, killed 42, survived 5. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/dialogs/views.py:29 Mutant #11`
 
@@ -43,47 +43,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.787, thr
                    None,
   ```
 
-- `src/cargotracker/booking/interfaces/dialogs/views.py:45 Mutant #24`
-
-  ```diff
-  @@ -42,7 +42,7 @@
-                   None,
-               )
-               if destination is None:
-  -                error = 'Select a valid destination.'
-  +                error = 'XXSelect a valid destination.XX'
-               else:
-                   cargo_specification.change_destination(TrackingId(tracking_id), destination)
-                   return _dialog_completion(request)
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:45 Mutant #25`
-
-  ```diff
-  @@ -42,7 +42,7 @@
-                   None,
-               )
-               if destination is None:
-  -                error = 'Select a valid destination.'
-  +                error = None
-               else:
-                   cargo_specification.change_destination(TrackingId(tracking_id), destination)
-                   return _dialog_completion(request)
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:53 Mutant #29`
-
-  ```diff
-  @@ -50,7 +50,7 @@
-           return render(
-               request,
-               'booking/dialogs/destination.html',
-  -            {'cargo': cargo, 'locations': locations, 'error': error},
-  +            {'cargo': cargo, 'locations': locations, 'XXerrorXX': error},
-           )
-       def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
-  ```
-
 - `src/cargotracker/booking/interfaces/dialogs/views.py:59 Mutant #32`
 
   ```diff
@@ -108,33 +67,5 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.787, thr
            if request.method == 'POST':
                deadline_value = request.POST.get('deadline', '')
                try:
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:64 Mutant #39`
-
-  ```diff
-  @@ -61,7 +61,7 @@
-           deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
-           error = ''
-           if request.method == 'POST':
-  -            deadline_value = request.POST.get('deadline', '')
-  +            deadline_value = request.POST.get('deadline', 'XXXX')
-               try:
-                   deadline = date.fromisoformat(deadline_value)
-               except ValueError:
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:68 Mutant #42`
-
-  ```diff
-  @@ -65,7 +65,7 @@
-               try:
-                   deadline = date.fromisoformat(deadline_value)
-               except ValueError:
-  -                error = 'Enter a valid arrival deadline.'
-  +                error = 'XXEnter a valid arrival deadline.XX'
-               else:
-                   cargo_specification.change_deadline(
-                       TrackingId(tracking_id),
   ```
 
