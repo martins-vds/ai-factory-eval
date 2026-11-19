@@ -1,0 +1,44 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1525
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1530
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 8.0
+  mutation_changed: 0.840
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN values must be nonblank; otherwise lending is rejected with field errors.
+    use_case: LoanService.lend
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_blank_fields_without_using_the_store
+    enforced: true
+    ledger_rule: required-member-and-isbn
+  - capability: loan.return-date
+    rule: An already-returned loan must not be returned again or have its original returned date replaced.
+    use_case: LoanService.mark_returned
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_an_already_returned_loan_without_overwriting_its_date
+    enforced: true
+    ledger_rule: single-return
+  - capability: loan.return
+    rule: A return request for an unknown loan must produce the not-found outcome without modifying data.
+    use_case: LoanService.mark_returned
+    test: tests/loans/test_circulation.py::test_return_use_case_returns_none_for_an_unknown_loan
+    enforced: true
+    ledger_rule: unknown-loan-not-found
+no_rules: {}

@@ -1,0 +1,10 @@
+<article id="loan-{{ loan.id }}" class="grid gap-4 py-5 sm:grid-cols-[1fr_auto]">
+  <div>
+    <h2 class="text-xl font-semibold"><a class="underline decoration-[#d8cdbb] underline-offset-4" href="/ui/loans/{{ loan.id }}/">Loan {{ loan.id }}</a></h2>
+    <p class="mt-1 text-[#66705b]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+  </div>
+  <div class="sm:text-right">
+    <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+    {% include "loans/_loan_state.html" %}
+  </div>
+</article>
