@@ -96,6 +96,7 @@ def test_lending_endpoint_rejects_empty_fields(client, fields):
     response = client.post('/loans', fields)
 
     assert response.status_code == 400
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'member and isbn are required\n'
     assert Loan.objects.count() == 3
 
@@ -157,6 +158,7 @@ def test_return_endpoint_rejects_a_repeat_and_keeps_the_original_date(client):
     response = client.post('/loans/L2/return')
 
     assert response.status_code == 409
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'loan already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_date
 
@@ -166,6 +168,7 @@ def test_return_endpoint_returns_not_found_for_an_unknown_loan(client):
     response = client.post('/loans/unknown/return')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
 
 
@@ -180,18 +183,27 @@ def test_new_loan_page_offers_an_htmx_lending_form(client):
     assert b'hx-post="/ui/loans/"' in response.content
     assert b'name="member"' in response.content
     assert b'name="isbn"' in response.content
-    assert b"htmx:beforeSwap" in response.content
+    assert b'htmx:beforeSwap' in response.content
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    ('fields', 'error_id'),
+    ('fields', 'error_id', 'retained_value'),
     [
-        ({'member': ' \t', 'isbn': '123'}, 'member-error'),
-        ({'member': 'reader', 'isbn': ' \t'}, 'isbn-error'),
+        ({'member': ' \t', 'isbn': '123'}, 'member-error', b'value="123"'),
+        (
+            {'member': 'reader', 'isbn': ' \t'},
+            'isbn-error',
+            b'value="reader"',
+        ),
     ],
 )
-def test_htmx_lending_form_renders_field_errors(client, fields, error_id):
+def test_htmx_lending_form_renders_field_errors(
+    client,
+    fields,
+    error_id,
+    retained_value,
+):
     response = client.post(
         '/ui/loans/',
         fields,
@@ -199,8 +211,10 @@ def test_htmx_lending_form_renders_field_errors(client, fields, error_id):
     )
 
     assert response.status_code == 400
+    assert b'<!doctype html>' not in response.content
     assert f'id="{error_id}" role="alert"'.encode() in response.content
     assert b'This field is required.' in response.content
+    assert retained_value in response.content
 
 
 @pytest.mark.django_db
@@ -232,12 +246,24 @@ def test_htmx_lending_form_confirms_the_created_loan(client):
 
 
 @pytest.mark.django_db
+def test_full_page_lending_form_redirects_after_success(client):
+    response = client.post(
+        '/ui/loans/',
+        {'member': 'reader', 'isbn': '123'},
+    )
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    assert Loan.objects.get(pk='L4').member == 'reader'
+
+
+@pytest.mark.django_db
 def test_browser_loan_detail_offers_return_and_handles_htmx_errors(client):
     response = client.get('/ui/loans/L1/')
 
     assert response.status_code == 200
     assert b'hx-post="/ui/loans/L1/return/"' in response.content
-    assert b"htmx:beforeSwap" in response.content
+    assert b'htmx:beforeSwap' in response.content
 
 
 @pytest.mark.django_db
@@ -269,3 +295,19 @@ def test_htmx_return_renders_unknown_and_repeat_errors(client):
     assert b'This loan was already returned.' in repeated.content
     assert b'Loan record \xc2\xb7 L2' in repeated.content
     assert b'Jan 20, 2026' in repeated.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('put', '/ui/loans/'),
+        ('post', '/ui/loans/new/'),
+        ('get', '/loans/L1/return'),
+        ('get', '/ui/loans/L1/return/'),
+    ],
+)
+def test_loan_routes_reject_unsupported_methods(client, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
