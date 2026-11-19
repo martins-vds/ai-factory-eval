@@ -34,6 +34,7 @@ evidence:
   - tests/fees/test_gateway.py::test_payment_gateway_returns_non_success_body_for_application_mapping
   - tests/fees/test_gateway.py::test_payment_gateway_does_not_follow_redirects
   - tests/fees/test_gateway.py::test_payment_gateway_keeps_interrupted_failure_as_exception_cause
+  - tests/fees/test_gateway.py::test_payment_gateway_maps_error_body_read_failure_to_gateway_error
   - tests/fees/test_gateway.py::test_payment_gateway_uses_configured_or_source_default_url
   - tests/fees/test_views.py::test_payment_api_returns_gateway_success_unchanged
   - tests/fees/test_views.py::test_payment_api_maps_gateway_failure_to_bad_gateway

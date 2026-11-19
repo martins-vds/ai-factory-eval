@@ -1,3 +1,6 @@
+from io import BytesIO
+from urllib.error import HTTPError
+
 import pytest
 
 from src.fees import gateway
@@ -48,6 +51,27 @@ def test_payment_gateway_keeps_interrupted_failure_as_exception_cause(monkeypatc
         HttpPaymentGateway('http://payments.example').charge('L1')
 
     assert raised.value.__cause__ is interruption
+
+
+def test_payment_gateway_maps_error_body_read_failure_to_gateway_error(monkeypatch):
+    read_failure = InterruptedError('response read interrupted')
+    error = HTTPError('http://payments.example', 503, 'unavailable', {}, BytesIO())
+
+    def fail_read():
+        raise read_failure
+
+    error.read = fail_read
+
+    class FailedResponseOpener:
+        def open(self, request):
+            raise error
+
+    monkeypatch.setattr(gateway, 'build_opener', lambda *handlers: FailedResponseOpener())
+
+    with pytest.raises(PaymentGatewayError) as raised:
+        HttpPaymentGateway('http://payments.example').charge('L1')
+
+    assert raised.value.__cause__ is read_failure
 
 
 def test_payment_gateway_uses_configured_or_source_default_url(monkeypatch):

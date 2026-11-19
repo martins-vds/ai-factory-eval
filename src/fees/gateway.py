@@ -30,6 +30,8 @@ class HttpPaymentGateway:
         except HTTPError as error:
             try:
                 body = error.read().decode(errors='replace')
+            except (HTTPException, OSError, URLError) as read_error:
+                raise PaymentGatewayError('payment gateway unavailable') from read_error
             finally:
                 error.close()
             return PaymentGatewayResponse(error.code, body)
