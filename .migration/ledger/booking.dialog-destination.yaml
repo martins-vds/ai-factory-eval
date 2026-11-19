@@ -8,7 +8,6 @@ source:
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +15,15 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_options_exclude_origin_and_current_destination_without_mutating_locations"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_completes_dialog_and_refreshes_table_without_losing_other_fields"
+  - ".migration/evidence/runs/BK-05G.md"
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/destination.html
+status: migrated
+no_rules: "Destination option filtering is presentation-only; business route-specification behavior is owned by booking.destination-change."
+notes: "Destination options exclude origin and current destination from a copied location list; successful changes complete through a dashboard redirect without the #251 warning."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
