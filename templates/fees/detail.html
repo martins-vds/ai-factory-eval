@@ -7,15 +7,17 @@
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/{{ fee.loan.id }}/">← Back to the loan</a>
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
-      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Late fee · Loan {{ fee.loan.id }}</p>
-      <h1 class="card-title mt-2 text-4xl">Late fee for loan {{ fee.loan.id }}</h1>
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+      <h1 class="card-title mt-2 text-4xl">Late fees</h1>
+      <p class="mt-2">{{ fee.loan.member }} · Loan {{ fee.loan.id }}</p>
       <p class="mt-2">Due {{ fee.loan.due_on|date:"M j, Y" }}, {{ fee.days_late }} day(s) late.</p>
-      <p class="mt-6 text-2xl">Fee: ${{ fee_amount }}</p>
+      <p class="mt-6 text-4xl font-bold">Fee: ${{ fee_amount }}</p>
+      <p class="mt-2">25¢ per late day once more than two days overdue, capped at $10.00.</p>
       <div id="payment-status" class="mt-6">
         <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
               hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
           {% csrf_token %}
-          <button class="btn btn-neutral" type="submit">Pay late fee</button>
+          <button class="btn" style="background-color:#a94e37;color:white;border-color:#a94e37;" type="submit">Pay late fee</button>
         </form>
       </div>
     </div>

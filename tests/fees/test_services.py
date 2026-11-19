@@ -120,12 +120,10 @@ def test_non_success_gateway_response_becomes_bad_gateway():
 
 def test_interrupted_gateway_failure_remains_chained():
     interruption = InterruptedError('request interrupted')
-    failure = PaymentGatewayError('payment gateway unavailable')
-    failure.__cause__ = interruption
 
     class PaymentGateway:
         def charge(self, loan_id):
-            raise failure
+            raise PaymentGatewayError('payment gateway unavailable') from interruption
 
     loan = Loan('L1', date(2026, 1, 16))
     application = PaymentApplication(LoanRepository(loan), PaymentGateway())

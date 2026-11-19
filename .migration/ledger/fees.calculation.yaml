@@ -8,8 +8,26 @@ source:
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1714]
+target:
+  components: [src.fees.services.FeeApplication.calculate_fee]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_services.py::test_fee_is_waived_through_two_days_late_then_charges_the_full_late_days
+  - tests/fees/test_services.py::test_fee_is_capped_at_ten_dollars
+  - tests/fees/test_services.py::test_early_return_has_no_late_days_or_fee
+  - tests/fees/test_services.py::test_unreturned_loan_uses_the_injected_clock
+rules:
+  - id: nonnegative-late-days
+    rule: "Late days are clamped to zero and use returnedOn when present, otherwise the server's local current date."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-35
+  - id: grace-rate-cap
+    rule: "Fees are waived through two days late; after that, charge 25 cents for each full late day, capped at $10."
+    source: legacy/src/main/java/lib/LateFeeView.java:35-36

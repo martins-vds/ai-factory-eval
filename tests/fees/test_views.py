@@ -88,7 +88,8 @@ def test_fee_page_shows_the_quote_and_htmx_payment_action(client):
     response = client.get('/ui/fees/L3/')
 
     assert response.status_code == 200
-    assert b'Late fee for loan L3' in response.content
+    assert b'A small nudge, never a surprise' in response.content
+    assert b'Late fees' in response.content
     assert b'19 day(s) late' in response.content
     assert b'$4.75' in response.content
     assert b'action="/ui/payments/L3/"' in response.content

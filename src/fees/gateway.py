@@ -10,7 +10,11 @@ DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 class HttpPaymentGateway:
     def __init__(self, base_url=None):
-        self.base_url = base_url or os.environ.get('PAYMENT_GATEWAY_URL', DEFAULT_GATEWAY_URL)
+        self.base_url = (
+            base_url
+            if base_url is not None
+            else os.environ.get('PAYMENT_GATEWAY_URL', DEFAULT_GATEWAY_URL)
+        )
 
     def charge(self, loan_id):
         query = urlencode({'loan': loan_id})
