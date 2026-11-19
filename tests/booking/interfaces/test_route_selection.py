@@ -212,9 +212,7 @@ def test_route_selection_does_not_assign_a_token_to_another_cargo(client):
     candidate_routing_service.paths = _candidate_paths()
     selection_response = client.get(f'/admin/cargo/{tracking_id}/route/')
     candidate_token = selection_response.context['candidate_options'][0]['token']
-    other_tracking_id = CargoRegistration(repository).register(
-        ORIGIN, DESTINATION, DEADLINE
-    ).value
+    other_tracking_id = CargoRegistration(repository).register(ORIGIN, DESTINATION, DEADLINE).value
 
     response = client.post(
         f'/admin/cargo/{other_tracking_id}/route/',
