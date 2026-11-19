@@ -1,0 +1,15 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1645
+phase: 0
+decisions:
+  - "Pinned martins-vds/ai-factory-synthetic-target at 563c316ed51462b08fd6e58f3781a3c8b2890453, path legacy; verified its tree and characterized the running app at tier A. Exact commands and responses are in .migration/capabilities.yaml."
+  - "Identified capability gaps for the source test suite, best-effort source coverage and CRAP, and the H2-to-PostgreSQL migration path; each is marked ticket: new for bootstrap issue creation."
+dispatched: []
+awaiting_human:
+  - "Resolve the missing compose.yaml prerequisite before bootstrap step 5; the profile requires PostgreSQL test services, but scaffolding was deferred by the ticket."
+  - "Create operator issues for each ticket: new capability gap during bootstrap."
+  - "Name the data snapshot owner before snapshot work."
+next_step: "Dispatcher resolves the PostgreSQL compose/bootstrap ordering, runs pinned bootstrap.py with the profile, checklist, and stack pack, then presents the resulting gap issues for operator decisions."
+handoff: .migration/handoffs/SY-01.md
+pr: null
