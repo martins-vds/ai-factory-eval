@@ -13,7 +13,7 @@ target:
     - src/cargotracker/booking/interfaces/dialogs/views.py
     - templates/booking/dialogs/deadline.html
     - templates/booking/dashboard/not_routed_table.html
-status: migrated
+status: in-progress
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -29,4 +29,4 @@ evidence:
   - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]
 no_rules: "Date parsing is UI input formatting; CargoSpecification remains the application use case for deadline updates."
-notes: "Deadline parse failures are shown beside the field per #234; successful updates complete without the console warning per #251."
+notes: "Deadline parse failures are shown beside the field per #234; successful updates complete without the console warning per #251. Production URL registration remains in BK-05H."

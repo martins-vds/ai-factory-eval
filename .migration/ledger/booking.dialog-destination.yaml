@@ -13,7 +13,7 @@ target:
     - src/cargotracker/booking/interfaces/dialogs/views.py
     - templates/booking/dialogs/destination.html
     - templates/booking/dashboard/not_routed_table.html
-status: migrated
+status: in-progress
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -29,4 +29,4 @@ evidence:
   - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
 no_rules: "Destination option filtering is UI selection behavior; CargoSpecification remains the application use case for destination updates."
-notes: "The target filters a copied location list so repeat renders remain stable per #235; successful updates omit the console warning per #251."
+notes: "The target filters a copied location list so repeat renders remain stable per #235; successful updates omit the console warning per #251. Production URL registration remains in BK-05H."

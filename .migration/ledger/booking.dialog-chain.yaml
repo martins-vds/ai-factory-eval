@@ -14,7 +14,7 @@ target:
     - templates/booking/dialogs/destination.html
     - templates/booking/dialogs/deadline.html
     - templates/booking/dashboard/not_routed_table.html
-status: migrated
+status: in-progress
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -28,4 +28,4 @@ evidence:
   - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#251]
 no_rules: "The dialog chain coordinates presentation and refresh; business updates are delegated to CargoSpecification."
-notes: "Target updates complete through an HX-Redirect to the dashboard. The source console warning is omitted under ruling #251."
+notes: "Target updates complete through an HX-Redirect to the dashboard and the source console warning is omitted under ruling #251. Production URL registration remains in BK-05H."

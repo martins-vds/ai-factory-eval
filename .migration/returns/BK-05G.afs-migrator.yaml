@@ -1,0 +1,34 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: martins-vds/ai-factory-eval#1588
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.837
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05G.md
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_http_flow_opens_updates_and_refreshes_destination_dialog
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_excludes_origin_and_current_destination_without_mutating_locations
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_displays_current_deadline_and_route
+  - tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_entered_value
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_route_specification_fields_and_redirects
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_route_specification_fields_and_redirects
+  - .migration/evidence/runs/BK-05G.md
+no_rules:
+  booking.dialog-chain: Dialog coordination has no business rule; specification updates use CargoSpecification.
+  booking.dialog-deadline: Date parsing is UI input formatting; updates use CargoSpecification.
+  booking.dialog-destination: Option filtering is UI selection behavior; updates use CargoSpecification.
