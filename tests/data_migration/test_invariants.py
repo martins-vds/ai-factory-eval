@@ -3,6 +3,7 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -161,7 +162,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
     ]
     assert any(len(legs) > 1 for legs in itineraries)
     for legs in itineraries:
-        for previous, following in zip(legs, legs[1:], strict=False):
+        for previous, following in pairwise(legs):
             assert previous.unload_location_id == following.load_location_id
 
 
@@ -193,6 +194,6 @@ def test_loaded_carrier_movement_schedules_are_ordered_and_connected(tmp_path):
         )
         for movement in movements:
             assert movement.departure_time <= movement.arrival_time
-        for previous, following in zip(movements, movements[1:], strict=False):
+        for previous, following in pairwise(movements):
             assert previous.arrival_time <= following.departure_time
             assert previous.arrival_location_id == following.departure_location_id
