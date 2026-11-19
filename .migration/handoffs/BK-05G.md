@@ -35,3 +35,23 @@ Resume BK-05G after the ticket scope explicitly includes `templates/booking/dash
 - The first red test run exited 2 at collection because the planned dialog view did not yet exist; after implementation, the focused suite passed.
 ### Next step for the next session
 Continue BK-05G by completing its ledger and gate evidence; then replace this in-progress state with the final return status.
+
+## Handoff — afs-migrator · 2026-11-19T14:41:06Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-continue-dialogs-from-not-routed-table-4bad45b9-b3e4-4f7b-9edc-a7300c92db5d` / https://github.com/martins-vds/ai-factory-eval/pull/1526  ·  **Last commit:** a78bd1cc
+### Done
+- Build passed: `.migration/runs/BK-05G/20261119T140740804758Z-build-compile.log`, `.migration/runs/BK-05G/20261119T140740898799Z-build-django-check.log`.
+- Full behavior suite passed: `.migration/runs/BK-05G/20261119T140747164254Z-behavior.log`; focused dialog tests passed: `.migration/runs/BK-05G/20261119T141403937857Z-tests-dialogs-final.log`.
+- Idiom and UI checks passed: `.migration/runs/BK-05G/20261119T140741265380Z-idiom-ruff.log`, `.migration/runs/BK-05G/20261119T140741326969Z-idiom-format.log`, `.migration/runs/BK-05G/20261119T140741382820Z-idiom-layers.log`, `.migration/runs/BK-05G/20261119T141408234278Z-idiom-ui-final.log`.
+- CRAP passed at 26.0 (threshold 30): `.migration/runs/BK-05G/20261119T140929261331Z-crap-score.log`.
+- CodeQL reported zero alerts.
+### Remaining
+- [ ] Get an operator/coordinator decision on the profile mutation gate's base or execution budget.
+- [ ] Run the approved mutation gate through `afs-run`, record its exact score in the journal and return, then rerun the finish check.
+### Decisions made
+- Did not substitute `--paths` or another base for the profile's exact mutation command, because such a run would not count as profile gate evidence.
+### Blockers / questions
+- The exact profile command `python .migration/harness/tools/afs-mutation --changed-since origin/main` selected 128 changed `src/` paths in this eval checkout, spanning capabilities unrelated to BK-05G. Its workers were still running after more than 22 minutes. The run was stopped without an `AFS-RESULT`, score, or journal entry; the raw log is empty. Should this gate use a ticket-appropriate base, or should it be dispatched with a longer execution budget?
+### Failing commands
+- None completed unsuccessfully; the mutation command did not finish and has no exit result.
+### Next step for the next session
+Ask the coordinator/operator to resolve the mutation scope or execution budget, then run the profile mutation command through `afs-run` and complete the return.

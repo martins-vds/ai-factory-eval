@@ -1,7 +1,7 @@
 role: afs-migrator
 ticket: BK-05G
 issue: martins-vds/ai-factory-pilot-target#294
-pr: null
+pr: martins-vds/ai-factory-eval#1526
 specialty: ui
 gates:
   build: 0
