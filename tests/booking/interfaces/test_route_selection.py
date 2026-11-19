@@ -108,7 +108,7 @@ def test_route_selection_renders_details_count_and_numbered_candidates(client):
     candidate_routing_service.paths = _candidate_paths()
 
     response = client.get(f'/admin/cargo/{tracking_id}/route/')
-    content = response.content.decode()
+    content = ' '.join(response.content.decode().split())
     candidates = response.context['candidates']
 
     assert response.status_code == 200
@@ -139,7 +139,7 @@ def test_select_itinerary_renders_populated_candidates(client):
     candidate_routing_service.paths = _candidate_paths()
 
     response = client.get(f'/admin/cargo/{tracking_id}/itineraries/')
-    content = response.content.decode()
+    content = ' '.join(response.content.decode().split())
 
     assert response.status_code == 200
     assert 'Potential routes: 2' in content
@@ -153,7 +153,7 @@ def test_select_itinerary_shows_no_route_guidance_when_candidates_are_empty(clie
     tracking_id = _register_cargo()
 
     response = client.get(f'/admin/cargo/{tracking_id}/itineraries/')
-    content = response.content.decode()
+    content = ' '.join(response.content.decode().split())
 
     assert response.status_code == 200
     assert 'Potential routes: 0' in content
@@ -169,16 +169,18 @@ def test_assign_candidate_redirects_to_cargo_details_and_shows_assigned_itinerar
     tracking_id = _register_cargo()
     candidate_routing_service.paths = _candidate_paths()
 
+    selection_response = client.get(f'/admin/cargo/{tracking_id}/route/')
+    candidate_token = selection_response.context['candidate_options'][0]['token']
     response = client.post(
         f'/admin/cargo/{tracking_id}/route/',
-        {'candidate_index': '0'},
+        {'candidate_token': candidate_token},
     )
 
     assert response.status_code == 302
     assert response.url == f'/admin/cargo/{tracking_id}/'
 
     details_response = client.get(response.url)
-    content = details_response.content.decode()
+    content = ' '.join(details_response.content.decode().split())
 
     assert details_response.status_code == 200
     assert f'Routing Details for Cargo {tracking_id}' in content
@@ -186,3 +188,27 @@ def test_assign_candidate_redirects_to_cargo_details_and_shows_assigned_itinerar
     assert 'CM001' in content
     assert 'CM002' in content
     assert 'Rotterdam' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_tampered_candidate_token(client):
+    tracking_id = _register_cargo()
+    candidate_routing_service.paths = _candidate_paths()
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id}/route/',
+        {'candidate_token': 'tampered-token'},
+    )
+
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_unsupported_methods(client):
+    tracking_id = _register_cargo()
+
+    response = client.put(f'/admin/cargo/{tracking_id}/route/')
+
+    assert response.status_code == 405
