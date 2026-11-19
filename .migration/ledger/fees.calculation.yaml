@@ -25,12 +25,18 @@ evidence:
   - tests/fees/test_services.py::test_early_return_has_no_late_days_or_fee
   - tests/fees/test_services.py::test_unreturned_loan_uses_the_injected_clock
 rules:
-  - id: late-day-date
-    rule: "Calculate late days against returnedOn when present, otherwise the server's local current date."
+  - id: returned-on-date
+    rule: "When a loan has been returned, calculate late days relative to returnedOn."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-34
+  - id: clock-date-fallback
+    rule: "For an unreturned loan, calculate late days relative to the server's local current date."
     source: legacy/src/main/java/lib/LateFeeView.java:31-34
   - id: nonnegative-late-days
     rule: "Late days are clamped to zero for loans returned before their due date."
     source: legacy/src/main/java/lib/LateFeeView.java:34
-  - id: grace-rate-cap
-    rule: "Fees are waived through two days late; after that, charge 25 cents for each full late day, capped at $10."
+  - id: grace-period-and-rate
+    rule: "Fees are waived through two days late; after that, charge 25 cents for each full late day."
+    source: legacy/src/main/java/lib/LateFeeView.java:35-36
+  - id: fee-cap
+    rule: "The fee is capped at $10."
     source: legacy/src/main/java/lib/LateFeeView.java:35-36
