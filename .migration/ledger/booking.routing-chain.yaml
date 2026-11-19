@@ -8,13 +8,22 @@ source:
 boundary: "CargoDetails and ItinerarySelection call BookingServiceFacade, DefaultBookingService, RoutingService and the configured graph-traversal endpoint; assignment maps route DTOs to JPA Voyage/Location entities and stores Cargo."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+target:
+  components:
+    - cargotracker.booking.application.routing.CargoRouting.route_candidates
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testAssignRoute"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
+  - "tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_screen_shows_details_and_valid_candidate_itinerary_legs"
+  - ".migration/evidence/runs/BK-05F.md"
+rules:
+  - id: candidates-satisfy-route-specification
+    rule: Candidate itineraries must match the cargo's origin and destination and arrive by its deadline.
+    source: "Approved booking plan .migration/plan/booking.md (#89 item 5 / #238)"
+notes: "Decision #89 selects in-process routing in the target while preserving random routes; the source REST client and graph traversal remain the equivalence boundary. BookingServiceTest was not executed; its candidate assertions are covered by target tests."

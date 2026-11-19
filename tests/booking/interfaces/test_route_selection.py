@@ -41,8 +41,6 @@ cargo_routing = CargoRouting(
 route_view, select_itinerary_view = create_route_selection_views(
     cargo_routing,
     cargo_dashboard,
-    location_repository,
-    voyage_repository,
 )
 _, cargo_details_view = create_booking_views(cargo_dashboard)
 urlpatterns = [
@@ -90,8 +88,13 @@ def test_route_screen_shows_details_and_valid_candidate_itinerary_legs(client):
             for first, second in zip(itinerary.legs, itinerary.legs[1:])
         )
         assert f'Candidate {candidate_number}' in content
-        for leg_number in range(1, len(itinerary.legs) + 1):
+        for leg_number, leg in enumerate(itinerary.legs, 1):
             assert f'Leg {leg_number}' in content
+            assert leg.voyage.voyage_number.value in content
+            assert leg.load_location.name in content
+            assert leg.unload_location.name in content
+            assert leg.load_time.strftime('%m/%d/%Y') in content
+            assert leg.unload_time.strftime('%m/%d/%Y') in content
 
 
 @pytest.mark.django_db
@@ -165,3 +168,17 @@ def test_route_selection_rejects_tampered_and_cross_cargo_candidate_tokens(clien
     assert cross_cargo_response.status_code == 400
     assert cargo is not None
     assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_form_posts_to_its_path_and_rejects_other_methods(client):
+    tracking_id = _register_cargo()
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+
+    response = client.get(route_url)
+    method_not_allowed = client.put(route_url)
+
+    assert f'action="{route_url}"' in response.content.decode()
+    assert method_not_allowed.status_code == 405
+    assert method_not_allowed['Allow'] == 'GET, POST'
