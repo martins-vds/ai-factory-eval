@@ -1,7 +1,9 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
+from django.utils import timezone
 
+from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 from src.loans.services import LoanInputError, lend_loan
 
@@ -29,3 +31,25 @@ def test_lending_rejects_missing_or_blank_fields(member, isbn, invalid_field):
 
     assert error.value.fields == {invalid_field: 'This field is required.'}
     assert LoanRepository().all().count() == loan_count
+
+
+@pytest.mark.django_db
+def test_lending_endpoint_creates_a_loan_and_escapes_delimiters(client):
+    today = timezone.localdate()
+    response = client.post(
+        '/loans',
+        {'member': 'Reader; Example', 'isbn': '123;456'},
+    )
+
+    assert response.status_code == 201
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == (
+        f'L4;"Reader; Example";"123;456";{today.isoformat()};'
+        f'{(today + timedelta(days=14)).isoformat()};\n'
+    )
+    loan = Loan.objects.get(pk='L4')
+    assert (loan.member, loan.isbn, loan.lent_on) == (
+        'Reader; Example',
+        '123;456',
+        today,
+    )
