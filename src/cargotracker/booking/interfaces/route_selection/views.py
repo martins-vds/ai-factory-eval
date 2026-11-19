@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from datetime import datetime
+from urllib.parse import quote
 
 from django.core import signing
 from django.core.signing import BadSignature
@@ -42,7 +43,8 @@ def create_route_selection_views(
             if itinerary is None:
                 return HttpResponseBadRequest('Invalid route selection.')
             cargo_routing.assign_route(TrackingId(tracking_id), itinerary)
-            return redirect(f'/admin/cargo/{tracking_id}/')
+            cargo_details_path = quote(tracking_id, safe='')
+            return redirect(f'/admin/cargo/{cargo_details_path}/')
         if request.method not in {'GET', 'HEAD'}:
             return HttpResponseNotAllowed(('GET', 'HEAD', 'POST'))
         return _render_candidates(
