@@ -28,3 +28,18 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T21:48:43+00:00 | ruff-check-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-19T21:48:43+00:00 | ruff-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-19T21:48:48+00:00 | focused-tests-final | 0 | 4.71 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `e793184a9d9ec9bf` |  |  |
+| 2026-11-19T21:51:17+00:00 | build-compileall | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-19T21:51:30+00:00 | build-check | 0 | 0.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-19T21:52:16+00:00 | behavior | 0 | 42.52 | `pytest -q` | `68db49dec42edf2c` |  |  |
+| 2026-11-19T21:52:23+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-19T21:52:26+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-19T21:52:30+00:00 | idiom-layers | 0 | 0.1 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-19T21:52:34+00:00 | idiom-ui | 0 | 0.34 | `python .migration/harness/tools/check_ui.py` | `48f6c439f84cbf94` |  | gate=ui scope="templates changed since 6348f858891024d9bfc2ae05d30336a1bf9f2a12" templates=4 findings=0 |
+| 2026-11-19T21:53:24+00:00 | crap-coverage | 0 | 38.25 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov'` | `e37d877fcdd0a2cd` |  |  |
+| 2026-11-19T21:53:27+00:00 | crap-lizard | 0 | 0.1 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-19T21:53:30+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9fce652a573cddd2` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-19T21:55:44+00:00 | mutation-changed | 1 | 119.08 | `python .migration/harness/tools/afs-mutation` | `5cfa1cb72894f40a` | afs-mutation: FAILED score=0.750 threshold=0.8 killed=42 survived=14 skipped=0 files=1 jobs=1 base=6348f858891024d9bfc2a | gate=mutation score=0.750 threshold=0.8 killed=42 survived=14 files=1 base=6348f858891024d9bfc2ae05d30336a1bf9f2a12 |
+| 2026-11-19T21:57:58+00:00 | mutation-gap-tests | 0 | 3.98 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `0621494a41d3bffa` |  |  |
+| 2026-11-19T21:58:20+00:00 | mutation-gap-green | 0 | 4.43 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `2fdc990df5d2bccf` |  |  |
+| 2026-11-19T21:58:25+00:00 | mutation-gap-lint | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-19T21:58:25+00:00 | mutation-gap-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |

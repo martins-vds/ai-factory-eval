@@ -37,6 +37,13 @@ def test_destination_dialog_shows_current_route_and_excludes_origin_and_destinat
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
+    option_values = re.findall(r'<option\b[^>]*value="([^"]+)"([^>]*)>', options.group(1))
+    assert option_values
+    selected_values = [
+        value for value, attributes in option_values if re.search(r'\bselected\b', attributes)
+    ]
+    assert selected_values == [option_values[0][0]]
+    assert 'destination-error' not in content
     assert 'Update' in content and 'Cancel' in content
 
 
@@ -93,7 +100,9 @@ def test_destination_dialog_rejects_origin_or_current_destination(destination):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in content
+    error = re.search(r'<p id="destination-error"[^>]*>(.*?)</p>', content, re.DOTALL)
+    assert error is not None
+    assert error.group(1).strip() == 'Select a valid destination.'
     assert cargo_repository.find(tracking_id) == original
 
 
@@ -179,7 +188,13 @@ def test_deadline_dialog_shows_parse_error_without_changing_cargo():
 
     assert response.status_code == 200
     assert 'id="deadline-error"' in response.content.decode()
-    assert 'Enter a valid arrival deadline.' in response.content.decode()
+    error = re.search(
+        r'<p id="deadline-error"[^>]*>(.*?)</p>',
+        response.content.decode(),
+        re.DOTALL,
+    )
+    assert error is not None
+    assert error.group(1).strip() == 'Enter a valid arrival deadline.'
     assert cargo_repository.find(tracking_id) == original
 
 
@@ -217,6 +232,7 @@ def test_deadline_dialog_updates_and_refreshes_without_changing_route_endpoints(
     )
     assert 'Hong Kong' in initial_response.content.decode()
     assert 'Melbourne' in initial_response.content.decode()
+    assert 'id="deadline-error"' not in initial_response.content.decode()
     assert response.status_code == 200
     assert response['HX-Redirect'] == '/admin/dashboard/'
     assert updated is not None

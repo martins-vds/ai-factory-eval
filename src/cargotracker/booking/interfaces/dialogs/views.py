@@ -36,15 +36,22 @@ def create_destination_dialog_view(
             for location in list_shipping_locations()
             if location != origin and location != current_destination
         ]
-        destination_value = request.POST.get('destination', '')
         selected_destination = next(
-            (location for location in destinations if location.unlocode.value == destination_value),
+            (
+                location
+                for location in destinations
+                if location.unlocode.value == request.POST.get('destination')
+            ),
             None,
         )
-        destination_error = ''
+        context = {
+            'cargo': cargo,
+            'destinations': destinations,
+            'selected_destination': selected_destination,
+        }
         if request.method == 'POST':
             if selected_destination is None:
-                destination_error = 'Select a valid destination.'
+                context['destination_error'] = 'Select a valid destination.'
             else:
                 try:
                     specification.change_destination(
@@ -56,19 +63,13 @@ def create_destination_dialog_view(
                 response = HttpResponse()
                 response['HX-Redirect'] = '/admin/dashboard/'
                 return response
-        elif selected_destination is None and destinations:
-            selected_destination = destinations[0]
+        elif destinations:
+            context['selected_destination'] = destinations[0]
 
         return render(
             request,
             'booking/dialogs/destination.html',
-            {
-                'cargo': cargo,
-                'destinations': destinations,
-                'selected_destination': selected_destination,
-                'destination_error': destination_error,
-                'destination_value': destination_value,
-            },
+            context,
         )
 
     return destination_dialog
@@ -83,16 +84,20 @@ def create_deadline_dialog_view(
         if cargo is None:
             return _not_found(request, tracking_id)
 
-        deadline_value = request.POST.get(
-            'arrival_deadline',
-            cargo.route_specification.arrival_deadline.date().isoformat(),
-        )
-        deadline_error = ''
         if request.method == 'POST':
+            deadline_value = request.POST.get('arrival_deadline', '')
             try:
                 arrival_date = date.fromisoformat(deadline_value)
             except ValueError:
-                deadline_error = 'Enter a valid arrival deadline.'
+                return render(
+                    request,
+                    'booking/dialogs/deadline.html',
+                    {
+                        'cargo': cargo,
+                        'deadline_value': deadline_value,
+                        'deadline_error': 'Enter a valid arrival deadline.',
+                    },
+                )
             else:
                 try:
                     specification.change_deadline(
@@ -104,14 +109,14 @@ def create_deadline_dialog_view(
                 response = HttpResponse()
                 response['HX-Redirect'] = '/admin/dashboard/'
                 return response
-
+        else:
+            deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
         return render(
             request,
             'booking/dialogs/deadline.html',
             {
                 'cargo': cargo,
                 'deadline_value': deadline_value,
-                'deadline_error': deadline_error,
             },
         )
 
