@@ -26,6 +26,7 @@
         role="application"
         aria-label="Cargo location map"
       ></div>
+      {# Map query failures stay silent; see .migration/design/admin-live-map.md, "Empty and failure behavior". #}
       <div
         id="live-map-markers"
         hx-get="{% url 'admin_live_map_markers' %}"
@@ -33,6 +34,7 @@
         hx-target="#live-map-markers"
         hx-swap="innerHTML"
         hx-on::before-request="window.liveMapMarkers.clear()"
+        hx-on::before-swap="if (event.detail.isError) event.detail.shouldSwap = false"
       ></div>
     </main>
     <script>

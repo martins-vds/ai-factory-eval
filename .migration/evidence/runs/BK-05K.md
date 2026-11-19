@@ -48,3 +48,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-18T22:39:20+00:00 | verification-ui-all | 0 | 0.37 | `python .migration/harness/tools/check_ui.py --all` | `0cb805740bfb2d16` |  | gate=ui scope="every template" templates=21 findings=0 |
 | 2026-11-18T22:40:54+00:00 | verification-regression | 0 | 90.92 | `pytest -q` | `0d7a19316c816193` |  |  |
 | 2026-11-18T23:54:12+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-18T23:55:55+00:00 | red-live-map-opt-out | 1 | 4.13 | `pytest -q tests/test_htmx_errors.py::test_live_map_page_keeps_marker_errors_silent` | `2e167f3156e0eeb5` | assert b'name="htmx-config"' in page.content |  |
+| 2026-11-18T23:56:06+00:00 | focused-map-silence | 0 | 1.58 | `pytest -q tests/test_htmx_errors.py::test_live_map_page_keeps_marker_errors_silent tests/test_htmx_errors.py::test_tracking_page_swaps_unknown_tracking_id_error` | `8467712def929e7a` |  |  |
+| 2026-11-18T23:59:36+00:00 | lint-ruling | 1 | 0.07 | `bash -c 'ruff check && ruff format --check'` | `3722476becd67db0` | 36 \|     assert RESPONSE_HANDLING in page.content |  |
+| 2026-11-18T23:59:37+00:00 | ui-all-ruling | 0 | 0.27 | `python .migration/harness/tools/check_ui.py --all` | `0cb805740bfb2d16` |  | gate=ui scope="every template" templates=21 findings=0 |
+| 2026-11-18T23:59:41+00:00 | focused-map-error-coverage | 0 | 4.64 | `pytest -q tests/test_htmx_errors.py tests/cargo/interfaces/test_admin_live_map_markers.py tests/cargo/test_tracking.py` | `78a8bc349a60baa1` |  |  |
+| 2026-11-19T00:00:01+00:00 | lint-ruling-final | 0 | 0.04 | `bash -c 'ruff check && ruff format --check'` | `de130d5f38e219d6` |  |  |
+| 2026-11-19T00:00:01+00:00 | ui-all-ruling-final | 0 | 0.29 | `python .migration/harness/tools/check_ui.py --all` | `0cb805740bfb2d16` |  | gate=ui scope="every template" templates=21 findings=0 |
+| 2026-11-19T00:00:05+00:00 | focused-ruling-final | 0 | 4.7 | `pytest -q tests/test_htmx_errors.py tests/cargo/interfaces/test_admin_live_map_markers.py tests/cargo/test_tracking.py` | `ac996c6dbbf1d588` |  |  |

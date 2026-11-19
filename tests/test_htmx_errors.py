@@ -29,22 +29,15 @@ def dashboard_page(client):
 
 
 @pytest.mark.django_db
-def test_live_map_page_swaps_failed_marker_response(client, monkeypatch):
+def test_live_map_page_keeps_marker_errors_silent(client):
     page = client.get('/admin/live-map/')
 
-    def fail_map_fetch(*args, **kwargs):
-        raise RuntimeError('map service unavailable')
-
-    monkeypatch.setattr(
-        'cargotracker.cargo.interfaces.admin_map.views.build_admin_map_data',
-        fail_map_fetch,
+    assert b'name="htmx-config"' in page.content
+    assert RESPONSE_HANDLING in page.content
+    assert (
+        b'hx-on::before-swap="if (event.detail.isError) event.detail.shouldSwap = false"'
+        in page.content
     )
-    client.raise_request_exception = False
-    response = client.get('/admin/live-map/markers/', HTTP_HX_REQUEST='true')
-
-    assert response.status_code == 500
-    assert b'Server Error (500)' in response.content
-    _assert_page_handles_error_swaps(page, '#live-map-markers')
 
 
 @pytest.mark.django_db
