@@ -2,8 +2,9 @@ import re
 
 import pytest
 from django.core.management import call_command
-from django.test import RequestFactory
 from django.template.loader import render_to_string
+from django.test import RequestFactory, override_settings
+from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
@@ -12,6 +13,17 @@ from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
+
+_http_repository = DjangoCargoRepository()
+_http_destination_view, _http_deadline_view = create_booking_dialog_views(
+    CargoDashboard(_http_repository),
+    CargoSpecification(_http_repository, DjangoHandlingEventRepository()),
+    DjangoLocationRepository().find_all,
+)
+urlpatterns = [
+    path('admin/cargo/<str:tracking_id>/destination/', _http_destination_view),
+    path('admin/cargo/<str:tracking_id>/deadline/', _http_deadline_view),
+]
 
 
 @pytest.mark.django_db
@@ -168,3 +180,23 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs():
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
     assert 'hx-target="#booking-dialog"' in content
     assert 'id="booking-dialog"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_http_deadline_dialog_updates_and_refreshes_the_table(client):
+    call_command('seed_sample_data')
+
+    initial_response = client.get('/admin/cargo/DEF789/deadline/')
+    assert initial_response.status_code == 200
+    assert 'Hong Kong' in initial_response.content.decode()
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': '2026-01-15'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert response.headers['HX-Retarget'] == '#not-routed-cargo'
+    assert '01/15/2026' in response.content.decode()

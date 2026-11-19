@@ -12,3 +12,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T13:53:06+00:00 | integration-red | 1 | 3.11 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `13c68dd23bdf9620` | assert cargo is not None |  |
 | 2026-11-19T13:53:27+00:00 | dialogs-and-dashboard | 0 | 4.02 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `84ef7238ff42c4c6` |  |  |
 | 2026-11-19T13:53:56+00:00 | dialogs-and-dashboard | 0 | 3.79 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `ac3d68313e6a4528` |  |  |
+| 2026-11-19T13:54:59+00:00 | dialogs-http | 0 | 4.4 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `81fe7e4b69df0f53` |  |  |
