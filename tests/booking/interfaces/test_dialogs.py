@@ -17,11 +17,18 @@ from cargotracker.location.infrastructure.repository import DjangoLocationReposi
 
 cargo_repository = DjangoCargoRepository()
 location_repository = DjangoLocationRepository()
+shipping_locations = []
+
+
+def list_shipping_locations():
+    return shipping_locations
+
+
 cargo_dashboard = CargoDashboard(cargo_repository)
 destination_dialog, deadline_dialog = create_dialog_views(
     CargoSpecification(cargo_repository, DjangoHandlingEventRepository()),
     cargo_dashboard,
-    location_repository.find_all,
+    list_shipping_locations,
 )
 dashboard, _ = create_booking_views(cargo_dashboard)
 urlpatterns = [
@@ -35,21 +42,28 @@ urlpatterns = [
 @override_settings(ROOT_URLCONF=__name__)
 def test_destination_dialog_shows_values_and_filters_options_without_mutating_locations(client):
     call_command('seed_sample_data')
-    locations = location_repository.find_all()
-    original_codes = [location.unlocode.value for location in locations]
+    shipping_locations[:] = location_repository.find_all()
+    original_codes = [location.unlocode.value for location in shipping_locations]
 
     response = client.get('/admin/cargo/DEF789/destination/')
     second_response = client.get('/admin/cargo/DEF789/destination/')
     content = response.content.decode()
     options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
+    second_options = re.search(
+        r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>',
+        second_response.content.decode(),
+        re.DOTALL,
+    )
 
     assert response.status_code == 200
     assert 'Hong Kong' in content and 'Melbourne' in content
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
-    assert [location.unlocode.value for location in locations] == original_codes
-    assert second_response.content == response.content
+    assert 'value="SEGOT" selected' in options.group(1)
+    assert [location.unlocode.value for location in shipping_locations] == original_codes
+    assert second_options is not None
+    assert second_options.group(1) == options.group(1)
 
 
 @pytest.mark.django_db
