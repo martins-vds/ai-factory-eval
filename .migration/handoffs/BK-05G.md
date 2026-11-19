@@ -55,3 +55,14 @@ Continue BK-05G by completing its ledger and gate evidence; then replace this in
 - None completed unsuccessfully; the mutation command did not finish and has no exit result.
 ### Next step for the next session
 Ask the coordinator/operator to resolve the mutation scope or execution budget, then run the profile mutation command through `afs-run` and complete the return.
+
+## Handoff — afs-migrator · 2026-11-19T14:43:53Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-from-not-routed-table-4bad45b9-b3e4-4f7b-9edc-a7300c92db5d  ·  **Last commit:** d345a384
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05G.afs-migrator.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
