@@ -135,13 +135,14 @@ def test_route_selection_shows_no_route_guidance_when_candidates_are_empty(
 
     response = client.get('/admin/cargo/DEF789/route/')
     content = response.content.decode()
+    normalized_content = ' '.join(content.split())
 
     assert response.status_code == 200
     assert 'Potential routes: 0' in content
     assert (
         'No routes found that satisfy the route specification. '
         'Try setting an arrival deadline further into the future (a few weeks at least).'
-    ) in content
+    ) in normalized_content
     assert 'Candidate 1' not in content
 
 
@@ -155,7 +156,7 @@ def test_route_selection_assigns_selected_candidate_and_redirects_to_cargo_detai
     route_url = '/admin/cargo/DEF789/route/'
     response = client.get(route_url)
     token = re.search(
-        r'name="candidate_token" value="([^"]+)"', response.content.decode()
+        r'name="candidate_token"\s+value="([^"]+)"', response.content.decode()
     ).group(1)
 
     response = client.post(route_url, {'candidate_token': token}, follow=True)
