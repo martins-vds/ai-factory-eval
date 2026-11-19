@@ -16,3 +16,14 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-19T22:02:00Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-not-routed-table-36e04750-e9be-44c0-85d9-79acd0b48a0b  ·  **Last commit:** ea33157d
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] No return file. Write and commit `.migration/returns/BK-05G.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05G`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05G.md`). See afs-migration-contract → Return files.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.

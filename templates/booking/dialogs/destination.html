@@ -1,0 +1,35 @@
+<section aria-labelledby="destination-dialog-title">
+  <h2 id="destination-dialog-title" class="mb-4 text-xl font-semibold text-gray-900">Change destination</h2>
+  <dl class="mb-4 grid grid-cols-2 gap-2">
+    <dt class="font-medium">Origin</dt>
+    <dd>{{ cargo.route_specification.origin.name }}</dd>
+    <dt class="font-medium">Current destination</dt>
+    <dd>{{ cargo.route_specification.destination.name }}</dd>
+  </dl>
+  <form
+    method="post"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-target="#cargo-edit-dialog"
+    hx-swap="innerHTML"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+  >
+    {% csrf_token %}
+    <div class="mb-4">
+      <label for="destination" class="mb-1 block font-medium">New destination</label>
+      <select id="destination" name="destination" class="select select-bordered w-full" required>
+        {% for location in destinations %}
+          <option value="{{ location.unlocode.value }}"{% if location == selected_destination %} selected{% endif %}>
+            {{ location.name }} ({{ location.unlocode.value }})
+          </option>
+        {% endfor %}
+      </select>
+      {% if destination_error %}
+        <p id="destination-error" class="mt-1 text-sm text-red-700" role="alert">{{ destination_error }}</p>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+  </form>
+  <form method="dialog" class="mt-2">
+    <button type="submit" class="btn btn-ghost">Cancel</button>
+  </form>
+</section>

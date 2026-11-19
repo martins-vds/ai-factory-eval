@@ -28,11 +28,42 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                type="button"
+                class="mt-1 text-sm font-medium text-blue-700 underline"
+                aria-haspopup="dialog"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+              >
+                Change
+              </button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+              <button
+                type="button"
+                class="mt-1 text-sm font-medium text-blue-700 underline"
+                aria-haspopup="dialog"
+                aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+              >
+                Change
+              </button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog
+    id="cargo-edit-dialog"
+    class="w-full max-w-lg rounded-lg border border-gray-300 p-6 shadow-xl"
+    hx-on::after-swap="this.showModal()"
+  ></dialog>
 </section>
