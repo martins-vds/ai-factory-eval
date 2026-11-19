@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>characterization</groupId>
+  <artifactId>member-billing</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.13.2</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <sourceDirectory>${project.basedir}/../../..</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/../../..</testSourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>legacy-billing/src/main/java/billing/*.java</include>
+            <include>.migration/characterization/billing/src/main/java/com/northgate/vault/*.java</include>
+          </includes>
+          <testIncludes>
+            <testInclude>legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java</testInclude>
+            <testInclude>.migration/characterization/billing/src/test/java/billing/*.java</testInclude>
+          </testIncludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
