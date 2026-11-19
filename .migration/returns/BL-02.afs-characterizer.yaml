@@ -1,0 +1,28 @@
+role: afs-characterizer
+ticket: BL-02
+issue: martins-vds/ai-factory-eval#1560
+tier_used:
+  A: 0
+  B: 6
+  C: 0
+suite:
+  path: .migration/characterization/billing/pom.xml
+  cases: 16
+  passing: 16
+  run_log: .migration/evidence/runs/BL-02.md
+predicted_vs_observed:
+  match: 15
+  differs: 1
+ledger_updated:
+  - billing.invoice-line-validation
+  - billing.job-processing
+  - billing.charge-threshold
+  - billing.job-entrypoint
+  - billing.card-vault
+  - billing.invoice-total
+quirk_tickets:
+  - .migration/quirks/billing-carry-over-not-persisted.md
+  - .migration/quirks/billing-hardcoded-sample-members.md
+  - .migration/quirks/billing-member-map-order.md
+  - .migration/quirks/billing-null-invoice-amount.md
+review_only_requests: []

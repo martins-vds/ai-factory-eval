@@ -6,7 +6,12 @@ source:
 boundary: "CardVault.charge(memberId, amount): Northgate charge request and approval reference or exception"
 tickets: [martins-vds/ai-factory-eval#1556]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::cardVaultSubmitsExactUsdCentsAndReturnsReference
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::cardVaultDeclinesAndRejectsFractionalCents
 rules:
   - id: charge-usd-cents
     rule: "Convert the decimal amount to an exact integer number of cents and submit the charge to Northgate in USD."

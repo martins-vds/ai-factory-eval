@@ -5,8 +5,10 @@ Should `BillingJob.main` charge the hardcoded `ana` and `ben` records on every i
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/BillingJob.java:26-30`
-- Characterization: Not run; BL-01 inventories source behavior only.
+- Characterization: `.migration/characterization/billing/observations.md` records a separate-JVM run with test environment credentials and an ignored command-line argument. It still charges the fixed Ana $4.75 and Ben empty-fee sample, producing $8.14 and $3.15 respectively.
 - Why it looks wrong: The executable entrypoint ignores its arguments and always invokes the billing job with a fixed map containing `ana`'s $4.75 fee and `ben`'s empty fee list, rather than reading a monthly member-billing input.
+
+The observed member order is covered separately by `.migration/quirks/billing-member-map-order.md`.
 
 ## Impact
 - Ledger capabilities: `billing.job-entrypoint`, `billing.job-processing`

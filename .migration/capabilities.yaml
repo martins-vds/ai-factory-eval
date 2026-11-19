@@ -29,7 +29,9 @@ capabilities:
   - kind: tool
     name: .migration/characterization/source/characterize.py and HTTP/browser golden files
   notes: 'All 7 source graph endpoints, 12 edge cases, 2 browser pages, restart reset and payment-gateway mappings
-    are captured. Evidence: .migration/evidence/runs/SY-05.md (source-characterization-record, source-characterization-verify).'
+    are captured. Evidence: .migration/evidence/runs/SY-05.md (source-characterization-record, source-characterization-verify).
+    Separate legacy-billing tier-B harness uses stand-ins for com.northgate.vault.VaultClient, VaultCredentials and
+    ChargeResult; see .migration/characterization/billing/observations.md and .migration/evidence/runs/BL-02.md.'
 - id: unit-integration-tests
   applies_to: target
   status: met

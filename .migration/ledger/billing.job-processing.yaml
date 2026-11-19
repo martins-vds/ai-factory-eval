@@ -6,7 +6,13 @@ source:
 boundary: "BillingJob.run(member-to-invoice-lines): card charge or carry-over console output for each map entry"
 tickets: [martins-vds/ai-factory-eval#1556]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobChargesEachMemberAndCarriesEmptyMemberFeesIntoMembershipTotal
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobIsSilentForNoMembersAndPropagatesDeclines
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobRejectsNullInvoiceList
 rules:
   - id: calculate-as-member
     rule: "Calculate each map entry's total with member set to true."
@@ -17,4 +23,4 @@ rules:
   - id: propagate-charge-failure
     rule: "Do not swallow a charge failure; the run exits through the thrown exception."
     source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
-notes: "Carry-over is reported but not persisted in this source; see quirk draft .migration/quirks/billing-carry-over-not-persisted.md."
+notes: "Carry-over is reported but not persisted in this source; see quirk draft .migration/quirks/billing-carry-over-not-persisted.md. Member order is not guaranteed; see .migration/quirks/billing-member-map-order.md."
