@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{% if fee %}Late fee for {{ fee.loan_id }}{% else %}Loan not found{% endif %} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      {% if fee %}
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The Lending Library · Fees</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ fee.loan_id }}</h1>
+      <p class="mt-2">Due {{ fee.due_on|date:"M j, Y" }}, {{ fee.late_days }} day(s) late.</p>
+      <p class="fee mt-6 text-2xl">Fee: ${{ fee_amount }}</p>
+      <div id="payment-status" class="mt-6"></div>
+      <form method="post" action="/ui/payments/{{ fee.loan_id }}/"
+            hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-status" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Pay late fee</button>
+      </form>
+      {% else %}
+      <p role="alert">No such loan.</p>
+      {% endif %}
+    </div>
+  </article>
+</section>
+<script>
+  htmx.config.responseHandling = [
+    {code: '204', swap: false},
+    {code: '[23]..', swap: true},
+    {code: '[45]..', swap: true, error: true},
+    {code: '...', swap: false}
+  ];
+</script>
+{% endblock %}

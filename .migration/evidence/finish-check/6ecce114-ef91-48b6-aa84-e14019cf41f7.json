@@ -1,0 +1,46 @@
+[
+  {
+    "at": "2026-11-19T15:07:01Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 22301,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-03",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6ecce114-ef91-48b6-aa84-e14019cf41f7.json",
+      ".migration/evidence/mutants/LL-03.md",
+      ".migration/evidence/runs/LL-03.md",
+      ".migration/ledger/fees.calculation.yaml",
+      ".migration/ledger/fees.page.yaml",
+      ".migration/ledger/integration.payment-gateway.yaml",
+      ".migration/returns/LL-03.afs-migrator.yaml",
+      "config/urls.py",
+      "src/fees/__init__.py",
+      "src/fees/composition.py",
+      "src/fees/gateway.py",
+      "src/fees/services.py",
+      "src/fees/urls.py",
+      "src/fees/views.py",
+      "templates/fees/page.html",
+      "templates/fees/payment-result.html",
+      "templates/fees/payment-status.html",
+      "tests/fees/test_endpoints.py",
+      "tests/fees/test_fee_services.py",
+      "tests/fees/test_gateway.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]

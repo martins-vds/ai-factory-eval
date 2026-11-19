@@ -1,0 +1,51 @@
+[
+  {
+    "at": "2026-11-19T14:56:53Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 22301,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-03",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/mutants/LL-03.md",
+      ".migration/evidence/runs/LL-03.md",
+      ".migration/ledger/fees.calculation.yaml",
+      ".migration/ledger/fees.page.yaml",
+      ".migration/ledger/integration.payment-gateway.yaml",
+      "config/urls.py",
+      "src/fees/__init__.py",
+      "src/fees/composition.py",
+      "src/fees/gateway.py",
+      "src/fees/services.py",
+      "src/fees/urls.py",
+      "src/fees/views.py",
+      "templates/fees/page.html",
+      "templates/fees/payment-result.html",
+      "templates/fees/payment-status.html",
+      "tests/fees/test_endpoints.py",
+      "tests/fees/test_fee_services.py",
+      "tests/fees/test_gateway.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-03.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-03`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-03.md`). See afs-migration-contract \u2192 Return files.",
+      "[mechanical] CI's validate.py will fail on this: .migration/ledger/integration.payment-gateway.yaml: invalid YAML: mapping values are not allowed here. Fix it and commit.",
+      "[mechanical] CI's validate.py will fail on this: in \".migration/ledger/integration.payment-gateway.yaml\", line 45, column 50. Fix it and commit."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
