@@ -5,10 +5,15 @@ source:
   graph_node: class:src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:ChangeDestinationDialog
   location: src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:15-43
   risk: {crap: 2, complexity: 1, coverage: 0.0}
-boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
+boundary: "Not-routed table actions load destination or deadline forms into a modal; successful application-use-case updates navigate back to the refreshed dashboard, and Cancel closes the modal."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - src/cargotracker/booking/interfaces/dialogs/views.py:create_dialog_views
+    - templates/booking/dialogs/
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +22,10 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_exposes_dialog_controls_without_changing_route_link"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_redirects_and_refreshes_not_routed_row"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_route_fields_and_refreshes_not_routed_row"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "The dialog chain coordinates presentation and refresh; destination and deadline business rules remain in the application/domain use cases."
+notes: "The target loads both edit fragments from the not-routed table and uses full-dashboard navigation after successful updates; ruling #251 drops the unavailable PrimeFaces widget warning."
+quirks: [martins-vds/ai-factory-pilot-target#251]

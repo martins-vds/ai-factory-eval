@@ -91,6 +91,7 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert f'value="{first_options[0]}" selected' in first_content
     assert first_options == second_options
     assert tuple(shipping_locations) == original_locations
+    assert 'role="alert"' not in first_content
 
 
 def test_deadline_dialog_shows_current_route_and_deadline(client):
@@ -124,6 +125,7 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(client, form_d
     assert 'Enter a valid arrival deadline.' in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
+    assert response.context['deadline_error'] == 'Enter a valid arrival deadline.'
     if not form_data:
         assert 'value=""' in content
 
@@ -144,6 +146,7 @@ def test_invalid_destination_shows_field_error_without_updating_cargo(client):
     assert 'Select a valid destination.' in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
+    assert response.context['destination_error'] == 'Select a valid destination.'
     assert updated is not None
     assert updated.route_specification.destination == cargo.route_specification.destination
 
@@ -210,6 +213,14 @@ def test_change_destination_use_case_rejects_the_cargo_origin():
 
     with pytest.raises(ValueError, match="Origin and destination can't be the same"):
         cargo_specification.change_destination(cargo.tracking_id, cargo.route_specification.origin)
+
+
+def test_change_deadline_use_case_rejects_non_datetime_input():
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(TypeError, match='Arrival deadline must be a datetime'):
+        cargo_specification.change_deadline(cargo.tracking_id, 'not-a-date')
 
 
 @pytest.mark.parametrize('dialog', ['destination', 'deadline'])
