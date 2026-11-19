@@ -6,7 +6,11 @@ source:
 boundary: "The main entrypoint reads Northgate credentials from environment variables, constructs a fixed two-member example batch, and invokes the monthly run; run.sh builds and launches it."
 tickets: [martins-vds/ai-factory-eval#1558]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/evidence/runs/BL-02.md
 quirks: []
 rules:
   - id: credential-environment

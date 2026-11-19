@@ -5,7 +5,7 @@
 
 ## Evidence
 - Source: `legacy-billing/run.sh:5-6` and `legacy-billing/pom.xml:20-33`
-- Characterization: source-predicted: `mvn package` is followed by a Java classpath containing `target/classes` and `target/dependency/*`; the POM declares the Northgate client but no dependency-copy plugin or execution. Not executed in BL-01 because the full build requires the vendor's private Maven repository.
+- Characterization: `.migration/characterization/billing/observations.md`, case `test_launcher_runs_maven_then_java_with_target_dependency_classpath`; fake `mvn` and `java` executables observed `mvn -q -B package` followed by `java -cp target/classes:target/dependency/* billing.BillingJob`. The private dependency was not resolved, so real launch success is unverified.
 - Why it looks wrong: the billing entrypoint references `VaultClient`, but the run script does not add Maven's local dependency cache or otherwise populate its `target/dependency` classpath directory.
 
 ## Impact

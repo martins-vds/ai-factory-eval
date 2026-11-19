@@ -5,7 +5,7 @@ When a member's charge is declined, `CardVault.charge` throws and `BillingJob.ru
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/CardVault.java:18-20` and `legacy-billing/src/main/java/billing/BillingJob.java:15-23`
-- Characterization: source-predicted batch where the first entry is declined throws from `run` and does not attempt subsequent entries; not executed in BL-01.
+- Characterization: `.migration/characterization/billing/observations.md`, case `test_declined_charge_stops_batch`; the first entry's decline throws and only that member is sent to the vault.
 - Why it looks wrong: one member's declined payment can prevent unrelated members later in the iteration from being billed or reported.
 
 ## Impact
