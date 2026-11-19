@@ -103,20 +103,34 @@ def loan_lend_page(request):
 def loan_return_page(request, loan_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
+    repository = LoanRepository()
+    is_htmx = request.headers.get('HX-Request') == 'true'
     try:
-        loan = return_loan_use_case(LoanRepository(), loan_id, timezone.localdate())
+        loan = return_loan_use_case(repository, loan_id, timezone.localdate())
     except LoanAlreadyReturned:
+        message = 'This book has already been returned.'
+        if is_htmx:
+            return render(
+                request,
+                'loans/partials/return_status.html',
+                {'message': message, 'loan': None},
+                status=409,
+            )
         return render(
             request,
-            'loans/partials/return_status.html',
-            {'message': 'This book has already been returned.', 'loan': None},
+            'loans/detail.html',
+            {'loan': repository.find(loan_id), 'return_error': message},
             status=409,
         )
     if loan is None:
-        return render(
-            request,
-            'loans/partials/return_status.html',
-            {'message': 'No such loan.', 'loan': None},
-            status=404,
-        )
+        if is_htmx:
+            return render(
+                request,
+                'loans/partials/return_status.html',
+                {'message': 'No such loan.', 'loan': None},
+                status=404,
+            )
+        return render(request, 'loans/not_found.html', status=404)
+    if not is_htmx:
+        return redirect('loan_catalog_detail', loan_id=loan.id)
     return render(request, 'loans/partials/return_status.html', {'message': '', 'loan': loan})

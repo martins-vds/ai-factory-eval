@@ -27,6 +27,9 @@ evidence:
   - tests/loans/test_circulation.py::test_return_use_case_rejects_a_repeat_and_preserves_the_original_date
   - tests/loans/test_circulation.py::test_return_endpoint_returns_not_found_for_an_unknown_loan
   - tests/loans/test_circulation.py::test_htmx_unknown_return_renders_not_found
+  - tests/loans/test_circulation.py::test_full_page_return_redirects_to_the_updated_loan
+  - tests/loans/test_circulation.py::test_full_page_repeat_return_renders_the_loan_and_error
+  - tests/loans/test_circulation.py::test_full_page_unknown_return_renders_the_reading_room_not_found_page
 rules:
   - id: unknown-loan-not-found
     rule: Returning an unknown loan yields no record and does not create one.

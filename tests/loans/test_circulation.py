@@ -224,6 +224,17 @@ def test_htmx_return_page_shows_the_return_date(client, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_full_page_return_redirects_to_the_updated_loan(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 19))
+
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+    assert Loan.objects.get(pk='L1').returned_on == date(2026, 11, 19)
+
+
+@pytest.mark.django_db
 def test_htmx_repeat_return_renders_error_and_keeps_original_date(client):
     original_date = Loan.objects.get(pk='L2').returned_on
 
@@ -238,8 +249,30 @@ def test_htmx_repeat_return_renders_error_and_keeps_original_date(client):
 
 
 @pytest.mark.django_db
+def test_full_page_repeat_return_renders_the_loan_and_error(client):
+    original_date = Loan.objects.get(pk='L2').returned_on
+
+    response = client.post('/ui/loans/L2/return/')
+
+    assert response.status_code == 409
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'This book has already been returned.' in response.content
+    assert b'Jan 20, 2026' in response.content
+    assert Loan.objects.get(pk='L2').returned_on == original_date
+
+
+@pytest.mark.django_db
 def test_htmx_unknown_return_renders_not_found(client):
     response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
     assert b'<p role="alert">No such loan.</p>' in response.content
+
+
+@pytest.mark.django_db
+def test_full_page_unknown_return_renders_the_reading_room_not_found_page(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert b'The Lending Library' in response.content
+    assert b'No such loan.' in response.content
