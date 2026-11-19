@@ -1,0 +1,124 @@
+harness_version: 0.2.0
+checked_at: "2026-11-19T22:07:27Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    From /home/runner/work/ai-factory-eval/ai-factory-eval, ran `./legacy/run.sh`;
+    `mvn -q -B package -DskipTests` succeeded and the app printed `Lending Library
+    listening on 8080` after connecting to `jdbc:h2:mem:library;DB_CLOSE_DELAY=-1`.
+    Ran `curl -sS -X GET -w '\nHTTP %{http_code}' http://127.0.0.1:8080/loans`;
+    it returned 200 and lines `L1;ana;9780134685991;2026-01-02;2026-01-16;`,
+    `L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20`, and
+    `L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03`. The same GET command
+    for `/loans/L1` returned 200 and the L1 line; `/loans/1` returned 404
+    `no such loan`; `/fees/1` returned 404 `<p>No such loan.</p>`; `/about` returned
+    200 with `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>About
+    the Lending Library</title></head><body><h1>About the Lending Library</h1><p>Open
+    Monday to Saturday, 9:00 to 18:00. Books are lent for 14 days.</p><p>Contact:
+    desk@lending-library.invalid</p></body></html>`. `curl -sS -X POST -d
+    'member=probe&isbn=9780000000001' -w '\nHTTP %{http_code}'
+    http://127.0.0.1:8080/loans` returned 201 and
+    `L4;probe;9780000000001;2026-11-19;2026-12-03;`. The same POST command without
+    form data for `/loans/L1/return` returned 200 and updated L1 to
+    `L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-19`; a subsequent GET
+    `/loans/L1` returned that line with 200. `/loans/1/return` and `/payments/1`
+    returned 404 `no such loan`. `GET /fees/L3` returned 200 with
+    `<h1>Late fee for L3</h1><p>Due 2025-12-15, 19 day(s) late.</p><p class="fee">Fee:
+    $4.75</p>`. Jersey emitted provider warnings at startup, but the tested routes
+    responded. No successful payment request was made because its default gateway is
+    an external `.invalid` URL.
+capabilities:
+  - id: build-run
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh (Maven, Java 17)" }
+      - { kind: tool, name: "Django management CLI (Python 3.13, Django 5)" }
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh" }
+      - { kind: tool, name: curl }
+    notes: "Tier A HTTP characterization was performed against the running source."
+  - id: unit-integration-tests
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No source test suite was found under legacy/; characterization used live HTTP requests."
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: pytest }
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source test suite or coverage provider is present; source coverage is best-effort."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: pytest-coverage }
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source coverage data is available; source CRAP is best-effort."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "crap.py, lizard, coverage.py" }
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: afs-mutation }
+      - { kind: tool, name: mutmut }
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: ruff }
+  - id: stack-idioms
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: "java-docs, java-junit" }
+      - { kind: skill, name: "django-patterns, django-security, django-tdd, django-verification" }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: "The pinned data skills do not cover the source H2 to target PostgreSQL migration path."
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: agent-browser }
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
