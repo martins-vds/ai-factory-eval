@@ -10,7 +10,7 @@ def _fee_amount(fee):
 
 
 def _api_response(body, status, content_type):
-    response = HttpResponse(body, status=status, content_type=content_type)
+    response = HttpResponse(body, status=status)
     response['Content-Type'] = content_type
     return response
 

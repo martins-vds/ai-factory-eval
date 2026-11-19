@@ -57,6 +57,39 @@ def test_fee_api_returns_the_characterized_unknown_loan_response(client):
 
 
 @pytest.mark.django_db
+def test_fee_api_formats_a_capped_fee_as_two_decimal_dollars(client):
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert b'Fee: $10.00' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_not_found_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/ui/fees/L1/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
 def test_fee_page_shows_fee_and_posts_payment_to_the_ui_route(client):
     response = client.get('/ui/fees/L3/')
 
@@ -113,10 +146,21 @@ def test_payment_api_maps_connection_failure_to_gateway_unavailable(client, monk
 
 
 @pytest.mark.django_db
+def test_htmx_payment_for_an_unknown_loan_returns_an_error_fragment(client):
+    response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'<!doctype html>' not in response.content
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
 def test_htmx_payment_success_renders_a_status_fragment(payment_gateway, client):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' not in response.content
     assert b'role="status"' in response.content
     assert b'charged' in response.content
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
@@ -130,6 +174,7 @@ def test_htmx_payment_failure_renders_an_error_fragment(payment_gateway, client)
     response = client.post('/ui/payments/L2/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 502
+    assert b'<!doctype html>' not in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
 

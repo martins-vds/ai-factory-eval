@@ -21,13 +21,13 @@ class GatewayFailure(Exception):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass
 class GatewayResult:
     status_code: int
     body: str
 
 
-@dataclass(frozen=True)
+@dataclass
 class PaymentResult:
     status_code: int
     body: str
@@ -38,7 +38,7 @@ class PaymentGateway(Protocol):
     def charge(self, loan_id: str) -> GatewayResult: ...
 
 
-@dataclass(frozen=True)
+@dataclass
 class LateFee:
     loan_id: str
     due_on: date

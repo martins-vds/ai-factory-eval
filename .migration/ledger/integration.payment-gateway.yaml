@@ -14,7 +14,23 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_payment_application_does_not_call_gateway_for_an_unknown_loan, tests/fees/test_services.py::test_payment_application_maps_non_success_gateway_status_to_failure, tests/fees/test_services.py::test_payment_application_retains_interruption_while_mapping_gateway_failure, tests/fees/test_gateway.py::test_http_payment_gateway_preserves_interruption_when_wrapping_failure, tests/fees/test_endpoints.py::test_payment_api_forwards_the_gateway_request_and_success, tests/fees/test_endpoints.py::test_payment_api_maps_gateway_decline_to_502_and_preserves_body, tests/fees/test_payment_api_maps_connection_failure_to_gateway_unavailable, tests/fees/test_real_browser_displays_payment_gateway_failures]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_fee_services.py::test_payment_application_does_not_call_gateway_for_an_unknown_loan
+  - tests/fees/test_fee_services.py::test_payment_application_maps_non_success_gateway_status_to_failure
+  - tests/fees/test_fee_services.py::test_payment_application_retains_interruption_while_mapping_gateway_failure
+  - tests/fees/test_gateway.py::test_http_payment_gateway_preserves_interruption_when_wrapping_failure
+  - tests/fees/test_gateway.py::test_http_payment_gateway_retains_interrupted_url_error
+  - tests/fees/test_gateway.py::test_http_payment_gateway_uses_the_configured_default_and_encodes_loan_id
+  - tests/fees/test_endpoints.py::test_payment_api_forwards_the_gateway_request_and_success
+  - tests/fees/test_endpoints.py::test_payment_api_maps_gateway_decline_to_502_and_preserves_body
+  - tests/fees/test_endpoints.py::test_payment_api_maps_connection_failure_to_gateway_unavailable
+  - tests/fees/test_endpoints.py::test_htmx_payment_for_an_unknown_loan_returns_an_error_fragment
+  - tests/fees/test_endpoints.py::test_real_browser_displays_payment_gateway_failures
 notes: "The approved fix in martins-vds/ai-factory-synthetic-target#40 maps interruptions to 502 while retaining the InterruptedError as the gateway failure cause."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
 rules:

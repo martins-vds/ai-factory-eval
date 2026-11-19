@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_fee_application_applies_waiver_daily_rate_and_cap, tests/fees/test_services.py::test_fee_application_uses_today_for_an_unreturned_loan]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fee_services.py::test_fee_calculation_applies_waiver_daily_rate_and_cap, tests/fees/test_fee_services.py::test_fee_application_uses_today_for_an_unreturned_loan]
 rules:
   - id: fee-calculation
     rule: "Late days are clamped at zero; fees are waived through two late days, then accrue at 25 cents per late day up to $10."

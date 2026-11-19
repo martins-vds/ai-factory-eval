@@ -13,7 +13,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_endpoints.py::test_fee_api_matches_the_characterized_html_response, tests/fees/test_fee_api_returns_the_characterized_unknown_loan_response, tests/fees/test_fee_page_shows_fee_and_posts_payment_to_the_ui_route, tests/fees/test_real_browser_can_pay_a_late_fee]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_endpoints.py::test_fee_api_matches_the_characterized_html_response, tests/fees/test_endpoints.py::test_fee_api_returns_the_characterized_unknown_loan_response, tests/fees/test_endpoints.py::test_fee_page_shows_fee_and_posts_payment_to_the_ui_route, tests/fees/test_endpoints.py::test_real_browser_can_pay_a_late_fee]
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
 rules:
   - id: unknown-loan

@@ -49,7 +49,7 @@ class ResultGateway:
     ('days_from_due', 'late_days', 'fee_cents'),
     [(-3, 0, 0), (0, 0, 0), (2, 2, 0), (3, 3, 75), (50, 50, 1000)],
 )
-def test_fee_application_applies_waiver_daily_rate_and_cap(days_from_due, late_days, fee_cents):
+def test_fee_calculation_applies_waiver_daily_rate_and_cap(days_from_due, late_days, fee_cents):
     due_on = date(2026, 1, 16)
     loan = LoanRecord('L1', due_on, due_on + timedelta(days=days_from_due))
     application = FeeApplication(LoanRepository(loan), FixedClock(date(2026, 3, 7)))
@@ -98,6 +98,7 @@ def test_payment_application_maps_non_success_gateway_status_to_failure():
 
     assert result.status_code == 502
     assert result.body == 'declined\n'
+    assert result.failure is None
 
 
 def test_payment_application_retains_interruption_while_mapping_gateway_failure():
