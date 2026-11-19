@@ -1,7 +1,22 @@
 import csv
 from io import StringIO
+from typing import Protocol
 
-from .repository import LoanRepository
+
+class LoanRepositoryPort(Protocol):
+    def all(self): ...
+
+    def create(self, **fields): ...
+
+    def find(self, loan_id): ...
+
+    def save(self, loan): ...
+
+
+class LoanInputError(Exception):
+    def __init__(self, fields):
+        self.fields = fields
+        super().__init__('Member and ISBN are required.')
 
 
 def loan_line(loan):
@@ -20,10 +35,28 @@ def loan_line(loan):
     return output.getvalue()
 
 
-def list_loans_text():
-    return ''.join(loan_line(loan) for loan in LoanRepository().all())
+def list_loans_text(repository: LoanRepositoryPort):
+    return ''.join(loan_line(loan) for loan in repository.all())
 
 
-def get_loan_text(loan_id):
-    loan = LoanRepository().find(loan_id)
+def get_loan_text(loan_id, repository: LoanRepositoryPort):
+    loan = repository.find(loan_id)
     return loan_line(loan) if loan else None
+
+
+def lend_loan(*, repository: LoanRepositoryPort, member: str, isbn: str, lent_on):
+    fields = {'member': member, 'isbn': isbn}
+    errors = {
+        name: 'This field is required.'
+        for name, value in fields.items()
+        if not isinstance(value, str) or not value.strip()
+    }
+    if errors:
+        raise LoanInputError(errors)
+
+    return repository.create(
+        id=f'L{len(repository.all()) + 1}',
+        member=member,
+        isbn=isbn,
+        lent_on=lent_on,
+    )
