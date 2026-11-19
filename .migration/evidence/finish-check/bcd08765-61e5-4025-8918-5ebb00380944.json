@@ -1,0 +1,54 @@
+[
+  {
+    "at": "2026-11-19T22:33:12Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17082,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-02.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T22:33:41Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17389,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/bcd08765-61e5-4025-8918-5ebb00380944.json"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-02.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/LL-02.md"
+  }
+]
