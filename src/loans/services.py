@@ -1,7 +1,7 @@
 import csv
 from io import StringIO
 
-from .ports import LoanRepositoryPort, LoanRecord
+from .ports import LoanRecord, LoanRepositoryPort
 
 
 class LoanInputError(ValueError):

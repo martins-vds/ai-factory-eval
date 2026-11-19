@@ -71,7 +71,7 @@ def test_lend_use_case_creates_a_loan_due_fourteen_days_later():
     assert loan.due_on == date(2026, 12, 3)
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_lend_use_case_retries_a_conflicting_id():
     Loan.objects.create(
         id='L5',
@@ -150,6 +150,7 @@ def test_reading_room_catalog_links_to_the_lending_form(client):
     assert response.status_code == 200
     assert b'href="/ui/loans/new/"' in response.content
     assert b'Lend a book' in response.content
+    assert b'ana' in response.content
 
 
 @pytest.mark.django_db
@@ -232,7 +233,7 @@ def test_htmx_repeat_return_renders_error_and_keeps_original_date(client):
     )
 
     assert response.status_code == 409
-    assert b'already been returned' in response.content
+    assert b'<p role="alert">This book has already been returned.</p>' in response.content
     assert Loan.objects.get(pk='L2').returned_on == original_date
 
 
@@ -241,4 +242,4 @@ def test_htmx_unknown_return_renders_not_found(client):
     response = client.post('/ui/loans/unknown/return/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
-    assert b'No such loan.' in response.content
+    assert b'<p role="alert">No such loan.</p>' in response.content

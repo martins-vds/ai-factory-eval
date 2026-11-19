@@ -1,5 +1,4 @@
-from django.http import HttpResponse
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -12,6 +11,8 @@ from .services import (
     lend_loan,
     list_loans_text,
     loan_line,
+)
+from .services import (
     return_loan as return_loan_use_case,
 )
 
