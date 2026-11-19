@@ -1,0 +1,29 @@
+[
+  {
+    "at": "2026-11-19T14:53:24Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17076,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-02",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/evidence/runs/BL-02.md",
+      ".migration/handoffs/BL-02.md",
+      ".migration/returns/BL-02.afs-characterizer.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
