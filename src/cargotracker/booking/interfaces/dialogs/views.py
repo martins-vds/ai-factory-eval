@@ -41,18 +41,21 @@ def _render_dialog(
     return render(request, page, {**context, 'open_dialog': True})
 
 
-def _destination_context(
-    cargo: Cargo,
-    tracking_id: str,
-    locations: list[Location],
-    destination_value: str = '',
-    destination_error: str = '',
-) -> dict[str, object]:
-    destinations = [
+def _destination_options(cargo: Cargo, locations: list[Location]) -> list[Location]:
+    return [
         location
         for location in locations
         if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
     ]
+
+
+def _destination_context(
+    cargo: Cargo,
+    tracking_id: str,
+    destinations: list[Location],
+    destination_value: str = '',
+    destination_error: str = '',
+) -> dict[str, object]:
     if not destination_value and destinations:
         destination_value = next(
             (
@@ -79,6 +82,7 @@ def create_dialog_views(
     def destination_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         cargo = _find_cargo(cargo_dashboard, tracking_id)
         locations = list(list_shipping_locations())
+        destinations = _destination_options(cargo, locations)
         destination_value = request.POST.get('destination', '')
         destination_error = ''
 
@@ -86,7 +90,7 @@ def create_dialog_views(
             destination = next(
                 (
                     location
-                    for location in locations
+                    for location in destinations
                     if location.unlocode.value == destination_value
                 ),
                 None,
@@ -100,7 +104,7 @@ def create_dialog_views(
         context = _destination_context(
             cargo,
             tracking_id,
-            locations,
+            destinations,
             destination_value=destination_value,
             destination_error=destination_error,
         )

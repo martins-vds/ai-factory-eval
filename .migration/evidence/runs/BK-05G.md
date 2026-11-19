@@ -23,3 +23,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T21:51:10+00:00 | dialogs-no-js-red | 1 | 1.88 | `pytest -q tests/booking/interfaces/test_dialogs.py -k non_htmx` | `8c8022284f95d14c` | assert page.status_code == 200 |  |
 | 2026-11-19T21:51:16+00:00 | mutation-changed | 1 | 103.38 | `python .migration/harness/tools/afs-mutation` | `9b3761aa05bfa4eb` | afs-mutation: FAILED score=0.727 threshold=0.8 killed=48 survived=18 skipped=0 files=1 jobs=1 base=cce147dc5b1f06341760d | gate=mutation score=0.727 threshold=0.8 killed=48 survived=18 files=1 base=cce147dc5b1f06341760dbe4bbf1925210133037 |
 | 2026-11-19T21:52:35+00:00 | dialogs-targeted | 0 | 3.98 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `6952f4ed683bae13` |  |  |
+| 2026-11-19T21:55:41+00:00 | mutation-changed | 0 | 140.93 | `python .migration/harness/tools/afs-mutation` | `84d2ba89fda4f4b3` |  | gate=mutation score=0.838 threshold=0.8 killed=62 survived=12 files=1 base=cce147dc5b1f06341760dbe4bbf1925210133037 |
+| 2026-11-19T21:56:13+00:00 | excluded-destination-red | 1 | 1.71 | `pytest -q tests/booking/interfaces/test_dialogs.py -k rejects_origin` | `cf0c377cbc3a0ec2` | assert before is not None |  |
+| 2026-11-19T21:56:41+00:00 | dialogs-targeted | 0 | 4.2 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `868894e7097e2853` |  |  |
+| 2026-11-19T21:58:02+00:00 | build-compileall | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-19T21:58:02+00:00 | build-django-check | 0 | 0.23 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-19T21:58:06+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-19T21:58:06+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-19T21:58:06+00:00 | idiom-layers | 0 | 0.09 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-19T21:58:06+00:00 | idiom-ui | 0 | 0.3 | `python .migration/harness/tools/check_ui.py` | `1ffdf2d00f5eba11` |  | gate=ui scope="templates changed since cce147dc5b1f06341760dbe4bbf1925210133037" templates=5 findings=0 |
+| 2026-11-19T21:58:42+00:00 | behavior | 0 | 33.4 | `pytest -q` | `29a5775803d50629` |  |  |
+| 2026-11-19T21:59:21+00:00 | crap-coverage | 0 | 35.7 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `9154cea87164c49c` |  |  |
+| 2026-11-19T21:59:21+00:00 | crap-lizard | 0 | 0.09 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-19T21:59:21+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-19T22:01:59+00:00 | mutation-changed | 0 | 155.02 | `python .migration/harness/tools/afs-mutation` | `9882b3ca53710be1` |  | gate=mutation score=0.838 threshold=0.8 killed=62 survived=12 files=1 base=cce147dc5b1f06341760dbe4bbf1925210133037 |

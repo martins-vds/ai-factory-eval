@@ -1,0 +1,40 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1611
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.838
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+  - .migration/evidence/mutants/BK-05G.md
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_values_and_filters_options_without_mutating_locations
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_defaults_to_first_available_when_gothenburg_is_absent
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_reports_unknown_location_without_updating_cargo
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_origin_and_current_destination
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_route_specification_values
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_reports_unparseable_value_without_changing_cargo
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_completes_dialog
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_refreshes_table
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
+  - tests/booking/interfaces/test_dialogs.py::test_dialogs_have_working_non_htmx_pages_and_submission
+  - .migration/evidence/runs/BK-05G.md
+  - .migration/evidence/mutants/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+rules: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+no_rules:
+  booking.dialog-chain: The dialogs coordinate presentation and application calls; they own no independent business constraints.
+  booking.dialog-deadline: Date parsing is form syntax validation; cargo deadline changes remain governed by CargoSpecification.
+  booking.dialog-destination: Allowed destination choices are a presentation-level list; cargo specification business policy remains in CargoSpecification.

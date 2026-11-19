@@ -155,6 +155,29 @@ def test_destination_dialog_reports_unknown_location_without_updating_cargo(clie
     )
 
 
+@pytest.mark.parametrize('excluded_destination', ('CNHKG', 'AUMEL'))
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_rejects_origin_and_current_destination(client, excluded_destination):
+    call_command('seed_sample_data')
+    shipping_locations[:] = location_repository.find_all()
+    before = cargo_repository.find(TrackingId('DEF789'))
+    assert before is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': excluded_destination},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert (
+        cargo_repository.find(TrackingId('DEF789')).route_specification
+        == before.route_specification
+    )
+
+
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_destination_update_preserves_other_specification_fields_and_completes_dialog(client):
