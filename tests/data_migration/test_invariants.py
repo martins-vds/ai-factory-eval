@@ -10,9 +10,12 @@ from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
-from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.cargo.infrastructure.models import CargoRecord
+from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
+from cargotracker.handling.infrastructure.models import HandlingEventRecord
+from cargotracker.location.infrastructure.models import LocationRecord
+from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
 
 pytestmark = pytest.mark.django_db(transaction=True)
 
@@ -64,9 +67,18 @@ def _consistent_snapshot(snapshot):
     )
     _write_rows(snapshot, 'CARGO', [cargo])
 
-    event = _read_rows(snapshot, 'HANDLINGEVENT')[0]
-    event.update({'VOYAGE_ID': r'\N', 'LOCATION_ID': '101'})
-    _write_rows(snapshot, 'HANDLINGEVENT', [event])
+    receive_event = _read_rows(snapshot, 'HANDLINGEVENT')[0]
+    receive_event.update({'VOYAGE_ID': r'\N', 'LOCATION_ID': '101'})
+    load_event = {
+        'ID': '72',
+        'TYPE': 'LOAD',
+        'VOYAGE_ID': '900',
+        'LOCATION_ID': '101',
+        'COMPLETIONTIME': '2026-11-07T08:10:00Z',
+        'REGISTRATION': '2026-11-07T08:11:00Z',
+        'CARGO_ID': '13',
+    }
+    _write_rows(snapshot, 'HANDLINGEVENT', [receive_event, load_event])
 
     _write_rows(
         snapshot,
@@ -149,3 +161,50 @@ def test_loaded_cargo_delivery_matches_its_handling_history(loaded_snapshot):
         assert stored.unloaded_at_destination == derived.unloaded_at_destination
         assert stored.routing_status == derived.routing_status
         assert stored.last_event_id == history.most_recent_event_id
+
+
+def test_loaded_itinerary_legs_connect(loaded_snapshot):
+        itineraries = []
+        for cargo in CargoRecord.objects.order_by('pk'):
+            legs = list(
+                cargo.legs.order_by('load_time', 'pk').values_list(
+                    'load_location_id',
+                    'unload_location_id',
+                )
+            )
+            itineraries.append(legs)
+
+        assert any(len(legs) > 1 for legs in itineraries)
+        assert all(
+            previous[1] == following[0]
+            for legs in itineraries
+            for previous, following in pairwise(legs)
+        )
+
+
+def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
+        events = list(HandlingEventRecord.objects.order_by('pk'))
+        assert events
+        assert any(event.voyage_id is not None for event in events)
+
+        for event in events:
+            assert LocationRecord.objects.filter(pk=event.location_id).exists()
+            assert event.voyage_id is None or VoyageRecord.objects.filter(pk=event.voyage_id).exists()
+
+
+def test_loaded_voyage_schedules_are_chronological_and_connected(loaded_snapshot):
+        schedules = []
+        for voyage in VoyageRecord.objects.order_by('pk'):
+            movements = list(
+                CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
+            )
+            schedules.append(movements)
+
+        assert any(len(movements) > 1 for movements in schedules)
+        for movements in schedules:
+            assert all(movement.departure_time <= movement.arrival_time for movement in movements)
+            assert all(
+                previous.arrival_time <= following.departure_time
+                and previous.arrival_location_id == following.departure_location_id
+                for previous, following in pairwise(movements)
+            )

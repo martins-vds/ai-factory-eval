@@ -8,3 +8,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T18:18:02+00:00 | snapshot-validation | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
 | 2026-11-19T18:21:12+00:00 | invariants-delivery | 0 | 4.01 | `pytest -q tests/data_migration/test_invariants.py` | `1c6b0233fa8cd732` |  |  |
 | 2026-11-19T18:21:39+00:00 | invariants-delivery | 0 | 1.67 | `pytest -q tests/data_migration/test_invariants.py` | `941ba30613647e4a` |  |  |
+| 2026-11-19T18:22:07+00:00 | invariants | 0 | 1.92 | `pytest -q tests/data_migration/test_invariants.py` | `bb19e66110651773` |  |  |
