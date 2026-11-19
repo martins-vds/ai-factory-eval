@@ -1,8 +1,10 @@
+import re
 from datetime import UTC, datetime, timedelta
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -97,10 +99,13 @@ def test_route_page_displays_cargo_details_and_candidate_itinerary_properties(cl
 
     assert response.status_code == 200
     assert cargo is not None
-    assert 'Route Cargo DEF789' in content
+    heading = re.search(r'<h1\b[^>]*>(.*?)</h1>', content, re.DOTALL)
+    assert heading is not None
+    assert heading.group(1).strip() == 'Route Cargo DEF789'
     assert 'Hong Kong' in content and 'CNHKG' in content
     assert 'Melbourne' in content and 'AUMEL' in content
     assert 'Arrival deadline:' in content
+    assert 'role="alert"' not in content
     assert 'Potential routes: 2' in content
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
     assert '0100S' in content and '0200T' in content and '0300A' in content
@@ -125,7 +130,9 @@ def test_itinerary_page_renders_candidates_when_present(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select an itinerary for cargo DEF789' in content
+    heading = re.search(r'<h1\b[^>]*>(.*?)</h1>', content, re.DOTALL)
+    assert heading is not None
+    assert heading.group(1).strip() == 'Select an itinerary for cargo DEF789'
     assert 'Potential routes: 2' in content
     assert 'Itinerary 1' in content and 'Itinerary 2' in content
     assert NO_ROUTES_MESSAGE not in content
@@ -195,3 +202,88 @@ def test_invalid_candidate_selection_is_reported_without_assigning_a_route(clien
     assert 'Potential routes: 2' in content
     assert cargo is not None
     assert not cargo.itinerary.legs
+
+
+@pytest.mark.parametrize(
+    'candidate_index',
+    ('not-a-number', None),
+    ids=('malformed', 'missing'),
+)
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_malformed_or_missing_candidate_selection_is_reported(client, candidate_index):
+    call_command('seed_sample_data')
+    routing_service.paths = _candidate_paths()
+    client.get('/admin/cargo/DEF789/route/')
+    form_data = {} if candidate_index is None else {'candidate_index': candidate_index}
+
+    response = client.post('/admin/cargo/DEF789/route/', form_data)
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select one of the available itineraries.' in content
+    assert 'Potential routes: 2' in content
+    assert cargo is not None
+    assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_missing_candidate_snapshot_is_refreshed_before_selection(client):
+    call_command('seed_sample_data')
+    routing_service.paths = _candidate_paths()
+    client.get('/admin/cargo/DEF789/route/')
+    session = client.session
+    session.clear()
+    session.save()
+
+    response = client.post('/admin/cargo/DEF789/route/', {'candidate_index': '0'})
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select one of the available itineraries.' in content
+    assert 'Potential routes: 2' in content
+    assert 'Itinerary 1' in content and 'Itinerary 2' in content
+    assert len(response.context['candidates']) == 2
+
+    routing_service.paths = ()
+    assignment_response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate_index': '0'},
+    )
+    assigned = cargo_repository.find(TrackingId('DEF789'))
+    assert assignment_response.status_code == 302
+    assert assignment_response['Location'] == '/admin/cargo/DEF789/'
+    assert assigned is not None
+    assert assigned.itinerary.legs[0].voyage.voyage_number.value == '0100S'
+
+
+@pytest.mark.django_db
+def test_corrupt_candidate_snapshot_is_refreshed_before_selection():
+    class CorruptSession(dict):
+        def get(self, key, default=None):
+            return [[]]
+
+    call_command('seed_sample_data')
+    routing_service.paths = _candidate_paths()
+    request = RequestFactory().post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate_index': '0'},
+    )
+    request.session = CorruptSession()
+
+    response = route_view(request, 'DEF789')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select one of the available itineraries.' in content
+    assert 'Potential routes: 2' in content
+    assert 'Itinerary 1' in content and 'Itinerary 2' in content
+    assert len(next(iter(request.session.values()))) == 2
+
+
+@pytest.mark.django_db
+def test_unknown_route_selection_raises_the_existing_not_found_error():
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        route_view(RequestFactory().get('/admin/cargo/UNKNOWN/route/'), 'UNKNOWN')

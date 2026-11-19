@@ -71,13 +71,14 @@ def create_route_selection_views(
                 candidates = tuple(_deserialize_itinerary(legs) for legs in stored_candidates)
             except (KeyError, TypeError, ValueError):
                 candidates = ()
+                stored_candidates = None
 
             try:
-                candidate_index = int(request.POST.get('candidate_index', ''))
-            except ValueError:
-                candidate_index = -1
+                candidate_index = int(request.POST['candidate_index'])
+            except (KeyError, ValueError):
+                candidate_index = None
 
-            if 0 <= candidate_index < len(candidates):
+            if candidate_index is not None and 0 <= candidate_index < len(candidates):
                 cargo_routing.assign_route(cargo.tracking_id, candidates[candidate_index])
                 del request.session[session_key]
                 return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
