@@ -1,0 +1,110 @@
+from datetime import date, timedelta
+
+import pytest
+from django.core.management import call_command
+from django.utils import timezone
+
+RESPONSE_HANDLING = (
+    b'"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},'
+    b'{"code":"[45]..","swap":true,"error":true},{"code":"...","swap":false}]'
+)
+
+
+def _assert_page_handles_error_swaps(page, target, fragment=None):
+    content = page.content
+    target_content = (fragment or page).content
+    target_id = target.removeprefix('#').encode()
+
+    assert page.status_code == 200
+    assert b'name="htmx-config"' in content
+    assert RESPONSE_HANDLING in content
+    assert f'hx-target="{target}"'.encode() in target_content
+    assert b'id="' + target_id + b'"' in target_content
+
+
+@pytest.fixture
+def dashboard_page(client):
+    call_command('seed_sample_data')
+    return client.get('/admin/dashboard/')
+
+
+@pytest.mark.django_db
+def test_live_map_page_keeps_marker_errors_silent(client):
+    page = client.get('/admin/live-map/')
+
+    assert b'name="htmx-config"' in page.content
+    assert RESPONSE_HANDLING in page.content
+    assert (
+        b'hx-on::before-swap="if (event.detail.isError) event.detail.shouldSwap = false"'
+        in page.content
+    )
+
+
+@pytest.mark.django_db
+def test_not_routed_table_page_swaps_unknown_cargo_response(client, dashboard_page):
+    response = client.get(
+        '/admin/cargo/UNKNOWN/destination/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+    assert b'The requested resource was not found on this server.' in response.content
+    _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
+
+
+@pytest.mark.django_db
+def test_deadline_dialog_page_swaps_expired_cargo_response(client, dashboard_page):
+    response = client.get('/admin/cargo/STALE1/deadline/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'The requested resource was not found on this server.' in response.content
+    _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
+
+
+@pytest.mark.django_db
+def test_destination_dialog_page_swaps_invalid_destination_error(client, dashboard_page):
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'UNKNOWN'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'Select a valid destination.' in response.content
+    _assert_page_handles_error_swaps(dashboard_page, '#cargo-edit-dialog-content')
+
+
+@pytest.mark.django_db
+def test_booking_deadline_form_swaps_expired_deadline_error(client, monkeypatch):
+    call_command('seed_sample_data')
+    page = client.get('/booking/')
+    today = date(2026, 11, 18)
+    monkeypatch.setattr(timezone, 'localdate', lambda: today)
+    response = client.post(
+        '/booking/',
+        {
+            'step': 'deadline',
+            'origin': 'USCHI',
+            'destination': 'USDAL',
+            'deadline': (today - timedelta(days=1)).isoformat(),
+        },
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'Arrival deadline cannot be before today.' in response.content
+    _assert_page_handles_error_swaps(page, '#deadline-form', response)
+
+
+@pytest.mark.django_db
+def test_tracking_page_swaps_unknown_tracking_id_error(client):
+    page = client.get('/')
+    response = client.post(
+        '/',
+        {'tracking_id': 'UNKNOWN'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert b'Cargo with tracking ID UNKNOWN not found.' in response.content
+    _assert_page_handles_error_swaps(page, '#tracking-result')
