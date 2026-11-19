@@ -261,5 +261,7 @@ def test_route_screens_reject_unsupported_http_methods(client):
 def test_route_selection_raises_not_found_for_unknown_cargo():
     request = RequestFactory().get('/admin/cargo/MISSING1/route/')
 
-    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
+    with pytest.raises(Http404) as error:
         route_view(request, 'MISSING1')
+
+    assert str(error.value) == 'Cargo with tracking ID MISSING1 not found.'

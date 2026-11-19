@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `97d6d08d94d8b719104de7b149b6ebc4d457f358`): score 0.871, threshold 0.8, killed 54, survived 8. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `97d6d08d94d8b719104de7b149b6ebc4d457f358`): score 0.887, threshold 0.8, killed 55, survived 7. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:22 Mutant #1`
 
@@ -53,20 +53,6 @@ Written by `afs-mutation` on its last run (base `97d6d08d94d8b719104de7b149b6ebc
            context = _selection_context(
                cargo_routing,
                cargo_dashboard,
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:70 Mutant #27`
-
-  ```diff
-  @@ -67,7 +67,7 @@
-       tracking_id = TrackingId(tracking_id_value)
-       cargo = cargo_dashboard.get_cargo_details(tracking_id)
-       if cargo is None:
-  -        raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
-  +        raise Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')
-       itineraries = cargo_routing.route_candidates(tracking_id)
-       return {
-           'cargo': cargo,
   ```
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:95 Mutant #40`
