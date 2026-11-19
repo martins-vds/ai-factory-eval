@@ -1,0 +1,27 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1558
+graphs:
+  knowledge: null
+  domain: null
+  nodes: "n/a: operator decision"
+  edges: "n/a: operator decision"
+  flows: "n/a: operator decision"
+ledger:
+  entries: 6
+  by_kind:
+    structural: 1
+    behavioral: 4
+    ui: 0
+    integration: 1
+    data: 0
+risk_map:
+  path: "n/a: operator decision"
+  methods: "n/a: operator decision"
+  above_threshold: "n/a: operator decision"
+  hot_spots: []
+quirk_tickets:
+  - .migration/quirks/billing-cent-precision.md
+  - .migration/quirks/billing-decline-aborts-batch.md
+  - .migration/quirks/billing-launch-classpath.md
+graph_discrepancies: []
