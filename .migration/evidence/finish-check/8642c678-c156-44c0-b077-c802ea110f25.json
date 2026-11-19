@@ -61,5 +61,37 @@
     "blocks_before": 0,
     "decision": "allow",
     "why": "clean"
+  },
+  {
+    "at": "2026-11-19T02:25:41Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 83202,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "tests/fixtures/htmx-2.0.11.min.js"
+    ],
+    "enabled": true,
+    "ticket": "BK-05K",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/8642c678-c156-44c0-b077-c802ea110f25.json",
+      ".migration/evidence/runs/BK-05K.md",
+      ".migration/returns/BK-05K.afs-migrator.yaml",
+      "templates/admin/live_map.html",
+      "templates/base.html",
+      "tests/test_htmx_errors.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
   }
 ]
