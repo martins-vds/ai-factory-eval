@@ -1,0 +1,38 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1503
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1507
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.898
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_itinerary_properties_as_target_behavior
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_shows_no_route_guidance_when_candidates_are_empty
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_assigns_selected_candidate_and_redirects_to_cargo_details
+  - .migration/evidence/runs/BK-05F.md
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: booking.routing-assign
+    rule: Assigning the selected candidate persists its itinerary and recalculates cargo delivery state.
+    use_case: cargotracker.booking.application.routing.CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+    ledger_rule: assign-selected-itinerary
+no_rules:
+  booking.routing-chain: Routing dependency chain only; candidate eligibility and assignment state are enforced by CargoRouting.
+  booking.screen-route: Candidate presentation only; route eligibility is enforced by CargoRouting.route_candidates.
+  booking.screen-select-itinerary: Presentation state only; route eligibility is enforced by CargoRouting.route_candidates.
