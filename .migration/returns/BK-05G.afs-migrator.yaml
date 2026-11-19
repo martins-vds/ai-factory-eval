@@ -4,16 +4,25 @@ issue: martins-vds/ai-factory-pilot-target#294
 pr: null
 specialty: ui
 gates:
-  build: null
-  behavior: null
-  idiom: null
-  crap: null
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
   mutation_changed: null
-  regression: null
+  regression: 0
 evidence_logs:
   - .migration/evidence/runs/BK-05G.md
-specialty_evidence: []
-ledger_updated: []
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
+  - tests/booking/interfaces/test_dialogs.py::test_destination_options_are_stable_and_do_not_mutate_available_locations
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_initial_value_and_parse_error
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_refreshes_not_routed_table
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_and_refreshes_not_routed_table
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
 quirk_tickets: []
 new_tickets: []
 handoff: .migration/handoffs/BK-05G.md

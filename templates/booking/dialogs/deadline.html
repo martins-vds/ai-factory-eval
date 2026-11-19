@@ -1,0 +1,47 @@
+<dialog
+  open
+  aria-labelledby="change-deadline-title"
+  class="fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-lg rounded-lg bg-white p-6 shadow-xl backdrop:bg-black/50"
+>
+  <h2 id="change-deadline-title" class="mb-4 text-xl font-semibold text-slate-900">Change arrival deadline</h2>
+  <p class="mb-4 text-slate-700">
+    Cargo {{ cargo.tracking_id.value }} travels from {{ cargo.route_specification.origin.name }}
+    ({{ cargo.route_specification.origin.unlocode.value }}) to
+    {{ cargo.route_specification.destination.name }}
+    ({{ cargo.route_specification.destination.unlocode.value }}).
+  </p>
+  <form
+    id="change-deadline-form"
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-target="#booking-dialog-container"
+    hx-swap="innerHTML"
+    class="flex flex-col gap-5"
+  >
+    {% csrf_token %}
+    <div>
+      <label class="mb-1 block font-medium text-slate-800" for="deadline">Arrival deadline</label>
+      <input
+        class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-blue-600"
+        type="date"
+        id="deadline"
+        name="deadline"
+        value="{{ deadline_value }}"
+        required
+        aria-describedby="deadline-help{% if error %} deadline-error{% endif %}"
+        {% if error %}aria-invalid="true"{% endif %}
+      >
+      <p class="mt-1 text-sm text-slate-600" id="deadline-help">Enter the cargo's arrival deadline.</p>
+      {% if error %}
+        <p class="mt-2 text-red-700" id="deadline-error">{{ error }}</p>
+      {% endif %}
+    </div>
+  </form>
+  <div class="mt-5 flex justify-end gap-3">
+    <form method="dialog">
+      <button class="min-h-11 rounded-md px-4 py-2 font-semibold text-slate-800 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-600" type="submit">Cancel</button>
+    </form>
+    <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600" type="submit" form="change-deadline-form">Update</button>
+  </div>
+</dialog>

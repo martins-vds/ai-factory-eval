@@ -26,13 +26,41 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.origin.unlocode.value }}</span>
             </td>
             <td class="p-3">
-              {{ cargo.route_specification.destination.name }}<br>
-              <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <a
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#booking-dialog-container"
+                hx-swap="innerHTML"
+                aria-haspopup="dialog"
+                aria-controls="booking-dialog-container"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+              >
+                {{ cargo.route_specification.destination.name }}<br>
+                <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              </a>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <a
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#booking-dialog-container"
+                hx-swap="innerHTML"
+                aria-haspopup="dialog"
+                aria-controls="booking-dialog-container"
+                aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+              >
+                {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+              </a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <div
+    id="booking-dialog-container"
+    aria-live="polite"
+    hx-on::after-swap="const dialog = this.querySelector('dialog'); if (dialog) { if (dialog.open) dialog.close(); dialog.showModal(); }"
+    hx-on::response-error="this.textContent = 'The dialog could not be loaded or saved. Please try again.'"
+  ></div>
 </section>
