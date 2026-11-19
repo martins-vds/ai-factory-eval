@@ -47,6 +47,7 @@ def test_monthly_report_summarizes_prior_month_loan_activity():
                 Loan('L2', 'ada', date(2026, 2, 10)),
                 Loan('L3', 'bea', date(2026, 2, 2), date(2026, 2, 17)),
                 Loan('L4', 'cora', date(2026, 2, 3), date(2026, 2, 18)),
+                Loan('L7', 'dave', date(2026, 2, 1), date(2026, 2, 15)),
                 Loan('L5', 'outside', date(2026, 1, 31), date(2026, 2, 25)),
                 Loan('L6', 'future', date(2026, 3, 1)),
             ]
@@ -60,6 +61,7 @@ def test_monthly_report_summarizes_prior_month_loan_activity():
         MonthlyReportRow('ada', loans_started=2, late_returns=1, late_fees_cents=250),
         MonthlyReportRow('bea', loans_started=1, late_returns=1, late_fees_cents=0),
         MonthlyReportRow('cora', loans_started=1, late_returns=1, late_fees_cents=0),
+        MonthlyReportRow('dave', loans_started=1, late_returns=0, late_fees_cents=0),
     ]
 
 
