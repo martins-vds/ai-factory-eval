@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from datetime import datetime
+from urllib.parse import quote
 
 from django.core import signing
 from django.http import (
@@ -50,7 +51,7 @@ def create_route_selection_views(
             except (signing.BadSignature, KeyError, TypeError, ValueError):
                 return HttpResponseBadRequest('Invalid route selection.')
             cargo_routing.assign_route(cargo_tracking_id, itinerary)
-            return redirect(f'/admin/cargo/{tracking_id}/')
+            return redirect(f'/admin/cargo/{quote(tracking_id, safe="")}/')
 
         candidates = cargo_routing.route_candidates(cargo_tracking_id)
         candidate_options = [
