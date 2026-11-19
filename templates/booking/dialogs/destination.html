@@ -1,0 +1,58 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+  <section
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="destination-dialog-title"
+    class="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl"
+  >
+    <h2 id="destination-dialog-title" class="mb-4 text-xl font-semibold text-slate-900">
+      Change destination for {{ cargo.tracking_id.value }}
+    </h2>
+    <dl class="mb-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2">
+      <dt class="font-medium">Origin</dt>
+      <dd>{{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})</dd>
+      <dt class="font-medium">Current destination</dt>
+      <dd>{{ cargo.route_specification.destination.name }} ({{ cargo.route_specification.destination.unlocode.value }})</dd>
+    </dl>
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+      class="flex flex-col gap-5"
+    >
+      {% csrf_token %}
+      <div>
+        <label class="mb-1 block font-medium text-slate-800" for="destination">New destination</label>
+        <select
+          class="w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+          id="destination"
+          name="destination"
+          required
+          autofocus
+          aria-describedby="{% if destination_error %}destination-error{% endif %}"
+          {% if destination_error %}aria-invalid="true"{% endif %}
+        >
+          <option value="">Select a destination</option>
+          {% for location in destinations %}
+            <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+          {% endfor %}
+        </select>
+        {% if destination_error %}
+          <p class="mt-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+        {% endif %}
+      </div>
+      <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+        <button
+          class="min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100"
+          type="button"
+          onclick="this.closest('[role=dialog]').parentElement.remove()"
+        >Cancel</button>
+        <button class="min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">
+          Update
+        </button>
+      </nav>
+    </form>
+  </section>
+</div>

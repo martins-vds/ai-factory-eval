@@ -26,13 +26,47 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.origin.unlocode.value }}</span>
             </td>
             <td class="p-3">
-              {{ cargo.route_specification.destination.name }}<br>
-              <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                class="text-left text-blue-700 underline underline-offset-2 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                type="button"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+                aria-haspopup="dialog"
+                aria-controls="booking-dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#booking-dialog"
+                hx-swap="innerHTML"
+              >
+                {{ cargo.route_specification.destination.name }}<br>
+                <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              </button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <button
+                class="text-blue-700 underline underline-offset-2 hover:text-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+                type="button"
+                aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+                aria-haspopup="dialog"
+                aria-controls="booking-dialog"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#booking-dialog"
+                hx-swap="innerHTML"
+              >{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <div id="booking-dialog"></div>
+  <script>
+    if (!window.bookingDialogHtmxErrorHandler) {
+      window.bookingDialogHtmxErrorHandler = true;
+      document.body.addEventListener('htmx:beforeSwap', function (event) {
+        if (event.detail.target?.id === 'booking-dialog' && event.detail.xhr.status >= 400) {
+          event.detail.shouldSwap = true;
+          event.detail.isError = false;
+        }
+      });
+    }
+  </script>
 </section>
