@@ -1,0 +1,31 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-synthetic-target#65
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1722
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings:
+  - severity: major
+    where: templates/library_info/about.html:6,9-10
+    what: "The changed template uses py-8, leading-relaxed, and mt-8, but the committed Tailwind CSS omits them, so the browser ignores those layout styles."
+    evidence: "run: idiom-final"
+  - severity: minor
+    where: .migration/harness/installed.json:4
+    what: "The ticket diff changes pinned harness install metadata outside its declared file scope; check_installed.py reports no drift."
+tests_added:
+  - tests/library_info/test_about_page.py::test_about_pages_reject_non_get_requests
+ledger_issues:
+  - "about.page lacks a ledger-level no_rules declaration; the verifier confirms this static informational page has no business rules."
+quirk_tickets: []
+rules: []
+no_rules:
+  about.page: "Static information page with no eligibility checks, limits, state transitions, forms, or downstream requests."
+inherited: []
