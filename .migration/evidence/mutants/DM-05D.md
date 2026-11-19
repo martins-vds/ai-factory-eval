@@ -57,4 +57,3 @@ Written by `afs-mutation` on its last run (base `f588d5360f7175491af1ab3d9688571
                        rows_written += 1
                row_counts.append((target, rows_written))
   ```
-
