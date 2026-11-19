@@ -46,7 +46,7 @@ def _payment_result(request, loan_id, *, browser):
                 status=result.status_code,
             )
         if result.status_code == 200:
-            return redirect(f'/ui/fees/{loan_id}/')
+            return redirect('fee_page', loan_id=loan_id)
 
         fee = fee_application.calculate(loan_id)
         if fee is None:

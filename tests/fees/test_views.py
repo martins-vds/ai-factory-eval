@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import pytest
+from django.urls import reverse
 from playwright.sync_api import sync_playwright
 
 from src.fees import views
@@ -145,6 +146,17 @@ def test_htmx_payment_success_renders_status(client, monkeypatch):
     assert response.status_code == 200
     assert b'role="status"' in response.content
     assert b'Payment received.' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_payment_success_redirects_to_fee_page(client, monkeypatch):
+    gateway = PaymentGateway()
+    monkeypatch.setattr(views.payment_application, 'gateway', gateway)
+
+    response = client.post('/ui/payments/L3/')
+
+    assert response.status_code == 302
+    assert response['Location'] == reverse('fee_page', kwargs={'loan_id': 'L3'})
 
 
 @pytest.mark.django_db

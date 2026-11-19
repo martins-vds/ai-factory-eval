@@ -15,7 +15,7 @@ def local_gateway():
             self.requests.append((self.command, self.path, body))
             if self.path.endswith('loan=L3'):
                 self.send_response(302)
-                self.send_header('Location', f'http://{self.headers["Host"]}/charge?loan=L1')
+                self.send_header('Location', '/charge?loan=L1')
                 self.end_headers()
                 return
             if self.path.endswith('loan=L1'):
