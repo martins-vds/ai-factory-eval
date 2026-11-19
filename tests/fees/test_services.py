@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication, PaymentApplication
+from src.fees.services import FeeApplication, GatewayFailure, GatewayResult, PaymentApplication
 
 
 @dataclass
@@ -35,6 +35,14 @@ class RecordingGateway:
 
     def charge(self, loan_id):
         self.loan_ids.append(loan_id)
+
+
+class ResultGateway:
+    def __init__(self, result):
+        self.result = result
+
+    def charge(self, loan_id):
+        return self.result
 
 
 @pytest.mark.parametrize(
@@ -79,3 +87,34 @@ def test_payment_application_does_not_call_gateway_for_an_unknown_loan():
 
     assert application.pay('missing') is None
     assert gateway.loan_ids == []
+
+
+def test_payment_application_maps_non_success_gateway_status_to_failure():
+    loan = LoanRecord('L1', date(2026, 1, 16))
+    gateway = ResultGateway(GatewayResult(503, 'declined\n'))
+    application = PaymentApplication(LoanRepository(loan), gateway)
+
+    result = application.pay('L1')
+
+    assert result.status_code == 502
+    assert result.body == 'declined\n'
+
+
+def test_payment_application_retains_interruption_while_mapping_gateway_failure():
+    loan = LoanRecord('L1', date(2026, 1, 16))
+    interruption = InterruptedError('payment request interrupted')
+    failure = GatewayFailure('payment gateway unavailable')
+    failure.__cause__ = interruption
+
+    class InterruptedGateway:
+        def charge(self, loan_id):
+            raise failure
+
+    application = PaymentApplication(LoanRepository(loan), InterruptedGateway())
+
+    result = application.pay('L1')
+
+    assert result.status_code == 502
+    assert result.body == 'payment gateway unavailable\n'
+    assert result.failure is failure
+    assert result.failure.__cause__ is interruption

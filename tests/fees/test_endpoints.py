@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 
 @pytest.fixture
@@ -118,3 +119,52 @@ def test_htmx_payment_failure_renders_an_error_fragment(payment_gateway, client)
     assert response.status_code == 502
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_real_browser_can_pay_a_late_fee(payment_gateway, live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
+
+            page.get_by_role('button', name='Pay late fee').click()
+
+            if htmx_available:
+                status = page.locator('#payment-status [role="status"]')
+                status.wait_for()
+            else:
+                status = page.get_by_role('status')
+                status.wait_for()
+            assert 'Payment complete: charged' in status.inner_text()
+            assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_displays_payment_gateway_failures(payment_gateway, live_server):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L2/')
+            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
+
+            page.get_by_role('button', name='Pay late fee').click()
+
+            if htmx_available:
+                alert = page.locator('#payment-status [role="alert"]')
+                alert.wait_for()
+            else:
+                alert = page.get_by_role('alert')
+                alert.wait_for()
+            assert 'declined' in alert.inner_text()
+            assert payment_gateway.requests == [('POST', '/charge?loan=L2', b'')]
+        finally:
+            browser.close()

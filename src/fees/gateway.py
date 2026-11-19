@@ -2,11 +2,7 @@ import os
 from urllib import error, request
 from urllib.parse import quote
 
-from .services import GatewayResult
-
-
-class GatewayFailure(Exception):
-    pass
+from .services import GatewayFailure, GatewayResult
 
 
 class HttpPaymentGateway:

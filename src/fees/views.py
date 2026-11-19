@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application, payment_application
-from .gateway import GatewayFailure
 
 
 def _fee_amount(fee):
@@ -42,33 +41,22 @@ def fee_page(request, loan_id):
 
 @require_POST
 def payment_api(request, loan_id):
-    try:
-        result = payment_application.pay(loan_id)
-    except GatewayFailure:
-        return _api_response('payment gateway unavailable\n', 502, 'text/plain')
-
+    result = payment_application.pay(loan_id)
     if result is None:
         return _api_response('no such loan\n', 404, 'text/plain')
-    return _api_response(result.body, 200 if result.status_code == 200 else 502, 'text/plain')
+    return _api_response(result.body, result.status_code, 'text/plain')
 
 
 @require_POST
 def payment_page(request, loan_id):
-    status = 200
-    success = False
-    message = ''
-    try:
-        result = payment_application.pay(loan_id)
-    except GatewayFailure:
-        result = None
-        status = 502
-        message = 'Payment gateway unavailable.'
-    if result is None and not message:
+    result = payment_application.pay(loan_id)
+    if result is None:
         status = 404
+        success = False
         message = 'No such loan.'
-    elif result is not None:
-        success = result.status_code == 200
-        status = 200 if success else 502
+    else:
+        status = result.status_code
+        success = status == 200
         message = result.body.strip()
 
     context = {'success': success, 'message': message}
