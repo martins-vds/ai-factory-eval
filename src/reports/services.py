@@ -54,13 +54,18 @@ class MonthlyReport:
 
             end = loan.returned_on if loan.returned_on is not None else as_of
             days_late = max(0, (end - loan.due_on).days)
-            if loan.returned_on is not None and days_late > 0:
+            if loan.returned_on is not None and loan.returned_on > loan.due_on:
                 member_totals.late_returns += 1
             if days_late > 2:
                 member_totals.late_fees_cents += min(1000, days_late * 25)
 
         rows = [
-            MonthlyReportRow(member_id, **vars(member_totals))
+            MonthlyReportRow(
+                member_id=member_id,
+                loans_started=member_totals.loans_started,
+                late_returns=member_totals.late_returns,
+                late_fees_cents=member_totals.late_fees_cents,
+            )
             for member_id, member_totals in totals.items()
         ]
         return sorted(rows, key=lambda row: (-row.late_fees_cents, row.member_id))
