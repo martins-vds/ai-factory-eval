@@ -1,0 +1,21 @@
+id: billing.job-launch
+kind: structural
+title: Launch the monthly billing job
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:26-31
+boundary: "The main entrypoint reads Northgate credentials from environment variables, constructs a fixed two-member example batch, and invokes the monthly run; run.sh builds and launches it."
+tickets: [martins-vds/ai-factory-eval#1558]
+status: pending
+verification: pending
+quirks: []
+rules:
+  - id: credential-environment
+    rule: "Read the Northgate merchant ID and API key from NORTHGATE_MERCHANT and NORTHGATE_KEY."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:26-27
+  - id: example-members
+    rule: "The entrypoint submits Ana with a $4.75 late fee and Ben with no late fees."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:28-30
+  - id: java-version
+    rule: "Compile for Java 17 and launch BillingJob through the Maven package produced by run.sh."
+    source: legacy-billing/pom.xml:10-12; legacy-billing/run.sh:1-6
+notes: "The launcher classpath may omit the declared Northgate runtime dependency; see .migration/quirks/billing-launch-classpath.md."

@@ -1,0 +1,13 @@
+id: billing.charge-threshold
+kind: behavioral
+title: Carry forward invoices below one dollar
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+boundary: "InvoiceCalculator.chargeable returns false for totals below $1.00 and true at or above $1.00."
+tickets: [martins-vds/ai-factory-eval#1558]
+status: pending
+verification: pending
+rules:
+  - id: minimum-charge
+    rule: "A total is chargeable only when it is at least $1.00."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30

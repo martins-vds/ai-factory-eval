@@ -1,0 +1,23 @@
+id: billing.monthly-run
+kind: behavioral
+title: Process a monthly billing batch
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-24
+boundary: "BillingJob.run totals every map entry as a member, charges totals of at least $1.00, and prints a charged or carried-over line."
+tickets: [martins-vds/ai-factory-eval#1558]
+status: pending
+verification: pending
+quirks: []
+rules:
+  - id: member-invoice
+    rule: "Calculate every batch entry with the member flag set to true."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-17
+  - id: bill-chargeable
+    rule: "Charge the card on file when the calculated total is at least $1.00."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-19
+  - id: carry-nonchargeable
+    rule: "Do not call the vault for totals below $1.00; print that the amount is carried over."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:20-22
+  - id: report-result
+    rule: "Print the member ID, total, and vault reference after an approved charge."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:19
