@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
-from src.loans.services import LoanInputError, lend_loan
+from src.loans.services import LoanAlreadyReturned, LoanInputError, lend_loan, return_loan
 
 
 @pytest.mark.django_db
@@ -53,3 +53,17 @@ def test_lending_endpoint_creates_a_loan_and_escapes_delimiters(client):
         '123;456',
         today,
     )
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeated_return_without_changing_the_date():
+    original_date = Loan.objects.get(pk='L2').returned_on
+
+    with pytest.raises(LoanAlreadyReturned):
+        return_loan(
+            repository=LoanRepository(),
+            loan_id='L2',
+            returned_on=date(2026, 11, 19),
+        )
+
+    assert Loan.objects.get(pk='L2').returned_on == original_date

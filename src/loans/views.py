@@ -5,11 +5,14 @@ from django.utils import timezone
 from .models import Loan
 from .repository import LoanRepository
 from .services import (
+    LoanAlreadyReturned,
     LoanInputError,
+    LoanNotFound,
     get_loan_text,
     lend_loan,
     list_loans_text,
     loan_line,
+    return_loan,
 )
 
 
@@ -55,3 +58,27 @@ def loan_detail(request, loan_id):
     if body is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
     return HttpResponse(body, content_type='text/plain')
+
+
+def loan_return(request, loan_id):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    try:
+        loan = return_loan(
+            repository=LoanRepository(),
+            loan_id=loan_id,
+            returned_on=timezone.localdate(),
+        )
+    except LoanNotFound:
+        return HttpResponse(
+            'no such loan\n',
+            status=404,
+            content_type='text/plain',
+        )
+    except LoanAlreadyReturned:
+        return HttpResponse(
+            'loan already returned\n',
+            status=409,
+            content_type='text/plain',
+        )
+    return HttpResponse(loan_line(loan), content_type='text/plain')
