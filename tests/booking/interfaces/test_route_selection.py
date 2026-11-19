@@ -69,7 +69,7 @@ route_selection_view, select_itinerary_view = _route_selection_views()
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/route/', route_selection_view),
     path('admin/cargo/<str:tracking_id>/itineraries/', select_itinerary_view),
-    path('admin/cargo/<str:tracking_id>/', cargo_details_view),
+    path('admin/cargo/<str:tracking_id>/', cargo_details_view, name='cargo-details'),
 ]
 
 
