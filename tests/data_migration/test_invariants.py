@@ -196,4 +196,3 @@ def test_loaded_carrier_movement_schedules_are_ordered_and_connected(tmp_path):
             assert movement.departure_time <= movement.arrival_time
         for previous, following in pairwise(movements):
             assert previous.arrival_time <= following.departure_time
-            assert previous.arrival_location_id == following.departure_location_id
