@@ -1,0 +1,37 @@
+[
+  {
+    "at": "2026-11-19T15:06:30Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17767,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-01",
+    "role": "afs-analyst",
+    "changed": [
+      ".migration/evidence/runs/BL-01.md",
+      ".migration/ledger/billing.card-vault.yaml",
+      ".migration/ledger/billing.charge-threshold.yaml",
+      ".migration/ledger/billing.invoice-line.yaml",
+      ".migration/ledger/billing.invoice-total.yaml",
+      ".migration/ledger/billing.job-launch.yaml",
+      ".migration/ledger/billing.monthly-run.yaml",
+      ".migration/quirks/billing-cent-precision.md",
+      ".migration/quirks/billing-decline-aborts-batch.md",
+      ".migration/quirks/billing-launch-classpath.md",
+      ".migration/returns/BL-01.afs-analyst.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
