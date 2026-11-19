@@ -15,7 +15,20 @@
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
       </dl>
+      <div class="mt-6">
+        <div id="return-status">
+          {% if loan.returned_on %}
+          <p>Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+          {% else %}
+          <p>Ready to come home?</p>
+          {% endif %}
+        </div>
+        {% if not loan.returned_on %}
+        <button class="btn btn-primary mt-2" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="outerHTML" type="button">Mark returned</button>
+        {% endif %}
+      </div>
     </div>
   </article>
 </section>
+{% include "loans/htmx_errors.html" %}
 {% endblock %}

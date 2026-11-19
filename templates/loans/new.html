@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk · A new chapter</p>
+  <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Lend a book.</h1>
+  <p class="mb-8 text-[#66705b]">Add a reader and a book to the neighborhood collection.</p>
+  {% include "loans/lend_form.html" %}
+</section>
+{% include "loans/htmx_errors.html" %}
+{% endblock %}
