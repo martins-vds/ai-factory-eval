@@ -1,3 +1,4 @@
+from collections import defaultdict
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -36,6 +37,13 @@ class MonthlyReportRow:
     late_fees_cents: int
 
 
+@dataclass
+class _MemberTotals:
+    loans_started: int = 0
+    late_returns: int = 0
+    late_fees_cents: int = 0
+
+
 class MonthlyReportApplication:
     def __init__(
         self,
@@ -52,16 +60,26 @@ class MonthlyReportApplication:
         month_start = today.replace(day=1)
         previous_month = (month_start - timedelta(days=1)).replace(day=1)
 
-        members = {}
+        members = defaultdict(_MemberTotals)
         for loan in self.loans.all():
             if not previous_month <= loan.lent_on < month_start:
                 continue
 
-            totals = members.setdefault(loan.member, [0, 0, 0])
-            totals[0] += 1
-            totals[1] += int(loan.returned_on is not None and loan.returned_on > loan.due_on)
+            totals = members[loan.member]
+            totals.loans_started += 1
+            totals.late_returns += int(
+                loan.returned_on is not None and loan.returned_on > loan.due_on
+            )
             fee = self.fees.fee_for(loan.id)
-            totals[2] += fee.amount_cents if fee else 0
+            totals.late_fees_cents += fee.amount_cents if fee else 0
 
-        rows = [MonthlyReportRow(member_id, *totals) for member_id, totals in members.items()]
+        rows = [
+            MonthlyReportRow(
+                member_id,
+                totals.loans_started,
+                totals.late_returns,
+                totals.late_fees_cents,
+            )
+            for member_id, totals in members.items()
+        ]
         return sorted(rows, key=lambda row: (-row.late_fees_cents, row.member_id))
