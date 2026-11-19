@@ -1,0 +1,21 @@
+id: billing.monthly-run
+kind: behavioral
+title: Run monthly member billing
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-30
+boundary: "BillingJob.run processes the supplied member-to-late-fees map and writes one charged or carried-over line per processed member."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1548]
+status: pending
+verification: pending
+rules:
+  - id: member-invoice
+    rule: "Calculate each supplied member's invoice with member=true, including the monthly membership fee."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-18
+  - id: charge-or-carry
+    rule: "For each map entry, charge totals of at least $1.00 and print the member, amount, and returned reference; otherwise print that the amount is carried over."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-21
+  - id: sequential-failure
+    rule: "A charge exception propagates from run and prevents processing later map entries."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:16-23
+notes: "The sequential-failure behavior is raised for human review in .migration/quirks/billing-decline-aborts-run.md."

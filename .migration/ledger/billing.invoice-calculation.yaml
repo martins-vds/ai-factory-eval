@@ -1,0 +1,23 @@
+id: billing.invoice-calculation
+kind: behavioral
+title: Calculate monthly member invoices
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9-30
+boundary: "InvoiceCalculator.total returns a two-decimal monthly total from late-fee lines and membership status."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1548]
+status: pending
+verification: pending
+rules:
+  - id: cap-late-fees
+    rule: "Sum the late-fee lines and cap that sum at $25.00 per month."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:17-21
+  - id: member-monthly-fee
+    rule: "Add the $3.00 monthly fee only when member is true; the fee is not included in the late-fee cap."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9,22
+  - id: tax-rounding
+    rule: "Calculate 5% tax on the subtotal, round tax once half-up to cents, then return the subtotal plus tax at two decimal places."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:10,22-24
+  - id: carryover-threshold
+    rule: "Treat totals of at least $1.00 as chargeable; totals below $1.00 are carried over."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
