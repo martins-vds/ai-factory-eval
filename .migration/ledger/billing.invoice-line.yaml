@@ -1,0 +1,13 @@
+id: billing.invoice-line
+kind: behavioral
+title: Validate invoice line amounts
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceLine.java:5-11
+boundary: "InvoiceLine construction: description and amount fields, including rejection of negative amounts."
+tickets: [martins-vds/ai-factory-eval#1569]
+status: pending
+verification: pending
+rules:
+  - id: nonnegative-charge
+    rule: "Reject an invoice line with a negative amount by throwing IllegalArgumentException."
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10

@@ -1,0 +1,17 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1569
+graphs: null
+ledger:
+  entries: 6
+  by_kind:
+    structural: 0
+    behavioral: 4
+    ui: 0
+    integration: 2
+    data: 0
+risk_map: null
+quirk_tickets:
+  - .migration/quirks/billing-decline-aborts-batch.md
+  - .migration/quirks/billing-main-charges-sample-members.md
+graph_discrepancies: []

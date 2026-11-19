@@ -1,0 +1,16 @@
+id: billing.monthly-run
+kind: behavioral
+title: Process each member's monthly invoice
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-23
+boundary: "BillingJob.run: per-member total, charge or carry-over action, and console output."
+tickets: [martins-vds/ai-factory-eval#1569]
+status: pending
+verification: pending
+rules:
+  - id: member-invoice
+    rule: "Calculate each supplied member's invoice with the membership fee included."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-17
+  - id: charge-or-carry
+    rule: "Charge invoices meeting the $1.00 threshold and print the charge reference; otherwise print that the total is carried over."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22

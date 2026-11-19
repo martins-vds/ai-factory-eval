@@ -1,0 +1,19 @@
+id: billing.invoice-total
+kind: behavioral
+title: Calculate a monthly invoice total
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9-24
+boundary: "InvoiceCalculator.total: fee cap, optional monthly fee, tax, and returned two-decimal total."
+tickets: [martins-vds/ai-factory-eval#1569]
+status: pending
+verification: pending
+rules:
+  - id: late-fee-cap
+    rule: "Sum all late fees and cap the monthly late-fee subtotal at $25.00."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:18-21
+  - id: member-fee
+    rule: "Add the $3.00 monthly fee only when the invoice is for a member; the fee cap does not apply to it."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9,22
+  - id: invoice-tax
+    rule: "Apply 5% tax to the subtotal, round half-up once to two decimal places, and return a two-decimal total."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:10,23-24
