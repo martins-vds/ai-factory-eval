@@ -7,7 +7,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 8.0
-  mutation_changed: 0.814
+  mutation_changed: 0.840
   regression: 0
 evidence_logs:
   - .migration/evidence/runs/LL-02.md

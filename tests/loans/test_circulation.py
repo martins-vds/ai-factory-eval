@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from types import SimpleNamespace
 
 import pytest
+from django.urls import reverse
 
 from src.loans.models import Loan
 
@@ -225,6 +226,14 @@ def test_browser_can_return_a_loan_with_htmx(client):
     assert b'Returned' in response.content
     assert today.strftime('%b %-d, %Y').encode() in response.content
     assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
+def test_browser_return_redirects_to_the_catalog_detail(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == reverse('loan_catalog_detail', kwargs={'loan_id': 'L1'})
 
 
 @pytest.mark.django_db

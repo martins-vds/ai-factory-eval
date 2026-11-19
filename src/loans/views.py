@@ -105,7 +105,7 @@ def loan_return_page(request, loan_id):
         return render(request, 'loans/not_found.html', status=404)
     if is_htmx:
         return render(request, 'loans/_loan_state.html', {'loan': loan})
-    return redirect(f'/ui/loans/{loan_id}/')
+    return redirect('loan_catalog_detail', loan_id=loan_id)
 
 
 @require_GET
