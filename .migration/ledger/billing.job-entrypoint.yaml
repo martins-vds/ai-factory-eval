@@ -1,0 +1,17 @@
+id: billing.job-entrypoint
+kind: behavioral
+title: Start the monthly billing job
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:26-31
+boundary: billing.BillingJob.main, invoked by the legacy-billing run script
+tickets:
+  - martins-vds/ai-factory-eval#1540
+status: pending
+verification: pending
+rules:
+  - id: environment-credentials
+    rule: Construct the Northgate vault using NORTHGATE_MERCHANT and NORTHGATE_KEY from the process environment.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:26-28
+  - id: fixed-sample-members
+    rule: Run the job with only the hard-coded ana entry containing a $4.75 late fee and the ben entry with no late fees; do not load a member roster from another source.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:28-30

@@ -1,0 +1,20 @@
+id: billing.monthly-job
+kind: behavioral
+title: Process each member's monthly billing entry
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-24
+boundary: BillingJob.run(lateFeesByMember), including card-charge side effects and per-member console output
+tickets:
+  - martins-vds/ai-factory-eval#1540
+status: pending
+verification: pending
+rules:
+  - id: member-invoice
+    rule: For each map entry, calculate the invoice as a member, including the monthly membership fee.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-18
+  - id: charge-or-carryover
+    rule: Charge the member when the calculated total is chargeable; otherwise do not call the vault and print a carried-over message.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
+  - id: billing-output
+    rule: Print the member ID and total with the charge reference after a successful charge, or the member ID and total when carried over.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:19-22
