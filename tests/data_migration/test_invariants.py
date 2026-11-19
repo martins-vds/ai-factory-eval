@@ -129,7 +129,8 @@ def _refresh_manifest(snapshot):
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
     for table, entry in manifest['tables'].items():
         path = snapshot / f'{table}.csv'
-        entry['rows'] = sum(1 for _ in path.open(encoding='utf-8')) - 1
+        with path.open(encoding='utf-8') as stream:
+            entry['rows'] = sum(1 for _ in stream) - 1
         entry['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
     manifest_path.write_text(json.dumps(manifest), encoding='utf-8')
 
@@ -159,4 +160,50 @@ def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
         assert cargo.delivery == replace(
             derived_delivery,
             last_event_id=history.most_recent_event_id,
+        )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_itinerary_legs_connect(tmp_path):
+    _load_snapshot(_snapshot_for_invariants(tmp_path))
+
+    cargos = CargoRecord.objects.all()
+    assert cargos.exists()
+    for cargo in cargos:
+        legs = list(LegRecord.objects.filter(cargo=cargo).order_by('load_time', 'pk'))
+        assert len(legs) >= 2
+        assert all(
+            current.unload_location_id == following.load_location_id
+            for current, following in zip(legs, legs[1:])
+        )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_handling_events_reference_existing_voyages_and_locations(tmp_path):
+    _load_snapshot(_snapshot_for_invariants(tmp_path))
+
+    voyages = set(VoyageRecord.objects.values_list('pk', flat=True))
+    locations = set(LocationRecord.objects.values_list('pk', flat=True))
+    events = list(HandlingEventRecord.objects.all())
+    assert events
+    assert all(event.voyage_id in voyages for event in events)
+    assert all(event.location_id in locations for event in events)
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_voyage_carrier_movements_are_in_schedule_order(tmp_path):
+    _load_snapshot(_snapshot_for_invariants(tmp_path))
+
+    voyages = list(VoyageRecord.objects.all())
+    assert voyages
+    for voyage in voyages:
+        movements = list(
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
+        )
+        assert len(movements) >= 2
+        assert all(movement.departure_time <= movement.arrival_time for movement in movements)
+        assert all(
+            current.arrival_time <= following.departure_time
+            and current.arrival_location_id == following.departure_location_id
+            for current, following in zip(movements, movements[1:])
         )
