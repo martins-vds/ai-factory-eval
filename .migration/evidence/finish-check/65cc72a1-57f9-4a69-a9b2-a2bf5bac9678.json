@@ -1,0 +1,54 @@
+[
+  {
+    "at": "2026-11-19T22:30:55Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16951,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-verifier",
+    "changed": [],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-02.afs-verifier.yaml` with `role: afs-verifier`, `ticket: LL-02`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-02.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T22:31:20Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17412,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/65cc72a1-57f9-4a69-a9b2-a2bf5bac9678.json"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-02.afs-verifier.yaml` with `role: afs-verifier`, `ticket: LL-02`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-02.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/LL-02.md"
+  }
+]
