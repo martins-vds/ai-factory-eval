@@ -19,7 +19,7 @@ def test_legacy_about_response_matches_characterization(client):
     response = client.get('/about')
 
     assert response.status_code == expected['status']
-    assert response['Content-Type'] == f"{expected['content_type']}; charset=utf-8"
+    assert response['Content-Type'] == f'{expected["content_type"]}; charset=utf-8'
     assert response.content.decode() == expected['body']
 
 
