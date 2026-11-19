@@ -1,0 +1,14 @@
+id: billing.charge-threshold
+kind: behavioral
+title: Carry forward totals under one dollar
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+boundary: InvoiceCalculator.chargeable(total), used to decide whether a member is charged this month or carried over
+tickets:
+  - martins-vds/ai-factory-eval#1540
+status: pending
+verification: pending
+rules:
+  - id: minimum-charge
+    rule: A total of $1.00 or more is chargeable; a total below $1.00 is carried over.
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-29
