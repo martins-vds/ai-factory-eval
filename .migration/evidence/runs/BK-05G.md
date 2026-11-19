@@ -43,3 +43,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T21:58:20+00:00 | mutation-gap-green | 0 | 4.43 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `2fdc990df5d2bccf` |  |  |
 | 2026-11-19T21:58:25+00:00 | mutation-gap-lint | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-19T21:58:25+00:00 | mutation-gap-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-19T22:01:06+00:00 | mutation-changed-final | 0 | 98.26 | `python .migration/harness/tools/afs-mutation` | `be77d2961761ed55` |  | gate=mutation score=0.925 threshold=0.8 killed=49 survived=4 files=1 base=6348f858891024d9bfc2ae05d30336a1bf9f2a12 |
