@@ -8,7 +8,6 @@ source:
 boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +15,15 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_cargo_unchanged"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_completes_dialog_and_refreshes_table_without_losing_other_fields"
+  - ".migration/evidence/runs/BK-05G.md"
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/deadline.html
+status: migrated
+no_rules: "Date parsing and field feedback are presentation-boundary behavior; business route-specification behavior is owned by booking.deadline-change."
+notes: "Invalid dates render a field-level error without updating cargo; successful changes complete through a dashboard redirect. The unavailable-widget warning is omitted per #251."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]

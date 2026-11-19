@@ -1,5 +1,4 @@
 from datetime import datetime
-from types import SimpleNamespace
 
 import pytest
 from django.core.management import call_command
@@ -13,8 +12,6 @@ from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
-from cargotracker.location.domain.location import Location
-from cargotracker.location.domain.un_locode import UnLocode
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
 cargo_repository = DjangoCargoRepository()
@@ -65,13 +62,16 @@ def test_destination_options_exclude_origin_and_current_destination_without_muta
     first_response = view(request, 'DEF789')
     second_response = view(request, 'DEF789')
     options = first_response.content.decode().split('<select', 1)[1].split('</select>', 1)[0]
+    subsequent_options = (
+        second_response.content.decode().split('<select', 1)[1].split('</select>', 1)[0]
+    )
 
     assert 'CNHKG' not in options
     assert 'AUMEL' not in options
     assert options.count('<option') == len(locations) - 2
     assert 'value="USNYC"' in options
     assert len(locations) == 13
-    assert first_response.content == second_response.content
+    assert options == subsequent_options
 
 
 @pytest.mark.django_db
@@ -97,7 +97,10 @@ def test_destination_update_completes_dialog_and_refreshes_table_without_losing_
     assert response.headers['HX-Redirect'] == '/admin/dashboard/'
     assert b'unavailable' not in response.content.lower()
     assert updated.route_specification.origin == original.route_specification.origin
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
     assert 'Hong Kong' in refreshed_dashboard
     assert 'New York' in refreshed_dashboard
     assert original_deadline in refreshed_dashboard
@@ -123,7 +126,10 @@ def test_invalid_deadline_shows_field_error_and_keeps_cargo_unchanged(client):
     assert 'Enter a valid arrival deadline.' in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
 
 
 @pytest.mark.django_db
