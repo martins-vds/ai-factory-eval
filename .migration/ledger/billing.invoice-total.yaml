@@ -1,0 +1,24 @@
+id: billing.invoice-total
+kind: behavioral
+title: Calculate monthly invoice totals
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:7-25
+boundary: "Sum late fees, cap their monthly aggregate at $25.00, add the $3.00 membership fee only for members, apply 5% tax to the subtotal, round tax half-up once to cents, and return a two-decimal total."
+tickets: [martins-vds/ai-factory-eval#1568]
+status: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.json
+  - .migration/evidence/runs/BL-02.md
+rules:
+  - id: aggregate-fee-cap
+    rule: "The sum of late fees is capped at $25.00 per month; the membership fee is outside this cap."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9-22
+  - id: member-fee
+    rule: "A member's invoice includes a $3.00 monthly fee; a non-member's invoice does not."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:9,22
+  - id: tax-rounding
+    rule: "Apply 5% tax to the subtotal, round half-up to two decimals once, and return the total to two decimals."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:10,22-24
+notes: "An empty member invoice is $3.15; see .migration/quirks/billing-unreachable-carryover.md."

@@ -1,0 +1,84 @@
+[
+  {
+    "at": "2026-11-19T17:59:51Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17771,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-01",
+    "role": "afs-analyst",
+    "changed": [
+      ".migration/characterization/billing/observations.json",
+      ".migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java",
+      ".migration/characterization/billing/stubs/com/northgate/vault/ChargeResult.java",
+      ".migration/characterization/billing/stubs/com/northgate/vault/VaultClient.java",
+      ".migration/characterization/billing/stubs/com/northgate/vault/VaultCredentials.java",
+      ".migration/evidence/runs/BL-01.md",
+      ".migration/evidence/runs/BL-02.md",
+      ".migration/ledger/billing.card-vault.yaml",
+      ".migration/ledger/billing.chargeability.yaml",
+      ".migration/ledger/billing.invoice-line.yaml",
+      ".migration/ledger/billing.invoice-total.yaml",
+      ".migration/ledger/billing.monthly-run.yaml",
+      ".migration/quirks/billing-null-amount.md",
+      ".migration/quirks/billing-unreachable-carryover.md",
+      ".migration/returns/BL-01.afs-analyst.yaml",
+      ".migration/returns/BL-02.afs-characterizer.yaml"
+    ],
+    "findings": [
+      "[mechanical] You changed another role's or ticket's return file: `.migration/returns/BL-02.afs-characterizer.yaml`. A session writes only its own return (`.migration/returns/BL-01.afs-analyst.yaml`). Restore each one exactly as it was on your base branch (`git checkout <base> -- <file>`) and commit."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T18:01:33Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18221,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-01",
+    "role": "afs-analyst",
+    "changed": [
+      ".migration/characterization/billing/observations.json",
+      ".migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java",
+      ".migration/characterization/billing/stubs/com/northgate/vault/ChargeResult.java",
+      ".migration/characterization/billing/stubs/com/northgate/vault/VaultClient.java",
+      ".migration/characterization/billing/stubs/com/northgate/vault/VaultCredentials.java",
+      ".migration/costs/ce80c58f-6ebb-4df3-861d-e1875f02062b.json",
+      ".migration/evidence/runs/BL-01.md",
+      ".migration/evidence/runs/BL-02.md",
+      ".migration/ledger/billing.card-vault.yaml",
+      ".migration/ledger/billing.chargeability.yaml",
+      ".migration/ledger/billing.invoice-line.yaml",
+      ".migration/ledger/billing.invoice-total.yaml",
+      ".migration/ledger/billing.monthly-run.yaml",
+      ".migration/quirks/billing-null-amount.md",
+      ".migration/quirks/billing-unreachable-carryover.md",
+      ".migration/returns/BL-01.afs-analyst.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
+  }
+]

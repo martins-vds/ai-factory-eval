@@ -1,0 +1,21 @@
+id: billing.invoice-line
+kind: behavioral
+title: Validate invoice line amounts
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceLine.java:5-11
+boundary: "Creating an invoice line rejects negative amounts with IllegalArgumentException; zero and positive amounts are accepted."
+tickets: [martins-vds/ai-factory-eval#1568]
+status: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.json
+  - .migration/evidence/runs/BL-02.md
+rules:
+  - id: non-negative-amount
+    rule: "An invoice line amount must not be negative."
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
+  - id: allow-zero-amount
+    rule: "A zero invoice line amount is accepted."
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
+notes: "A null amount is dereferenced by signum(); see .migration/quirks/billing-null-amount.md."
