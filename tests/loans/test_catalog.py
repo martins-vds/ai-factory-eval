@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -125,6 +126,33 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [
+        ('', '123'),
+        (' ', '123'),
+        ('reader', ''),
+        ('reader', ' '),
+    ],
+)
+def test_lend_use_case_rejects_blank_required_fields(member, isbn):
+    with pytest.raises(ValueError):
+        lend_loan(member=member, isbn=isbn)
+
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+def test_lend_use_case_assigns_a_fourteen_day_due_date():
+    today = timezone.localdate()
+
+    loan = lend_loan(member='reader', isbn='123')
+
+    assert loan.lent_on == today
+    assert loan.due_on == today + timedelta(days=14)
+
+
+@pytest.mark.django_db
 def test_return_endpoint_records_the_return_date(client):
     returned_on = timezone.localdate()
     golden = HTTP_GOLDENS['POST /loans/{id}/return']
@@ -138,6 +166,36 @@ def test_return_endpoint_records_the_return_date(client):
     assert response.content.decode().endswith('\n')
     assert target_fields == source_fields[:5] + [returned_on.isoformat()]
     assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db(transaction=True)
+def test_return_use_case_records_today_on_first_return():
+    returned_on = timezone.localdate()
+
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeated_return_without_replacing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert loan.returned_on == original_return_date
+    assert not updated
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert not updated
 
 
 @pytest.mark.django_db
@@ -323,6 +381,15 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
 
 
 @pytest.mark.django_db
+def test_regular_invalid_lending_submission_renders_the_full_page(client):
+    response = client.post('/ui/loans/new/', {'member': '', 'isbn': ''})
+
+    assert response.status_code == 200
+    assert b'<!doctype html>' in response.content
+    assert response.content.count(b'This field is required.') == 2
+
+
+@pytest.mark.django_db
 def test_browser_can_lend_a_book_with_htmx(client):
     form_response = client.get('/ui/loans/new/')
 
@@ -406,6 +473,29 @@ def test_real_browser_can_lend_and_return_a_book(live_server):
 
 
 @pytest.mark.django_db
+def test_ui_configures_htmx_error_responses():
+    root = Path(__file__).resolve().parents[2]
+    sources = [
+        path.read_text(encoding='utf-8')
+        for directory, pattern in ((root / 'templates', '**/*.html'), (root / 'static', '**/*.js'))
+        for path in directory.glob(pattern)
+    ]
+
+    assert any(
+        marker in source
+        for source in sources
+        for marker in (
+            'responseHandling',
+            'htmx:beforeSwap',
+            'htmx:responseError',
+            'hx-target-error',
+            'hx-target-4',
+            'hx-target-5',
+        )
+    )
+
+
+@pytest.mark.django_db
 def test_browser_repeat_return_keeps_original_date(client):
     original_return_date = date(2026, 1, 20)
 
@@ -424,6 +514,8 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert 'Loan record · L2'.encode() in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 

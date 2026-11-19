@@ -1,0 +1,81 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1709
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutmut could not produce a score because verifier tests fail at baseline"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:9
+    what: lend_loan accepts empty or whitespace member/ISBN values and persists them; required-field validation exists only in LoanForm.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - severity: major
+    where: src/loans/services.py:4
+    what: The use case imports Django's clock and LoanRepository (line 6), violating the ports-only layer contract.
+    evidence: "run: verified-layering"
+  - severity: major
+    where: templates/loans/detail.html:25
+    what: The changed loan-return htmx request has no 4xx/5xx handling; loan-form.html:3 is also unhandled, so error responses are not swapped.
+    evidence: tests/loans/test_catalog.py::test_ui_configures_htmx_error_responses
+  - severity: major
+    where: templates/loans/detail.html:27
+    what: The committed Tailwind CSS lacks utilities used by changed loans templates; the UI gate reports 14 missing selectors across six templates.
+    evidence: "run: verified-ui"
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_assigns_a_fourteen_day_due_date
+  - tests/loans/test_catalog.py::test_return_use_case_records_today_on_first_return
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_unknown_loan
+  - tests/loans/test_catalog.py::test_regular_invalid_lending_submission_renders_the_full_page
+  - tests/loans/test_catalog.py::test_ui_configures_htmx_error_responses
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited: []
+rules:
+  - capability: loan.lend
+    rule: Refuse empty or whitespace-only member and ISBN values before creating a loan.
+    use_case: lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: false
+  - capability: loan.return-date
+    rule: Reject a repeated return without replacing the originally saved return date.
+    use_case: return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+    enforced: true
+  - capability: loan.return
+    rule: Reject a return request for an unknown loan.
+    use_case: return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_unknown_loan
+    enforced: true
+  - capability: loan.return
+    rule: Reject repeated returns and preserve the original saved date.
+    use_case: return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+    enforced: true
+no_rules: {}
+mutation_survivors:
+  prior_report: .migration/evidence/mutants/LL-02.md
+  prior_result: "score 0.855, 100 killed, 17 survived; this is from the earlier successful run, not this verification run."
+  current_attempt: "verified-mutation-changed exited 2 because mutmut could not run mutants with the verifier tests failing at baseline; no current score or survivor diff was produced."
+  material:
+    - "views.py #8, #24, #54 and #65 remove HTTP method guards; method semantics matter and the existing unsupported-method test covers their paths."
+    - "views.py #44 changes a normal invalid lend POST to a partial fragment; the added full-page test covers this regression."
+    - "repository.py #2 removes transaction.atomic around select_for_update; the first-return test now runs in transaction=True to exercise the boundary."
+    - "views.py #68 and #69 alter the unknown-return response; this path matters because htmx errors currently are not handled."
+    - "views.py #79 drops loan context from the repeated-return error page; the strengthened test asserts loan identity and saved date."
+    - "urls.py #2-#7 and forms.py #9 alter required API/UI routes or form binding; existing boundary and UI tests exercise these contracts."
+  lower_priority:
+    - "views.py #70 changes the unknown-return Content-Type; it is less user-visible than the body/status and error-swap survivors."
