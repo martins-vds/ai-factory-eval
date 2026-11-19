@@ -1,0 +1,79 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}{% if select_itinerary %}Select Itinerary{% else %}Route Cargo{% endif %} | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-6 text-2xl font-semibold text-gray-900">
+    {% if select_itinerary %}Select Itinerary{% else %}Route Cargo{% endif %} {{ cargo.tracking_id.value }}
+  </h1>
+  <dl class="mb-6 grid gap-4 sm:grid-cols-[max-content_1fr]">
+    <dt class="font-semibold text-blue-700">Origin:</dt>
+    <dd>{{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})</dd>
+    <dt class="font-semibold text-blue-700">Destination:</dt>
+    <dd>
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </dd>
+    <dt class="font-semibold text-blue-700">Arrival deadline:</dt>
+    <dd>{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</dd>
+  </dl>
+
+  <h2 class="mb-4 text-xl font-semibold text-gray-900">Potential routes: {{ candidate_count }}</h2>
+  {% if candidates %}
+    <div class="space-y-6">
+      {% for candidate in candidates %}
+        <fieldset class="rounded border border-gray-300 p-4">
+          <legend class="px-2 font-semibold text-gray-900">Route {{ candidate.number }}</legend>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+              <caption class="sr-only">Route {{ candidate.number }} itinerary legs</caption>
+              <thead>
+                <tr class="border-b border-gray-300">
+                  <th scope="col" class="p-3">Leg</th>
+                  <th scope="col" class="p-3">Voyage</th>
+                  <th scope="col" class="p-3">Load</th>
+                  <th scope="col" class="p-3">Date</th>
+                  <th scope="col" class="p-3">Unload</th>
+                  <th scope="col" class="p-3">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for leg in candidate.itinerary.legs %}
+                  <tr class="border-b border-gray-200">
+                    <th scope="row" class="p-3">Leg {{ forloop.counter }}</th>
+                    <td class="p-3">{{ leg.voyage.voyage_number.value }}</td>
+                    <td class="p-3">
+                      {{ leg.load_location.name }}<br>
+                      <span class="text-sm text-gray-600">{{ leg.load_location.unlocode.value }}</span>
+                    </td>
+                    <td class="p-3">{{ leg.load_time|date:"m/d/Y" }}</td>
+                    <td class="p-3">
+                      {{ leg.unload_location.name }}<br>
+                      <span class="text-sm text-gray-600">{{ leg.unload_location.unlocode.value }}</span>
+                    </td>
+                    <td class="p-3">{{ leg.unload_time|date:"m/d/Y" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/itineraries/">
+            {% csrf_token %}
+            <input type="hidden" name="candidate" value="{{ candidate.token }}">
+            <button
+              class="mt-4 min-h-11 rounded bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+              type="submit"
+            >Assign Route {{ candidate.number }}</button>
+          </form>
+        </fieldset>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="my-6">
+      No routes found that satisfy the route specification. Try setting an arrival deadline further into the future.
+    </p>
+  {% endif %}
+  <a class="mt-6 inline-block text-blue-700 underline" href="/admin/cargo/{{ cargo.tracking_id.value }}/">
+    Cargo details
+  </a>
+{% endblock %}

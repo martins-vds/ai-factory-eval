@@ -1,6 +1,7 @@
 import html
 import re
 from datetime import UTC, datetime
+from itertools import pairwise
 
 import pytest
 from django.core.management import call_command
@@ -111,15 +112,17 @@ def test_route_page_displays_cargo_candidate_count_and_numbered_connected_legs(
 
     response = client.get(f'/admin/cargo/{seeded_cargo.value}/route/')
     content = response.content.decode()
+    candidates = response.context['candidates']
 
     assert response.status_code == 200
+    assert len(candidates) == 2
     assert 'Hong Kong (CNHKG)' in content
-    assert 'Melbourne (AUMEL)' in content
+    assert 'Melbourne' in content
+    assert 'AUMEL' in content
     assert 'Potential routes: 2' in content
     assert 'Route 1' in content
     assert 'Leg 1' in content
     assert 'Leg 2' in content
-    candidates = response.context['candidates']
     assert candidates is not None
     for candidate in candidates:
         legs = candidate['itinerary'].legs
@@ -128,7 +131,7 @@ def test_route_page_displays_cargo_candidate_count_and_numbered_connected_legs(
         assert legs[-1].unload_location.unlocode.value == DESTINATION
         assert all(
             previous.unload_location == following.load_location
-            for previous, following in zip(legs, legs[1:])
+            for previous, following in pairwise(legs)
         )
 
 
@@ -164,13 +167,36 @@ def test_route_screens_show_no_route_guidance_when_candidates_are_empty(
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize('screen', ('route', 'itineraries'))
+def test_unknown_cargo_route_screens_return_http_404(client, screen):
+    response = client.get(f'/admin/cargo/UNKNOWN/{screen}/')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_modified_candidate_token(seeded_cargo, client):
+    response = client.post(
+        f'/admin/cargo/{seeded_cargo.value}/itineraries/',
+        {'candidate': 'not-a-server-signed-candidate'},
+    )
+    details_response = client.get(f'/admin/cargo/{seeded_cargo.value}/')
+
+    assert response.status_code == 400
+    assert details_response.status_code == 200
+    assert '<strong>Not routed</strong>' in details_response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_selecting_a_candidate_redirects_to_details_with_the_assigned_itinerary(
     seeded_cargo, client
 ):
     routing_service.candidates = _candidate_paths()
     route_response = client.get(f'/admin/cargo/{seeded_cargo.value}/route/')
     token_match = re.search(
-        r'name="candidate" value="([^"]+)"',
+        r'name="candidate"\s+value="([^"]+)"',
         route_response.content.decode(),
     )
     assert token_match is not None
