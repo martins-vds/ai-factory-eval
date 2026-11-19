@@ -1,0 +1,52 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#1527
+pr: martins-vds/ai-factory-eval#1532
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.98
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: Late days are clamped at zero; fees are waived through two late days, then accrue at 25 cents per late day up to $10.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_applies_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-calculation
+  - capability: fees.page
+    rule: An unknown loan returns no fee page.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_application_returns_none_for_an_unknown_loan
+    enforced: true
+    ledger_rule: unknown-loan
+  - capability: integration.payment-gateway
+    rule: An unknown loan is rejected before the payment gateway is called.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_does_not_call_gateway_for_an_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan
+  - capability: integration.payment-gateway
+    rule: Only gateway HTTP 200 is a payment success; other gateway responses become HTTP 502 with the gateway body preserved.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_maps_non_success_gateway_status_to_failure
+    enforced: true
+    ledger_rule: gateway-status
+  - capability: integration.payment-gateway
+    rule: Gateway I/O and interruption failures become HTTP 502; interruption is retained as the failure cause.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_retains_interruption_while_mapping_gateway_failure
+    enforced: true
+    ledger_rule: gateway-failure

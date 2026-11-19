@@ -42,4 +42,4 @@ rules:
     source: FinePayments.java:32-35
   - id: gateway-failure
     rule: "Gateway I/O and interruption failures become HTTP 502; interruption is retained as the failure cause."
-    source: FinePayments.java:35-40; approved fix: martins-vds/ai-factory-synthetic-target#40
+    source: "FinePayments.java:35-40; approved fix: martins-vds/ai-factory-synthetic-target#40"
