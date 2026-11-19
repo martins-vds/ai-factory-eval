@@ -37,6 +37,18 @@ def test_lend_endpoint_rejects_empty_and_whitespace_fields(client, member, isbn)
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    'data',
+    [{'isbn': '123'}, {'member': 'reader'}],
+)
+def test_lend_endpoint_rejects_a_missing_field(client, data):
+    response = client.post('/loans', data)
+
+    assert response.status_code == 400
+    assert response.content.decode() == 'member and isbn are required\n'
+
+
+@pytest.mark.django_db
 def test_lend_use_case_rejects_blank_fields_without_creating_a_loan():
     repository = LoanRepository()
     before = Loan.objects.count()
@@ -46,6 +58,17 @@ def test_lend_use_case_rejects_blank_fields_without_creating_a_loan():
 
     assert error.value.fields == {'member': 'Member is required.', 'isbn': 'ISBN is required.'}
     assert Loan.objects.count() == before
+
+
+@pytest.mark.django_db
+def test_lend_use_case_creates_a_loan_due_fourteen_days_later():
+    today = date(2026, 11, 19)
+
+    loan = lend_loan(LoanRepository(), 'dee', '123', today)
+
+    assert loan.id == 'L4'
+    assert loan.lent_on == today
+    assert loan.due_on == date(2026, 12, 3)
 
 
 @pytest.mark.django_db
@@ -78,6 +101,11 @@ def test_return_use_case_rejects_a_repeat_and_preserves_the_original_date():
         return_loan(LoanRepository(), 'L2', date(2026, 11, 19))
 
     assert Loan.objects.get(pk='L2').returned_on == original_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_returns_none_for_an_unknown_loan():
+    assert return_loan(LoanRepository(), 'unknown', date(2026, 11, 19)) is None
 
 
 @pytest.mark.django_db
