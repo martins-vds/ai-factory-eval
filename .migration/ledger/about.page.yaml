@@ -7,9 +7,19 @@ source:
   flow: View About Page
   location: legacy/src/main/resources/static/about.html:1-9
   risk: {crap: 1, complexity: 1, coverage: 1.0}
-boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
-verification: differential
+boundary: "GET /about serves the characterized static HTML page; GET /ui/about/ presents the same library information in the modernized reading-room layout."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1512]
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
+target:
+  components: [src.library_info.views.about, src.library_info.views.about_page]
+status: migrated
+verification: differential
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - tests/library_info/test_about.py::test_about_endpoint_matches_characterized_html
+  - tests/library_info/test_about.py::test_about_page_presents_library_information_in_browser
+  - .migration/evidence/runs/LL-04.md
+no_rules: This static information page presents library details and enforces no business rules.
