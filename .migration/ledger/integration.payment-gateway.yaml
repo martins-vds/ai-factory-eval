@@ -9,9 +9,49 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+notes: "Interruption remains the cause of the gateway failure per decision map ruling #40."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+target:
+  components:
+    - src.fees.services.PaymentApplication
+    - src.fees.gateway.HttpPaymentGateway
+    - src.fees.views.payment
+    - src.fees.views.payment_page
+    - templates/fees/payment-result.html
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - tests/fees/test_fee_services.py::test_payment_does_not_call_gateway_when_loan_does_not_exist
+  - tests/fees/test_fee_services.py::test_payment_returns_gateway_success_unchanged
+  - tests/fees/test_fee_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
+  - tests/fees/test_fee_services.py::test_payment_gateway_failure_preserves_interruption
+  - tests/fees/test_gateway.py::test_payment_gateway_sends_post_without_body_and_returns_gateway_response
+  - tests/fees/test_gateway.py::test_payment_gateway_returns_non_success_body_for_application_mapping
+  - tests/fees/test_gateway.py::test_payment_gateway_does_not_follow_redirects
+  - tests/fees/test_gateway.py::test_payment_gateway_keeps_interrupted_failure_as_exception_cause
+  - tests/fees/test_gateway.py::test_payment_gateway_maps_error_body_read_failure_to_gateway_error
+  - tests/fees/test_gateway.py::test_payment_gateway_uses_configured_or_source_default_url
+  - tests/fees/test_views.py::test_payment_api_returns_gateway_success_unchanged
+  - tests/fees/test_views.py::test_payment_api_maps_gateway_failure_to_bad_gateway
+  - tests/fees/test_views.py::test_payment_api_does_not_call_gateway_for_unknown_loan
+  - tests/fees/test_views.py::test_payment_api_maps_interruption_to_gateway_failure
+  - tests/fees/test_views.py::test_htmx_payment_page_renders_gateway_failure_for_swap
+  - tests/fees/test_views.py::test_htmx_payment_success_renders_status
+  - tests/fees/test_views.py::test_payment_page_response_handles_gateway_interruption
+  - tests/fees/test_views.py::test_browser_payment_failure_is_rendered
+  - .migration/evidence/runs/LL-03.md
+rules:
+  - id: existing-loan-before-charge
+    rule: Do not call the payment gateway unless the loan exists.
+    source: FinePayments.java:30-32
+  - id: gateway-status
+    rule: A gateway HTTP 200 remains 200; every other HTTP status becomes 502 while preserving its response body.
+    source: FinePayments.java:34-37
+  - id: interrupted-payment
+    rule: Gateway I/O or interruption becomes a 502 gateway failure, and the original interruption remains its cause.
+    source: Decision map #38, ruling #40; FinePayments.java:34-40

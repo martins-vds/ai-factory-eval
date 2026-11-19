@@ -1,0 +1,58 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#1511
+pr: martins-vds/ai-factory-eval#1516
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.908
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: A late fee is not calculated for an unknown loan.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_late_fee_is_missing_when_loan_does_not_exist
+    enforced: true
+    ledger_rule: existing-loan
+  - capability: fees.calculation
+    rule: Count days from returnedOn or today and clamp at zero; waive two or fewer days, then charge 25 cents per late day up to 10 dollars.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_late_fee_uses_two_day_grace_and_caps_at_ten_dollars
+    enforced: true
+    ledger_rule: late-fee-policy
+  - capability: fees.page
+    rule: Fee pages are available only for existing loans; an unknown loan returns 404.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_late_fee_is_missing_when_loan_does_not_exist
+    enforced: true
+    ledger_rule: known-loan-page
+  - capability: integration.payment-gateway
+    rule: Do not call the payment gateway unless the loan exists.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_does_not_call_gateway_when_loan_does_not_exist
+    enforced: true
+    ledger_rule: existing-loan-before-charge
+  - capability: integration.payment-gateway
+    rule: A gateway HTTP 200 remains 200; every other HTTP status becomes 502 while preserving its response body.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
+    enforced: true
+    ledger_rule: gateway-status
+  - capability: integration.payment-gateway
+    rule: Gateway I/O or interruption becomes a gateway failure, and the original interruption remains its cause.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_gateway_failure_preserves_interruption
+    enforced: true
+    ledger_rule: interrupted-payment

@@ -1,0 +1,9 @@
+<div id="payment-result" class="mt-2">
+  {% if missing %}
+  <p role="alert">No such loan.</p>
+  {% elif success %}
+  <p role="status">Payment received. {{ body }}</p>
+  {% else %}
+  <p role="alert">Payment could not be completed. {{ body }}</p>
+  {% endif %}
+</div>
