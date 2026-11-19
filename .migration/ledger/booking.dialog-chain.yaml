@@ -20,6 +20,7 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
   - "tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_returns_not_found_from_both_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_have_working_non_htmx_pages_and_submission"
   - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_completes_dialog"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_refreshes_table"
   - ".migration/evidence/runs/BK-05G.md"

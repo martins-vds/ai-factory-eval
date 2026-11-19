@@ -45,8 +45,8 @@ def test_destination_dialog_shows_values_and_filters_options_without_mutating_lo
     shipping_locations[:] = location_repository.find_all()
     original_codes = [location.unlocode.value for location in shipping_locations]
 
-    response = client.get('/admin/cargo/DEF789/destination/')
-    second_response = client.get('/admin/cargo/DEF789/destination/')
+    response = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true')
+    second_response = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true')
     content = response.content.decode()
     options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
     second_options = re.search(
@@ -61,6 +61,8 @@ def test_destination_dialog_shows_values_and_filters_options_without_mutating_lo
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
     assert 'value="SEGOT" selected' in options.group(1)
+    assert 'destination-error' not in content
+    assert 'hx-post="/admin/cargo/DEF789/destination/"' in content
     assert [location.unlocode.value for location in shipping_locations] == original_codes
     assert second_options is not None
     assert second_options.group(1) == options.group(1)
@@ -73,12 +75,36 @@ def test_deadline_dialog_shows_current_route_specification_values(client):
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
 
-    response = client.get('/admin/cargo/DEF789/deadline/')
+    response = client.get('/admin/cargo/DEF789/deadline/', HTTP_HX_REQUEST='true')
     content = response.content.decode()
 
     assert response.status_code == 200
     assert 'Hong Kong' in content and 'Melbourne' in content
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
+    assert 'deadline-error' not in content
+    assert 'hx-post="/admin/cargo/DEF789/deadline/"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_defaults_to_first_available_when_gothenburg_is_absent(client):
+    call_command('seed_sample_data')
+    shipping_locations[:] = [
+        location
+        for location in location_repository.find_all()
+        if location.unlocode.value != 'SEGOT'
+    ]
+
+    response = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true')
+    content = response.content.decode()
+    options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
+    assert options is not None
+    first_option = re.search(r'<option value="([^"]+)"', options.group(1))
+    selected_option = re.search(r'<option value="([^"]+)" selected', options.group(1))
+
+    assert first_option is not None
+    assert selected_option is not None
+    assert selected_option.group(1) == first_option.group(1)
 
 
 @pytest.mark.django_db
@@ -99,6 +125,30 @@ def test_deadline_dialog_reports_unparseable_value_without_changing_cargo(client
     assert 'Enter a valid arrival deadline.' in content
     assert 'aria-invalid="true"' in content
     assert 'value="not-a-date"' in content
+    assert (
+        cargo_repository.find(TrackingId('DEF789')).route_specification
+        == before.route_specification
+    )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_reports_unknown_location_without_updating_cargo(client):
+    call_command('seed_sample_data')
+    shipping_locations[:] = location_repository.find_all()
+    before = cargo_repository.find(TrackingId('DEF789'))
+    assert before is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'MISSING'},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in content
+    assert 'aria-invalid="true"' in content
     assert (
         cargo_repository.find(TrackingId('DEF789')).route_specification
         == before.route_specification
@@ -181,3 +231,26 @@ def test_unknown_cargo_returns_not_found_from_both_dialogs(client, dialog):
     response = client.get(f'/admin/cargo/MISSING1/{dialog}/')
 
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    ('dialog', 'data'),
+    [
+        ('destination', {'destination': 'USNYC'}),
+        ('deadline', {'deadline': '2027-01-15'}),
+    ],
+)
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_have_working_non_htmx_pages_and_submission(client, dialog, data):
+    call_command('seed_sample_data')
+
+    page = client.get(f'/admin/cargo/DEF789/{dialog}/')
+    response = client.post(f'/admin/cargo/DEF789/{dialog}/', data)
+
+    assert page.status_code == 200
+    assert '<html' in page.content.decode()
+    assert f'id="{dialog}-dialog"' in page.content.decode()
+    assert 'open' in page.content.decode()
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/dashboard/'

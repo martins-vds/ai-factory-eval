@@ -20,6 +20,7 @@ evidence:
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_current_route_specification_values"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_reports_unparseable_value_without_changing_cargo"
   - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_refreshes_table"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_have_working_non_htmx_pages_and_submission"
   - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]
 no_rules: "Date parsing is form syntax validation; cargo deadline changes remain governed by CargoSpecification."

@@ -33,6 +33,14 @@ def _updated_table(request: HttpRequest, cargo_dashboard: CargoDashboard) -> Htt
     return response
 
 
+def _render_dialog(
+    request: HttpRequest, fragment: str, page: str, context: dict[str, object]
+) -> HttpResponse:
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, fragment, context)
+    return render(request, page, {**context, 'open_dialog': True})
+
+
 def _destination_context(
     cargo: Cargo,
     tracking_id: str,
@@ -96,7 +104,12 @@ def create_dialog_views(
             destination_value=destination_value,
             destination_error=destination_error,
         )
-        return render(request, 'booking/dialogs/destination.html', context)
+        return _render_dialog(
+            request,
+            'booking/dialogs/destination.html',
+            'booking/dialogs/destination_page.html',
+            context,
+        )
 
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         cargo = _find_cargo(cargo_dashboard, tracking_id)
@@ -117,9 +130,10 @@ def create_dialog_views(
                 cargo_specification.change_deadline(TrackingId(tracking_id), arrival_deadline)
                 return _updated_table(request, cargo_dashboard)
 
-        return render(
+        return _render_dialog(
             request,
             'booking/dialogs/deadline.html',
+            'booking/dialogs/deadline_page.html',
             {
                 'cargo': cargo,
                 'deadline_value': deadline_value,
