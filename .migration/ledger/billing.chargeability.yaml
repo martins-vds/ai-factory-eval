@@ -1,0 +1,18 @@
+id: billing.chargeability
+kind: behavioral
+title: Decide whether to charge an invoice
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+boundary: "InvoiceCalculator.chargeable: whether an invoice total is charged now or carried over."
+tickets: [martins-vds/ai-factory-eval#1569]
+status: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::underADollarCarriesOver
+  - .migration/characterization/billing/InvoiceCalculatorCharacterizationTest.java::oneDollarChargeThresholdIsInclusive
+  - .migration/evidence/runs/BL-02.md
+rules:
+  - id: minimum-charge
+    rule: "A total of at least $1.00 is chargeable; a lower total is carried over."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30

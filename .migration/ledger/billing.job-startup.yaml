@@ -1,0 +1,19 @@
+id: billing.job-startup
+kind: integration
+title: Start the command-line billing job
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:26-30
+boundary: "BillingJob.main: environment credentials and the sample member invoices submitted to the billing job."
+tickets: [martins-vds/ai-factory-eval#1569]
+status: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/characterization/billing/source-derived.md
+rules:
+  - id: environment-credentials
+    rule: "Connect to the card vault using NORTHGATE_MERCHANT and NORTHGATE_KEY from the process environment."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:26-27
+  - id: sample-invoices
+    rule: "The entry point submits an invoice for ana with a $4.75 late fee and an empty invoice for ben."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:28-30

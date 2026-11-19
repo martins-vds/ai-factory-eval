@@ -1,0 +1,19 @@
+id: billing.invoice-line
+kind: behavioral
+title: Validate invoice line amounts
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceLine.java:5-11
+boundary: "InvoiceLine construction: description and amount fields, including rejection of negative amounts."
+tickets: [martins-vds/ai-factory-eval#1569]
+status: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::negativeChargesAreRejected
+  - .migration/characterization/billing/InvoiceCalculatorCharacterizationTest.java::nullLineAmountFailsWithNullPointerException
+  - .migration/characterization/billing/InvoiceCalculatorCharacterizationTest.java::zeroLateFeeIsAllowed
+  - .migration/evidence/runs/BL-02.md
+rules:
+  - id: nonnegative-charge
+    rule: "Reject an invoice line with a negative amount by throwing IllegalArgumentException."
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
