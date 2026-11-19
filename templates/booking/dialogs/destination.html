@@ -1,0 +1,19 @@
+<dialog open class="fixed inset-0 z-50 m-auto w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+  <h2 class="mb-4 text-xl font-semibold text-gray-900">Change destination</h2>
+  <p class="mb-4 text-gray-700">
+    {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
+  </p>
+  <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/">
+    {% csrf_token %}
+    <label for="destination" class="mb-2 block font-medium text-gray-900">Destination</label>
+    <select id="destination" name="destination" class="w-full rounded border border-gray-300 p-2">
+      {% for location in destinations %}
+        <option value="{{ location.unlocode.value }}">{{ location.name }}</option>
+      {% endfor %}
+    </select>
+    <div class="mt-6 flex justify-end gap-3">
+      <a href="/admin/dashboard/" class="rounded border border-gray-300 px-4 py-2">Cancel</a>
+      <button type="submit" class="rounded bg-blue-700 px-4 py-2 text-white">Update</button>
+    </div>
+  </form>
+</dialog>

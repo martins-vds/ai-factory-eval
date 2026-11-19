@@ -1,0 +1,21 @@
+<dialog open class="fixed inset-0 z-50 m-auto w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+  <h2 class="mb-4 text-xl font-semibold text-gray-900">Change arrival deadline</h2>
+  <p class="mb-4 text-gray-700">
+    {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
+  </p>
+  <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/">
+    {% csrf_token %}
+    <label for="deadline" class="mb-2 block font-medium text-gray-900">Arrival deadline</label>
+    <input
+      id="deadline"
+      name="deadline"
+      type="date"
+      value="{{ cargo.route_specification.arrival_deadline|date:'Y-m-d' }}"
+      class="w-full rounded border border-gray-300 p-2"
+    >
+    <div class="mt-6 flex justify-end gap-3">
+      <a href="/admin/dashboard/" class="rounded border border-gray-300 px-4 py-2">Cancel</a>
+      <button type="submit" class="rounded bg-blue-700 px-4 py-2 text-white">Update</button>
+    </div>
+  </form>
+</dialog>
