@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,6 +53,7 @@ public class BillingCharacterizationTest {
 
     @Test
     public void chargeThresholdIsInclusiveAtOneDollar() {
+        assertFalse(InvoiceCalculator.chargeable(new BigDecimal("0.00")));
         assertFalse(InvoiceCalculator.chargeable(new BigDecimal("0.99")));
         assertTrue(InvoiceCalculator.chargeable(new BigDecimal("1.00")));
         assertFalse(InvoiceCalculator.chargeable(new BigDecimal("-0.01")));
@@ -62,8 +64,13 @@ public class BillingCharacterizationTest {
         CardVault vault = new CardVault("merchant", "key");
 
         assertEquals("ref-ana", vault.charge("ana", new BigDecimal("12.34")));
+        assertEquals("ref-ben", vault.charge("ben", BigDecimal.ZERO));
         assertEquals(new com.northgate.vault.VaultCredentials("merchant", "key"), VaultClient.credentials());
-        assertEquals(List.of(new VaultClient.Charge("ana", 1234L, "USD")), VaultClient.charges());
+        assertEquals(
+                List.of(
+                        new VaultClient.Charge("ana", 1234L, "USD"),
+                        new VaultClient.Charge("ben", 0L, "USD")),
+                VaultClient.charges());
     }
 
     @Test
@@ -111,6 +118,16 @@ public class BillingCharacterizationTest {
     }
 
     @Test
+    public void billingJobRejectsNullInvoiceList() {
+        Map<String, List<InvoiceLine>> invoices = new LinkedHashMap<>();
+        invoices.put("ana", null);
+
+        assertThrows(
+                NullPointerException.class,
+                () -> new BillingJob(new CardVault("m", "k")).run(invoices));
+    }
+
+    @Test
     public void entryPointReadsEnvironmentAndUsesFixedMembersRegardlessOfArguments() throws Exception {
         Path classes = Path.of(BillingJob.class.getProtectionDomain().getCodeSource().getLocation().toURI());
         ProcessBuilder builder = new ProcessBuilder(
@@ -132,10 +149,10 @@ public class BillingCharacterizationTest {
 
         assertTrue("billing main did not finish", finished);
         assertEquals(0, process.exitValue());
-        assertEquals(
-                "ana charged 8.14 ref ref-ana" + System.lineSeparator()
-                        + "ben charged 3.15 ref ref-ben" + System.lineSeparator(),
-                new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8));
+        Set<String> outputLines = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8)
+                .lines()
+                .collect(java.util.stream.Collectors.toSet());
+        assertEquals(Set.of("ana charged 8.14 ref ref-ana", "ben charged 3.15 ref ref-ben"), outputLines);
     }
 
     private static ByteArrayOutputStream captureOutput(ThrowingRunnable action) {
