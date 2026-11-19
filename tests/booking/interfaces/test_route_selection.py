@@ -116,6 +116,7 @@ def test_route_page_displays_cargo_candidate_count_and_numbered_connected_legs(
 
     assert response.status_code == 200
     assert len(candidates) == 2
+    assert 'Route Cargo DEF789' in content
     assert 'Hong Kong (CNHKG)' in content
     assert 'Melbourne' in content
     assert 'AUMEL' in content
@@ -144,6 +145,7 @@ def test_select_itinerary_displays_candidates_when_routes_exist(seeded_cargo, cl
     content = response.content.decode()
 
     assert response.status_code == 200
+    assert 'Select Itinerary DEF789' in content
     assert 'Potential routes: 2' in content
     assert 'Route 1' in content
     assert 'Route 2' in content
@@ -184,6 +186,7 @@ def test_route_assignment_rejects_a_modified_candidate_token(seeded_cargo, clien
     details_response = client.get(f'/admin/cargo/{seeded_cargo.value}/')
 
     assert response.status_code == 400
+    assert response.content == b'Invalid route selection.'
     assert details_response.status_code == 200
     assert '<strong>Not routed</strong>' in details_response.content.decode()
 
