@@ -1,13 +1,15 @@
 from datetime import UTC, datetime
 
 import pytest
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -16,7 +18,6 @@ from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
-from cargotracker.voyage.domain.voyage_number import VoyageNumber
 from cargotracker.voyage.infrastructure.models import VoyageRecord
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
@@ -206,9 +207,39 @@ def test_route_selection_rejects_tampered_candidate_token(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_does_not_assign_a_token_to_another_cargo(client):
+    tracking_id = _register_cargo()
+    candidate_routing_service.paths = _candidate_paths()
+    selection_response = client.get(f'/admin/cargo/{tracking_id}/route/')
+    candidate_token = selection_response.context['candidate_options'][0]['token']
+    other_tracking_id = CargoRegistration(repository).register(
+        ORIGIN, DESTINATION, DEADLINE
+    ).value
+
+    response = client.post(
+        f'/admin/cargo/{other_tracking_id}/route/',
+        {'candidate_token': candidate_token},
+    )
+
+    assert response.status_code == 400
+    other_cargo = repository.find(TrackingId(other_tracking_id))
+    assert other_cargo is not None
+    assert other_cargo.itinerary.legs == ()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_raises_not_found_for_unknown_cargo():
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID MISSING1 not found\.$'):
+        route_selection_view(RequestFactory().get('/admin/cargo/MISSING1/route/'), 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_selection_rejects_unsupported_methods(client):
     tracking_id = _register_cargo()
 
     response = client.put(f'/admin/cargo/{tracking_id}/route/')
 
     assert response.status_code == 405
+    assert response.headers['Allow'] == 'GET, POST'
