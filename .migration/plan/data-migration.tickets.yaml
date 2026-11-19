@@ -28,7 +28,7 @@ tickets:
   - DM-05B
 - id: DM-05D
   title: 'Target export: export_data_snapshot'
-  role: afs-migrator
+  role: afs-specialist-migrator
   specialty: data
   files:
   - src/cargotracker/data_migration/management/commands/export_data_snapshot.py
