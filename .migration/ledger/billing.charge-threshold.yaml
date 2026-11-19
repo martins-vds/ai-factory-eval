@@ -1,0 +1,14 @@
+id: billing.charge-threshold
+kind: behavioral
+title: Decide whether an invoice total is chargeable
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+boundary: "InvoiceCalculator.chargeable(total): boolean decision"
+tickets: [martins-vds/ai-factory-eval#1556]
+status: pending
+verification: pending
+rules:
+  - id: one-dollar-minimum
+    rule: "A total of at least $1.00 is chargeable; a lower total is not."
+    source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+notes: "The implementation describes sub-dollar totals as carried over; see quirk draft .migration/quirks/billing-carry-over-not-persisted.md."

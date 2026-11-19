@@ -1,0 +1,17 @@
+id: billing.job-entrypoint
+kind: behavioral
+title: Configure and invoke the billing job
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:26-31
+boundary: "Launching billing.BillingJob: environment-based Northgate credentials and the map passed to run"
+tickets: [martins-vds/ai-factory-eval#1556]
+status: pending
+verification: pending
+rules:
+  - id: credentials-from-environment
+    rule: "Read NORTHGATE_MERCHANT and NORTHGATE_KEY from the environment to construct the card vault."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:26-28
+  - id: invoke-with-static-members
+    rule: "Invoke the billing job with fixed sample entries for ana ($4.75) and ben (no late fees); command-line arguments are unused."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:26-30
+notes: "The fixed sample input may not represent a production monthly member-billing source; see quirk draft .migration/quirks/billing-hardcoded-sample-members.md."

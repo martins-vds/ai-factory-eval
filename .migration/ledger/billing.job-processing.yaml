@@ -1,0 +1,20 @@
+id: billing.job-processing
+kind: behavioral
+title: Process each member's monthly invoice
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-24
+boundary: "BillingJob.run(member-to-invoice-lines): card charge or carry-over console output for each map entry"
+tickets: [martins-vds/ai-factory-eval#1556]
+status: pending
+verification: pending
+rules:
+  - id: calculate-as-member
+    rule: "Calculate each map entry's total with member set to true."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-17
+  - id: charge-or-report
+    rule: "Charge a chargeable total and print the member id, total, and returned reference; otherwise print that the total is carried over."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
+  - id: propagate-charge-failure
+    rule: "Do not swallow a charge failure; the run exits through the thrown exception."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
+notes: "Carry-over is reported but not persisted in this source; see quirk draft .migration/quirks/billing-carry-over-not-persisted.md."
