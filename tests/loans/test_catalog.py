@@ -11,6 +11,7 @@ from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -125,6 +126,33 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [
+        ('', '123'),
+        (' ', '123'),
+        ('reader', ''),
+        ('reader', ' '),
+    ],
+)
+def test_lend_use_case_rejects_blank_required_fields(member, isbn):
+    with pytest.raises(ValidationError):
+        lend_loan(member=member, isbn=isbn)
+
+    assert Loan.objects.count() == 3
+
+
+@pytest.mark.django_db
+def test_lend_use_case_assigns_a_fourteen_day_due_date():
+    today = timezone.localdate()
+
+    loan = lend_loan(member='reader', isbn='123')
+
+    assert loan.lent_on == today
+    assert loan.due_on == today + timedelta(days=14)
+
+
+@pytest.mark.django_db
 def test_return_endpoint_records_the_return_date(client):
     returned_on = timezone.localdate()
     golden = HTTP_GOLDENS['POST /loans/{id}/return']
@@ -138,6 +166,36 @@ def test_return_endpoint_records_the_return_date(client):
     assert response.content.decode().endswith('\n')
     assert target_fields == source_fields[:5] + [returned_on.isoformat()]
     assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_return_use_case_records_today_on_first_return():
+    returned_on = timezone.localdate()
+
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeated_return_without_replacing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert loan.returned_on == original_return_date
+    assert not updated
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert not updated
 
 
 @pytest.mark.django_db
