@@ -1,0 +1,31 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1609
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.887
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-assign
+  - booking.screen-route
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+notes: >-
+  Changed-code mutation was 0.887 (55 killed, 7 survived) against 0.8. Survivor classifications:
+  views.py:22 #1 changes the shared signing salt value, but it remains non-empty and is used by both
+  signing and verification; the default-salt token test confirms namespace separation. views.py:34 #10
+  changes only the unknown-cargo Http404 detail on POST; the HTTP result remains 404. views.py:37 #13
+  changes only the stale-route Http404 detail; the HTTP result remains 404. views.py:39 #14 changes
+  quote's safe set from empty to "XXXX"; X is an unreserved character, so quoting is unchanged.
+  views.py:95 #40 changes the missing candidate default from empty string to "XXXX"; both inputs fail
+  signature verification and yield the same 404. views.py:97 #44 and views.py:100 #46 change Http404
+  detail text; both retain the same 404 response. These detail-text differences are not rendered by the
+  normal non-debug 404 page. The route-specification eligibility check remains in the view and needs
+  an authorized scope extension for direct use-case enforcement and testing; see the handoff.
