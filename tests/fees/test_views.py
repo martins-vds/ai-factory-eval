@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 
 import pytest
+from playwright.sync_api import sync_playwright
+
+from src.fees import views
+from src.fees.gateway import HttpPaymentGateway
+from src.fees.services import PaymentGatewayError
 
 
 @dataclass
@@ -46,8 +51,6 @@ def test_fee_api_returns_characterized_not_found_response(client):
 
 @pytest.mark.django_db
 def test_payment_api_returns_gateway_success_unchanged(client, monkeypatch):
-    from src.fees import views
-
     gateway = PaymentGateway()
     monkeypatch.setattr(views.payment_application, 'gateway', gateway)
 
@@ -61,8 +64,6 @@ def test_payment_api_returns_gateway_success_unchanged(client, monkeypatch):
 
 @pytest.mark.django_db
 def test_payment_api_maps_gateway_failure_to_bad_gateway(client, monkeypatch):
-    from src.fees import views
-
     gateway = PaymentGateway(status_code=503, body='declined\n')
     monkeypatch.setattr(views.payment_application, 'gateway', gateway)
 
@@ -75,8 +76,6 @@ def test_payment_api_maps_gateway_failure_to_bad_gateway(client, monkeypatch):
 
 @pytest.mark.django_db
 def test_payment_api_does_not_call_gateway_for_unknown_loan(client, monkeypatch):
-    from src.fees import views
-
     gateway = PaymentGateway()
     monkeypatch.setattr(views.payment_application, 'gateway', gateway)
 
@@ -111,8 +110,6 @@ def test_fee_page_returns_a_not_found_page_for_unknown_loan(client):
 
 @pytest.mark.django_db
 def test_htmx_payment_page_renders_gateway_failure_for_swap(client, monkeypatch):
-    from src.fees import views
-
     gateway = PaymentGateway(status_code=503, body='declined\n')
     monkeypatch.setattr(views.payment_application, 'gateway', gateway)
 
@@ -125,8 +122,6 @@ def test_htmx_payment_page_renders_gateway_failure_for_swap(client, monkeypatch)
 
 @pytest.mark.django_db
 def test_htmx_payment_success_renders_status(client, monkeypatch):
-    from src.fees import views
-
     gateway = PaymentGateway()
     monkeypatch.setattr(views.payment_application, 'gateway', gateway)
 
@@ -139,9 +134,6 @@ def test_htmx_payment_success_renders_status(client, monkeypatch):
 
 @pytest.mark.django_db
 def test_payment_page_response_handles_gateway_interruption(client, monkeypatch):
-    from src.fees import views
-    from src.fees.services import PaymentGatewayError
-
     interruption = InterruptedError('request interrupted')
     failure = PaymentGatewayError('payment gateway unavailable')
     failure.__cause__ = interruption
@@ -153,3 +145,27 @@ def test_payment_page_response_handles_gateway_interruption(client, monkeypatch)
     assert response.status_code == 502
     assert b'payment gateway unavailable' in response.content
     assert failure.__cause__ is interruption
+
+
+@pytest.mark.django_db
+def test_browser_payment_failure_is_rendered(live_server, local_gateway, monkeypatch):
+    base_url, requests = local_gateway
+    monkeypatch.setattr(
+        views.payment_application,
+        'gateway',
+        HttpPaymentGateway(base_url),
+    )
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L2/')
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+            assert 'Payment could not be completed. declined' in alert.inner_text()
+            assert requests == [('POST', '/charge?loan=L2', b'')]
+        finally:
+            browser.close()
