@@ -1,12 +1,20 @@
 import json
 from pathlib import Path
 
+import pytest
 from playwright.sync_api import sync_playwright
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )
 HTTP_GOLDENS = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))
+
+
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_routes_reject_non_get_requests(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
 
 
 def test_about_endpoint_matches_characterized_response(client):
