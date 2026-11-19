@@ -3,14 +3,24 @@
   <p class="mb-4 text-gray-700">
     {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
   </p>
-  <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/">
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-target="#booking-dialog"
+    hx-swap="innerHTML"
+  >
     {% csrf_token %}
     <label for="deadline" class="mb-2 block font-medium text-gray-900">Arrival deadline</label>
+    {% if deadline_error %}
+      <p id="deadline-error" role="alert" class="mb-2 text-red-700">{{ deadline_error }}</p>
+    {% endif %}
     <input
       id="deadline"
       name="deadline"
       type="date"
-      value="{{ cargo.route_specification.arrival_deadline|date:'Y-m-d' }}"
+      value="{{ deadline_value }}"
+      {% if deadline_error %}aria-describedby="deadline-error"{% endif %}
       class="w-full rounded border border-gray-300 p-2"
     >
     <div class="mt-6 flex justify-end gap-3">

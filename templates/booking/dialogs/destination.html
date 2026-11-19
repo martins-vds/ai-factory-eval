@@ -3,12 +3,31 @@
   <p class="mb-4 text-gray-700">
     {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
   </p>
-  <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/">
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-target="#booking-dialog"
+    hx-swap="innerHTML"
+  >
     {% csrf_token %}
     <label for="destination" class="mb-2 block font-medium text-gray-900">Destination</label>
-    <select id="destination" name="destination" class="w-full rounded border border-gray-300 p-2">
+    {% if destination_error %}
+      <p id="destination-error" role="alert" class="mb-2 text-red-700">{{ destination_error }}</p>
+    {% endif %}
+    <select
+      id="destination"
+      name="destination"
+      {% if destination_error %}aria-describedby="destination-error"{% endif %}
+      class="w-full rounded border border-gray-300 p-2"
+    >
       {% for location in destinations %}
-        <option value="{{ location.unlocode.value }}">{{ location.name }}</option>
+        <option
+          value="{{ location.unlocode.value }}"
+          {% if location.unlocode.value == destination_value %}selected{% endif %}
+        >
+          {{ location.name }}
+        </option>
       {% endfor %}
     </select>
     <div class="mt-6 flex justify-end gap-3">
