@@ -55,3 +55,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T22:02:41+00:00 | final-crap-lizard | 0 | 0.1 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-19T22:02:41+00:00 | final-crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9f969d626564cc0f` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-19T22:03:35+00:00 | final-regression | 0 | 38.13 | `pytest -q` | `908551f50779be54` |  |  |
+| 2026-11-19T22:04:42+00:00 | return-validation | 2 | 0.1 | `python .migration/harness/tools/validate.py` | `8ccf6c31e456c000` | validate.py: error: the following arguments are required: folder |  |
+| 2026-11-19T22:04:50+00:00 | return-validation-final | 1 | 4.11 | `python .migration/harness/tools/validate.py .migration` | `a94a29bc07abf308` | 195 file(s) checked, 1 error(s) |  |
+| 2026-11-19T22:05:00+00:00 | return-validation-final | 0 | 4.09 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
