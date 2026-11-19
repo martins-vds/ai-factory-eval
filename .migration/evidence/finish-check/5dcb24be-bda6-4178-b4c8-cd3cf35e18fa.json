@@ -1,0 +1,54 @@
+[
+  {
+    "at": "2026-11-19T22:13:09Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17122,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-migrator",
+    "changed": [],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/DM-05F.afs-migrator.yaml` with `role: afs-migrator`, `ticket: DM-05F`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/DM-05F.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T22:13:47Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17586,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/5dcb24be-bda6-4178-b4c8-cd3cf35e18fa.json"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/DM-05F.afs-migrator.yaml` with `role: afs-migrator`, `ticket: DM-05F`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/DM-05F.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/DM-05F.md"
+  }
+]
