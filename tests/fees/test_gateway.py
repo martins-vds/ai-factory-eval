@@ -7,12 +7,18 @@ from src.fees.services import PaymentGatewayError
 
 def test_gateway_posts_an_empty_charge_request(gateway_server, monkeypatch):
     base_url, _, requests = gateway_server
-    monkeypatch.setenv('PAYMENT_GATEWAY_URL', base_url)
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', f'{base_url}/X/')
 
     response = HttpPaymentGateway().charge('L1')
 
     assert (response.status_code, response.body) == (200, 'charged\n')
-    assert requests == [('POST', '/charge?loan=L1', b'')]
+    assert requests == [('POST', '/X/charge?loan=L1', b'')]
+
+
+def test_gateway_uses_the_default_base_url_when_unconfigured(monkeypatch):
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+
+    assert HttpPaymentGateway().base_url == 'https://payments.lending-library.invalid'
 
 
 def test_interrupted_request_is_wrapped_without_losing_the_interruption(monkeypatch):
@@ -27,3 +33,4 @@ def test_interrupted_request_is_wrapped_without_losing_the_interruption(monkeypa
         HttpPaymentGateway('http://payments.invalid').charge('L1')
 
     assert raised.value.__cause__ is interruption
+    assert str(raised.value) == 'payment gateway unavailable'

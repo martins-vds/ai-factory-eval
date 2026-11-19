@@ -1,13 +1,15 @@
-from dataclasses import dataclass
+from dataclasses import FrozenInstanceError, dataclass
 from datetime import date, timedelta
 
 import pytest
 
 from src.fees.services import (
     FeeApplication,
+    FeeQuote,
     GatewayResponse,
     PaymentApplication,
     PaymentGatewayError,
+    PaymentResult,
 )
 
 
@@ -132,3 +134,16 @@ def test_interrupted_gateway_failure_remains_chained():
         application.pay('L1')
 
     assert raised.value.__cause__ is interruption
+
+
+@pytest.mark.parametrize(
+    ('value', 'attribute', 'replacement'),
+    [
+        (FeeQuote(Loan('L1', date(2026, 1, 16)), 0, 0), 'days_late', 1),
+        (GatewayResponse(200, 'charged\n'), 'status_code', 502),
+        (PaymentResult(200, 'charged\n'), 'status_code', 502),
+    ],
+)
+def test_fee_and_payment_results_are_immutable(value, attribute, replacement):
+    with pytest.raises(FrozenInstanceError):
+        setattr(value, attribute, replacement)
