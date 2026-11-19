@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, PaymentApplication
 
 
 @dataclass
@@ -27,6 +27,14 @@ class FixedClock:
 
     def today(self):
         return self.current_date
+
+
+class RecordingGateway:
+    def __init__(self):
+        self.loan_ids = []
+
+    def charge(self, loan_id):
+        self.loan_ids.append(loan_id)
 
 
 @pytest.mark.parametrize(
@@ -63,3 +71,11 @@ def test_fee_application_returns_none_for_an_unknown_loan():
     application = FeeApplication(LoanRepository(), FixedClock(date(2026, 3, 7)))
 
     assert application.calculate('missing') is None
+
+
+def test_payment_application_does_not_call_gateway_for_an_unknown_loan():
+    gateway = RecordingGateway()
+    application = PaymentApplication(LoanRepository(), gateway)
+
+    assert application.pay('missing') is None
+    assert gateway.loan_ids == []

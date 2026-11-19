@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Payment status · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      {% include "fees/payment-status.html" %}
+    </div>
+  </article>
+</section>
+{% endblock %}
