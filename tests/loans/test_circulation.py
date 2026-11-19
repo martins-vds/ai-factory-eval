@@ -19,8 +19,10 @@ from src.loans.services import (
     ('member', 'isbn', 'invalid_field'),
     [
         (None, '123', 'member'),
+        ('', '123', 'member'),
         (' \t', '123', 'member'),
         ('reader', None, 'isbn'),
+        ('reader', '', 'isbn'),
         ('reader', ' \t', 'isbn'),
     ],
 )
@@ -40,25 +42,62 @@ def test_lending_rejects_missing_or_blank_fields(member, isbn, invalid_field):
 
 
 @pytest.mark.django_db
+def test_lending_use_case_uses_the_next_id_and_supplied_local_date():
+    loan = lend_loan(
+        repository=LoanRepository(),
+        member=' reader ',
+        isbn=' 123 ',
+        lent_on=date(2026, 11, 19),
+    )
+
+    assert (loan.id, loan.member, loan.isbn, loan.lent_on, loan.due_on) == (
+        'L4',
+        ' reader ',
+        ' 123 ',
+        date(2026, 11, 19),
+        date(2026, 12, 3),
+    )
+
+
+@pytest.mark.django_db
 def test_lending_endpoint_creates_a_loan_and_escapes_delimiters(client):
     today = timezone.localdate()
     response = client.post(
         '/loans',
-        {'member': 'Reader; Example', 'isbn': '123;456'},
+        {'member': ' Reader; Example ', 'isbn': ' 123;456 '},
     )
 
     assert response.status_code == 201
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
-        f'L4;"Reader; Example";"123;456";{today.isoformat()};'
+        f'L4;" Reader; Example ";" 123;456 ";{today.isoformat()};'
         f'{(today + timedelta(days=14)).isoformat()};\n'
     )
     loan = Loan.objects.get(pk='L4')
     assert (loan.member, loan.isbn, loan.lent_on) == (
-        'Reader; Example',
-        '123;456',
+        ' Reader; Example ',
+        ' 123;456 ',
         today,
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'fields',
+    [
+        {},
+        {'member': 'reader'},
+        {'isbn': '123'},
+        {'member': '', 'isbn': '123'},
+        {'member': 'reader', 'isbn': ''},
+    ],
+)
+def test_lending_endpoint_rejects_empty_fields(client, fields):
+    response = client.post('/loans', fields)
+
+    assert response.status_code == 400
+    assert response.content.decode() == 'member and isbn are required\n'
+    assert Loan.objects.count() == 3
 
 
 @pytest.mark.django_db
@@ -73,6 +112,20 @@ def test_return_use_case_rejects_repeated_return_without_changing_the_date():
         )
 
     assert Loan.objects.get(pk='L2').returned_on == original_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_stores_the_supplied_date():
+    returned_on = date(2026, 11, 19)
+
+    loan = return_loan(
+        repository=LoanRepository(),
+        loan_id='L1',
+        returned_on=returned_on,
+    )
+
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
 
 
 @pytest.mark.django_db
@@ -119,8 +172,11 @@ def test_return_endpoint_returns_not_found_for_an_unknown_loan(client):
 @pytest.mark.django_db
 def test_new_loan_page_offers_an_htmx_lending_form(client):
     response = client.get('/ui/loans/new/')
+    catalog = client.get('/ui/loans/')
 
     assert response.status_code == 200
+    assert catalog.status_code == 200
+    assert b'href="/ui/loans/new/"' in catalog.content
     assert b'hx-post="/ui/loans/"' in response.content
     assert b'name="member"' in response.content
     assert b'name="isbn"' in response.content
@@ -128,16 +184,37 @@ def test_new_loan_page_offers_an_htmx_lending_form(client):
 
 
 @pytest.mark.django_db
-def test_htmx_lending_form_renders_field_errors(client):
+@pytest.mark.parametrize(
+    ('fields', 'error_id'),
+    [
+        ({'member': ' \t', 'isbn': '123'}, 'member-error'),
+        ({'member': 'reader', 'isbn': ' \t'}, 'isbn-error'),
+    ],
+)
+def test_htmx_lending_form_renders_field_errors(client, fields, error_id):
     response = client.post(
         '/ui/loans/',
-        {'member': ' \t', 'isbn': '123'},
+        fields,
         HTTP_HX_REQUEST='true',
     )
 
     assert response.status_code == 400
+    assert f'id="{error_id}" role="alert"'.encode() in response.content
+    assert b'This field is required.' in response.content
+
+
+@pytest.mark.django_db
+def test_full_page_lending_form_renders_field_errors(client):
+    response = client.post(
+        '/ui/loans/',
+        {'member': '', 'isbn': '123'},
+    )
+
+    assert response.status_code == 400
+    assert b'<!doctype html>' in response.content
     assert b'id="member-error" role="alert"' in response.content
     assert b'This field is required.' in response.content
+    assert Loan.objects.count() == 3
 
 
 @pytest.mark.django_db
@@ -190,3 +267,5 @@ def test_htmx_return_renders_unknown_and_repeat_errors(client):
     assert b'No such loan.' in unknown.content
     assert repeated.status_code == 409
     assert b'This loan was already returned.' in repeated.content
+    assert b'Loan record \xc2\xb7 L2' in repeated.content
+    assert b'Jan 20, 2026' in repeated.content

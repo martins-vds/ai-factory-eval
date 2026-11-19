@@ -135,11 +135,14 @@ def loan_catalog_return(request, loan_id):
             {'error': 'No such loan.'},
             status=404,
         )
-    except LoanAlreadyReturned:
+    except LoanAlreadyReturned as error:
         return render(
             request,
             'loans/return_status.html',
-            {'error': 'This loan was already returned.'},
+            {
+                'error': 'This loan was already returned.',
+                'loan': error.loan,
+            },
             status=409,
         )
     return render(request, 'loans/return_status.html', {'loan': loan})

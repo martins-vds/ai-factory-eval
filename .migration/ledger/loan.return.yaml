@@ -7,11 +7,25 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan or HTTP 404 with `no such loan` and a newline for an unknown id; a repeat returns HTTP 409. The reading-room return interaction is at /ui/loans/{id}/return/."
+tickets: [martins-vds/ai-factory-synthetic-target#61]
+target:
+  components: [src.loans.services.return_loan, src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
+  - tests/loans/test_circulation.py::test_return_endpoint_returns_not_found_for_an_unknown_loan
+  - tests/loans/test_circulation.py::test_htmx_return_renders_unknown_and_repeat_errors
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - id: existing-loan
+    rule: "A return is allowed only for an existing loan."
+    source: legacy/src/main/java/lib/LoanResource.java:45-50

@@ -28,7 +28,9 @@ class LoanNotFound(Exception):
 
 
 class LoanAlreadyReturned(Exception):
-    pass
+    def __init__(self, loan):
+        self.loan = loan
+        super().__init__(loan.id)
 
 
 def loan_line(loan):
@@ -56,7 +58,13 @@ def get_loan_text(loan_id, repository: LoanRepositoryPort):
     return loan_line(loan) if loan else None
 
 
-def lend_loan(*, repository: LoanRepositoryPort, member: str, isbn: str, lent_on):
+def lend_loan(
+    *,
+    repository: LoanRepositoryPort,
+    member: str | None,
+    isbn: str | None,
+    lent_on,
+):
     fields = {'member': member, 'isbn': isbn}
     errors = {
         name: 'This field is required.'
@@ -80,6 +88,6 @@ def return_loan(*, repository: LoanRepositoryPort, loan_id: str, returned_on):
         if loan is None:
             raise LoanNotFound(loan_id)
         if loan.returned_on is not None:
-            raise LoanAlreadyReturned(loan_id)
+            raise LoanAlreadyReturned(loan)
         loan.returned_on = returned_on
         return repository.save(loan)
