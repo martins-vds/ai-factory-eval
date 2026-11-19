@@ -26,3 +26,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T13:58:25+00:00 | crap-coverage | 0 | 44.85 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `0bc483b6635b89b6` |  |  |
 | 2026-11-19T13:58:25+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-19T13:58:26+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `e227809556c58f4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=204 |
+| 2026-11-19T14:02:26+00:00 | mutation-changed | 0 | 216.6 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `d43f64782e9d20a3` |  | gate=mutation score=0.878 threshold=0.8 killed=43 survived=6 files=1 base=origin/main |
+| 2026-11-19T14:04:16+00:00 | route-token-binding | 0 | 3.35 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `f329478ba065a40c` |  |  |
+| 2026-11-19T14:04:16+00:00 | format-check-token-binding | 1 | 0.01 | `ruff format --check` | `0067efcbbb68f3d4` |  |  |
+| 2026-11-19T14:04:23+00:00 | format-check-token-binding-rerun | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |

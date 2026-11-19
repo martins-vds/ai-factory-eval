@@ -182,3 +182,26 @@ def test_route_selection_rejects_an_invalid_candidate_token(client, monkeypatch)
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
     assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_a_candidate_token_for_another_cargo(client, monkeypatch):
+    _seed_sample_data(monkeypatch)
+    routing_service.candidates = _candidate_paths()
+    cargo = cargo_repository.find(TrackingId('ABC123'))
+    assert cargo is not None
+    response = client.get('/admin/cargo/DEF789/route/')
+    token = re.search(r'name="candidate_token"\s+value="([^"]+)"', response.content.decode()).group(
+        1
+    )
+
+    response = client.post(
+        '/admin/cargo/ABC123/route/',
+        {'candidate_token': token},
+    )
+    updated_cargo = cargo_repository.find(TrackingId('ABC123'))
+
+    assert response.status_code == 400
+    assert updated_cargo is not None
+    assert updated_cargo.itinerary == cargo.itinerary
