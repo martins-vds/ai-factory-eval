@@ -6,8 +6,13 @@ source:
 boundary: "An invoice total of at least $1.00 is chargeable; a smaller total carries over."
 tickets: [martins-vds/ai-factory-eval#1568]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.json
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: minimum-charge
     rule: "Charge totals greater than or equal to $1.00; carry totals below $1.00 over."
     source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+notes: "BillingJob always calculates member totals, which cannot fall below $3.15 for valid inputs; see .migration/quirks/billing-unreachable-carryover.md."

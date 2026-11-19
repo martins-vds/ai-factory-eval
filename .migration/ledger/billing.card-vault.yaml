@@ -6,7 +6,11 @@ source:
 boundary: "Send the member ID and exact whole-cent amount to Northgate in USD; return the approved charge reference or raise IllegalStateException on a decline."
 tickets: [martins-vds/ai-factory-eval#1568]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.json
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: usd-cents
     rule: "Send the requested amount as exact cents in USD."
