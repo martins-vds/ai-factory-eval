@@ -1,0 +1,9 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1542
+graphs: null
+ledger: null
+risk_map: null
+quirk_tickets: null
+graph_discrepancies: null
+handoff: .migration/handoffs/BL-01.md
