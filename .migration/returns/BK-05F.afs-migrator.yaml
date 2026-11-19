@@ -1,0 +1,17 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1578
+pr: null
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: "n/a: not run, handed off"
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
