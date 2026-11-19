@@ -13,6 +13,7 @@ gates:
 evidence_logs:
   - .migration/evidence/runs/BK-05G.md
 specialty_evidence:
+  - .migration/evidence/ui/BK-05G.md
   - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_exposes_dialog_controls_without_changing_route_link
   - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_filters_options_without_mutating_locations
   - tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo

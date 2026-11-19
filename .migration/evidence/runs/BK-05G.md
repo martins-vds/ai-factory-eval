@@ -50,3 +50,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T18:47:39+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `42b637de9cb6ebca` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
 | 2026-11-19T18:49:24+00:00 | mutation-changed | 0 | 101.13 | `python .migration/harness/tools/afs-mutation` | `cc57262d0b4c8f90` |  | gate=mutation score=0.945 threshold=0.8 killed=52 survived=3 files=1 base=ce761d4a65447f021ae8d498bada3ebbdc42c352 |
 | 2026-11-19T18:49:57+00:00 | browser-tailwind-build | 0 | 0.17 | `make tailwind-build` | `ebb7bfb1123b3355` |  |  |
+| 2026-11-19T18:52:32+00:00 | return-validation | 2 | 0.1 | `python .migration/harness/tools/validate.py` | `8ccf6c31e456c000` | validate.py: error: the following arguments are required: folder |  |
+| 2026-11-19T18:52:37+00:00 | return-validation | 1 | 0.09 | `python .migration/harness/tools/validate.py .` | `9052543579aed45a` | 0 file(s) checked, 1 error(s) |  |
+| 2026-11-19T18:52:45+00:00 | return-validation | 0 | 3.85 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
