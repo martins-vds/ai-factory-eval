@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.878, threshold 0.8, killed 43, survived 6. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.898, threshold 0.8, killed 44, survived 5. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:19 Mutant #1`
 
@@ -22,19 +22,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.878, thr
   -_CANDIDATE_TOKEN_SALT = 'booking.route-selection.candidate'
   +_CANDIDATE_TOKEN_SALT = None
    def _candidate_token(tracking_id: TrackingId, itinerary: Itinerary) -> str:
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:52 Mutant #18`
-
-  ```diff
-  @@ -49,7 +49,7 @@
-       tracking_id: TrackingId,
-   ) -> Itinerary:
-       payload = signing.loads(token, salt=_CANDIDATE_TOKEN_SALT)
-  -    if not isinstance(payload, dict) or payload.get('tracking_id') != tracking_id.value:
-  +    if not isinstance(payload, dict) and payload.get('tracking_id') != tracking_id.value:
-           raise signing.BadSignature('Candidate does not match cargo')
-       try:
   ```
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:53 Mutant #19`

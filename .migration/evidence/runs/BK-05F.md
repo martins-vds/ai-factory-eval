@@ -30,3 +30,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T14:04:16+00:00 | route-token-binding | 0 | 3.35 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `f329478ba065a40c` |  |  |
 | 2026-11-19T14:04:16+00:00 | format-check-token-binding | 1 | 0.01 | `ruff format --check` | `0067efcbbb68f3d4` |  |  |
 | 2026-11-19T14:04:23+00:00 | format-check-token-binding-rerun | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-19T14:06:14+00:00 | regression-final | 0 | 46.9 | `pytest -q` | `90949bdfa8e58496` |  |  |
+| 2026-11-19T14:09:47+00:00 | mutation-changed-final | 0 | 207.03 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `24854fa7664323d3` |  | gate=mutation score=0.898 threshold=0.8 killed=44 survived=5 files=1 base=origin/main |
