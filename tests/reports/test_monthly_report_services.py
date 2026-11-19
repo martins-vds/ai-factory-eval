@@ -21,8 +21,8 @@ class LoanRepository:
     def __init__(self, loans):
         self.loans = loans
 
-    def all(self):
-        return self.loans
+    def for_period(self, start, end):
+        return [loan for loan in self.loans if start <= loan.lent_on < end]
 
     def find(self, loan_id):
         return next((loan for loan in self.loans if loan.id == loan_id), None)

@@ -14,7 +14,7 @@ class LoanRecord(Protocol):
 
 
 class LoanRepository(Protocol):
-    def all(self) -> Iterable[LoanRecord]: ...
+    def for_period(self, start: date, end: date) -> Iterable[LoanRecord]: ...
 
 
 class Fee(Protocol):
@@ -61,10 +61,7 @@ class MonthlyReportApplication:
         previous_month = (month_start - timedelta(days=1)).replace(day=1)
 
         members = defaultdict(_MemberTotals)
-        for loan in self.loans.all():
-            if not previous_month <= loan.lent_on < month_start:
-                continue
-
+        for loan in self.loans.for_period(previous_month, month_start):
             totals = members[loan.member]
             totals.loans_started += 1
             totals.late_returns += int(

@@ -1,11 +1,14 @@
-from src.fees.composition import fee_application
+from src.fees.gateway import HttpPaymentGateway
+from src.fees.services import FeeApplication
 from src.loans.clock import SystemClock
 
 from .repository import DjangoReportLoanRepository
 from .services import MonthlyReportApplication
 
+report_loans = DjangoReportLoanRepository()
+report_clock = SystemClock()
 monthly_report_application = MonthlyReportApplication(
-    DjangoReportLoanRepository(),
-    fee_application,
-    SystemClock(),
+    report_loans,
+    FeeApplication(report_loans, report_clock, HttpPaymentGateway()),
+    report_clock,
 )

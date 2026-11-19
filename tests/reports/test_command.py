@@ -10,7 +10,7 @@ from src.loans.models import Loan
 pytestmark = pytest.mark.django_db
 
 
-def test_monthly_report_command_outputs_previous_month_as_csv():
+def test_monthly_report_command_outputs_previous_month_as_csv(django_assert_num_queries):
     today = timezone.localdate()
     month_start = today.replace(day=1)
     previous_month_start = (month_start - timedelta(days=1)).replace(day=1)
@@ -22,6 +22,13 @@ def test_monthly_report_command_outputs_previous_month_as_csv():
         isbn='123',
         lent_on=lent_on,
         returned_on=due_on + timedelta(days=3),
+    )
+    Loan.objects.create(
+        id='L-report-2',
+        member='Member, One',
+        isbn='124',
+        lent_on=lent_on,
+        returned_on=due_on,
     )
     Loan.objects.create(
         id='L-before',
@@ -37,8 +44,9 @@ def test_monthly_report_command_outputs_previous_month_as_csv():
     )
     output = StringIO()
 
-    call_command('monthly_report', stdout=output)
+    with django_assert_num_queries(1):
+        call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,late_fees_cents\n"Member, One",1,1,75\n'
+        'member_id,loans_started,late_returns,late_fees_cents\n"Member, One",2,1,75\n'
     )
