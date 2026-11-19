@@ -136,7 +136,7 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
     ],
 )
 def test_lend_use_case_rejects_blank_required_fields(member, isbn):
-    with pytest.raises(ValidationError):
+    with pytest.raises(ValueError):
         lend_loan(member=member, isbn=isbn)
 
     assert Loan.objects.count() == 3
