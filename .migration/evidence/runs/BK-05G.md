@@ -58,3 +58,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T22:04:42+00:00 | return-validation | 2 | 0.1 | `python .migration/harness/tools/validate.py` | `8ccf6c31e456c000` | validate.py: error: the following arguments are required: folder |  |
 | 2026-11-19T22:04:50+00:00 | return-validation-final | 1 | 4.11 | `python .migration/harness/tools/validate.py .migration` | `a94a29bc07abf308` | 195 file(s) checked, 1 error(s) |  |
 | 2026-11-19T22:05:00+00:00 | return-validation-final | 0 | 4.09 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-19T22:05:55+00:00 | committed-finish-check | 0 | 33.11 | `python .migration/harness/tools/afs-finish-check --ticket BK-05G --role afs-migrator` | `eb4ff67144f66958` |  | gate=finish-check ticket=BK-05G role=afs-migrator findings=0 |
+| 2026-11-19T22:06:41+00:00 | post-codeql-validation | 0 | 4.08 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
