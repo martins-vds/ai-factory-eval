@@ -444,139 +444,6 @@
       "if": {
         "properties": {
           "role": {
-            "const": "afs-bootstrapper"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "setup_pr",
-          "characterization_tier",
-          "tier_evidence",
-          "capabilities",
-          "gap_tickets",
-          "validation"
-        ],
-        "properties": {
-          "setup_pr": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "characterization_tier": {
-            "enum": [
-              "A",
-              "B",
-              "C",
-              null
-            ]
-          },
-          "tier_evidence": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "capabilities": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "required": [
-              "met",
-              "gap",
-              "waived",
-              "not_applicable"
-            ],
-            "properties": {
-              "met": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ],
-                    "minimum": 0
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "gap": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ],
-                    "minimum": 0
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "waived": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ],
-                    "minimum": 0
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "not_applicable": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ],
-                    "minimum": 0
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              }
-            }
-          },
-          "gap_tickets": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "validation": {
-            "type": [
-              "string",
-              "null"
-            ]
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "role": {
             "const": "afs-characterizer"
           }
         }
@@ -1220,6 +1087,369 @@
       "if": {
         "properties": {
           "role": {
+            "const": "afs-verifier"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "pr",
+          "verdict",
+          "gates",
+          "evidence_logs",
+          "findings",
+          "tests_added",
+          "ledger_issues",
+          "quirk_tickets"
+        ],
+        "properties": {
+          "pr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "verdict": {
+            "enum": [
+              "pass",
+              "changes-required",
+              "blocked",
+              null
+            ]
+          },
+          "gates": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "build",
+              "behavior",
+              "idiom",
+              "crap",
+              "mutation_changed",
+              "regression"
+            ],
+            "properties": {
+              "build": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "behavior": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "idiom": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "crap": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "mutation_changed": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "regression": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              }
+            }
+          },
+          "evidence_logs": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "integer",
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "findings": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "required": [
+                "severity",
+                "where",
+                "what"
+              ],
+              "properties": {
+                "severity": {
+                  "enum": [
+                    "blocker",
+                    "major",
+                    "minor",
+                    null
+                  ]
+                },
+                "where": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "what": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "tests_added": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "ledger_issues": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "quirk_tickets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "role": {
+            "const": "afs-bootstrapper"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "setup_pr",
+          "characterization_tier",
+          "tier_evidence",
+          "capabilities",
+          "gap_tickets",
+          "validation"
+        ],
+        "properties": {
+          "setup_pr": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "characterization_tier": {
+            "enum": [
+              "A",
+              "B",
+              "C",
+              null
+            ]
+          },
+          "tier_evidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "capabilities": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": [
+              "met",
+              "gap",
+              "waived",
+              "not_applicable"
+            ],
+            "properties": {
+              "met": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "gap": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "waived": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              },
+              "not_applicable": {
+                "anyOf": [
+                  {
+                    "type": [
+                      "integer",
+                      "null"
+                    ],
+                    "minimum": 0
+                  },
+                  {
+                    "type": "string",
+                    "pattern": "^n/a: \\S"
+                  }
+                ]
+              }
+            }
+          },
+          "gap_tickets": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "validation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "role": {
             "const": "afs-slice-coordinator"
           }
         }
@@ -1587,236 +1817,6 @@
               "string",
               "null"
             ]
-          }
-        }
-      }
-    },
-    {
-      "if": {
-        "properties": {
-          "role": {
-            "const": "afs-verifier"
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "pr",
-          "verdict",
-          "gates",
-          "evidence_logs",
-          "findings",
-          "tests_added",
-          "ledger_issues",
-          "quirk_tickets"
-        ],
-        "properties": {
-          "pr": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "verdict": {
-            "enum": [
-              "pass",
-              "changes-required",
-              "blocked",
-              null
-            ]
-          },
-          "gates": {
-            "type": [
-              "object",
-              "null"
-            ],
-            "required": [
-              "build",
-              "behavior",
-              "idiom",
-              "crap",
-              "mutation_changed",
-              "regression"
-            ],
-            "properties": {
-              "build": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "behavior": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "idiom": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "crap": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
-                    "minimum": 0
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "mutation_changed": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
-                    "minimum": 0,
-                    "maximum": 1
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              },
-              "regression": {
-                "anyOf": [
-                  {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  {
-                    "type": "string",
-                    "pattern": "^n/a: \\S"
-                  }
-                ]
-              }
-            }
-          },
-          "evidence_logs": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": [
-                "string",
-                "number",
-                "integer",
-                "boolean",
-                "null"
-              ]
-            }
-          },
-          "findings": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": [
-                "object",
-                "null"
-              ],
-              "required": [
-                "severity",
-                "where",
-                "what"
-              ],
-              "properties": {
-                "severity": {
-                  "enum": [
-                    "blocker",
-                    "major",
-                    "minor",
-                    null
-                  ]
-                },
-                "where": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                },
-                "what": {
-                  "type": [
-                    "string",
-                    "null"
-                  ]
-                }
-              }
-            }
-          },
-          "tests_added": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "ledger_issues": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          },
-          "quirk_tickets": {
-            "type": [
-              "array",
-              "null"
-            ],
-            "items": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
           }
         }
       }
