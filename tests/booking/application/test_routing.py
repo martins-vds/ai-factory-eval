@@ -114,6 +114,44 @@ def test_assign_route_persists_itinerary_and_recalculates_delivery():
 
 
 @pytest.mark.django_db
+def test_assign_route_rejects_itinerary_that_is_not_a_candidate():
+    routing, tracking_id, _ = _routing_service(())
+    itinerary = Itinerary(
+        (
+            Leg(
+                DjangoVoyageRepository().find(VoyageNumber('CM001')),
+                ORIGIN,
+                DESTINATION,
+                datetime(2030, 11, 1, tzinfo=UTC),
+                datetime(2030, 11, 4, tzinfo=UTC),
+            ),
+        )
+    )
+
+    with pytest.raises(ValueError):
+        routing.assign_route(tracking_id, itinerary)
+
+
+@pytest.mark.django_db
+def test_assign_route_rejects_itinerary_that_does_not_satisfy_route_specification():
+    routing, tracking_id, _ = _routing_service(())
+    itinerary = Itinerary(
+        (
+            Leg(
+                DjangoVoyageRepository().find(VoyageNumber('CM001')),
+                TRANSFER,
+                DESTINATION,
+                datetime(2030, 11, 1, tzinfo=UTC),
+                datetime(2030, 11, 4, tzinfo=UTC),
+            ),
+        )
+    )
+
+    with pytest.raises(ValueError):
+        routing.assign_route(tracking_id, itinerary)
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ('operation', 'stale'),
     [
