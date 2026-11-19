@@ -1,0 +1,54 @@
+[
+  {
+    "at": "2026-11-19T22:30:57Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17057,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-02.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-02`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-02.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T22:31:27Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17518,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6e0283cc-04cf-44d6-a5a9-4e7df7a1d550.json"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-02.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-02`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-02.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/LL-02.md"
+  }
+]
