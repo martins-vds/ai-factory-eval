@@ -1,0 +1,46 @@
+[
+  {
+    "at": "2026-11-19T15:22:16Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17090,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-02",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/capabilities.yaml",
+      ".migration/characterization/billing/.gitignore",
+      ".migration/characterization/billing/observations.md",
+      ".migration/characterization/billing/pom.xml",
+      ".migration/characterization/billing/src/main/java/com/northgate/vault/ChargeResult.java",
+      ".migration/characterization/billing/src/main/java/com/northgate/vault/VaultClient.java",
+      ".migration/characterization/billing/src/main/java/com/northgate/vault/VaultCredentials.java",
+      ".migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java",
+      ".migration/evidence/runs/BL-02.md",
+      ".migration/ledger/billing.card-vault.yaml",
+      ".migration/ledger/billing.charge-threshold.yaml",
+      ".migration/ledger/billing.invoice-line-validation.yaml",
+      ".migration/ledger/billing.invoice-total.yaml",
+      ".migration/ledger/billing.job-entrypoint.yaml",
+      ".migration/ledger/billing.job-processing.yaml",
+      ".migration/quirks/billing-carry-over-not-persisted.md",
+      ".migration/quirks/billing-hardcoded-sample-members.md",
+      ".migration/quirks/billing-member-map-order.md",
+      ".migration/quirks/billing-null-invoice-amount.md",
+      ".migration/returns/BL-02.afs-characterizer.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
