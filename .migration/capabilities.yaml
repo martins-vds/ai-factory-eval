@@ -1,0 +1,153 @@
+harness_version: 0.2.0
+checked_at: "2026-11-19T14:50:00Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: |
+    Source commit: 563c316ed51462b08fd6e58f3781a3c8b2890453.
+    Build and start, from an extracted scratch copy so legacy/ remains untouched:
+      tmpdir=$(mktemp -d /tmp/sy01-legacy.XXXXXX)
+      git archive --format=tar 563c316ed51462b08fd6e58f3781a3c8b2890453 legacy | tar -xf - -C "$tmpdir"
+      cd "$tmpdir/legacy"; ./run.sh
+    Result: exit remained running; Maven package succeeded; Hibernate connected to H2 jdbc:h2:mem:library; server logged "Lending Library listening on 8080".
+    Requests and observed status/body:
+      GET / -> 404, empty body.
+      GET /loans -> 200; three seeded lines:
+        L1;ana;9780134685991;2026-01-02;2026-01-16;
+        L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20
+        L3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03
+      GET /loans/L1 -> 200, "L1;ana;9780134685991;2026-01-02;2026-01-16;\n".
+      GET /loans/missing -> 404, "no such loan\n".
+      GET /fees/L1 -> 200, HTML reported 307 days late and Fee: $10.00.
+      GET /fees/missing -> 404, "<p>No such loan.</p>".
+      GET /about -> 200, HTML title "About the Lending Library".
+      POST /loans with member=pat and isbn=9780000000000 -> 201,
+        "L4;pat;9780000000000;2026-11-19;2026-12-03;\n".
+      POST /loans/L1/return -> 200,
+        "L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-19\n".
+      POST /loans/missing/return -> 404, "no such loan\n".
+      POST /payments/missing -> 404, "no such loan\n".
+      POST /loans with no form body -> 500, Grizzly "Request failed" HTML (1031 bytes);
+        this differs from LoanResource's explicit null-input 400 branch and is drafted as a quirk.
+    The valid-payment gateway call was not exercised; its default URL is an external .invalid host.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: OpenJDK, version: "17.0.21"}
+      - {kind: tool, name: Maven, version: "3.10.0"}
+  - id: build-run
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: Python, version: "3.13"}
+      - {kind: tool, name: Django, version: "5"}
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: skill, name: java-junit}
+      - {kind: tool, name: curl}
+    notes: Tier-A runtime behavior was exercised and recorded above.
+  - id: characterization-harness
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: pytest-coverage}
+  - id: unit-integration-tests
+    applies_to: source
+    status: not-applicable
+    notes: No source test files or test dependencies are present in the pinned legacy tree.
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest}
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: The source has no test suite or coverage provider configured; source coverage remains best-effort.
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: pytest-coverage}
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard}
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: No source coverage data is available; source CRAP remains best-effort.
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: crap.py}
+      - {kind: tool, name: coverage.py}
+      - {kind: tool, name: lizard}
+  - id: mutation-testing
+    applies_to: source
+    status: not-applicable
+    notes: The source is pinned and read-only; there are no source tests to mutate.
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: afs-mutation}
+  - id: lint-format
+    applies_to: source
+    status: not-applicable
+    notes: The source is pinned and read-only; no source lint/format configuration is present.
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: Ruff}
+  - id: stack-idioms
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: skill, name: java-docs}
+      - {kind: skill, name: java-junit}
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: django-patterns}
+      - {kind: skill, name: django-security}
+      - {kind: skill, name: django-tdd}
+      - {kind: skill, name: django-verification}
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: The source uses H2 and the target PostgreSQL 17; no pinned provider specifically covers this H2-to-PostgreSQL path.
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: skill, name: agent-browser}
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4"}
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: "enrich_graph.py (java-ee, django)"}
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: rtk-oss, version: "1.1.0"}
