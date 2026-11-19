@@ -12,7 +12,8 @@ target:
   components:
     - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
     - templates/booking/dashboard/not_routed_table.html
-    - templates/booking/dialogs/
+    - templates/booking/dialogs/deadline.html
+    - templates/booking/dialogs/destination.html
 status: migrated
 verification: characterized
 characterization_tier: A

@@ -19,3 +19,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T14:09:29+00:00 | crap-coverage | 0 | 47.42 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `93bb83250e8aa82a` |  |  |
 | 2026-11-19T14:09:29+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-19T14:09:29+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9c0a5fae73dec1c8` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-19T14:14:08+00:00 | tests-dialogs-final | 0 | 4.26 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `410cf0d46ea63b05` |  |  |
+| 2026-11-19T14:14:08+00:00 | idiom-ui-final | 0 | 0.42 | `python .migration/harness/tools/check_ui.py` | `d3d977f04498d8c9` |  | gate=ui scope="templates changed since ce7fef4539e78f730bcfb48037e18da46e6b6d7b" templates=3 findings=0 |

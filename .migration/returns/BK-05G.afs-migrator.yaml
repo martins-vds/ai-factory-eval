@@ -15,6 +15,7 @@ evidence_logs:
 specialty_evidence:
   - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs
   - tests/booking/interfaces/test_dialogs.py::test_destination_options_are_stable_and_do_not_mutate_available_locations
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_unavailable_destinations
   - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_initial_value_and_parse_error
   - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_and_refreshes_not_routed_table
   - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_and_refreshes_not_routed_table

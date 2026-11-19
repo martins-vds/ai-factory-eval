@@ -176,6 +176,7 @@ def test_deadline_dialog_updates_cargo_and_refreshes_not_routed_table(client):
     assert response.status_code == 204
     assert response.headers['HX-Redirect'] == '/admin/dashboard/'
     assert updated is not None
+    assert 'Widget for var' not in response.content.decode()
     assert updated.route_specification.origin == original.route_specification.origin
     assert updated.route_specification.destination == original.route_specification.destination
     assert updated.route_specification.arrival_deadline.strftime('%Y-%m-%d') == '2035-02-01'
