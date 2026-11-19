@@ -1,0 +1,39 @@
+<dialog id="deadline-dialog" class="modal" aria-labelledby="deadline-dialog-title" {% if open_dialog %}open{% endif %}>
+  <div class="modal-box">
+    <h2 id="deadline-dialog-title" class="mb-4 text-xl font-semibold">Change arrival deadline</h2>
+    <p class="mb-4">
+      {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
+    </p>
+    <form
+      id="deadline-dialog-form"
+      method="post"
+      action="{{ action }}"
+      hx-post="{{ action }}"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+      hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+    >
+      {% csrf_token %}
+      <label class="label mb-1 block font-medium" for="arrival-deadline">Arrival deadline</label>
+      <input
+        class="input input-bordered w-full"
+        id="arrival-deadline"
+        name="deadline"
+        type="date"
+        value="{{ deadline_value }}"
+        {% if deadline_error %}aria-describedby="deadline-error"{% endif %}
+        {% if deadline_error %}aria-invalid="true"{% endif %}
+        required
+      >
+      {% if deadline_error %}
+        <p id="deadline-error" class="mt-2 text-red-700" role="alert">{{ deadline_error }}</p>
+      {% endif %}
+    </form>
+    <div class="modal-action">
+      <form method="dialog">
+        <button class="btn btn-ghost min-h-11" type="submit">Cancel</button>
+      </form>
+      <button class="btn btn-primary min-h-11" type="submit" form="deadline-dialog-form">Update</button>
+    </div>
+  </div>
+</dialog>

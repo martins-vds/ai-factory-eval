@@ -1,5 +1,10 @@
 <section id="not-routed-cargo" aria-labelledby="not-routed-cargo-heading">
   <h2 id="not-routed-cargo-heading" class="mb-3 text-xl font-semibold text-gray-900">Not Routed Cargo</h2>
+  <div
+    id="booking-dialog"
+    aria-live="polite"
+    hx-on::after-swap="const dialog = this.querySelector('dialog'); if (dialog && !dialog.open) dialog.showModal();"
+  ></div>
   <div class="overflow-x-auto">
     <table class="w-full border-collapse text-left">
       <thead>
@@ -28,8 +33,25 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <br>
+              <a
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#booking-dialog"
+                hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+              >Change destination</a>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}<br>
+              <a
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#booking-dialog"
+                hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+              >Change deadline</a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

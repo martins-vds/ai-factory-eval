@@ -7,14 +7,22 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates/booking/dialogs/destination.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - ".migration/characterization/booking/observations.json"
-  - ".migration/characterization/booking/source-tests.json"
-  - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_values_and_filters_options_without_mutating_locations"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_defaults_to_first_available_when_gothenburg_is_absent"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_reports_unknown_location_without_updating_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_origin_and_current_destination"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_completes_dialog"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_have_working_non_htmx_pages_and_submission"
+  - ".migration/evidence/runs/BK-05G.md"
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
+no_rules: "Allowed destination choices are a presentation-level list; cargo specification business policy remains in CargoSpecification."

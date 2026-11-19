@@ -7,14 +7,21 @@ source:
   risk: {crap: 2, complexity: 1, coverage: 0.0}
 boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_dialog_views
+    - templates/booking/dialogs/
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
-  - ".migration/characterization/booking/source-tests.json"
-  - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_returns_not_found_from_both_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_have_working_non_htmx_pages_and_submission"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_completes_dialog"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_refreshes_table"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "The dialogs coordinate presentation and application calls; they own no independent business constraints."
