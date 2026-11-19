@@ -10,6 +10,7 @@ from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -95,6 +96,16 @@ def test_unknown_cargo_dialog_returns_not_found(client):
     response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize('dialog', ('destination', 'deadline'))
+def test_stale_cargo_dialog_returns_not_found(client, dialog):
+    CargoRecord.objects.filter(tracking_id='DEF789').delete()
+
+    response = client.get(f'/admin/cargo/DEF789/{dialog}/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert 'Cargo with tracking ID DEF789 not found.' in response.content.decode()
 
 
 def test_deadline_dialog_shows_current_route_and_deadline(client):
