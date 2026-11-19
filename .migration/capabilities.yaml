@@ -1,0 +1,117 @@
+harness_version: 0.2.0
+checked_at: "2026-11-19T22:22:50Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    From the repository root, `./legacy/run.sh` completed Maven packaging and started the app on
+    port 8080. `curl -i` probes observed GET /loans and GET /about returning 200, GET /fees/L1
+    returning 200 with a $10.00 fee, unknown loan/payment lookups returning 404, an empty
+    urlencoded loan form returning 400, blank member/ISBN values returning 201, repeat return
+    returning 200, and POST /payments/L1 returning 502 through the default .invalid gateway.
+    See the SY-01 handoff for exact probes and outputs.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh (Maven 3.10, Java 17)" }
+  - id: build-run
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "Python 3.13 and Django 5" }
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: curl }
+      - { kind: skill, name: java-junit }
+    notes: "The running HTTP app was probed directly; no legacy test sources exist."
+  - id: unit-integration-tests
+    applies_to: source
+    status: not-applicable
+    notes: "No legacy test sources exist at the pinned revision."
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: pytest }
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No legacy tests exist from which to collect coverage; source coverage is best-effort."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: pytest-coverage }
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No legacy test coverage is available; source CRAP remains best-effort."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "lizard and coverage.py" }
+      - { kind: tool, name: "crap.py" }
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: afs-mutation }
+  - id: lint-format
+    applies_to: source
+    status: not-applicable
+    notes: "The pinned legacy source is read-only and will not be modified."
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: ruff }
+  - id: stack-idioms
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: java-docs }
+      - { kind: skill, name: django-patterns }
+  - id: data-migration
+    applies_to: both
+    status: waived
+    waiver:
+      reason: >-
+        The synthetic legacy database contains only seed data, no planted scenario requires a
+        migration, and the operator recorded that the pilot exercises data migration end to end
+        (martins-vds/ai-factory-synthetic-target#20).
+      approved_by: martins-vds
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: agent-browser }
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }

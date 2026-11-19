@@ -1,0 +1,22 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1699
+phase: 0
+decisions:
+  - >-
+    Characterization tier A: `./legacy/run.sh` completed Maven packaging and started the pinned
+    app; curl probes reached the HTTP endpoints. Exact results are recorded in
+    `.migration/capabilities.yaml` and `.migration/handoffs/SY-01.md`.
+  - >-
+    Data migration is waived by the operator's recorded decision at
+    martins-vds/ai-factory-synthetic-target#20.
+dispatched: []
+awaiting_human:
+  - >-
+    Dispatcher: resolve the required `compose.yaml` prerequisite before running bootstrap step 5;
+    this session stops before scaffolding as requested.
+next_step: >-
+  After the target test-services compose file exists, run bootstrap.py from harness
+  f195ae3d25110bdcf4bd78cadd0676c25c614a5c with stacks/java-to-django.json and
+  --create-gap-issues, then proceed to scaffolding.
+handoff: .migration/handoffs/SY-01.md
