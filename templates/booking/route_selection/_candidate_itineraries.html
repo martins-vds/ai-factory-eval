@@ -11,9 +11,7 @@
       <legend class="sr-only">Choose an itinerary</legend>
       {% for itinerary in candidates %}
         <section class="rounded border border-gray-300 p-4">
-          <h2 class="mb-3 text-xl font-semibold text-gray-900">
-            <label for="candidate-{{ forloop.counter }}">Itinerary {{ forloop.counter }}</label>
-          </h2>
+          <h2 class="mb-3 text-xl font-semibold text-gray-900">Itinerary {{ forloop.counter }}</h2>
           <label class="mb-4 flex min-h-11 items-center gap-3">
             <input
               class="h-5 w-5"

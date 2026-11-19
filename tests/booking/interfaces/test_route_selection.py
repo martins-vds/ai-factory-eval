@@ -131,12 +131,17 @@ def test_itinerary_page_renders_candidates_when_present(client):
     assert NO_ROUTES_MESSAGE not in content
 
 
+@pytest.mark.parametrize(
+    'path',
+    ('route/', 'itineraries/'),
+    ids=('route-page', 'itinerary-page'),
+)
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_itinerary_page_guides_the_user_when_no_candidates_exist(client):
+def test_route_selection_guides_the_user_when_no_candidates_exist(client, path):
     call_command('seed_sample_data')
 
-    response = client.get('/admin/cargo/DEF789/itineraries/')
+    response = client.get(f'/admin/cargo/DEF789/{path}')
     content = response.content.decode()
 
     assert response.status_code == 200
