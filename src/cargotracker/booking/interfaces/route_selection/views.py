@@ -12,6 +12,7 @@ from django.http import (
     HttpResponseNotAllowed,
 )
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.routing import CargoRouting
@@ -44,7 +45,14 @@ def create_route_selection_views(
                 return HttpResponseBadRequest('Invalid route selection.')
             cargo_routing.assign_route(TrackingId(tracking_id), itinerary)
             cargo_details_path = quote(tracking_id, safe='')
-            return redirect(f'/admin/cargo/{cargo_details_path}/')
+            cargo_details_url = f'/admin/cargo/{cargo_details_path}/'
+            if not url_has_allowed_host_and_scheme(
+                cargo_details_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return HttpResponseBadRequest('Invalid cargo details redirect.')
+            return redirect(cargo_details_url)
         if request.method not in {'GET', 'HEAD'}:
             return HttpResponseNotAllowed(('GET', 'HEAD', 'POST'))
         return _render_candidates(

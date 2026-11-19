@@ -37,3 +37,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T14:22:49+00:00 | crap-lizard-final | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-19T14:22:53+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-19T14:25:55+00:00 | test-redirect-encoding | 0 | 3.58 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `d8a8cebc1af7bdb8` |  |  |
+| 2026-11-19T14:27:33+00:00 | test-redirect-host-validation | 0 | 4.11 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `61a38df496171c3f` |  |  |
