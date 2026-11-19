@@ -21,7 +21,9 @@ class HttpPaymentGateway:
         except InterruptedError as interruption:
             raise GatewayFailure('payment gateway unavailable') from interruption
         except error.URLError as failure:
-            interruption = failure.reason if isinstance(failure.reason, InterruptedError) else failure
+            interruption = (
+                failure.reason if isinstance(failure.reason, InterruptedError) else failure
+            )
             raise GatewayFailure('payment gateway unavailable') from interruption
         except OSError as failure:
             raise GatewayFailure('payment gateway unavailable') from failure

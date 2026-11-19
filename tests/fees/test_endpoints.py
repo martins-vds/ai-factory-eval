@@ -9,7 +9,9 @@ from playwright.sync_api import sync_playwright
 def payment_gateway(monkeypatch):
     class GatewayHandler(BaseHTTPRequestHandler):
         def do_POST(self):
-            self.server.requests.append((self.command, self.path, self.rfile.read(int(self.headers['Content-Length'] or 0))))
+            self.server.requests.append(
+                (self.command, self.path, self.rfile.read(int(self.headers['Content-Length'] or 0)))
+            )
             self.send_response(self.server.response_status)
             self.send_header('Content-Type', 'text/plain; charset=utf-8')
             self.end_headers()
