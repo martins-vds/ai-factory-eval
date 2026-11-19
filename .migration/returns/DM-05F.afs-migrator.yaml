@@ -19,4 +19,7 @@ handoff: none
 rules: []
 no_rules: {}
 specialty_evidence:
-  - tests/data_migration/test_invariants.py
+  - tests/data_migration/test_invariants.py::test_loaded_cargo_delivery_matches_its_handling_history
+  - tests/data_migration/test_invariants.py::test_loaded_itinerary_legs_connect
+  - tests/data_migration/test_invariants.py::test_loaded_handling_events_reference_existing_voyages_and_locations
+  - tests/data_migration/test_invariants.py::test_loaded_carrier_movement_schedules_are_ordered_and_connected

@@ -54,7 +54,23 @@ def _prepare_snapshot(tmp_path):
         ROUTING_STATUS='ROUTED',
         LAST_EVENT_ID='72',
     )
-    _write_rows(snapshot, 'CARGO', [cargo])
+    cargo_without_events = dict(cargo)
+    cargo_without_events.update(
+        ID='14',
+        TRACKING_ID='FIDELITY-0002',
+        TRANSPORT_STATUS='NOT_RECEIVED',
+        LAST_KNOWN_LOCATION_ID='\\N',
+        CURRENT_VOYAGE_ID='\\N',
+        MISDIRECTED='false',
+        ETA='\\N',
+        NEXT_EXPECTED_HANDLING_EVENT_TYPE='\\N',
+        NEXT_EXPECTED_LOCATION_ID='\\N',
+        NEXT_EXPECTED_VOYAGE_ID='\\N',
+        UNLOADED_AT_DEST='false',
+        ROUTING_STATUS='NOT_ROUTED',
+        LAST_EVENT_ID='\\N',
+    )
+    _write_rows(snapshot, 'CARGO', [cargo, cargo_without_events])
 
     events = _read_rows(snapshot, 'HANDLINGEVENT')
     events[0].update(TYPE='RECEIVE', VOYAGE_ID='\\N', LOCATION_ID='101')
@@ -126,9 +142,9 @@ def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
 
     cargos = cargo_repository.find_all()
     assert cargos
+    assert CargoRecord.objects.filter(last_event__isnull=True).exists()
     for cargo in cargos:
         history = handling_event_repository.lookup_handling_history_of_cargo(cargo.tracking_id)
-        assert history.most_recent_event is not None
         assert cargo.delivery.last_event_id == history.most_recent_event_id
         derived_delivery = Delivery.derived_from(
             cargo.route_specification,
