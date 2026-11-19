@@ -1,0 +1,43 @@
+[
+  {
+    "at": "2026-11-19T14:42:32Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20795,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-05",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/mutants/LL-05.md",
+      ".migration/evidence/runs/LL-05.md",
+      ".migration/ledger/reports.monthly-spec.yaml",
+      "config/settings.py",
+      "src/reports/__init__.py",
+      "src/reports/composition.py",
+      "src/reports/management/__init__.py",
+      "src/reports/management/commands/__init__.py",
+      "src/reports/management/commands/monthly_report.py",
+      "src/reports/repository.py",
+      "src/reports/services.py",
+      "tests/reports/test_monthly_report.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-05.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-05`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-05.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
