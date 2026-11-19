@@ -28,3 +28,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-19T14:02:26+00:00 | mutation-followup-tests | 0 | 4.73 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `fd2551a5a6074963` |  |  |
 | 2026-11-19T14:02:46+00:00 | idiom-format-followup | 0 | 0.01 | `ruff format --check` | `3accebe6ea89f2c7` |  |  |
 | 2026-11-19T14:03:26+00:00 | mutation-followup-tests | 0 | 4.65 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `5a66c1626b1dd64f` |  |  |
+| 2026-11-19T14:05:44+00:00 | mutation-changed | 0 | 100.41 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `d9981ab6bba0dcc3` |  | gate=mutation score=0.952 threshold=0.8 killed=59 survived=3 files=1 base=origin/main |
+| 2026-11-19T14:10:13+00:00 | scope-cleanup | 0 | 3.8 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `ad4dc636c010c6b7` |  |  |
