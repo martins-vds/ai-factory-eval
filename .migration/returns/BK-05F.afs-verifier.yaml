@@ -1,0 +1,65 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: martins-vds/ai-factory-eval#1606
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46
+    what: CargoRouting.assign_route persists an itinerary that was not returned as a candidate.
+    evidence: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_is_not_a_candidate
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46
+    what: CargoRouting.assign_route persists an itinerary that violates the cargo's current route specification.
+    evidence: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_does_not_satisfy_route_specification
+tests_added:
+  - tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_is_not_a_candidate
+  - tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_does_not_satisfy_route_specification
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_signed_for_another_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues:
+  - booking.routing-assign is marked migrated, but its recorded assignment rules are not enforced by the application use case.
+quirk_tickets:
+  - martins-vds/ai-factory-pilot-target#232
+  - martins-vds/ai-factory-pilot-target#236
+  - martins-vds/ai-factory-pilot-target#238
+  - martins-vds/ai-factory-pilot-target#252
+rules:
+  - capability: booking.routing-assign
+    rule: Assignment requires a submitted, valid signed candidate token associated with the requested cargo.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_is_not_a_candidate
+    enforced: false
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: The selected itinerary must satisfy the cargo's current route specification before assignment.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_does_not_satisfy_route_specification
+    enforced: false
+    ledger_rule: route-specification-satisfied
+no_rules:
+  booking.routing-chain: Structural route page flow; the independent assignment rules are recorded under booking.routing-assign.
+  booking.screen-route: Screen rendering and no-route guidance; no independent business rule.
+  booking.screen-select-itinerary: Candidate/empty-state rendering; no independent business rule.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "Known ADR-0001 layering violation: the application use case imports django.http.Http404."
+    origin: BK-05C
+    evidence: "run: idiom-layers"
+mutation_survivors: >-
+  The committed .migration/evidence/mutants/BK-05F.md records 9 survivors at 0.855
+  (above 0.8). None change same-version route behavior: #1/#2 mutate the shared
+  signing salt used by both signing and verification, #10/#13/#27/#44/#46 alter
+  Http404 text, #14 changes quoting for generated alphanumeric tracking IDs,
+  and #40 changes only the fallback for a missing token, which still fails
+  signature verification. The fresh profile mutation gate returned n/a because
+  no mutable code differs from its base in this verifier PR.
