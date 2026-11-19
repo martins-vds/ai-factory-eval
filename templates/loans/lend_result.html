@@ -1,0 +1,9 @@
+<div id="lend-form" class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+  <div class="card-body">
+    <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A new chapter</p>
+    <h2 class="card-title text-2xl">Loan {{ loan.id }} is ready.</h2>
+    <p>{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+    <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+    <a class="btn btn-ghost" href="/ui/loans/{{ loan.id }}/">View the loan</a>
+  </div>
+</div>

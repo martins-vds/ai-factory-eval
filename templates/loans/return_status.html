@@ -1,0 +1,11 @@
+<div id="return-status">
+  {% if error %}
+  <p class="text-[#a94e37]" role="alert">{{ error }}</p>
+  {% if loan %}
+  <p>Loan record · {{ loan.id }}</p>
+  <p>Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+  {% endif %}
+  {% else %}
+  <p role="status">Returned {{ loan.returned_on|date:"M j, Y" }}.</p>
+  {% endif %}
+</div>
