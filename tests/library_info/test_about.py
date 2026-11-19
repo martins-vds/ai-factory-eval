@@ -20,6 +20,13 @@ def test_about_endpoint_matches_characterized_html(client):
     assert response.content.decode() == expected['body']
 
 
+@pytest.mark.parametrize('path', ['/about', '/ui/about/'])
+def test_about_pages_only_allow_get(client, path):
+    response = client.post(path)
+
+    assert response.status_code == 405
+
+
 @pytest.mark.django_db
 def test_about_page_presents_library_information_in_browser(live_server):
     with sync_playwright() as playwright:
@@ -34,9 +41,10 @@ def test_about_page_presents_library_information_in_browser(live_server):
             assert page.get_by_text('A place for curious readers').is_visible()
             assert page.get_by_text('Open Monday to Saturday, 9:00 to 18:00.').is_visible()
             assert page.get_by_text('Books are lent for 14 days.').is_visible()
-            assert page.get_by_role('link', name='desk@lending-library.invalid').get_attribute(
-                'href'
-            ) == 'mailto:desk@lending-library.invalid'
+            assert (
+                page.get_by_role('link', name='desk@lending-library.invalid').get_attribute('href')
+                == 'mailto:desk@lending-library.invalid'
+            )
             assert page.locator('link[href="/static/css/tailwind.css"]').count() == 1
             assert page.locator('script[src*="htmx.org@2.0.11"]').count() == 1
         finally:
