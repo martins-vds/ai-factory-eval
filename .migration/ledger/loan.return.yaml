@@ -27,7 +27,7 @@ evidence:
   - tests/loans/test_circulation.py::test_return_use_case_returns_none_for_an_unknown_loan
   - tests/loans/test_circulation.py::test_return_endpoint_returns_not_found_for_unknown_loan
   - tests/loans/test_circulation.py::test_browser_return_page_renders_not_found_for_unknown_loan
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+notes: "The approved fix in martins-vds/ai-factory-synthetic-target#41 preserves the original return date after a repeat attempt."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
 rules:
   - id: unknown-loan-not-found
