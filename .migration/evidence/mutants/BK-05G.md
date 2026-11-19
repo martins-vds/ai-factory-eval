@@ -1,18 +1,6 @@
 # Surviving mutants: BK-05G
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.681, threshold 0.8, killed 32, survived 15. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:18 Mutant #8`
-
-  ```diff
-  @@ -15,7 +15,7 @@
-           response = HttpResponse()
-           response['HX-Redirect'] = '/admin/dashboard/'
-           return response
-  -    return redirect('/admin/dashboard/')
-  +    return redirect('XX/admin/dashboard/XX')
-   def create_booking_dialog_views(
-  ```
+Written by `afs-mutation` on its last run (base `origin/main`): score 0.787, threshold 0.8, killed 37, survived 10. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/dialogs/views.py:29 Mutant #11`
 
@@ -25,20 +13,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.681, thr
   +            raise Http404(f'XXCargo with tracking ID {tracking_id} not found.XX')
            locations = [
                location
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:37 Mutant #14`
-
-  ```diff
-  @@ -34,7 +34,7 @@
-               if location
-               not in (cargo.route_specification.origin, cargo.route_specification.destination)
-           ]
-  -        error = ''
-  +        error = 'XXXX'
-           if request.method == 'POST':
-               destination_code = request.POST.get('destination', '')
-               destination = next(
   ```
 
 - `src/cargotracker/booking/interfaces/dialogs/views.py:37 Mutant #15`
@@ -67,20 +41,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.681, thr
                destination = next(
                    (location for location in locations if location.unlocode.value == destination_code),
                    None,
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:41 Mutant #21`
-
-  ```diff
-  @@ -38,7 +38,7 @@
-           if request.method == 'POST':
-               destination_code = request.POST.get('destination', '')
-               destination = next(
-  -                (location for location in locations if location.unlocode.value == destination_code),
-  +                (location for location in locations if location.unlocode.value != destination_code),
-                   None,
-               )
-               if destination is None:
   ```
 
 - `src/cargotracker/booking/interfaces/dialogs/views.py:45 Mutant #24`
@@ -137,19 +97,6 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.681, thr
            error = ''
   ```
 
-- `src/cargotracker/booking/interfaces/dialogs/views.py:62 Mutant #34`
-
-  ```diff
-  @@ -59,7 +59,7 @@
-               raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
-           deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
-  -        error = ''
-  +        error = 'XXXX'
-           if request.method == 'POST':
-               deadline_value = request.POST.get('deadline', '')
-               try:
-  ```
-
 - `src/cargotracker/booking/interfaces/dialogs/views.py:62 Mutant #35`
 
   ```diff
@@ -189,18 +136,5 @@ Written by `afs-mutation` on its last run (base `origin/main`): score 0.681, thr
                else:
                    cargo_specification.change_deadline(
                        TrackingId(tracking_id),
-  ```
-
-- `src/cargotracker/booking/interfaces/dialogs/views.py:79 Mutant #45`
-
-  ```diff
-  @@ -76,7 +76,7 @@
-           return render(
-               request,
-               'booking/dialogs/deadline.html',
-  -            {'cargo': cargo, 'deadline_value': deadline_value, 'error': error},
-  +            {'XXcargoXX': cargo, 'deadline_value': deadline_value, 'error': error},
-           )
-       return destination_dialog, deadline_dialog
   ```
 

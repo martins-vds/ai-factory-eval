@@ -93,6 +93,28 @@ def test_destination_options_exclude_origin_and_current_destination_without_muta
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_invalid_destination_shows_field_error_without_changing_cargo(client):
+    call_command('seed_sample_data')
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'XXXXX'},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'id="destination-error" role="alert">Select a valid destination.</p>' in content
+    assert 'aria-invalid="true"' in content
+    assert updated is not None
+    assert updated.route_specification == original.route_specification
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_destination_update_completes_dialog_and_refreshes_table_without_losing_other_fields(
     client,
 ):
@@ -132,7 +154,7 @@ def test_destination_update_completes_dialog_and_refreshes_table_without_losing_
 @override_settings(ROOT_URLCONF=__name__)
 @pytest.mark.parametrize(
     ('deadline', 'expected_value'),
-    (('not-a-date', 'not-a-date'), ('', '')),
+    (('not-a-date', 'not-a-date'), ('', ''), (None, '')),
 )
 def test_invalid_deadline_shows_field_error_and_keeps_cargo_unchanged(
     client, deadline, expected_value
@@ -141,16 +163,13 @@ def test_invalid_deadline_shows_field_error_and_keeps_cargo_unchanged(
     original = cargo_repository.find(TrackingId('DEF789'))
     assert original is not None
 
-    response = client.post(
-        '/admin/cargo/DEF789/deadline/',
-        {'deadline': deadline},
-        HTTP_HX_REQUEST='true',
-    )
+    data = {} if deadline is None else {'deadline': deadline}
+    response = client.post('/admin/cargo/DEF789/deadline/', data, HTTP_HX_REQUEST='true')
     updated = cargo_repository.find(TrackingId('DEF789'))
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert 'id="deadline-error" role="alert">Enter a valid arrival deadline.</p>' in content
     assert 'aria-invalid="true"' in content
     assert f'value="{expected_value}"' in content
     assert updated is not None
