@@ -7,7 +7,14 @@ boundary: "Constructing an InvoiceLine rejects negative amounts with IllegalArgu
 slice: member-billing
 tickets: [martins-vds/ai-factory-eval#1548]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::negativeChargesAreRejected
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::invoiceLineRejectsNegativeAmountWithDescription
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::invoiceLineAcceptsZeroAndExposesRecordComponents
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::invoiceLineFailsForNullAmountWithNullPointerException
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: nonnegative-charge
     rule: "Reject an invoice line whose amount is negative with IllegalArgumentException; include its description in the exception message."

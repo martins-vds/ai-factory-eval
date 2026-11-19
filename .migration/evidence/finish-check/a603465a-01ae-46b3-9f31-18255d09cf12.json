@@ -1,0 +1,43 @@
+[
+  {
+    "at": "2026-11-19T15:09:56Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16908,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-02",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/capabilities.yaml",
+      ".migration/characterization/billing/.gitignore",
+      ".migration/characterization/billing/observations.md",
+      ".migration/characterization/billing/pom.xml",
+      ".migration/characterization/billing/src/main/java/com/northgate/vault/ChargeResult.java",
+      ".migration/characterization/billing/src/main/java/com/northgate/vault/VaultClient.java",
+      ".migration/characterization/billing/src/main/java/com/northgate/vault/VaultCredentials.java",
+      ".migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java",
+      ".migration/evidence/runs/BL-02.md",
+      ".migration/ledger/billing.build-run.yaml",
+      ".migration/ledger/billing.invoice-calculation.yaml",
+      ".migration/ledger/billing.invoice-line.yaml",
+      ".migration/ledger/billing.monthly-run.yaml",
+      ".migration/ledger/billing.northgate-card-vault.yaml",
+      ".migration/quirks/billing-null-input-collections.md",
+      ".migration/quirks/billing-unreachable-carryover.md",
+      ".migration/returns/BL-02.afs-characterizer.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
