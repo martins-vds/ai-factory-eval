@@ -7,7 +7,14 @@ boundary: "BillingJob.run processes the supplied member-to-late-fees map and wri
 slice: member-billing
 tickets: [martins-vds/ai-factory-eval#1548]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobChargesEachMemberInMapOrder
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobDoesNothingForAnEmptyMap
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobPropagatesDeclineAndSkipsLaterMembers
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::billingJobRejectsNullMemberMap
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: member-invoice
     rule: "Calculate each supplied member's invoice with member=true, including the monthly membership fee."
@@ -18,4 +25,4 @@ rules:
   - id: sequential-failure
     rule: "A charge exception propagates from run and prevents processing later map entries."
     source: legacy-billing/src/main/java/billing/BillingJob.java:16-23
-notes: "The sequential-failure behavior is raised for human review in .migration/quirks/billing-decline-aborts-run.md."
+notes: "The sequential-failure behavior is raised for human review in .migration/quirks/billing-decline-aborts-run.md. The carry-over branch is unreachable for valid member fees, and null maps fail with an incidental NullPointerException; see .migration/quirks/billing-unreachable-carryover.md and .migration/quirks/billing-null-input-collections.md."

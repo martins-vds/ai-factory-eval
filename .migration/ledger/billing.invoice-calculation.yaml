@@ -7,7 +7,20 @@ boundary: "InvoiceCalculator.total returns a two-decimal monthly total from late
 slice: member-billing
 tickets: [martins-vds/ai-factory-eval#1548]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::memberWithOneLateFee
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::lateFeesAreCappedButTheMonthlyFeeIsNot
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::nonMemberPaysOnlyFees
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::taxRoundsHalfUpOnce
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::underADollarCarriesOver
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::calculatorTotalsMemberAndNonMemberInvoices
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::calculatorHandlesEmptyFeesAndCapBoundary
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::calculatorRoundsTaxHalfUpAndUsesOneDollarThreshold
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::calculatorFailsForNullFeeListAndNullFeeLine
+  - .migration/evidence/runs/BL-02.md
+notes: "The carry-over branch is unreachable for valid member fees because the $3.00 monthly fee plus tax alone yields $3.15; see .migration/quirks/billing-unreachable-carryover.md and .migration/quirks/billing-null-input-collections.md."
 rules:
   - id: cap-late-fees
     rule: "Sum the late-fee lines and cap that sum at $25.00 per month."

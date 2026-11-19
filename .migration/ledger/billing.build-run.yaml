@@ -7,6 +7,11 @@ boundary: "The Maven project targets Java 17 and the run script packages the pro
 slice: member-billing
 tickets: [martins-vds/ai-factory-eval#1548]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::buildTargetsJava17AndDeclaresThePrivateVaultDependency
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::launcherPackagesBeforeUsingTheTargetDependencyWildcard
+  - .migration/evidence/runs/BL-02.md
 no_rules: "Build and launch mechanics carry no additional business rule beyond the billing behavior they invoke."
 notes: "The full build depends on the private com.northgate.vault:vault-client:4.2.1 Maven artifact. The run script's runtime dependency classpath is raised for human review in .migration/quirks/billing-run-classpath.md."

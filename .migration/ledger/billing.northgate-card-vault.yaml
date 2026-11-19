@@ -7,7 +7,13 @@ boundary: "CardVault connects to Northgate using the merchant ID and API key fro
 slice: member-billing
 tickets: [martins-vds/ai-factory-eval#1548]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::cardVaultConnectsAndSendsExactUsdCents
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::cardVaultThrowsOnDecline
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::cardVaultRejectsAmountsThatCannotBeConvertedToExactCents
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: charge-in-usd-cents
     rule: "Send the member ID, the amount converted to exact integer cents, and USD as the currency to Northgate."

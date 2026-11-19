@@ -1,8 +1,0 @@
-billing/InvoiceLine.class
-com/northgate/vault/VaultClient.class
-com/northgate/vault/ChargeResult.class
-billing/InvoiceCalculator.class
-billing/CardVault.class
-com/northgate/vault/VaultCredentials.class
-billing/BillingJob.class
-com/northgate/vault/VaultClient$Charge.class

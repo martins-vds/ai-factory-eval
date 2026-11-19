@@ -1,0 +1,28 @@
+role: afs-characterizer
+ticket: BL-02
+issue: martins-vds/ai-factory-eval#1553
+tier_used:
+  A: 0
+  B: 5
+  C: 0
+suite:
+  path: .migration/characterization/billing/
+  cases: 22
+  passing: 22
+  run_log: .migration/evidence/runs/BL-02.md
+predicted_vs_observed:
+  match: 22
+  differs: 0
+ledger_updated:
+  - billing.invoice-calculation
+  - billing.invoice-line
+  - billing.monthly-run
+  - billing.northgate-card-vault
+  - billing.build-run
+quirk_tickets:
+  - .migration/quirks/billing-decline-aborts-run.md
+  - .migration/quirks/billing-null-invoice-amount.md
+  - .migration/quirks/billing-run-classpath.md
+  - .migration/quirks/billing-unreachable-carryover.md
+  - .migration/quirks/billing-null-input-collections.md
+review_only_requests: []

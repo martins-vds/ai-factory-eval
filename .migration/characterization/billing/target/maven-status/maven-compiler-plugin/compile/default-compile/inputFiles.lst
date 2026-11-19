@@ -1,7 +1,0 @@
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../.migration/characterization/billing/src/main/java/com/northgate/vault/ChargeResult.java
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../.migration/characterization/billing/src/main/java/com/northgate/vault/VaultClient.java
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../.migration/characterization/billing/src/main/java/com/northgate/vault/VaultCredentials.java
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../legacy-billing/src/main/java/billing/BillingJob.java
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../legacy-billing/src/main/java/billing/CardVault.java
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../legacy-billing/src/main/java/billing/InvoiceCalculator.java
-/home/runner/work/ai-factory-eval/ai-factory-eval/.migration/characterization/billing/../../../legacy-billing/src/main/java/billing/InvoiceLine.java
