@@ -1,0 +1,12 @@
+id: billing.application-build
+kind: structural
+title: Build and launch the billing application
+source:
+  location: legacy-billing/pom.xml:7-27; legacy-billing/run.sh:1-7
+boundary: "The package is built with Maven for Java 17 and the executable script launches BillingJob; the full build requires access to Northgate's private Maven repository."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1617]
+status: pending
+verification: pending
+no_rules: This build-and-launch capability has operational prerequisites but no business rules.
+quirks: []

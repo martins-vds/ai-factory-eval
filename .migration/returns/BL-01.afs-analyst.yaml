@@ -1,0 +1,27 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1617
+graphs:
+  knowledge: null
+  domain: null
+  nodes: "n/a: operator decision; this source scope has no graph"
+  edges: "n/a: operator decision; this source scope has no graph"
+  flows: "n/a: operator decision; this source scope has no graph"
+ledger:
+  entries: 6
+  by_kind:
+    structural: 1
+    behavioral: 4
+    ui: 0
+    integration: 1
+    data: 0
+risk_map:
+  path: null
+  methods: "n/a: operator decision; no risk map for this scope"
+  above_threshold: "n/a: operator decision; no risk map for this scope"
+  hot_spots: []
+quirk_tickets:
+  - .migration/quirks/billing-decline-aborts-batch.md
+  - .migration/quirks/billing-hardcoded-main-input.md
+  - .migration/quirks/billing-null-invoice-amount.md
+graph_discrepancies: []
