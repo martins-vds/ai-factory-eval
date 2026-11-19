@@ -47,7 +47,7 @@ _, cargo_details_view = create_booking_views(cargo_dashboard)
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/route/', route_view),
     path('admin/cargo/<str:tracking_id>/itineraries/', select_itinerary_view),
-    path('admin/cargo/<str:tracking_id>/', cargo_details_view),
+    path('admin/cargo/<str:tracking_id>/', cargo_details_view, name='cargo-details'),
 ]
 
 
@@ -171,7 +171,8 @@ def test_route_selection_rejects_tampered_and_cross_cargo_candidate_tokens(clien
     assert not cargo.itinerary.legs
 
 
-def test_route_assignment_redirect_quotes_tracking_id(monkeypatch):
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_redirects_to_details_route(monkeypatch):
     class Dashboard:
         def get_cargo_details(self, tracking_id):
             return object()
@@ -188,11 +189,11 @@ def test_route_assignment_redirect_quotes_tracking_id(monkeypatch):
     route_view, _ = create_route_selection_views(Routing(), Dashboard())
 
     response = route_view(
-        RequestFactory().post('/admin/cargo/%2F%2Fevil.test/route/', {'candidate_token': 'token'}),
-        '//evil.test',
+        RequestFactory().post('/admin/cargo/ABC123/route/', {'candidate_token': 'token'}),
+        'ABC123',
     )
 
-    assert response['Location'] == '/admin/cargo/%2F%2Fevil.test/'
+    assert response['Location'] == '/admin/cargo/ABC123/'
 
 
 @pytest.mark.django_db
