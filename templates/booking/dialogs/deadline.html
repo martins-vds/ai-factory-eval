@@ -21,7 +21,7 @@
         name="deadline"
         type="date"
         value="{{ deadline_value }}"
-        aria-describedby="{% if deadline_error %}deadline-error{% endif %}"
+        {% if deadline_error %}aria-describedby="deadline-error"{% endif %}
         {% if deadline_error %}aria-invalid="true"{% endif %}
         required
       >

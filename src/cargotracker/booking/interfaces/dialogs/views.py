@@ -47,7 +47,11 @@ def _destination_context(
     ]
     if not destination_value and destinations:
         destination_value = next(
-            (location.unlocode.value for location in destinations if location.unlocode.value == 'SEGOT'),
+            (
+                location.unlocode.value
+                for location in destinations
+                if location.unlocode.value == 'SEGOT'
+            ),
             destinations[0].unlocode.value,
         )
     return {
@@ -71,13 +75,10 @@ def create_dialog_views(
         destination_error = ''
 
         if request.method == 'POST':
-            context = _destination_context(
-                cargo, tracking_id, locations, destination_value=destination_value
-            )
             destination = next(
                 (
                     location
-                    for location in context['destinations']
+                    for location in locations
                     if location.unlocode.value == destination_value
                 ),
                 None,

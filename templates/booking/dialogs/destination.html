@@ -20,7 +20,7 @@
         id="destination"
         name="destination"
         required
-        aria-describedby="{% if destination_error %}destination-error{% endif %}"
+        {% if destination_error %}aria-describedby="destination-error"{% endif %}
         {% if destination_error %}aria-invalid="true"{% endif %}
       >
         {% for location in destinations %}

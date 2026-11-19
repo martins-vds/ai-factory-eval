@@ -99,7 +99,10 @@ def test_deadline_dialog_reports_unparseable_value_without_changing_cargo(client
     assert 'Enter a valid arrival deadline.' in content
     assert 'aria-invalid="true"' in content
     assert 'value="not-a-date"' in content
-    assert cargo_repository.find(TrackingId('DEF789')).route_specification == before.route_specification
+    assert (
+        cargo_repository.find(TrackingId('DEF789')).route_specification
+        == before.route_specification
+    )
 
 
 @pytest.mark.django_db
@@ -126,7 +129,9 @@ def test_destination_update_preserves_other_specification_fields_and_completes_d
     assert 'Widget for var' not in content
     assert updated.route_specification.origin == before.route_specification.origin
     assert updated.route_specification.destination.unlocode.value == 'USNYC'
-    assert updated.route_specification.arrival_deadline == before.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline == before.route_specification.arrival_deadline
+    )
     assert 'data-tracking-id="DEF789"' in content
 
 
@@ -167,3 +172,12 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
     assert response.status_code == 200
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in table
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in table
+
+
+@pytest.mark.parametrize('dialog', ('destination', 'deadline'))
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unknown_cargo_returns_not_found_from_both_dialogs(client, dialog):
+    response = client.get(f'/admin/cargo/MISSING1/{dialog}/')
+
+    assert response.status_code == 404
