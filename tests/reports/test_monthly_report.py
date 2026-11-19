@@ -48,6 +48,8 @@ def test_monthly_report_summarizes_prior_month_loan_activity():
                 Loan('L3', 'bea', date(2026, 2, 2), date(2026, 2, 17)),
                 Loan('L4', 'cora', date(2026, 2, 3), date(2026, 2, 18)),
                 Loan('L7', 'dave', date(2026, 2, 1), date(2026, 2, 15)),
+                Loan('L8', 'ada', date(2026, 2, 1), date(2026, 2, 18)),
+                Loan('L9', 'erin', date(2026, 2, 1), date(2026, 2, 17)),
                 Loan('L5', 'outside', date(2026, 1, 31), date(2026, 2, 25)),
                 Loan('L6', 'future', date(2026, 3, 1)),
             ]
@@ -58,10 +60,11 @@ def test_monthly_report_summarizes_prior_month_loan_activity():
     rows = application.generate()
 
     assert rows == [
-        MonthlyReportRow('ada', loans_started=2, late_returns=1, late_fees_cents=250),
+        MonthlyReportRow('ada', loans_started=3, late_returns=2, late_fees_cents=325),
         MonthlyReportRow('bea', loans_started=1, late_returns=1, late_fees_cents=0),
         MonthlyReportRow('cora', loans_started=1, late_returns=1, late_fees_cents=0),
         MonthlyReportRow('dave', loans_started=1, late_returns=0, late_fees_cents=0),
+        MonthlyReportRow('erin', loans_started=1, late_returns=1, late_fees_cents=0),
     ]
 
 
@@ -81,6 +84,19 @@ def test_monthly_report_handles_year_boundary_and_month_edges():
 
     assert rows == [
         MonthlyReportRow('december', loans_started=1, late_returns=1, late_fees_cents=125),
+    ]
+
+
+def test_monthly_report_caps_unreturned_loan_fees():
+    application = MonthlyReport(
+        LoanRepository([Loan('L1', 'ada', date(2027, 2, 1))]),
+        Clock(date(2027, 3, 31)),
+    )
+
+    rows = application.generate()
+
+    assert rows == [
+        MonthlyReportRow('ada', loans_started=1, late_returns=0, late_fees_cents=1000),
     ]
 
 

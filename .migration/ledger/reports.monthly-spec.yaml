@@ -21,6 +21,7 @@ evidence:
   - .migration/evidence/runs/LL-05.md
   - tests/reports/test_monthly_report.py::test_monthly_report_summarizes_prior_month_loan_activity
   - tests/reports/test_monthly_report.py::test_monthly_report_handles_year_boundary_and_month_edges
+  - tests/reports/test_monthly_report.py::test_monthly_report_caps_unreturned_loan_fees
   - tests/reports/test_monthly_report.py::test_monthly_report_command_outputs_sorted_csv
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
 rules:
@@ -33,8 +34,11 @@ rules:
   - id: late-return-count
     rule: "Count a loan as a late return only when it has a return date later than its due date."
     source: "legacy/docs/reports-spec.md:7; .migration/ledger/fees.calculation.yaml:10"
-  - id: late-fee-amount
-    rule: "Calculate late days against returned_on or the local report date, waive up to two days, then charge 25 cents per day capped at 1000 cents."
+  - id: late-fee-grace-and-rate
+    rule: "Calculate late days against returned_on or the local report date, waive up to two days, then charge 25 cents per day."
+    source: ".migration/ledger/fees.calculation.yaml:10"
+  - id: late-fee-cap
+    rule: "Cap each individual loan's late fee at 1000 cents."
     source: ".migration/ledger/fees.calculation.yaml:10"
   - id: fee-order
     rule: "Sort rows by total late fees descending, then member id ascending."
