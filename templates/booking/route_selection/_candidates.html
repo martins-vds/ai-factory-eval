@@ -1,0 +1,43 @@
+{% if candidates %}
+  <ol class="space-y-6">
+    {% for candidate in candidates %}
+      <li class="rounded border border-gray-200 p-4">
+        <h2 class="mb-4 text-lg font-semibold text-gray-900">Candidate {{ forloop.counter }}</h2>
+        <form action="{{ form_action }}" method="post" class="mb-4">
+          {% csrf_token %}
+          <input type="hidden" name="candidate_token" value="{{ candidate.token }}">
+          <button
+            class="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+            type="submit"
+          >Assign route</button>
+        </form>
+        <ol class="space-y-3">
+          {% for leg in candidate.itinerary.legs %}
+            <li class="border-l-2 border-blue-700 pl-4">
+              <h3 class="font-semibold">Leg {{ forloop.counter }}</h3>
+              <dl class="grid gap-x-4 sm:grid-cols-[max-content_1fr]">
+                <dt class="font-medium">Voyage:</dt>
+                <dd>{{ leg.voyage.voyage_number.value }}</dd>
+                <dt class="font-medium">Load:</dt>
+                <dd>
+                  {{ leg.load_location.name }} ({{ leg.load_location.unlocode.value }})
+                  {{ leg.load_time|date:"m/d/Y" }}
+                </dd>
+                <dt class="font-medium">Unload:</dt>
+                <dd>
+                  {{ leg.unload_location.name }} ({{ leg.unload_location.unlocode.value }})
+                  {{ leg.unload_time|date:"m/d/Y" }}
+                </dd>
+              </dl>
+            </li>
+          {% endfor %}
+        </ol>
+      </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p class="my-6">
+    No routes found that satisfy the route specification. Try setting an arrival deadline further into the future
+    (a few weeks at least).
+  </p>
+{% endif %}

@@ -141,11 +141,27 @@ def test_assigning_candidate_redirects_to_details_and_shows_persisted_itinerary(
     persisted_cargo = cargo_repository.find(TrackingId(tracking_id.value))
     assert details_response.status_code == 200
     assert 'Itinerary' in details_response.content.decode()
-    assert (
-        persisted_cargo is not None
-        and persisted_cargo.itinerary == candidate['itinerary']
-    )
+    assert persisted_cargo is not None and persisted_cargo.itinerary == candidate['itinerary']
     assert (
         candidate['itinerary'].legs[0].voyage.voyage_number.value
         in details_response.content.decode()
     )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_tampered_and_cross_cargo_candidate_tokens(client):
+    source_tracking_id = _register_cargo()
+    target_tracking_id = _register_cargo()
+    source_response = client.get(f'/admin/cargo/{source_tracking_id.value}/route/')
+    candidate_token = source_response.context['candidates'][0]['token']
+    target_url = f'/admin/cargo/{target_tracking_id.value}/route/'
+
+    tampered_response = client.post(target_url, {'candidate_token': f'{candidate_token}x'})
+    cross_cargo_response = client.post(target_url, {'candidate_token': candidate_token})
+
+    cargo = cargo_repository.find(target_tracking_id)
+    assert tampered_response.status_code == 400
+    assert cross_cargo_response.status_code == 400
+    assert cargo is not None
+    assert not cargo.itinerary.legs
