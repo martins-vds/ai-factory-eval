@@ -1,0 +1,19 @@
+id: billing.monthly-run
+kind: integration
+title: Run monthly member billing
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-31
+boundary: "For each member entry, calculate a member total, charge chargeable totals and print the charge reference, or carry smaller totals over and print that result."
+tickets: [martins-vds/ai-factory-eval#1568]
+status: pending
+verification: pending
+rules:
+  - id: each-entry-is-member
+    rule: "Calculate every entry in lateFeesByMember as a member invoice."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-18
+  - id: charge-or-carry
+    rule: "Charge totals accepted by billing.chargeability; otherwise carry them over without calling the vault."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
+  - id: report-result
+    rule: "Print the member ID, total, and charge reference after a successful charge, or the member ID and carried-over total."
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22

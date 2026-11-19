@@ -1,0 +1,19 @@
+id: billing.card-vault
+kind: integration
+title: Charge a member card through Northgate
+source:
+  location: legacy-billing/src/main/java/billing/CardVault.java:8-22
+boundary: "Send the member ID and exact whole-cent amount to Northgate in USD; return the approved charge reference or raise IllegalStateException on a decline."
+tickets: [martins-vds/ai-factory-eval#1568]
+status: pending
+verification: pending
+rules:
+  - id: usd-cents
+    rule: "Send the requested amount as exact cents in USD."
+    source: legacy-billing/src/main/java/billing/CardVault.java:16-17
+  - id: decline-fails
+    rule: "A declined card charge raises IllegalStateException with the member ID and decline reason."
+    source: legacy-billing/src/main/java/billing/CardVault.java:18-20
+  - id: approved-reference
+    rule: "Return the reference from an approved charge."
+    source: legacy-billing/src/main/java/billing/CardVault.java:18-21

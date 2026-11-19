@@ -1,0 +1,25 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1568
+graphs:
+  knowledge: null
+  domain: null
+  nodes: "n/a: operator decision; this source has no graph"
+  edges: "n/a: operator decision; this source has no graph"
+  flows: "n/a: operator decision; this source has no graph"
+ledger:
+  entries: 5
+  by_kind:
+    structural: 0
+    behavioral: 3
+    ui: 0
+    integration: 2
+    data: 0
+risk_map:
+  path: null
+  methods: "n/a: operator decision; no risk map for this source"
+  above_threshold: "n/a: operator decision; no risk map for this source"
+  hot_spots: []
+quirk_tickets:
+  - .migration/quirks/billing-null-amount.md
+graph_discrepancies: []
