@@ -11,6 +11,8 @@ tickets: [martins-vds/ai-factory-pilot-target#290]
 target:
   components:
     - cargotracker.booking.application.routing.CargoRouting.assign_route
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_view
+    - templates/booking/route_selection/route_selection.html
 status: migrated
 verification: legacy-test
 characterization_tier: A
@@ -22,5 +24,11 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery"
   - ".migration/evidence/runs/BK-05C.md"
-notes: "The bean returns a show.html outcome, while the running UI resolved the selected route to show.xhtml; preserve this observed result for quirk #236 review. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_assigns_selected_candidate_and_redirects_to_cargo_details"
+  - ".migration/evidence/runs/BK-05F.md"
+rules:
+  - id: assign-selected-itinerary
+    rule: "Assigning the selected candidate persists its itinerary and recalculates cargo delivery state."
+    source: "src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ItinerarySelection.java:64-69"
+notes: "Assignment persists the selected candidate through CargoRouting and redirects to cargo details per the approved fix in #236. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]

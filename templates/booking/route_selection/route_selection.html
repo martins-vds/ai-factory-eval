@@ -1,0 +1,68 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Route Cargo | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-6 text-2xl font-semibold text-gray-900">
+    Route Cargo {{ cargo.tracking_id.value }}
+  </h1>
+  <dl class="grid gap-4 sm:grid-cols-[max-content_1fr]">
+    <dt class="font-semibold text-blue-700">Origin:</dt>
+    <dd>{{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})</dd>
+    <dt class="font-semibold text-blue-700">Destination:</dt>
+    <dd>
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </dd>
+    <dt class="font-semibold text-blue-700">Arrival deadline:</dt>
+    <dd>{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</dd>
+  </dl>
+
+  <h2 class="my-6 text-xl font-semibold text-gray-900">
+    Potential routes: {{ candidates|length }}
+  </h2>
+  {% if candidates %}
+    <div class="space-y-6">
+      {% for candidate in candidates %}
+        <section class="rounded border border-gray-200 p-4">
+          <h3 class="mb-4 text-lg font-semibold text-gray-900">Candidate {{ forloop.counter }}</h3>
+          <ol class="space-y-4">
+            {% for leg in candidate.itinerary.legs %}
+              <li class="border-l-2 border-blue-700 pl-4">
+                <h4 class="font-semibold text-gray-900">Leg {{ forloop.counter }}</h4>
+                <dl class="grid gap-2 sm:grid-cols-[max-content_1fr]">
+                  <dt class="font-semibold text-blue-700">Voyage:</dt>
+                  <dd>{{ leg.voyage.voyage_number.value }}</dd>
+                  <dt class="font-semibold text-blue-700">Load:</dt>
+                  <dd>
+                    {{ leg.load_location.name }} ({{ leg.load_location.unlocode.value }})
+                    — {{ leg.load_time|date:"m/d/Y" }}
+                  </dd>
+                  <dt class="font-semibold text-blue-700">Unload:</dt>
+                  <dd>
+                    {{ leg.unload_location.name }} ({{ leg.unload_location.unlocode.value }})
+                    — {{ leg.unload_time|date:"m/d/Y" }}
+                  </dd>
+                </dl>
+              </li>
+            {% endfor %}
+          </ol>
+          <form method="post" class="mt-4">
+            {% csrf_token %}
+            <button
+              class="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
+              type="submit"
+              name="candidate_token"
+              value="{{ candidate.token }}"
+            >Assign this route</button>
+          </form>
+        </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p role="status" class="my-6">
+      No routes found that satisfy the route specification. Try setting an arrival deadline further
+      into the future (a few weeks at least).
+    </p>
+  {% endif %}
+{% endblock %}
