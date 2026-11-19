@@ -1,6 +1,13 @@
+import csv
 from dataclasses import dataclass
 from datetime import date, timedelta
+from io import StringIO
 
+import pytest
+from django.core.management import call_command
+from django.utils import timezone
+
+from src.loans.models import Loan as LoanModel
 from src.reports.services import MonthlyReport, MonthlyReportRow
 
 
@@ -25,8 +32,11 @@ class LoanRepository:
 
 
 class Clock:
+    def __init__(self, today=date(2026, 3, 1)):
+        self.value = today
+
     def today(self):
-        return date(2026, 3, 1)
+        return self.value
 
 
 def test_monthly_report_summarizes_prior_month_loan_activity():
@@ -50,4 +60,51 @@ def test_monthly_report_summarizes_prior_month_loan_activity():
         MonthlyReportRow('ada', loans_started=2, late_returns=1, late_fees_cents=250),
         MonthlyReportRow('bea', loans_started=1, late_returns=1, late_fees_cents=0),
         MonthlyReportRow('cora', loans_started=1, late_returns=1, late_fees_cents=0),
+    ]
+
+
+def test_monthly_report_handles_year_boundary_and_month_edges():
+    application = MonthlyReport(
+        LoanRepository(
+            [
+                Loan('L1', 'december', date(2026, 12, 1), date(2026, 12, 20)),
+                Loan('L2', 'november', date(2026, 11, 30), date(2026, 12, 20)),
+                Loan('L3', 'january', date(2027, 1, 1)),
+            ]
+        ),
+        Clock(date(2027, 1, 1)),
+    )
+
+    rows = application.generate()
+
+    assert rows == [
+        MonthlyReportRow('december', loans_started=1, late_returns=1, late_fees_cents=125),
+    ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_command_outputs_sorted_csv(monkeypatch):
+    monkeypatch.setattr(timezone, 'localdate', lambda: date(2027, 1, 1))
+    LoanModel.objects.create(
+        id='RPT1',
+        member='beta',
+        isbn='123',
+        lent_on=date(2026, 12, 1),
+        returned_on=date(2026, 12, 20),
+    )
+    LoanModel.objects.create(
+        id='RPT2',
+        member='alpha',
+        isbn='456',
+        lent_on=date(2026, 12, 2),
+        returned_on=date(2026, 12, 17),
+    )
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert list(csv.reader(output.getvalue().splitlines())) == [
+        ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
+        ['beta', '1', '1', '125'],
+        ['alpha', '1', '1', '0'],
     ]
