@@ -12,8 +12,8 @@ from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
-from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
+from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
 
@@ -164,47 +164,47 @@ def test_loaded_cargo_delivery_matches_its_handling_history(loaded_snapshot):
 
 
 def test_loaded_itinerary_legs_connect(loaded_snapshot):
-        itineraries = []
-        for cargo in CargoRecord.objects.order_by('pk'):
-            legs = list(
-                cargo.legs.order_by('load_time', 'pk').values_list(
-                    'load_location_id',
-                    'unload_location_id',
-                )
+    itineraries = []
+    for cargo in CargoRecord.objects.order_by('pk'):
+        legs = list(
+            cargo.legs.order_by('load_time', 'pk').values_list(
+                'load_location_id',
+                'unload_location_id',
             )
-            itineraries.append(legs)
-
-        assert any(len(legs) > 1 for legs in itineraries)
-        assert all(
-            previous[1] == following[0]
-            for legs in itineraries
-            for previous, following in pairwise(legs)
         )
+        itineraries.append(legs)
+
+    assert any(len(legs) > 1 for legs in itineraries)
+    assert all(
+        previous[1] == following[0]
+        for legs in itineraries
+        for previous, following in pairwise(legs)
+    )
 
 
 def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
-        events = list(HandlingEventRecord.objects.order_by('pk'))
-        assert events
-        assert any(event.voyage_id is not None for event in events)
+    events = list(HandlingEventRecord.objects.order_by('pk'))
+    assert events
+    assert any(event.voyage_id is not None for event in events)
 
-        for event in events:
-            assert LocationRecord.objects.filter(pk=event.location_id).exists()
-            assert event.voyage_id is None or VoyageRecord.objects.filter(pk=event.voyage_id).exists()
+    for event in events:
+        assert LocationRecord.objects.filter(pk=event.location_id).exists()
+        assert event.voyage_id is None or VoyageRecord.objects.filter(pk=event.voyage_id).exists()
 
 
 def test_loaded_voyage_schedules_are_chronological_and_connected(loaded_snapshot):
-        schedules = []
-        for voyage in VoyageRecord.objects.order_by('pk'):
-            movements = list(
-                CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
-            )
-            schedules.append(movements)
+    schedules = []
+    for voyage in VoyageRecord.objects.order_by('pk'):
+        movements = list(
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
+        )
+        schedules.append(movements)
 
-        assert any(len(movements) > 1 for movements in schedules)
-        for movements in schedules:
-            assert all(movement.departure_time <= movement.arrival_time for movement in movements)
-            assert all(
-                previous.arrival_time <= following.departure_time
-                and previous.arrival_location_id == following.departure_location_id
-                for previous, following in pairwise(movements)
-            )
+    assert any(len(movements) > 1 for movements in schedules)
+    for movements in schedules:
+        assert all(movement.departure_time <= movement.arrival_time for movement in movements)
+        assert all(
+            previous.arrival_time <= following.departure_time
+            and previous.arrival_location_id == following.departure_location_id
+            for previous, following in pairwise(movements)
+        )
