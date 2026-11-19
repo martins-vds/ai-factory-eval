@@ -6,7 +6,10 @@ source:
 boundary: "BillingJob.run: per-member total, charge or carry-over action, and console output."
 tickets: [martins-vds/ai-factory-eval#1569]
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/characterization/billing/source-derived.md
 rules:
   - id: member-invoice
     rule: "Calculate each supplied member's invoice with the membership fee included."

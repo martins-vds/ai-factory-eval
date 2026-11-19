@@ -6,7 +6,14 @@ source:
 boundary: "InvoiceCalculator.total: fee cap, optional monthly fee, tax, and returned two-decimal total."
 tickets: [martins-vds/ai-factory-eval#1569]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::memberWithOneLateFee
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::lateFeesAreCappedButTheMonthlyFeeIsNot
+  - .migration/characterization/billing/InvoiceCalculatorCharacterizationTest.java::emptyMemberInvoiceIncludesMonthlyFeeAndTax
+  - .migration/characterization/billing/InvoiceCalculatorCharacterizationTest.java::emptyNonMemberInvoiceIsZero
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: late-fee-cap
     rule: "Sum all late fees and cap the monthly late-fee subtotal at $25.00."

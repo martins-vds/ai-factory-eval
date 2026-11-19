@@ -1,0 +1,27 @@
+role: afs-characterizer
+ticket: BL-02
+issue: martins-vds/ai-factory-eval#1569
+tier_used:
+  A: 0
+  B: 3
+  C: 3
+suite:
+  path: .migration/characterization/billing/InvoiceCalculatorCharacterizationTest.java
+  cases: 12
+  passing: 12
+  run_log: .migration/evidence/runs/BL-02.md
+predicted_vs_observed:
+  match: 12
+  differs: 0
+ledger_updated:
+  - billing.invoice-total
+  - billing.invoice-line
+  - billing.chargeability
+  - billing.card-vault
+  - billing.monthly-run
+  - billing.job-startup
+quirk_tickets:
+  - .migration/quirks/billing-decline-aborts-batch.md
+  - .migration/quirks/billing-main-charges-sample-members.md
+  - .migration/quirks/billing-null-line-amount.md
+review_only_requests: []

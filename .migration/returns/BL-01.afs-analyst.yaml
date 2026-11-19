@@ -14,4 +14,5 @@ risk_map: null
 quirk_tickets:
   - .migration/quirks/billing-decline-aborts-batch.md
   - .migration/quirks/billing-main-charges-sample-members.md
+  - .migration/quirks/billing-null-line-amount.md
 graph_discrepancies: []

@@ -6,7 +6,10 @@ source:
 boundary: "BillingJob.main: environment credentials and the sample member invoices submitted to the billing job."
 tickets: [martins-vds/ai-factory-eval#1569]
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/characterization/billing/source-derived.md
 rules:
   - id: environment-credentials
     rule: "Connect to the card vault using NORTHGATE_MERCHANT and NORTHGATE_KEY from the process environment."

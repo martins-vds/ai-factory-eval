@@ -6,7 +6,10 @@ source:
 boundary: "CardVault.charge: the member, USD amount in cents, approval result, and returned reference or decline exception."
 tickets: [martins-vds/ai-factory-eval#1569]
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/characterization/billing/source-derived.md
 rules:
   - id: usd-cents
     rule: "Send the amount as exact integer cents in USD to the member's card on file."
