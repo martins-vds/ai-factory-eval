@@ -8,8 +8,12 @@ source:
 boundary: "CargoDetails and ItinerarySelection call BookingServiceFacade, DefaultBookingService, RoutingService and the configured graph-traversal endpoint; assignment maps route DTOs to JPA Voyage/Location entities and stores Cargo."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+target:
+  components:
+    - cargotracker.booking.application.routing.CargoRouting
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_view
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
@@ -17,4 +21,8 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_itinerary_properties_as_target_behavior"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_assigns_selected_candidate_and_redirects_to_cargo_details"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "This capability is the routing dependency chain; candidate eligibility and assignment state are enforced by CargoRouting."
+notes: "Decision #89 selects in-process routing in the target while preserving random routes; the page delegates route discovery and assignment to CargoRouting."

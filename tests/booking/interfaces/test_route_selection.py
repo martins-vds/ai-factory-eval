@@ -12,6 +12,7 @@ from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import (
     create_route_selection_view,
 )
+from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.cargo.management.commands import seed_sample_data
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
@@ -168,3 +169,20 @@ def test_route_selection_assigns_selected_candidate_and_redirects_to_cargo_detai
     assert 'Itinerary' in content
     assert '0300A' in content and '0200T' in content
     assert '0400S' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_an_invalid_candidate_token(client, monkeypatch):
+    _seed_sample_data(monkeypatch)
+
+    response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate_token': 'not-a-valid-signature'},
+    )
+
+    assert response.status_code == 400
+    assert response.content == b'Invalid route selection.'
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    assert not cargo.itinerary.legs
