@@ -1,0 +1,10 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Route Cargo {{ cargo.tracking_id.value }} | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-6 text-2xl font-semibold text-gray-900">{{ page_heading }}</h1>
+  {% include "booking/route_selection/_route_details.html" %}
+  <p class="my-4 font-medium" id="candidate-count">Potential routes: {{ candidate_count }}</p>
+  {% include "booking/route_selection/_candidate_itineraries.html" %}
+{% endblock %}
