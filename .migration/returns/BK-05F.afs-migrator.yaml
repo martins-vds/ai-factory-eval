@@ -8,7 +8,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: n/a: not rerun after named-route redirect change
+  mutation_changed: 'n/a: not rerun after named-route redirect change'
   regression: 0
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_screen_shows_details_and_valid_candidate_itinerary_legs
