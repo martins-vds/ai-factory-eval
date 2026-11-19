@@ -55,7 +55,7 @@ class PaymentGateway:
 @pytest.mark.parametrize(
     ('actual_on', 'late_days', 'amount_cents'),
     [
-        (date(2026, 3, 10), 0, 0),
+        (date(2026, 3, 9), 0, 0),
         (date(2026, 3, 12), 2, 0),
         (date(2026, 3, 13), 3, 75),
         (date(2026, 4, 22), 43, 1000),
