@@ -14,7 +14,7 @@ evidence_logs:
 ledger_updated: []
 quirk_tickets: []
 new_tickets: []
-handoff: none
+handoff: .migration/handoffs/LL-08.md
 rules: []
 no_rules: {}
 specialty: ui
