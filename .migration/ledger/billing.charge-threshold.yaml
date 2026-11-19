@@ -6,7 +6,11 @@ source:
 boundary: "InvoiceCalculator.chargeable returns false for totals below $1.00 and true at or above $1.00."
 tickets: [martins-vds/ai-factory-eval#1558]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: minimum-charge
     rule: "A total is chargeable only when it is at least $1.00."

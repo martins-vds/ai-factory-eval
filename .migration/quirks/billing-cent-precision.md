@@ -5,7 +5,7 @@
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/CardVault.java:16-17`
-- Characterization: source-predicted input `$1.001` becomes `100.100` after moving the decimal point and `longValueExact()` throws `ArithmeticException`; not executed in BL-01.
+- Characterization: `.migration/characterization/billing/observations.md`, case `test_vault_rejects_fractional_cent_without_calling_provider`; `$1.001` throws `ArithmeticException:Rounding necessary` before a provider call.
 - Why it looks wrong: the public charge method accepts `BigDecimal` without documenting a cents-only input requirement or translating this failure into a billing validation error.
 
 ## Impact

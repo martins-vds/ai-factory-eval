@@ -6,7 +6,11 @@ source:
 boundary: "BillingJob.run totals every map entry as a member, charges totals of at least $1.00, and prints a charged or carried-over line."
 tickets: [martins-vds/ai-factory-eval#1558]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/evidence/runs/BL-02.md
 quirks: []
 rules:
   - id: member-invoice

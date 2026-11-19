@@ -6,7 +6,11 @@ source:
 boundary: "InvoiceCalculator.total returns the sum of late fees, the applicable monthly fee, and tax rounded to two decimal places."
 tickets: [martins-vds/ai-factory-eval#1558]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: late-fee-cap
     rule: "The sum of late fees is capped at $25.00 per invoice."

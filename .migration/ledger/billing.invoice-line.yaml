@@ -6,7 +6,11 @@ source:
 boundary: "Creating an invoice line with a negative amount throws IllegalArgumentException; zero and positive amounts are accepted."
 tickets: [martins-vds/ai-factory-eval#1558]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/evidence/runs/BL-02.md
 rules:
   - id: nonnegative-amount
     rule: "An invoice line amount must not be negative."
