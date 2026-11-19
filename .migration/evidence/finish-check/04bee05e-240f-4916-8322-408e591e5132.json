@@ -1,0 +1,116 @@
+[
+  {
+    "at": "2026-11-19T22:29:08Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 22919,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/mutants/BK-05F.md",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/ledger/booking.routing-assign.yaml",
+      ".migration/ledger/booking.routing-chain.yaml",
+      ".migration/ledger/booking.screen-route.yaml",
+      ".migration/ledger/booking.screen-select-itinerary.yaml",
+      ".migration/returns/BK-05F.afs-migrator.yaml",
+      "src/cargotracker/booking/interfaces/route_selection/views.py",
+      "templates/booking/route_selection/_candidates.html",
+      "templates/booking/route_selection/route.html",
+      "templates/booking/route_selection/select_itinerary.html",
+      "tests/booking/interfaces/test_route_selection.py"
+    ],
+    "findings": [
+      "[mechanical] CI's validate.py will fail on this: .migration/returns/BK-05F.afs-migrator.yaml: invalid YAML: mapping values are not allowed here. Fix it and commit.",
+      "[mechanical] CI's validate.py will fail on this: in \".migration/returns/BK-05F.afs-migrator.yaml\", line 11, column 24. Fix it and commit.",
+      "[mechanical] `.migration/returns/BK-05F.afs-migrator.yaml` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` (e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be left empty."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T22:30:25Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 23663,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/04bee05e-240f-4916-8322-408e591e5132.json",
+      ".migration/evidence/mutants/BK-05F.md",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/ledger/booking.routing-assign.yaml",
+      ".migration/ledger/booking.routing-chain.yaml",
+      ".migration/ledger/booking.screen-route.yaml",
+      ".migration/ledger/booking.screen-select-itinerary.yaml",
+      ".migration/returns/BK-05F.afs-migrator.yaml",
+      "src/cargotracker/booking/interfaces/route_selection/views.py",
+      "templates/booking/route_selection/_candidates.html",
+      "templates/booking/route_selection/route.html",
+      "templates/booking/route_selection/select_itinerary.html",
+      "tests/booking/interfaces/test_route_selection.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
+  },
+  {
+    "at": "2026-11-19T22:31:08Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 23872,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/04bee05e-240f-4916-8322-408e591e5132.json",
+      ".migration/evidence/mutants/BK-05F.md",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/ledger/booking.routing-assign.yaml",
+      ".migration/ledger/booking.routing-chain.yaml",
+      ".migration/ledger/booking.screen-route.yaml",
+      ".migration/ledger/booking.screen-select-itinerary.yaml",
+      ".migration/returns/BK-05F.afs-migrator.yaml",
+      "src/cargotracker/booking/interfaces/route_selection/views.py",
+      "templates/booking/route_selection/_candidates.html",
+      "templates/booking/route_selection/route.html",
+      "templates/booking/route_selection/select_itinerary.html",
+      "tests/booking/interfaces/test_route_selection.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
