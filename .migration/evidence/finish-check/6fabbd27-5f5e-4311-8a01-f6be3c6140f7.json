@@ -1,0 +1,87 @@
+[
+  {
+    "at": "2026-11-19T22:11:22Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18457,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05E",
+    "role": "afs-migrator",
+    "changed": [],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05E.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05E`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05E.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-19T22:11:57Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18921,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05A",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6fabbd27-5f5e-4311-8a01-f6be3c6140f7.json"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05A.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 1,
+    "decision": "block",
+    "why": "block 2 of 2"
+  },
+  {
+    "at": "2026-11-19T22:12:26Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 19229,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05E",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/6fabbd27-5f5e-4311-8a01-f6be3c6140f7.json"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05E.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05E`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05E.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 2,
+    "decision": "allow",
+    "why": "retry budget spent; wrote .migration/handoffs/BK-05E.md"
+  }
+]
