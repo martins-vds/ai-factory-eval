@@ -1,18 +1,26 @@
 id: booking.screen-select-itinerary
 kind: ui
-title: Display the no-route state on itinerary selection
+title: Select from candidate itineraries
 source:
   graph_node: page:src/main/webapp/admin/selectItinerary.xhtml:src/main/webapp/admin/selectItinerary.xhtml
   location: src/main/webapp/admin/selectItinerary.xhtml:9-23
   risk: {crap: 12, complexity: 3, coverage: 0.0}
-boundary: "The select-itinerary page reads trackingId and loads ItinerarySelection; when routeCandidates is empty it advises moving the arrival deadline further into the future."
+boundary: "The select-itinerary page displays numbered candidate routes when present and advises moving the arrival deadline further into the future when none match."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/itineraries.html
+status: migrated
 verification: characterized
 characterization_tier: A
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "This page contains only an empty-route state; the populated candidate table is in route.xhtml. With candidates present, its body is blank (.migration/quirks/booking-select-itinerary-blank-with-candidates.md). No named JUnit class exercises the page."
+  - "tests/booking/interfaces/test_route_selection.py::test_itinerary_page_renders_candidates_when_present"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_guides_the_user_when_no_candidates_exist"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "This screen presents candidate routes or no-route guidance; candidate eligibility is enforced by CargoRouting.route_candidates."
+notes: "Ruling #252 approves rendering candidate routes when present; the empty-candidate guidance is preserved."
 quirks: [martins-vds/ai-factory-pilot-target#252]

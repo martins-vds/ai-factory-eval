@@ -1,0 +1,66 @@
+{% if selection_error %}
+  <p class="my-4 rounded border border-red-300 bg-red-50 p-3 text-red-800" role="alert">
+    {{ selection_error }}
+  </p>
+{% endif %}
+
+{% if candidates %}
+  <form method="post">
+    {% csrf_token %}
+    <fieldset class="space-y-6">
+      <legend class="sr-only">Choose an itinerary</legend>
+      {% for itinerary in candidates %}
+        <section class="rounded border border-gray-300 p-4">
+          <h2 class="mb-3 text-xl font-semibold text-gray-900">Itinerary {{ forloop.counter }}</h2>
+          <label class="mb-4 flex min-h-11 items-center gap-3">
+            <input
+              class="h-5 w-5"
+              type="radio"
+              id="candidate-{{ forloop.counter }}"
+              name="candidate_index"
+              value="{{ forloop.counter0 }}"
+              {% if forloop.first %}checked{% endif %}
+            >
+            Select itinerary {{ forloop.counter }}
+          </label>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+              <caption class="sr-only">Itinerary {{ forloop.counter }} legs</caption>
+              <thead>
+                <tr class="border-b border-gray-300">
+                  <th scope="col" class="p-3">Leg</th>
+                  <th scope="col" class="p-3">Voyage</th>
+                  <th scope="col" class="p-3">Load</th>
+                  <th scope="col" class="p-3">Departure</th>
+                  <th scope="col" class="p-3">Unload</th>
+                  <th scope="col" class="p-3">Arrival</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for leg in itinerary.legs %}
+                  <tr class="border-b border-gray-200">
+                    <th scope="row" class="p-3">{{ forloop.counter }}</th>
+                    <td class="p-3">{{ leg.voyage.voyage_number.value }}</td>
+                    <td class="p-3">
+                      {{ leg.load_location.name }} ({{ leg.load_location.unlocode.value }})
+                    </td>
+                    <td class="p-3">{{ leg.load_time|date:"m/d/Y" }}</td>
+                    <td class="p-3">
+                      {{ leg.unload_location.name }} ({{ leg.unload_location.unlocode.value }})
+                    </td>
+                    <td class="p-3">{{ leg.unload_time|date:"m/d/Y" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      {% endfor %}
+    </fieldset>
+    <button class="my-4 rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800" type="submit">
+      Assign Selected Itinerary
+    </button>
+  </form>
+{% else %}
+  <p class="my-6" role="status">{{ no_routes_message }}</p>
+{% endif %}
