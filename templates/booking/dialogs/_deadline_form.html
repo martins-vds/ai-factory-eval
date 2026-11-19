@@ -1,0 +1,13 @@
+<h2 id="dialog-title">Change arrival deadline</h2>
+<p>Origin: {{ origin.name }} ({{ origin.unlocode.value }})</p>
+<p>Destination: {{ destination.name }} ({{ destination.unlocode.value }})</p>
+<form method="post" action="{{ action }}" hx-post="{{ action }}" hx-target="#booking-dialog-content">
+  {% csrf_token %}
+  <label for="deadline">Arrival deadline</label>
+  {% if deadline_error %}
+    <p id="deadline-error" role="alert">{{ deadline_error }}</p>
+  {% endif %}
+  <input id="deadline" name="deadline" type="text" value="{{ deadline_value }}" {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}>
+  <button type="submit">Update</button>
+  <a href="/admin/dashboard/">Cancel</a>
+</form>
