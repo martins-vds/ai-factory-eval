@@ -14,7 +14,7 @@ evidence_logs:
 ledger_updated: []
 quirk_tickets: []
 new_tickets: []
-handoff: .migration/handoffs/BK-05K.md
+handoff: none
 specialty: ui
 specialty_evidence:
   - .migration/evidence/runs/BK-05K.md
@@ -24,5 +24,6 @@ specialty_evidence:
   - tests/test_htmx_errors.py::test_destination_dialog_page_swaps_invalid_destination_error
   - tests/test_htmx_errors.py::test_booking_deadline_form_swaps_expired_deadline_error
   - tests/test_htmx_errors.py::test_tracking_page_swaps_unknown_tracking_id_error
+  - "No browser runtime is available in the repository test environment; the htmx error targets and server responses are verified at the server level."
 rules: []
 no_rules: {}
