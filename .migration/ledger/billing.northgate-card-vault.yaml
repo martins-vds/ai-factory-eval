@@ -1,0 +1,18 @@
+id: billing.northgate-card-vault
+kind: integration
+title: Charge member cards through Northgate
+source:
+  location: legacy-billing/src/main/java/billing/CardVault.java:8-22; legacy-billing/src/main/java/billing/BillingJob.java:26-30
+boundary: "CardVault connects to Northgate using the merchant ID and API key from NORTHGATE_MERCHANT and NORTHGATE_KEY, submits charges in USD cents, throws on declines, and returns approved references."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1548]
+status: pending
+verification: pending
+rules:
+  - id: charge-in-usd-cents
+    rule: "Send the member ID, the amount converted to exact integer cents, and USD as the currency to Northgate."
+    source: legacy-billing/src/main/java/billing/CardVault.java:16-17
+  - id: decline-fails
+    rule: "When Northgate does not approve a charge, throw IllegalStateException with the member ID and decline reason; otherwise return the provider reference."
+    source: legacy-billing/src/main/java/billing/CardVault.java:18-21
+notes: "A propagated decline aborts the remaining monthly run; see .migration/quirks/billing-decline-aborts-run.md."

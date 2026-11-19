@@ -1,0 +1,27 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1548
+graphs:
+  knowledge: null
+  domain: null
+  nodes: "n/a: operator decision: no source graph for legacy-billing"
+  edges: "n/a: operator decision: no source graph for legacy-billing"
+  flows: "n/a: operator decision: no source graph for legacy-billing"
+ledger:
+  entries: 5
+  by_kind:
+    structural: 1
+    behavioral: 3
+    ui: 0
+    integration: 1
+    data: 0
+risk_map:
+  path: null
+  methods: "n/a: operator decision: no risk map for legacy-billing"
+  above_threshold: "n/a: operator decision: no risk map for legacy-billing"
+  hot_spots: []
+quirk_tickets:
+  - .migration/quirks/billing-decline-aborts-run.md
+  - .migration/quirks/billing-null-invoice-amount.md
+  - .migration/quirks/billing-run-classpath.md
+graph_discrepancies: []

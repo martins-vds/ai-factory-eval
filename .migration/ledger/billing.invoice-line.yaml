@@ -1,0 +1,15 @@
+id: billing.invoice-line
+kind: behavioral
+title: Validate invoice charge lines
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceLine.java:5-11
+boundary: "Constructing an InvoiceLine rejects negative amounts with IllegalArgumentException; description and amount are exposed as record components."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1548]
+status: pending
+verification: pending
+rules:
+  - id: nonnegative-charge
+    rule: "Reject an invoice line whose amount is negative with IllegalArgumentException; include its description in the exception message."
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
+notes: "Null amounts are not explicitly validated and currently fail with NullPointerException; see .migration/quirks/billing-null-invoice-amount.md."

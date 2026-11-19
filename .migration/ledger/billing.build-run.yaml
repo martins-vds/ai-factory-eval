@@ -1,0 +1,12 @@
+id: billing.build-run
+kind: structural
+title: Build and launch the billing job
+source:
+  location: legacy-billing/pom.xml:5-33; legacy-billing/run.sh:1-6
+boundary: "The Maven project targets Java 17 and the run script packages the project before launching billing.BillingJob with target/classes and target/dependency/* on the classpath."
+slice: member-billing
+tickets: [martins-vds/ai-factory-eval#1548]
+status: pending
+verification: pending
+no_rules: "Build and launch mechanics carry no additional business rule beyond the billing behavior they invoke."
+notes: "The full build depends on the private com.northgate.vault:vault-client:4.2.1 Maven artifact. The run script's runtime dependency classpath is raised for human review in .migration/quirks/billing-run-classpath.md."
