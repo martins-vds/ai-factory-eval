@@ -178,9 +178,9 @@ def test_loaded_cargo_delivery_state_matches_handling_history(loaded_snapshot):
         )
 
         assert cargo.delivery.last_event_id == history.most_recent_event_id
-        assert (
-            derived.eta.date() if derived.eta is not None else None
-        ) == (cargo.delivery.eta.date() if cargo.delivery.eta is not None else None)
+        assert (derived.eta.date() if derived.eta is not None else None) == (
+            cargo.delivery.eta.date() if cargo.delivery.eta is not None else None
+        )
         assert replace(derived, eta=cargo.delivery.eta) == replace(
             cargo.delivery, last_event_id=None
         )
@@ -190,9 +190,7 @@ def test_loaded_cargo_delivery_state_matches_handling_history(loaded_snapshot):
 def test_loaded_itinerary_legs_connect(loaded_snapshot):
     connected_pairs = 0
     for cargo in CargoRecord.objects.all():
-        legs = list(
-            LegRecord.objects.filter(cargo=cargo).order_by('load_time', 'pk')
-        )
+        legs = list(LegRecord.objects.filter(cargo=cargo).order_by('load_time', 'pk'))
         for previous, following in pairwise(legs):
             assert previous.unload_location_id == following.load_location_id
             assert previous.unload_time <= following.load_time
@@ -219,9 +217,7 @@ def test_loaded_voyage_carrier_movement_schedules_are_in_order(loaded_snapshot):
     ordered_pairs = 0
     for voyage in VoyageRecord.objects.all():
         movements = list(
-            CarrierMovementRecord.objects.filter(voyage=voyage).order_by(
-                'departure_time', 'pk'
-            )
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
         )
         for previous, following in pairwise(movements):
             assert previous.arrival_time <= following.departure_time
