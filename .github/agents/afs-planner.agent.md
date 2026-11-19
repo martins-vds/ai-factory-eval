@@ -45,7 +45,22 @@ strategy, UI direction), `profile.context.working_budget`.
    for acceptance, and list in `entry_points.target` every other target endpoint or command the slice
    adds that those anchors don't reach (a frame, a seed command): at acceptance, an entry point no slice
    owns fails the gate (ADR-0026). The spec is validated by `schemas/slice.schema.json`.
-7. Write the plan as a draft for review (do not publish).
+7. **List the tickets for the tools** in `.migration/plan/<slice>.tickets.yaml`
+   (`schemas/plan-tickets.schema.json`): `id`, `role`, `specialty`, `files`, `capabilities`, `blocked_by`,
+   and `cross_slice` for files another slice also changes. The file list is the ticket's **whole scope**:
+   a session may change nothing else (ADR-0034). So list everything the work will touch, including:
+   - the ticket's own capability ledger entries (`.migration/ledger/<id>.yaml`);
+   - a test package's `__init__.py` when a test file's name is already used in another folder;
+   - a shared test or setting the change will break (e.g. a test that asserts the exact installed apps);
+   - a view or module owned by an earlier ticket that this one must extend (and a blocking edge to it).
+
+   Each target anchor of the slice spec goes under the ticket that builds it (`builds:`, written exactly as
+   the spec writes it); a deleted file goes under `removes:` with the tests that import it; and pages sit in
+   the profile's `graph.target_paths` (ADR-0048).
+
+   Use new ids that no earlier ticket, return, journal or handoff used. Run `validate.py .migration`:
+   `check_plan.py` fails the plan on any of the above that it can detect.
+8. Write the plan as a draft for review (do not publish).
 
 ## Rules
 - Do not decide architecture or mappings yourself; use the decision-map answers. Missing decision → a
@@ -54,8 +69,7 @@ strategy, UI direction), `profile.context.working_budget`.
 
 ## Return contract
 Commit it as `.migration/returns/<ticket>.<role>.yaml` with `role`, `ticket` and `issue` added
-(`afs-migration-contract` → Durable outputs). In the PR description, describe the change and **link** to
-the return file; never paste its contents (a description can't be updated later, so a copy goes stale).
+(`afs-migration-contract` → Durable outputs); link it from the PR description, never paste it.
 ```yaml
 plan: <path or draft issue link>
 slices: [{name: <slice>, anchor: <flow/entry point>, tickets: <n>, blocked_by: [<slice>]}]
