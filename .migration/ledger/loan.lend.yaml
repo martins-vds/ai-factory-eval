@@ -27,6 +27,7 @@ evidence:
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_fields_without_creating_a_loan
   - tests/loans/test_circulation.py::test_lend_use_case_creates_a_loan_due_fourteen_days_later
+  - tests/loans/test_circulation.py::test_lend_use_case_retries_a_conflicting_id
   - tests/loans/test_circulation.py::test_lend_endpoint_creates_a_loan_with_the_characterized_record
   - tests/loans/test_circulation.py::test_lend_endpoint_rejects_empty_and_whitespace_fields
   - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks

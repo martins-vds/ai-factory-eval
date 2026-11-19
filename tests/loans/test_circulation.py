@@ -72,6 +72,20 @@ def test_lend_use_case_creates_a_loan_due_fourteen_days_later():
 
 
 @pytest.mark.django_db
+def test_lend_use_case_retries_a_conflicting_id():
+    Loan.objects.create(
+        id='L5',
+        member='reader',
+        isbn='456',
+        lent_on=date(2026, 3, 1),
+    )
+
+    loan = lend_loan(LoanRepository(), 'dee', '123', date(2026, 11, 19))
+
+    assert loan.id == 'L6'
+
+
+@pytest.mark.django_db
 def test_return_endpoint_persists_the_return_date(client, monkeypatch):
     monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 19))
 
