@@ -47,7 +47,7 @@ def _parse_deadline(value: str) -> datetime:
             return datetime.strptime(value, date_format).replace(tzinfo=UTC)
         except ValueError:
             continue
-    raise ValueError('Enter a valid arrival deadline.')
+    raise ValueError
 
 
 def create_booking_dialog_views(
@@ -69,9 +69,7 @@ def create_booking_dialog_views(
         current_destination = cargo.route_specification.destination
         locations = list_shipping_locations()
         destinations = [
-            location
-            for location in locations
-            if location not in {origin, current_destination}
+            location for location in locations if location not in {origin, current_destination}
         ]
         destination_error = ''
         if request.method == 'POST':
