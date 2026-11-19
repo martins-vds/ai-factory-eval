@@ -1,0 +1,10 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1535
+phase: 0
+decisions: []
+dispatched: []
+awaiting_human:
+  - "Provision the pinned migration harness and bootstrap prerequisites; setup-check could not run because .migration/ and its tools are absent."
+next_step: "Restart setup-check after the harness prerequisites are provisioned, then complete bootstrap steps 1–4."
+handoff: .migration/handoffs/SY-01.md
