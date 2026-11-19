@@ -5,8 +5,8 @@ Should sub-dollar invoice totals be considered carried over when `BillingJob.run
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30`; `legacy-billing/src/main/java/billing/BillingJob.java:15-23`
-- Characterization: Not run; BL-01 inventories source behavior only.
-- Why it looks wrong: `chargeable` documents that a sub-dollar amount carries over to next month, but `BillingJob.run` only prints that it was carried over; no persistence or returned carry-over value is present in the source.
+- Characterization: `.migration/characterization/billing/observations.md` records that `chargeable(0.99)` is false, while `BillingJob.run` charges a member with an empty fee list at $3.15. Since valid `InvoiceLine` amounts are nonnegative and the job always includes the $3.00 member fee, the job's carry-over branch is unreachable for valid invoice input.
+- Why it looks wrong: `chargeable` documents that a sub-dollar amount carries over to next month, but `BillingJob.run` only prints a carry-over message and stores no state; moreover, valid job inputs cannot produce the sub-dollar total that would enter that branch.
 
 ## Impact
 - Ledger capabilities: `billing.charge-threshold`, `billing.job-processing`

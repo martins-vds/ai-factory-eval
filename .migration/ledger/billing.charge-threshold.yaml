@@ -6,7 +6,12 @@ source:
 boundary: "InvoiceCalculator.chargeable(total): boolean decision"
 tickets: [martins-vds/ai-factory-eval#1556]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::chargeThresholdIsInclusiveAtOneDollar
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::underADollarCarriesOver
 rules:
   - id: one-dollar-minimum
     rule: "A total of at least $1.00 is chargeable; a lower total is not."

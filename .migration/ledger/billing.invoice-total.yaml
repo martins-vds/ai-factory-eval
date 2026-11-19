@@ -6,7 +6,15 @@ source:
 boundary: "InvoiceCalculator.total(lateFees, member): returned BigDecimal total"
 tickets: [martins-vds/ai-factory-eval#1556]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::invoiceTotalsCoverEmptyFeesCapAndTax
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::memberWithOneLateFee
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::lateFeesAreCappedButTheMonthlyFeeIsNot
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::nonMemberPaysOnlyFees
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::taxRoundsHalfUpOnce
 rules:
   - id: sum-late-fees
     rule: "Sum all supplied late-fee amounts before applying the monthly fee and tax."

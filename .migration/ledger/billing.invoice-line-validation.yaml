@@ -6,7 +6,14 @@ source:
 boundary: "Constructing an InvoiceLine with its description and amount"
 tickets: [martins-vds/ai-factory-eval#1556]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
+evidence:
+  - .migration/characterization/billing/observations.md
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::invoiceLinesRejectNegativeAndAllowZero
+  - .migration/characterization/billing/src/test/java/billing/BillingCharacterizationTest.java::nullInvoiceLineAmountThrowsNullPointerException
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java::negativeChargesAreRejected
+notes: "Null amounts throw NullPointerException before explicit validation; see quirk draft .migration/quirks/billing-null-invoice-amount.md."
 rules:
   - id: reject-negative-amount
     rule: "An invoice line with a negative amount is rejected with IllegalArgumentException; zero and positive amounts are accepted."
