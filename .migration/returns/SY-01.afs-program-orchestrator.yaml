@@ -1,0 +1,14 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1923
+pr: null
+phase: 0
+decisions:
+  - "martins-vds/ai-factory-eval#1923: Characterization tier A; the pinned legacy app built and ran and live HTTP endpoints were exercised."
+  - "martins-vds/ai-factory-eval#1923: Target stack is Python 3.13 + Django 5, Django templates, PostgreSQL 17."
+  - "martins-vds/ai-factory-eval#1923: Sign-off approver is martins-vds."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-eval#1923: Review and merge the setup PR after the dispatcher runs bootstrap.py."
+  - "new data-migration capability gap: H2/JPA snapshot, PostgreSQL mapping/load, and reconciliation setup."
+next_step: "Handoff to the dispatcher: run bootstrap.py from harness f195ae3d25110bdcf4bd78cadd0676c25c614a5c with stacks/java-to-django.json, then open the setup PR."
