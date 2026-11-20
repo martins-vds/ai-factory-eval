@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -10,7 +11,13 @@ from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
-from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.booking.interfaces.route_selection.views import (
+    _CANDIDATE_SALT,
+    create_route_selection_views,
+)
+from cargotracker.cargo.domain.itinerary import Itinerary
+from cargotracker.cargo.domain.leg import Leg
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -19,6 +26,7 @@ from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
+from cargotracker.voyage.domain.voyage_number import VoyageNumber
 from cargotracker.voyage.infrastructure.models import VoyageRecord
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
@@ -111,6 +119,8 @@ def test_route_selection_renders_populated_candidates_and_numbered_legs(client):
     assert 'Rotterdam' in content and 'NLRTM' in content
     assert 'Helsinki' in content and 'FIHEL' in content
     assert '11/03/2030' in content and '11/04/2030' in content
+    assert 'Arrival deadline:' in content
+    assert '11/05/2030' in content
 
 
 @pytest.mark.django_db
@@ -150,6 +160,8 @@ def test_select_itinerary_renders_candidate_routes_when_available(client):
     content = response.content.decode()
 
     assert response.status_code == 200
+    assert 'Arrival deadline:' in content
+    assert '11/05/2030' in content
     assert 'Route option #1' in content
     assert 'Route option #2' in content
     assert 'CM001' in content
@@ -199,6 +211,26 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_candidate_signed_for_another_purpose(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+    route_content = client.get(route_url).content.decode()
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_content,
+    ).group(1)
+    candidate = signing.loads(candidate_token, salt=_CANDIDATE_SALT)
+    other_purpose_token = signing.dumps(candidate, salt=None)
+
+    response = client.post(route_url, {'candidate': other_purpose_token})
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
     route_page = client.get(f'/admin/cargo/{tracking_id.value}/route/')
@@ -220,3 +252,47 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_screens_return_not_found_for_unknown_and_stale_tracking_ids(client):
+    unknown_route = client.get('/admin/cargo/MISSING1/route/')
+    unknown_itinerary = client.get('/admin/cargo/MISSING1/itineraries/')
+
+    stale_tracking_id = _create_cargo(())
+    CargoRecord.objects.filter(tracking_id=stale_tracking_id.value).delete()
+    stale_route = client.get(f'/admin/cargo/{stale_tracking_id.value}/route/')
+    stale_itinerary = client.get(f'/admin/cargo/{stale_tracking_id.value}/itineraries/')
+    stale_assignment = client.post(f'/admin/cargo/{stale_tracking_id.value}/route/', {})
+
+    assert unknown_route.status_code == 404
+    assert unknown_itinerary.status_code == 404
+    assert stale_route.status_code == 404
+    assert stale_itinerary.status_code == 404
+    assert stale_assignment.status_code == 404
+
+
+@pytest.mark.django_db
+def test_assign_route_does_not_persist_itinerary_outside_route_specification():
+    tracking_id = _create_cargo(())
+    invalid_itinerary = Itinerary(
+        (
+            Leg(
+                DjangoVoyageRepository().find(VoyageNumber('CM001')),
+                TRANSFER,
+                DESTINATION,
+                datetime(2030, 11, 1, tzinfo=UTC),
+                datetime(2030, 11, 2, tzinfo=UTC),
+            ),
+        )
+    )
+
+    try:
+        routing.assign_route(tracking_id, invalid_itinerary)
+    except ValueError:
+        pass
+
+    assigned_cargo = repository.find(tracking_id)
+    assert assigned_cargo is not None
+    assert assigned_cargo.itinerary == Itinerary.EMPTY

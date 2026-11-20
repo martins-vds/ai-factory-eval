@@ -1,0 +1,94 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+related_prs:
+  - https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+  - https://github.com/martins-vds/ai-factory-pilot-target/pull/406
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: profile mutation runner aborts on the direct-use-case defect test; diagnostic mutation run excluding it scored 0.871"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46-50
+    what: CargoRouting.assign_route persists an itinerary that violates the cargo's route specification; the guard exists only in the view.
+    evidence: tests/booking/interfaces/test_route_selection.py::test_assign_route_does_not_persist_itinerary_outside_route_specification
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_and_stale_tracking_ids
+  - tests/booking/interfaces/test_route_selection.py::test_assign_route_does_not_persist_itinerary_outside_route_specification
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_signed_for_another_purpose
+ledger_issues:
+  - booking.routing-assign records route-specification-satisfied, but the application use case does not enforce it (see major finding).
+quirk_tickets: []
+rules:
+  - capability: booking.routing-chain
+    rule: Candidate routes come from RoutingService and exclude itineraries arriving after the cargo's deadline.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+  - capability: booking.routing-assign
+    rule: Assigning a valid itinerary stores it and recalculates the cargo's routing state to ROUTED.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+  - capability: booking.routing-assign
+    rule: Assignment refuses an itinerary that violates the cargo's current route specification.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/interfaces/test_route_selection.py::test_assign_route_does_not_persist_itinerary_outside_route_specification
+    enforced: false
+    ledger_rule: route-specification-satisfied
+  - capability: booking.routing-assign
+    rule: The submitted candidate token must be valid and associated with the requested cargo.
+    use_case: create_route_selection_views.route_selection (HTTP adapter token boundary)
+    test: tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
+    enforced: true
+    ledger_rule: route-candidate-valid
+    note: The signed token is an HTTP adapter invariant; CargoRouting receives a decoded domain itinerary.
+no_rules:
+  booking.screen-route: Presentation capability; no additional business rule beyond the linked assignment behavior.
+  booking.screen-select-itinerary: Presentation capability; no unique business rule beyond displaying candidates and empty-state guidance.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "Known, non-failing layering debt: the application use case imports Django Http404."
+    origin: BK-05C
+    evidence: "run: idiom-layers-post-tests"
+mutation_diagnostic:
+  score: 0.871
+  threshold: 0.8
+  killed: 54
+  survived: 8
+  runner: pytest -q tests/booking/interfaces/test_route_selection.py -k 'not test_assign_route_does_not_persist_itinerary_outside_route_specification'
+  note: This diagnostic excludes the intentionally failing defect test; the exact profile mutation command exited 2 before producing a score.
+mutation_survivors_file: .migration/evidence/mutants/BK-05F.md
+mutation_survivors:
+  - id: 1
+    matters: false
+    reason: Changing the explicit salt to another explicit string preserves purpose separation and both signing/verification use it.
+  - id: 10
+    matters: false
+    reason: Changes only the Http404 diagnostic for a missing cargo; the response remains 404.
+  - id: 13
+    matters: false
+    reason: Changes only the Http404 diagnostic for an invalid route specification; the response remains 404.
+  - id: 14
+    matters: false
+    reason: Adds X to quote's safe set; X is unreserved and is not percent-encoded by quote.
+  - id: 27
+    matters: false
+    reason: Changes only the Http404 diagnostic for an unknown cargo; the response remains 404.
+  - id: 40
+    matters: false
+    reason: Changes the missing-token default, but both values fail signature validation and produce 404.
+  - id: 44
+    matters: false
+    reason: Changes a caught BadSignature diagnostic; the public response remains the same 404.
+  - id: 46
+    matters: false
+    reason: Changes only the Http404 diagnostic for an invalid selected route; the response remains 404.
