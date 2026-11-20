@@ -12,7 +12,9 @@ target:
   components:
     - src/cargotracker/booking/interfaces/dialogs/views.py:create_dialog_views
     - templates/booking/dialogs/destination.html
+    - templates/booking/dialogs/destination_page.html
     - templates/booking/dialogs/not_found.html
+    - templates/booking/dialogs/not_found_page.html
     - templates/booking/dashboard/not_routed_table.html
 status: migrated
 verification: legacy-test

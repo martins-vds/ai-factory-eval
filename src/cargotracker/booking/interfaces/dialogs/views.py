@@ -17,10 +17,15 @@ def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo | No
     return cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
 
 
+def _dialog_template(request: HttpRequest, name: str) -> str:
+    page_suffix = '' if request.headers.get('HX-Request') == 'true' else '_page'
+    return f'booking/dialogs/{name}{page_suffix}.html'
+
+
 def _not_found_response(request: HttpRequest, tracking_id: str) -> HttpResponse:
     return render(
         request,
-        'booking/dialogs/not_found.html',
+        _dialog_template(request, 'not_found'),
         {'tracking_id': tracking_id},
         status=404,
     )
@@ -75,7 +80,7 @@ def create_dialog_views(
 
         return render(
             request,
-            'booking/dialogs/destination.html',
+            _dialog_template(request, 'destination'),
             {
                 'cargo': cargo,
                 'destinations': destinations,
@@ -100,6 +105,8 @@ def create_dialog_views(
         if request.method == 'POST':
             try:
                 arrival_date = date.fromisoformat(deadline_value)
+                if arrival_date.isoformat() != deadline_value:
+                    raise ValueError
             except ValueError:
                 deadline_error = 'Enter a valid arrival deadline.'
             else:
@@ -112,7 +119,7 @@ def create_dialog_views(
 
         return render(
             request,
-            'booking/dialogs/deadline.html',
+            _dialog_template(request, 'deadline'),
             {
                 'cargo': cargo,
                 'deadline_value': deadline_value,

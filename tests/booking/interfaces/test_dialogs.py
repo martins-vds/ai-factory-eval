@@ -59,6 +59,8 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
     assert response.status_code == 200
     assert f'hx-get="/admin/cargo/{cargo.tracking_id.value}/destination/"' in not_routed_table
     assert f'hx-get="/admin/cargo/{cargo.tracking_id.value}/deadline/"' in not_routed_table
+    assert f'href="/admin/cargo/{cargo.tracking_id.value}/destination/"' in not_routed_table
+    assert f'href="/admin/cargo/{cargo.tracking_id.value}/deadline/"' in not_routed_table
     assert f'href="/admin/cargo/{cargo.tracking_id.value}/route/"' in not_routed_table
     assert 'id="cargo-edit-dialog"' in not_routed_table
 
@@ -112,8 +114,7 @@ def test_destination_update_redirects_and_refreshes_the_not_routed_row(client):
     new_destination = next(
         location
         for location in shipping_locations
-        if location
-        not in (cargo.route_specification.origin, cargo.route_specification.destination)
+        if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
     )
 
     response = client.post(
@@ -154,7 +155,7 @@ def test_deadline_dialog_shows_current_route_and_deadline(client):
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
 
 
-@pytest.mark.parametrize('deadline', ['not-a-date', ''])
+@pytest.mark.parametrize('deadline', ['not-a-date', '', '2031-W05-2'])
 def test_invalid_deadline_shows_field_error_without_updating_cargo(client, deadline):
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
@@ -209,3 +210,19 @@ def test_missing_cargo_renders_an_error_for_the_dialog(client, dialog):
 
     assert response.status_code == 404
     assert 'Cargo MISSING1 was not found.' in response.content.decode()
+
+
+def test_deadline_dialog_works_without_htmx(client):
+    response = client.get('/admin/cargo/DEF789/deadline/')
+
+    assert response.status_code == 200
+    assert '<main' in response.content.decode()
+    assert 'href="/admin/dashboard/"' in response.content.decode()
+
+    update_response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': '2031-02-04'},
+    )
+
+    assert update_response.status_code == 302
+    assert update_response['Location'] == '/admin/dashboard/'
