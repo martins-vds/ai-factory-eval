@@ -41,7 +41,8 @@ PR_ATTRIBUTION_RULE_V1 = "PR_ATTRIBUTION_RULE_V1"  # Stable history marker for r
 VERIFIER_VERDICT_RULE_V1 = "VERIFIER_VERDICT_RULE_V1"  # Phase 3e: returns committed before this rule are exempt.
 VERIFIER_RULES_RULE_V1 = "VERIFIER_RULES_RULE_V1"  # Phase 3e (rules checked): earlier returns are exempt.
 LEDGER_RULES_RULE_V1 = "LEDGER_RULES_RULE_V1"  # Phase 3e (rules in the ledger): earlier returns are exempt.
-MIGRATOR_SELF_VERIFY_RULE_V1 = "MIGRATOR_SELF_VERIFY_RULE_V1"  # ADR-0045: earlier Migrator returns are exempt.
+MIGRATOR_SELF_VERIFY_RULE_V1 = "MIGRATOR_SELF_VERIFY_RULE_V1"
+PLAN_ANCHORS_RULE_V1 = "PLAN_ANCHORS_RULE_V1"  # ADR-0048 (builds: for target anchors): earlier plans are exempt.  # ADR-0045: earlier Migrator returns are exempt.
 
 
 def load_schema(schemas, name):
@@ -349,13 +350,23 @@ def read_journal(path):
     return rows, has_result
 
 
+CHANGED_SINCE = re.compile(r"\s--changed-since[ =]\S+")
+
+
 def gate_commands(profile):
-    """Journal Command cells that count as a real gate run: each profile gate command, as run or via bash -c."""
+    """Journal Command cells that count as a real gate run: each profile gate command, as run or via bash -c.
+    An afs-mutation run counts with or without `--changed-since <ref>`: the base it diffed against was the
+    profile's choice then, and dropping the flag (harness #211) mustn't untrust the journals before it."""
     trusted = set()
     for cmds in (profile.get("gates") or {}).values():
         for cmd in cmds or []:
-            trusted.add(cell(cmd))
-            trusted.add(cell(shlex.join(["bash", "-c", cmd])))
+            forms = {cmd}
+            if "afs-mutation" in cmd:
+                bare = CHANGED_SINCE.sub("", cmd)
+                forms |= {bare, bare.replace("afs-mutation", "afs-mutation --changed-since origin/main", 1)}
+            for form in forms:
+                trusted.add(cell(form))
+                trusted.add(cell(shlex.join(["bash", "-c", form])))
     return trusted
 
 
@@ -458,12 +469,16 @@ TIER_B_ATTEMPT = re.compile(r"^(ran|no code): \S")
 def check_tier_attempt(path, doc, errors):
     """ADR-0005: tier C only after the tier-B recipe was tried. A build that fails on a private dependency is
     exactly the case tier B exists for, so `tier_b_attempt` must show the compile-only run and its result,
-    or say there is no code to compile."""
+    or say there is no code to compile. ADR-0046: the proof lives in `capabilities.yaml`'s
+    `characterization`; a retired Bootstrapper's return carrying it is still checked."""
+    if pathlib.Path(path).name == "capabilities.yaml":
+        doc = {"role": "afs-bootstrapper", "characterization_tier": (doc.get("characterization") or {}).get("tier"),
+               "tier_b_attempt": (doc.get("characterization") or {}).get("tier_b_attempt")}
     if doc.get("role") != "afs-bootstrapper" or doc.get("characterization_tier") != "C":
         return
     attempt = doc.get("tier_b_attempt")
     if not isinstance(attempt, str) or not TIER_B_ATTEMPT.match(attempt.strip()):
-        errors.append(f"{path}: characterization_tier C needs `tier_b_attempt: \"ran: <compile-only command> -> "
+        errors.append(f"{path}: characterization tier C needs `tier_b_attempt: \"ran: <compile-only command> -> "
                       f"<result>\"` (the tier-B recipe: compile only what the source's tests reach) or "
                       f"`\"no code: <what the source contains>\"`. A failed full build is not enough "
                       f"(afs-migration-contract -> references/characterization.md)")
@@ -572,6 +587,16 @@ def check_thresholds(path, profile, errors):
                               f"is {limit}; make them equal (the threshold is the source of truth)")
 
 
+def check_mutation_base(path, profile, errors):
+    """gates.mutation_changed lets afs-mutation take its base from $AFS_BASE, which CI sets to the PR's base. A
+    hardcoded `--changed-since origin/main` mutates a stacked PR's parent too, and on the eval repo (whose
+    `main` is unrelated history) the whole codebase: eval 4f's pilot Gates ran 76 minutes or hit the timeout."""
+    for cmd in (profile.get("gates") or {}).get("mutation_changed") or []:
+        if re.search(r"afs-mutation\b.*--changed-since", str(cmd)):
+            errors.append(f"{path}: gates.mutation_changed passes --changed-since; drop it so afs-mutation diffs "
+                          f"against $AFS_BASE (CI sets it to the PR's base), falling back to origin/main")
+
+
 def check_layering_gate(path, profile, errors):
     """A profile with layer contracts or UI checks runs them: without the tool in gates.idiom, they check nothing."""
     idiom = (profile.get("gates") or {}).get("idiom") or []
@@ -597,6 +622,9 @@ def main():
             if name == "profile.yaml":
                 check_thresholds(folder / name, load_yaml(folder / name) or {}, errors)
                 check_layering_gate(folder / name, load_yaml(folder / name) or {}, errors)
+                check_mutation_base(folder / name, load_yaml(folder / name) or {}, errors)
+            else:
+                check_tier_attempt(folder / name, load_yaml(folder / name) or {}, errors)
             checked += 1
 
     slices = folder / "slices"
