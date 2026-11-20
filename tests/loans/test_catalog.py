@@ -74,3 +74,49 @@ def test_repository_refuses_absent_lookup():
     from src.loans.repository import LoanRepository
 
     assert LoanRepository().get('missing') is None
+
+
+@pytest.mark.django_db
+def test_ui_detail_and_absent_detail(client):
+    known = client.get('/ui/loans/L1/')
+    unknown = client.get('/ui/loans/missing/')
+
+    assert known.status_code == 200
+    assert b'Due 2026-01-16' in known.content
+    assert unknown.status_code == 404
+
+
+def test_loan_model_contract():
+    from src.loans.models import Loan
+
+    assert Loan._meta.get_field('id').max_length == 32
+    assert Loan._meta.get_field('member').max_length == 255
+    assert Loan._meta.get_field('isbn').max_length == 255
+    assert Loan._meta.get_field('returned_on').null is True
+    assert Loan._meta.ordering == ('id',)
+
+
+def test_loan_due_on_property_uses_fourteen_days():
+    from src.loans.models import Loan
+
+    loan = Loan(lent_on=date(2026, 1, 2))
+
+    assert loan.due_on == date(2026, 1, 16)
+
+
+@pytest.mark.django_db
+def test_repository_save_is_available():
+    from src.loans.models import Loan
+    from src.loans.repository import LoanRepository
+
+    loan = Loan(
+        id='L9',
+        member='saved',
+        isbn='123',
+        lent_on=date(2026, 11, 8),
+    )
+
+    saved = LoanRepository().save(loan)
+
+    assert saved.pk == 'L9'
+    assert LoanRepository().get('L9').member == 'saved'
