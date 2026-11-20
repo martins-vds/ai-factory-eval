@@ -7,11 +7,17 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "The first return persists today's date. A later return is rejected with HTTP 409 and leaves the original date unchanged."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-synthetic-target#61]
+target:
+  components: [src.loans.services.return_loan, src.loans.repository.LoanRepository.return_if_unreturned]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_marks_an_unreturned_loan_with_the_supplied_date, tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_the_original_date, tests/loans/test_circulation.py::test_repeat_return_api_answers_conflict_without_replacing_the_saved_date]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - id: preserve-first-return-date
+    rule: "A loan's first return date is preserved; a repeated return is rejected."
+    source: martins-vds/ai-factory-synthetic-target#41
