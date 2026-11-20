@@ -1,0 +1,26 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-synthetic-target#65
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1886
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings:
+  - severity: major
+    where: templates/library_info/about.html:6,9-10
+    what: Three used utilities (py-8, leading-relaxed, mt-8) are absent from committed CSS, so the browser ignores them.
+    evidence: "run: idiom-final"
+tests_added:
+  - tests/library_info/test_about_page.py::test_about_routes_reject_post_requests
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  about.page: Static information page with no domain eligibility check, limit, or state transition.
