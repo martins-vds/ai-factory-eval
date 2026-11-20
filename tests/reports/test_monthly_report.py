@@ -45,8 +45,10 @@ class PaymentGateway:
 def test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member():
     loans = [
         Loan('L1', 'z-member', date(2024, 2, 1), date(2024, 2, 15), date(2024, 2, 19)),
+        Loan('L8', 'z-member', date(2024, 2, 2), date(2024, 2, 16)),
         Loan('L2', 'z-member', date(2024, 1, 4), date(2024, 1, 18), date(2024, 2, 1)),
         Loan('L3', 'a-member', date(2024, 2, 29), date(2024, 3, 14)),
+        Loan('L9', 'a-member', date(2024, 2, 1), date(2024, 2, 15), date(2024, 2, 15)),
         Loan('L4', 'b-member', date(2024, 2, 1), date(2024, 2, 15), date(2024, 2, 17)),
         Loan('L5', 'b-member', date(2024, 1, 10), date(2024, 1, 24), date(2024, 3, 1)),
         Loan('L6', 'omitted', date(2024, 1, 10), date(2024, 1, 24), date(2024, 2, 20)),
@@ -62,8 +64,8 @@ def test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member
     report = application.generate()
 
     assert report == [
-        MonthlyReportRow('z-member', loans_started=1, late_returns=2, late_fees_cents=450),
-        MonthlyReportRow('a-member', loans_started=1, late_returns=0, late_fees_cents=0),
+        MonthlyReportRow('z-member', loans_started=2, late_returns=2, late_fees_cents=450),
+        MonthlyReportRow('a-member', loans_started=2, late_returns=0, late_fees_cents=0),
         MonthlyReportRow('b-member', loans_started=1, late_returns=1, late_fees_cents=0),
     ]
 
