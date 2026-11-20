@@ -1,0 +1,15 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1898
+phase: 0
+decisions:
+  - "Characterization tier A: `./legacy/run.sh` built and started the pinned Java 17 app; HTTP observations are in `.migration/characterization/SY-01-http.md`."
+  - "Source stacks detected as Java 17, Jakarta REST/JAX-RS with Jersey/Grizzly, JPA/Hibernate, and H2; target stacks are the operator-specified Python 3.13, Django 5, Django templates, and PostgreSQL 17."
+  - "Pinned harness stack pack `stacks/java-to-django.json` and harness commit `f195ae3d25110bdcf4bd78cadd0676c25c614a5c`; the profile carries its graph requirements."
+  - "The blank-form `POST /loans` returned a Grizzly 500; this observed behavior is recorded for the next characterization/quirk review and must not be silently changed."
+dispatched: []
+awaiting_human:
+  - "Dispatcher to run bootstrap.py step 5 from the pinned harness checkout with this profile, capability checklist, and stack pack; this session intentionally stops before installation."
+  - "Operator review of the setup PR and newly opened capability-gap tickets, including the H2-to-PostgreSQL data-migration gap."
+  - "Name the data snapshot owner before data-migration planning."
+next_step: "Dispatcher installs the harness with bootstrap.py; scaffold after setup review, then build the source graph and require graph_gate.py --side source --require-graph before analysis or planning."
