@@ -43,6 +43,7 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client):
     assert 'Change Deadline' in content
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in content
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
+    assert 'hx-on::response-error=' in content
     assert 'id="cargo-edit-dialog"' in content
 
 
@@ -61,6 +62,7 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     assert first.status_code == second.status_code == 200
     assert 'Hong Kong' in first_content
     assert 'Melbourne' in first_content
+    assert 'id="destination-error"' not in first_content
     assert first_options == second_options
     assert first_options
     assert 'CNHKG' not in first_options
@@ -83,6 +85,7 @@ def test_deadline_dialog_displays_current_deadline(client):
     assert 'Melbourne' in content
     assert 'name="deadline"' in content
     assert f'value="{deadline}"' in content
+    assert 'id="deadline-error"' not in content
 
 
 @pytest.mark.django_db
@@ -103,6 +106,10 @@ def test_destination_dialog_rejects_unavailable_destinations(client, destination
 
     assert response.status_code == 200
     assert 'Choose an available destination.' in content
+    assert (
+        '<p class="text-red-700" id="destination-error" role="alert">'
+        'Choose an available destination.</p>'
+    ) in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
     assert updated.route_specification == original.route_specification
@@ -122,6 +129,10 @@ def test_deadline_dialog_shows_parse_error_and_preserves_input(client):
 
     assert response.status_code == 200
     assert 'Enter a valid arrival deadline.' in content
+    assert (
+        '<p class="text-red-700" id="deadline-error" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
     assert 'id="deadline-error"' in content
     assert 'aria-invalid="true"' in content
     assert 'aria-describedby="deadline-error"' in content
@@ -171,6 +182,23 @@ def test_destination_dialog_updates_cargo_refreshes_rows_and_completes(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_redirects_after_non_htmx_update(client):
+    call_command('seed_sample_data')
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'USDAL'},
+    )
+    updated = repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/dashboard/'
+    assert updated is not None
+    assert updated.route_specification.destination.unlocode.value == 'USDAL'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_deadline_dialog_updates_cargo_refreshes_rows_and_completes(client):
     call_command('seed_sample_data')
     original = repository.find(TrackingId('DEF789'))
@@ -196,3 +224,24 @@ def test_deadline_dialog_updates_cargo_refreshes_rows_and_completes(client):
     assert updated.route_specification.origin == original.route_specification.origin
     assert updated.route_specification.destination == original.route_specification.destination
     assert updated.route_specification.arrival_deadline.date() == new_deadline
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_rejects_a_missing_deadline(client):
+    call_command('seed_sample_data')
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Enter a valid arrival deadline.' in content
+    assert (
+        '<p class="text-red-700" id="deadline-error" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
+    assert 'value=""' in content

@@ -15,7 +15,7 @@ from cargotracker.location.domain.location import Location
 def _find_cargo(dashboard: CargoDashboard, tracking_id: str) -> Cargo:
     cargo = dashboard.get_cargo_details(TrackingId(tracking_id))
     if cargo is None:
-        raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+        raise Http404
     return cargo
 
 

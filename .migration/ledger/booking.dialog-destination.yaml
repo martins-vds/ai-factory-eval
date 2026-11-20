@@ -7,8 +7,13 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-eval#1765]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/destination.html
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +21,11 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_values_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_unavailable_destinations"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_updates_cargo_refreshes_rows_and_completes"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_redirects_after_non_htmx_update"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "Destination filtering and form parsing are UI concerns; route-specification invariants and cargo updates remain enforced by the application and domain."
+notes: "Destination choices exclude origin and current destination without mutating stored locations under ruling #235. Successful edits close without the unavailable-widget warning under ruling #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
