@@ -1,0 +1,62 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: null
+gates:
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+  - .migration/evidence/mutants/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+survivor_classifications:
+  - diff: "_CANDIDATE_SALT: 'booking.route_selection' -> 'XXbooking.route_selectionXX'"
+    classification: missing_test
+    rationale: A valid previously rendered token signed with the stable salt should remain acceptable.
+  - diff: "_CANDIDATE_SALT: 'booking.route_selection' -> None"
+    classification: missing_test
+    rationale: A valid previously rendered token signed with the stable salt should remain acceptable.
+  - diff: "remove @require_http_methods(['GET', 'POST'])"
+    classification: missing_test
+    rationale: The existing 405 interface test should kill this; investigate mutation test selection before adding redundant coverage.
+  - diff: "unknown-cargo Http404 message wrapped in XX"
+    classification: equivalent
+    rationale: Production receives the same 404 response; the exception detail is diagnostic.
+  - diff: "stale-route Http404 message wrapped in XX"
+    classification: equivalent
+    rationale: Production receives the same 404 response; the exception detail is diagnostic.
+  - diff: 'quote(..., safe="") -> quote(..., safe="XXXX")'
+    classification: equivalent
+    rationale: X is unreserved and remains unescaped by urllib.parse.quote either way.
+  - diff: "route-page no-route guidance wrapped in XX"
+    classification: missing_test
+    rationale: The guidance is rendered behavior; an existing test asserts it exactly, so confirm test selection/cache.
+  - diff: "remove @require_http_methods(['GET'])"
+    classification: missing_test
+    rationale: The existing 405 interface test should kill this; investigate mutation test selection before adding redundant coverage.
+  - diff: "itinerary-page no-route guidance wrapped in XX"
+    classification: missing_test
+    rationale: The guidance is rendered behavior; an existing test asserts it exactly, so confirm test selection/cache.
+  - diff: "unknown-cargo Http404 message in _selection_context wrapped in XX"
+    classification: equivalent
+    rationale: Production receives the same 404 response; the exception detail is diagnostic.
+  - diff: "request.POST.get('candidate', '') -> request.POST.get('candidate', 'XXXX')"
+    classification: equivalent
+    rationale: Both missing-field defaults fail signature validation and return 404.
+  - diff: "BadSignature reason wrapped in XX"
+    classification: equivalent
+    rationale: The caught reason is replaced by the same 404 response.
+  - diff: "invalid-route Http404 message wrapped in XX"
+    classification: equivalent
+    rationale: Production receives the same 404 response; the exception detail is diagnostic.
