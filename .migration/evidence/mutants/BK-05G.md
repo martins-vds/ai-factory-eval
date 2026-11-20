@@ -108,4 +108,3 @@ Written by `afs-mutation` on its last run (base `c6d033992ff59d8640efed62f3b5358
                    arrival_deadline = timezone.make_aware(datetime.combine(arrival_date, time.min))
                    try:
   ```
-
