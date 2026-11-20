@@ -22,3 +22,14 @@
 
 ### Next step for the next session
 Ask the operator to authorize the package initializer and ledger updates; after approval, add the initializer and resume the remaining profile gates.
+
+## Handoff — afs-migrator · 2026-11-20T01:12:09Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05f-build-route-selection-itinerary-screens-please-work  ·  **Last commit:** e063dedd
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05C.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
