@@ -1,7 +1,7 @@
 role: afs-migrator
 ticket: BK-05F
 issue: martins-vds/ai-factory-eval#1903
-pr: null
+pr: martins-vds/ai-factory-eval#1907
 specialty: ui
 specialty_evidence:
   - .migration/runs/BK-05F/20261120T235556260994Z-behavior.log
@@ -27,3 +27,4 @@ no_rules:
   booking.routing-chain: "This is a structural capability coordinating cargo lookup and route generation."
   booking.screen-route: "This screen presents routing data and exposes assignment; it does not add or change eligibility rules."
   booking.screen-select-itinerary: "This UI state has no input-refusal or persisted-state rule."
+  booking.routing-assign: "Assignment persists and recalculates the selected itinerary; the selected-candidate index is validated at the UI boundary."
