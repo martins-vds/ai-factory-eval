@@ -1,7 +1,26 @@
+from datetime import date
 import csv
 from io import StringIO
+from typing import Protocol
 
-from .repository import LoanRepository
+
+class Loan(Protocol):
+    id: str
+    member: str
+    isbn: str
+    lent_on: date
+    due_on: date
+    returned_on: date | None
+
+
+class Loans(Protocol):
+    def all(self): ...
+
+    def count(self): ...
+
+    def find(self, loan_id): ...
+
+    def create(self, **fields): ...
 
 
 class LoanInputError(ValueError):
@@ -17,6 +36,12 @@ def lend_loan(repository, member, isbn, today):
         errors['isbn'] = 'Enter an ISBN.'
     if errors:
         raise LoanInputError(errors)
+    return repository.create(
+        id=f'L{repository.count() + 1}',
+        member=member,
+        isbn=isbn,
+        lent_on=today,
+    )
 
 
 def loan_line(loan):
@@ -35,10 +60,10 @@ def loan_line(loan):
     return output.getvalue()
 
 
-def list_loans_text():
-    return ''.join(loan_line(loan) for loan in LoanRepository().all())
+def list_loans_text(repository: Loans):
+    return ''.join(loan_line(loan) for loan in repository.all())
 
 
-def get_loan_text(loan_id):
-    loan = LoanRepository().find(loan_id)
+def get_loan_text(repository: Loans, loan_id):
+    loan = repository.find(loan_id)
     return loan_line(loan) if loan else None
