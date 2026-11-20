@@ -17,3 +17,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-20T00:41:44+00:00 | snapshot-check | 0 | 0.05 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
 | 2026-11-20T00:41:52+00:00 | export-ruff | 0 | 0.01 | `ruff check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-20T00:41:57+00:00 | export-format-check | 0 | 0.01 | `ruff format --check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `eee76f865de5a9f2` |  |  |
+| 2026-11-20T00:42:30+00:00 | build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T00:42:35+00:00 | build-check | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-20T00:43:16+00:00 | behavior | 0 | 37.09 | `pytest -q` | `4877bf71573d5d73` |  |  |
+| 2026-11-20T00:43:20+00:00 | idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-20T00:43:23+00:00 | idiom-format | 0 | 0.02 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |
+| 2026-11-20T00:44:08+00:00 | crap-coverage | 0 | 34.84 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `4538924aba31eab8` |  |  |
+| 2026-11-20T00:44:20+00:00 | crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T00:44:23+00:00 | crap-check | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `96e71c291c816251` |  | gate=crap max=26.0 threshold=30 over=0 methods=185 |
+| 2026-11-20T00:46:01+00:00 | mutation-changed | 1 | 94.35 | `python .migration/harness/tools/afs-mutation` | `c7cfa69ad2e16f34` | afs-mutation: FAILED score=0.632 threshold=0.8 killed=48 survived=28 skipped=0 files=2 jobs=2 base=bbd42f104df4a113ac650 | gate=mutation score=0.632 threshold=0.8 killed=48 survived=28 files=2 base=bbd42f104df4a113ac65034b433328055fd8295b |
+| 2026-11-20T00:47:26+00:00 | export-test-strengthened | 0 | 1.61 | `pytest -q tests/data_migration/test_export.py` | `885a76b01320969b` |  |  |
+| 2026-11-20T00:48:58+00:00 | mutation-changed | 1 | 87.91 | `python .migration/harness/tools/afs-mutation` | `288e8f76baa34cb4` | afs-mutation: FAILED score=0.789 threshold=0.8 killed=60 survived=16 skipped=0 files=2 jobs=2 base=bbd42f104df4a113ac650 | gate=mutation score=0.789 threshold=0.8 killed=60 survived=16 files=2 base=bbd42f104df4a113ac65034b433328055fd8295b |
+| 2026-11-20T00:49:34+00:00 | export-test-timezone | 1 | 1.6 | `pytest -q tests/data_migration/test_export.py` | `dfafb35d771d7633` | assert stdout.getvalue().strip() == 'Exported 7 rows across 6 mapped tables.' |  |
+| 2026-11-20T00:50:29+00:00 | export-test-naive | 0 | 1.6 | `pytest -q tests/data_migration/test_export.py` | `ce4950deb2f2a171` |  |  |
+| 2026-11-20T00:51:58+00:00 | mutation-changed | 0 | 83.48 | `python .migration/harness/tools/afs-mutation` | `6e5ddc172df55315` |  | gate=mutation score=0.803 threshold=0.8 killed=61 survived=15 files=2 base=bbd42f104df4a113ac65034b433328055fd8295b |

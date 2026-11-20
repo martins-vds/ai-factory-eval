@@ -1,9 +1,12 @@
 import csv
 from pathlib import Path
+from io import StringIO
 
 import pytest
 import yaml
 from django.core.management import call_command
+from django.core.management.base import CommandError
+from django.test import override_settings
 
 from cargotracker.location.infrastructure.models import LocationRecord
 
@@ -27,11 +30,19 @@ def _load_fixture():
 
 
 @pytest.mark.django_db(transaction=True)
+@override_settings(USE_TZ=False)
 def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     _load_fixture()
-    output = tmp_path / 'target-export'
+    output = tmp_path / 'nested' / 'target-export'
+    stdout = StringIO()
 
-    call_command('export_data_snapshot', mapping=str(MAPPING_PATH), out=str(output))
+    call_command(
+        'export_data_snapshot',
+        mapping=str(MAPPING_PATH),
+        out=str(output),
+        stdout=stdout,
+    )
+    assert stdout.getvalue().strip() == 'Exported 7 rows across 6 mapped tables.'
 
     assert {path.stem for path in output.glob('*.csv')} == {
         spec['target'] for spec in MAPPING['tables']
@@ -91,6 +102,7 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     assert exported['carrier_movement'][1:] == [
         ['91', '2026-11-09T10:00:00Z', '2026-11-08T12:00:00Z', '102', '101', '900']
     ]
+    call_command('export_data_snapshot', mapping=str(MAPPING_PATH), out=str(output))
 
 
 @pytest.mark.django_db(transaction=True)
@@ -106,3 +118,34 @@ def test_export_snapshot_orders_rows_by_primary_key(tmp_path):
         '101',
         '102',
     ]
+
+
+@pytest.mark.parametrize(
+    'tables',
+    [
+        [],
+        [MAPPING['tables'][0], MAPPING['tables'][0]],
+    ],
+)
+def test_export_snapshot_rejects_empty_or_duplicate_table_mappings(tmp_path, tables):
+    mapping = tmp_path / 'invalid-mapping.yaml'
+    mapping.write_text(yaml.safe_dump({'tables': tables}), encoding='utf-8')
+
+    with pytest.raises(CommandError):
+        call_command(
+            'export_data_snapshot',
+            mapping=str(mapping),
+            out=str(tmp_path / 'target-export'),
+        )
+
+
+@pytest.mark.parametrize(
+    'options',
+    [
+        {'out': 'target-export'},
+        {'mapping': str(MAPPING_PATH)},
+    ],
+)
+def test_export_snapshot_requires_mapping_and_output(options):
+    with pytest.raises(CommandError):
+        call_command('export_data_snapshot', **options)
