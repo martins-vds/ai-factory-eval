@@ -9,6 +9,7 @@ def test_seeded_catalog_is_listed_in_id_order(client):
 
     assert response.status_code == 200
     assert response.headers['Content-Type'].startswith('text/plain')
+    assert response.headers['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
         'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
         'L2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\n'
@@ -25,6 +26,8 @@ def test_known_loan_is_returned_and_unknown_loan_is_not_found(client):
     assert known.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
     assert unknown.status_code == 404
     assert unknown.content.decode() == 'no such loan\n'
+    assert known.headers['Content-Type'] == 'text/plain'
+    assert unknown.headers['Content-Type'] == 'text/plain'
 
 
 def test_due_date_is_fourteen_calendar_days_after_lent_date():
@@ -93,6 +96,7 @@ def test_loan_model_contract():
     assert Loan._meta.get_field('member').max_length == 255
     assert Loan._meta.get_field('isbn').max_length == 255
     assert Loan._meta.get_field('returned_on').null is True
+    assert Loan._meta.get_field('returned_on').blank is True
     assert Loan._meta.ordering == ('id',)
 
 
@@ -120,3 +124,15 @@ def test_repository_save_is_available():
 
     assert saved.pk == 'L9'
     assert LoanRepository().get('L9').member == 'saved'
+
+
+def test_app_and_route_names_are_composed():
+    from django.urls import reverse
+
+    from src.loans.apps import LoansConfig
+
+    assert LoansConfig.default_auto_field == 'django.db.models.BigAutoField'
+    assert reverse('loan-list') == '/loans'
+    assert reverse('loan-detail', args=['L1']) == '/loans/L1'
+    assert reverse('ui-loan-list') == '/ui/loans/'
+    assert reverse('ui-loan-detail', args=['L1']) == '/ui/loans/L1/'
