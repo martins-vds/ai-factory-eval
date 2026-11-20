@@ -10,18 +10,17 @@ from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
-from cargotracker.cargo.infrastructure.models import LegRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.domain.handling_event import HandlingEvent, HandlingEventType
 from cargotracker.handling.domain.handling_history import HandlingHistory
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.location.domain.location import Location
-from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.domain.un_locode import UnLocode
-from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
+from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.voyage.domain.schedule import Schedule
 from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
+from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
 
 MAPPING_PATH = Path(__file__).resolve().parents[2] / '.migration' / 'data' / 'mapping.yaml'
 
@@ -144,9 +143,7 @@ def loaded_snapshot(tmp_path):
         with path.open('w', encoding='utf-8', newline='') as stream:
             writer = csv.writer(stream)
             writer.writerow(header)
-            writer.writerows(
-                [['\\N' if value is None else value for value in row] for row in rows]
-            )
+            writer.writerows([['\\N' if value is None else value for value in row] for row in rows])
         tables[table] = {
             'rows': len(rows),
             'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
