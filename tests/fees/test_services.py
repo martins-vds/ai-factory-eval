@@ -31,15 +31,15 @@ class FixedClock:
 
 
 class PaymentGateway:
-    def __init__(self, response=None, interruption=None):
+    def __init__(self, response=None, failure=None):
         self.calls = []
         self.response = response
-        self.interruption = interruption
+        self.failure = failure
 
     def charge(self, loan_id):
         self.calls.append(loan_id)
-        if self.interruption is not None:
-            raise self.interruption
+        if self.failure is not None:
+            raise self.failure
         return self.response
 
 
@@ -51,6 +51,12 @@ def test_fee_for_loan_charges_one_quarter_after_the_two_day_grace_period():
 
     assert fee.late_days == 3
     assert fee.amount == Decimal('0.75')
+
+
+def test_fee_for_unknown_loan_returns_no_quote():
+    application = FeeApplication(LoanRepository(None), FixedClock())
+
+    assert application.fee_for('missing') is None
 
 
 @pytest.mark.parametrize(
@@ -102,7 +108,7 @@ def test_payment_maps_gateway_status_and_preserves_response_body(
 def test_interrupted_payment_is_a_gateway_failure_and_retains_interruption():
     interruption = InterruptedError('request interrupted')
     loan = Loan('L1', due_on=date(2026, 1, 1))
-    gateway = PaymentGateway(interruption=interruption)
+    gateway = PaymentGateway(failure=interruption)
     application = PaymentApplication(LoanRepository(loan), gateway)
 
     result = application.pay('L1')
@@ -110,3 +116,14 @@ def test_interrupted_payment_is_a_gateway_failure_and_retains_interruption():
     assert result.status_code == 502
     assert result.body == 'payment gateway unavailable\n'
     assert result.interruption is interruption
+
+
+def test_gateway_io_failure_becomes_a_502_payment_result():
+    loan = Loan('L1', due_on=date(2026, 1, 1))
+    gateway = PaymentGateway(failure=OSError('connection refused'))
+    application = PaymentApplication(LoanRepository(loan), gateway)
+
+    result = application.pay('L1')
+
+    assert result.status_code == 502
+    assert result.body == 'payment gateway unavailable\n'
