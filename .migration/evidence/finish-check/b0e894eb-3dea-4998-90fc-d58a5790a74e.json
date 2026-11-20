@@ -1,0 +1,54 @@
+[
+  {
+    "at": "2026-11-20T01:06:41Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17420,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05E",
+    "role": "afs-verifier",
+    "changed": [],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05E.afs-verifier.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-20T01:07:10Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17728,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05A",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/b0e894eb-3dea-4998-90fc-d58a5790a74e.json"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05A.afs-verifier.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/BK-05A.md"
+  }
+]
