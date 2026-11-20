@@ -13,3 +13,16 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
 notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+target:
+  components:
+    - src.loans.models.LoanRecord
+    - src.loans.repositories.DjangoLoanRepository
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_repository.py::test_stored_records_and_seed_values_survive_reapplying_migrations
+rules:
+  - id: storage-round-trip
+    rule: "Storing and loading a loan preserves its ID, member, ISBN, lent date and nullable returned date."
+    source: legacy/src/main/java/lib/Loan.java:11-26

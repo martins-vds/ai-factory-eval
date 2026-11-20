@@ -1,0 +1,64 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#1780
+pr: martins-vds/ai-factory-eval#1785
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: data.loan-storage
+    rule: Storing and loading a loan preserves its ID, member, ISBN, lent date and nullable returned date.
+    use_case: src.loans.services.store_loan
+    test: tests/loans/test_repository.py::test_stored_records_and_seed_values_survive_reapplying_migrations
+    enforced: true
+    ledger_rule: storage-round-trip
+  - capability: repository.transactions
+    rule: A failed loan store leaves existing catalog records unchanged.
+    use_case: src.loans.services.store_loan
+    test: tests/loans/test_repository.py::test_failed_store_rolls_back_without_changing_existing_loan
+    enforced: true
+    ledger_rule: atomic-store
+  - capability: loan.due-date
+    rule: A loan is due exactly 14 calendar days after its lent date.
+    use_case: src.loans.domain.due_date
+    test: tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: fourteen-day-term
+  - capability: loan.list
+    rule: Loan lists are ordered by identifier in ascending order.
+    use_case: src.loans.services.list_loans
+    test: tests/loans/test_catalog.py::test_list_use_case_orders_loans_by_identifier
+    enforced: true
+    ledger_rule: identifier-order
+  - capability: loan.text-export
+    rule: Text export preserves field order and newline termination, quoting and escaping semicolons, quotes and line breaks in field values.
+    use_case: src.loans.services.export_loans
+    test: tests/loans/test_catalog.py::test_export_escapes_delimiters_and_quotes_in_field_values
+    enforced: true
+    ledger_rule: escaped-semicolon-export
+no_rules:
+  application.build: Building and launching the Django application carry no loan-domain input or state rules.
+  application.startup: Startup has no loan-domain input or state-transition rule; one-time seeding and persistence are covered by related data capabilities.
+  data.seed-records: The three fixed rows are initial catalog fixtures, not input or state-transition rules.
+  loan.get: Read-only lookup has no additional business rule; a missing identifier is represented as None.

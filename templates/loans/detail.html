@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id|default:"not found" }} · The Lending Library{% endblock %}
+
+{% block content %}
+<a class="link link-hover text-stone-700" href="{% url 'ui-loan-list' %}">← Back to the catalog</a>
+<div class="mt-6 max-w-2xl">
+  {% if loan %}
+    {% include "loans/_detail.html" %}
+  {% else %}
+    {% include "loans/_not_found.html" %}
+  {% endif %}
+</div>
+{% endblock %}

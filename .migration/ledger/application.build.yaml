@@ -12,3 +12,16 @@ verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md]
 notes: "The source has no src/test tree or legacy test suite."
+target:
+  components:
+    - config.settings
+    - config.urls
+    - src.loans
+    - Makefile
+    - static/css/tailwind.css
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/test_ui_smoke.py::test_loan_catalog_page_renders_in_browser
+no_rules: "Building and launching the Django application carry no loan-domain input or state rules."

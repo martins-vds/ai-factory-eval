@@ -13,3 +13,13 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/restart.json]
 notes: "Seed reload and reset-on-restart behavior are raised in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+target:
+  components:
+    - src.loans.migrations.0001_initial
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_list_returns_seeded_loans_in_characterized_format
+  - tests/loans/test_repository.py::test_stored_records_and_seed_values_survive_reapplying_migrations
+no_rules: "The three fixed rows are initial catalog fixtures, not input or state-transition rules."

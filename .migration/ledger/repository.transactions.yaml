@@ -12,3 +12,16 @@ status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md]
+target:
+  components:
+    - src.loans.repositories.DjangoLoanRepository
+    - src.loans.services.store_loan
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_repository.py::test_failed_store_rolls_back_without_changing_existing_loan
+rules:
+  - id: atomic-store
+    rule: "A failed loan store leaves existing catalog records unchanged."
+    source: legacy/src/main/java/lib/LoanRepository.java:47-69

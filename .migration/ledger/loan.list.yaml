@@ -13,3 +13,17 @@ status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components:
+    - src.loans.services.list_loans
+    - src.loans.views.api_loan_list
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_list_returns_seeded_loans_in_characterized_format
+  - tests/loans/test_catalog.py::test_list_use_case_orders_loans_by_identifier
+rules:
+  - id: identifier-order
+    rule: "Loan lists are ordered by identifier in ascending order."
+    source: legacy/src/main/java/lib/LoanRepository.java:47-69

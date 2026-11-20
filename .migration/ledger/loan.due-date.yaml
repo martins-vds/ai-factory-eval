@@ -12,3 +12,16 @@ status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components:
+    - src.loans.domain.Loan.due_on
+    - src.loans.domain.due_date
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lending
+rules:
+  - id: fourteen-day-term
+    rule: "A loan is due exactly 14 calendar days after its lent date."
+    source: legacy/src/main/java/lib/Loan.java:44-46
