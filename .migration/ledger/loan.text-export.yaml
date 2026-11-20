@@ -15,3 +15,18 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
+target:
+  components:
+    - src.loans.services.export_loans
+    - src.loans.views.api_loan_list
+    - src.loans.views.api_loan_detail
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_list_returns_seeded_loans_in_characterized_format
+  - tests/loans/test_catalog.py::test_export_escapes_delimiters_and_quotes_in_field_values
+rules:
+  - id: escaped-semicolon-export
+    rule: "Text export preserves field order and newline termination, quoting and escaping semicolons, quotes and line breaks in field values."
+    source: legacy/src/main/java/lib/LoanResource.java:52-55; approved ruling martins-vds/ai-factory-synthetic-target#43

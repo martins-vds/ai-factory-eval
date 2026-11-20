@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog · The Lending Library{% endblock %}
+
+{% block content %}
+<section>
+  <p class="text-xs uppercase tracking-[.2em] text-stone-600">The collection · {{ loans|length }} loans in view</p>
+  <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+  <p class="mb-8 max-w-2xl text-stone-600">A quiet ledger of what is out, who has it, and when it comes home.</p>
+  <div class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_19rem]">
+    <section aria-label="Loan catalog">
+      {% for loan in loans %}
+        <article class="grid gap-4 border-b border-amber-900/20 py-5 sm:grid-cols-[1fr_auto]">
+          <div>
+            <h2 class="text-xl font-semibold">
+              <a class="link link-hover text-stone-800" href="{% url 'ui-loan-detail' loan.id %}"
+                 hx-get="{% url 'ui-loan-detail' loan.id %}" hx-target="#loan-detail" hx-swap="innerHTML">
+                Loan {{ loan.id }}
+              </a>
+            </h2>
+            <p class="text-stone-600">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+          </div>
+          <div class="sm:text-right">
+            <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+            {% if loan.returned_on %}
+              <p class="text-sm text-stone-600">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+            {% else %}
+              <p class="text-sm text-stone-600">Currently on loan</p>
+            {% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <p class="py-5 text-stone-600">There are no loans in the catalog.</p>
+      {% endfor %}
+    </section>
+    <aside id="loan-detail" class="card h-fit border border-amber-900/20 bg-amber-50 p-6">
+      <p class="text-xs uppercase tracking-widest text-stone-600">At a glance</p>
+      <h2 class="mt-2 text-2xl">A shared collection</h2>
+      <p class="mt-3 text-stone-600">Choose a loan to see its complete record.</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}

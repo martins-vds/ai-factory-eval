@@ -14,3 +14,13 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json]
 notes: "Restart reset behavior is raised in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+target:
+  components:
+    - src.loans.apps.LoansConfig
+    - src.loans.migrations.0001_initial
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_repository.py::test_stored_records_and_seed_values_survive_reapplying_migrations
+no_rules: "Startup has no loan-domain input or state-transition rule; one-time seeding and persistence are covered by the related data capabilities."

@@ -12,3 +12,15 @@ status: pending
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components:
+    - src.loans.services.get_loan
+    - src.loans.views.api_loan_detail
+status: migrated
+verification: differential
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_get_returns_one_loan_with_trailing_newline
+  - tests/loans/test_catalog.py::test_get_missing_loan_returns_characterized_not_found_response
+  - tests/loans/test_catalog.py::test_get_use_case_returns_none_for_unknown_identifier
+no_rules: "Read-only lookup has no additional business rule; a missing identifier is represented as None."

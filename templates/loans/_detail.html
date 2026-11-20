@@ -1,0 +1,11 @@
+<article class="card border border-amber-900/20 bg-white p-7">
+  <p class="text-xs uppercase tracking-widest text-stone-600">Loan record</p>
+  <h1 class="mt-2 text-4xl">Loan {{ loan.id }}</h1>
+  <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+    <div><dt class="text-sm text-stone-600">Member</dt><dd class="text-lg">{{ loan.member }}</dd></div>
+    <div><dt class="text-sm text-stone-600">ISBN</dt><dd class="font-mono">{{ loan.isbn }}</dd></div>
+    <div><dt class="text-sm text-stone-600">Lent</dt><dd>{{ loan.lent_on|date:"M j, Y" }}</dd></div>
+    <div><dt class="text-sm text-stone-600">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
+    <div><dt class="text-sm text-stone-600">Returned</dt><dd>{{ loan.returned_on|date:"M j, Y"|default:"Not returned" }}</dd></div>
+  </dl>
+</article>
