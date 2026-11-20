@@ -31,3 +31,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-20T00:49:34+00:00 | export-test-timezone | 1 | 1.6 | `pytest -q tests/data_migration/test_export.py` | `dfafb35d771d7633` | assert stdout.getvalue().strip() == 'Exported 7 rows across 6 mapped tables.' |  |
 | 2026-11-20T00:50:29+00:00 | export-test-naive | 0 | 1.6 | `pytest -q tests/data_migration/test_export.py` | `ce4950deb2f2a171` |  |  |
 | 2026-11-20T00:51:58+00:00 | mutation-changed | 0 | 83.48 | `python .migration/harness/tools/afs-mutation` | `6e5ddc172df55315` |  | gate=mutation score=0.803 threshold=0.8 killed=61 survived=15 files=2 base=bbd42f104df4a113ac65034b433328055fd8295b |
+| 2026-11-20T00:52:51+00:00 | build-compile | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T00:52:53+00:00 | build-check | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-20T00:53:33+00:00 | behavior | 0 | 37.08 | `pytest -q` | `9ff6db806135abc5` |  |  |
+| 2026-11-20T00:53:37+00:00 | idiom-ruff | 1 | 0.01 | `ruff check` | `1f6b3855b786ad68` | Found 1 error. |  |
+| 2026-11-20T00:53:43+00:00 | idiom-ruff-fix | 0 | 0.01 | `ruff check --fix tests/data_migration/test_export.py` | `aac3a0503d8b9505` | Found 1 error (1 fixed, 0 remaining). |  |
+| 2026-11-20T00:53:46+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-20T00:53:49+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |
