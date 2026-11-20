@@ -30,3 +30,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-20T00:38:39+00:00 | crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-20T00:38:39+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `8cb946f24132ab4e` |  | gate=crap max=26.0 threshold=30 over=0 methods=197 |
 | 2026-11-20T00:49:26+00:00 | mutation-changed | 0 | 647.25 | `python .migration/harness/tools/afs-mutation` | `890ab83db5154169` |  | gate=mutation score=0.919 threshold=0.8 killed=248 survived=22 files=4 base=9fe28ced04732a1549a70162b4f8432bd5c179fb |
+| 2026-11-20T00:50:23+00:00 | dashboard-order-evidence | 0 | 2.48 | `pytest -q tests/booking/interfaces/test_dashboard.py::test_dashboard_preserves_source_order_in_not_routed_and_claimed_tables` | `8ca7534279cbd21c` |  |  |
+| 2026-11-20T00:50:34+00:00 | cargo-not-found-message | 1 | 2.55 | `pytest -q tests/booking/interfaces/test_cargo_details.py::test_unknown_cargo_details_show_the_not_found_message` | `3805b06e47493d9d` | assert response.status_code == 404 |  |
+| 2026-11-20T00:51:56+00:00 | behavior-regression | 1 | 71.58 | `pytest -q` | `9a467a4ed109380b` | assert response.status_code == 404 |  |
+| 2026-11-20T00:51:56+00:00 | idiom-ruff-check-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-20T00:51:56+00:00 | idiom-ruff-format-final | 0 | 0.01 | `ruff format --check` | `b30e83bb722165b1` |  |  |
