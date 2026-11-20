@@ -1,0 +1,12 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1805
+phase: 0
+decisions:
+  - "https://github.com/martins-vds/ai-factory-eval/issues/1805: Tier A; the pinned legacy app built, ran, and served the recorded HTTP probes."
+dispatched: []
+awaiting_human:
+  - "https://github.com/martins-vds/ai-factory-eval/issues/1805: Resolve the missing compose.yaml/bootstrap ordering and the ui_checks/profile-schema mismatch before step 5."
+next_step: "Resolve the two blockers, then have the dispatcher run bootstrap.py at the pinned harness revision; keep legacy/ and the synthetic-target tracker read-only."
+handoff: .migration/handoffs/SY-01.md
+pr: null

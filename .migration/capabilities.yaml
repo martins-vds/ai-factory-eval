@@ -1,0 +1,122 @@
+harness_version: 0.2.0
+checked_at: "2026-11-20T01:16:30Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    Built and ran the exact pinned source without modifying legacy/: `git archive
+    563c316ed51462b08fd6e58f3781a3c8b2890453 legacy | tar -x -C
+    /tmp/sy01-source.BG6mQV`, then `cd /tmp/sy01-source.BG6mQV/legacy &&
+    PORT=18080 ./run.sh`. OpenJDK 17.0.21 and Maven 3.10.0 were present; the
+    script completed `mvn -q -B package -DskipTests` and printed `Lending
+    Library listening on 18080`. HTTP probes: GET /loans -> 200 with seeded
+    loans; GET /loans/no-such-loan -> 404 `no such loan`; GET /loans/L1 -> 200;
+    GET /about -> 200 HTML; GET /fees/no-such-loan -> 404; GET /fees/L2 ->
+    200 with Fee $0.00; POST /loans with
+    `member=sy01-probe&isbn=9780000000000` -> 201, loan L4 due 2026-12-04;
+    POST /loans/L4/return -> 200, returned 2026-11-20; POST
+    /payments/no-such-loan -> 404 without calling the gateway. Startup logged
+    Jersey provider warnings, but the tested routes served successfully.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh", version: "Maven 3.10.0; OpenJDK 17.0.21" }
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: The Django target application and build gate have not been scaffolded.
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh and HTTP probes" }
+    notes: Tier A running environment; exact commands and observed responses are in characterization.reason.
+  - id: unit-integration-tests
+    applies_to: source
+    status: not-applicable
+    notes: The pinned legacy tree contains no test suite; runtime behavior was probed over HTTP.
+  - id: unit-integration-tests
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: A target test runner and tests are not scaffolded yet.
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: The legacy tree has no test suite from which to collect coverage.
+  - id: coverage
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target coverage tooling is not scaffolded yet.
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard, version: "1.24.3" }
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: No source tests exist to produce coverage input for CRAP.
+  - id: crap
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target tests and CRAP gate are not scaffolded yet.
+  - id: mutation-testing
+    applies_to: source
+    status: not-applicable
+    notes: The source is immutable; mutation testing applies to target changes.
+  - id: mutation-testing
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target mutation tooling is not scaffolded yet.
+  - id: lint-format
+    applies_to: source
+    status: not-applicable
+    notes: The source is pinned and read-only; it is not reformatted during migration.
+  - id: lint-format
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: Target lint and format tooling are not scaffolded yet.
+  - id: stack-idioms
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: java-docs }
+      - { kind: skill, name: django-patterns }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: Source uses in-memory H2; the operator must decide whether any source data needs migration to PostgreSQL.
+  - id: ui-end-to-end
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: Neither the source nor target has an automated browser end-to-end harness.
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
