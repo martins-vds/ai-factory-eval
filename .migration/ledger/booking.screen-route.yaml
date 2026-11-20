@@ -8,10 +8,12 @@ source:
 boundary: "Route page loads cargo and candidates, displays origin/destination/deadline and candidate count, shows an empty-state message or numbered itineraries with voyage, load/unload locations and dates, and lets the user select an index."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
 verification: legacy-test
 characterization_tier: A
 evidence:
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates"
+  - "tests/booking/interfaces/test_route_selection.py::test_candidate_assignment_redirects_to_cargo_details"
+  - "tests/booking/interfaces/test_route_selection.py::test_assignment_result_is_visible_on_cargo_details_page"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testAssignRoute"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/domain/model/cargo/RouteSpecificationTest.java::testIsSatisfiedBySuccess"
@@ -19,3 +21,8 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
 notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."
+status: migrated
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+no_rules: "This screen presents routing data and exposes assignment; it does not add or change eligibility rules."

@@ -5,14 +5,20 @@ source:
   graph_node: page:src/main/webapp/admin/selectItinerary.xhtml:src/main/webapp/admin/selectItinerary.xhtml
   location: src/main/webapp/admin/selectItinerary.xhtml:9-23
   risk: {crap: 12, complexity: 3, coverage: 0.0}
-boundary: "The select-itinerary page reads trackingId and loads ItinerarySelection; when routeCandidates is empty it advises moving the arrival deadline further into the future."
+boundary: "The itinerary page reads trackingId and loads candidates; populated candidates are rendered for selection, and an empty candidate list advises moving the arrival deadline further into the future."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
 verification: characterized
 characterization_tier: A
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "This page contains only an empty-route state; the populated candidate table is in route.xhtml. With candidates present, its body is blank (.migration/quirks/booking-select-itinerary-blank-with-candidates.md). No named JUnit class exercises the page."
+  - "tests/booking/interfaces/test_route_selection.py::test_itineraries_renders_populated_candidates"
+  - "tests/booking/interfaces/test_route_selection.py::test_itineraries_renders_empty_candidate_guidance"
+notes: "The Planner ruling #252 selects populated candidate rendering; otherwise retain the empty-candidate guidance."
 quirks: [martins-vds/ai-factory-pilot-target#252]
+status: migrated
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+no_rules: "This UI state has no input-refusal or persisted-state rule."

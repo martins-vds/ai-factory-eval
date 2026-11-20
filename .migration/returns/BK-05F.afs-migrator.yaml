@@ -1,0 +1,29 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1903
+pr: null
+specialty: ui
+specialty_evidence:
+  - .migration/runs/BK-05F/20261120T235556260994Z-behavior.log
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: "n/a: no-mutable-code-changed"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: null
+rules: []
+no_rules:
+  booking.routing-chain: "This is a structural capability coordinating cargo lookup and route generation."
+  booking.screen-route: "This screen presents routing data and exposes assignment; it does not add or change eligibility rules."
+  booking.screen-select-itinerary: "This UI state has no input-refusal or persisted-state rule."
