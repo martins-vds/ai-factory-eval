@@ -4,6 +4,21 @@ from io import StringIO
 from .repository import LoanRepository
 
 
+class LoanInputError(ValueError):
+    def __init__(self, errors):
+        self.errors = errors
+
+
+def lend_loan(repository, member, isbn, today):
+    errors = {}
+    if member is None or not member.strip():
+        errors['member'] = 'Enter a member name.'
+    if isbn is None or not isbn.strip():
+        errors['isbn'] = 'Enter an ISBN.'
+    if errors:
+        raise LoanInputError(errors)
+
+
 def loan_line(loan):
     output = StringIO(newline='')
     writer = csv.writer(output, delimiter=';', lineterminator='\n')
