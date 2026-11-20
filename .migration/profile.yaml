@@ -154,6 +154,9 @@ translation_rules: .migration/translation-rules.md
 signoff:
   approvers:
   - martins-vds
+self_heal:
+  enabled: true
+  max_blocks: 2
 layering:
   source_root: src
   contracts:
@@ -201,9 +204,6 @@ layering:
     module: cargotracker.handling.domain.repository
     reason: the handling report view receives the repository and passes it to accept_registration;
       to wire a use case instead
-self_heal:
-  enabled: true
-  max_blocks: 2
 ui_checks:
   templates:
   - templates/**/*.html
