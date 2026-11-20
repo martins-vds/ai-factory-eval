@@ -2,7 +2,13 @@ from datetime import date
 
 import pytest
 
-from src.loans.services import LoanInputError, lend_loan
+from src.loans.services import (
+    LoanAlreadyReturned,
+    LoanInputError,
+    LoanNotFound,
+    lend_loan,
+    return_loan,
+)
 from src.loans.repository import LoanRepository
 
 
@@ -32,3 +38,155 @@ def test_lending_persists_values_exactly_and_sets_the_fourteen_day_term():
     assert loan.isbn == ' 978-0 '
     assert loan.lent_on == date(2026, 11, 20)
     assert loan.due_on == date(2026, 12, 4)
+
+
+@pytest.mark.django_db
+def test_lending_api_returns_the_new_formatted_record(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/loans', {'member': 'reader', 'isbn': '123'})
+
+    assert response.status_code == 201
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'L4;reader;123;2026-11-20;2026-12-04;\n'
+
+
+@pytest.mark.django_db
+def test_lending_api_rejects_blank_fields_with_the_characterized_error(client):
+    response = client.post('/loans', {'member': ' \t', 'isbn': ''})
+
+    assert response.status_code == 400
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'member and isbn are required\n'
+
+
+@pytest.mark.django_db
+def test_lending_api_escapes_delimiters_in_the_created_record(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/loans', {'member': 'reader; one', 'isbn': '978"0'})
+
+    assert response.status_code == 201
+    assert response.content.decode() == 'L4;"reader; one";"978""0";2026-11-20;2026-12-04;\n'
+
+
+@pytest.mark.django_db
+def test_return_use_case_marks_an_unreturned_loan_with_the_supplied_date():
+    loan = return_loan(LoanRepository(), 'L1', date(2026, 11, 20))
+
+    assert loan.returned_on == date(2026, 11, 20)
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_an_unknown_loan():
+    with pytest.raises(LoanNotFound):
+        return_loan(LoanRepository(), 'missing', date(2026, 11, 20))
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_repeat_without_replacing_the_original_date():
+    original_date = date(2026, 1, 20)
+
+    with pytest.raises(LoanAlreadyReturned):
+        return_loan(LoanRepository(), 'L2', date(2026, 11, 20))
+
+    assert LoanRepository().find('L2').returned_on == original_date
+
+
+@pytest.mark.django_db
+def test_return_api_persists_and_returns_the_formatted_loan(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/loans/L1/return')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-20\n'
+
+
+@pytest.mark.django_db
+def test_return_api_returns_the_characterized_not_found_response(client):
+    response = client.post('/loans/missing/return')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_repeat_return_api_answers_conflict_without_replacing_the_saved_date(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/loans/L2/return')
+
+    assert response.status_code == 409
+    assert response.content.decode() == 'loan already returned\n'
+    assert LoanRepository().find('L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_new_loan_form_uses_the_reading_room_flow(client):
+    response = client.get('/ui/loans/new/')
+
+    assert response.status_code == 200
+    assert b'Lend a book' in response.content
+    assert b'Member name' in response.content
+    assert b'ISBN' in response.content
+    assert b'action="/ui/loans/"' in response.content
+
+
+@pytest.mark.django_db
+def test_lending_ui_stores_submitted_values_as_given(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/ui/loans/', {'member': ' m1 ', 'isbn': ' 978-0 '})
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    loan = LoanRepository().find('L4')
+    assert loan.member == ' m1 '
+    assert loan.isbn == ' 978-0 '
+    assert loan.lent_on == date(2026, 11, 20)
+
+
+@pytest.mark.django_db
+def test_lending_ui_renders_field_errors_and_preserves_invalid_values(client):
+    response = client.post('/ui/loans/', {'member': '  ', 'isbn': ''})
+
+    assert response.status_code == 400
+    assert b'Enter a member name.' in response.content
+    assert b'Enter an ISBN.' in response.content
+    assert b'value="  "' in response.content
+    assert b'aria-invalid="true"' in response.content
+
+
+@pytest.mark.django_db
+def test_unreturned_loan_detail_offers_an_htmx_return_action(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'hx-post="/ui/loans/L1/return/"' in response.content
+    assert b'csrfmiddlewaretoken' in response.content
+
+
+@pytest.mark.django_db
+def test_return_ui_updates_the_loan_with_the_return_date(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'Returned Nov 20, 2026' in response.content
+    assert b'hx-post=' not in response.content
+
+
+@pytest.mark.django_db
+def test_repeat_return_ui_renders_error_and_preserves_saved_date(client, monkeypatch):
+    monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
+
+    response = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 409
+    assert b'already been returned' in response.content
+    assert b'Jan 20, 2026' in response.content
+    assert b'hx-on::before-swap=' in response.content

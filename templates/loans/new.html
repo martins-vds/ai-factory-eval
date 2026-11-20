@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
+      <h1 class="card-title mt-2 text-4xl">Lend a book</h1>
+      <p class="mt-2 text-[#66705b]">Create a loan for the next 14 days.</p>
+      <form method="post" action="/ui/loans/">
+        {% csrf_token %}
+        <label class="form-control mt-3">
+          <span class="label-text">Member name</span>
+          <input class="input input-bordered mt-2" name="member" value="{{ form_values.member }}" autocomplete="name" aria-invalid="{% if errors.member %}true{% else %}false{% endif %}" required>
+          {% if errors.member %}<span class="mt-1 text-sm text-[#a94e37]" role="alert">{{ errors.member }}</span>{% endif %}
+        </label>
+        <label class="form-control mt-3">
+          <span class="label-text">ISBN</span>
+          <input class="input input-bordered mt-2" name="isbn" value="{{ form_values.isbn }}" aria-invalid="{% if errors.isbn %}true{% else %}false{% endif %}" required>
+          {% if errors.isbn %}<span class="mt-1 text-sm text-[#a94e37]" role="alert">{{ errors.isbn }}</span>{% endif %}
+        </label>
+        <button class="btn btn-primary mt-6">Create 14-day loan</button>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}

@@ -28,6 +28,14 @@ class LoanInputError(ValueError):
         self.errors = errors
 
 
+class LoanNotFound(LookupError):
+    pass
+
+
+class LoanAlreadyReturned(ValueError):
+    pass
+
+
 def lend_loan(repository, member, isbn, today):
     errors = {}
     if member is None or not member.strip():
@@ -42,6 +50,22 @@ def lend_loan(repository, member, isbn, today):
         isbn=isbn,
         lent_on=today,
     )
+
+
+def return_loan(repository, loan_id, today):
+    loan = repository.find(loan_id)
+    if loan is None:
+        raise LoanNotFound(loan_id)
+    if loan.returned_on is not None:
+        raise LoanAlreadyReturned(loan_id)
+
+    returned_loan = repository.return_if_unreturned(loan_id, today)
+    if returned_loan is not None:
+        return returned_loan
+
+    if repository.find(loan_id) is None:
+        raise LoanNotFound(loan_id)
+    raise LoanAlreadyReturned(loan_id)
 
 
 def loan_line(loan):
