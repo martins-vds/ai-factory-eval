@@ -33,23 +33,23 @@ def _load_fixture():
 @override_settings(USE_TZ=False)
 def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     _load_fixture()
-    output = tmp_path / 'nested' / 'target-export'
+    output_dir = tmp_path / 'nested' / 'target-export'
     stdout = StringIO()
 
     call_command(
         'export_data_snapshot',
         mapping=str(MAPPING_PATH),
-        out=str(output),
+        out=str(output_dir),
         stdout=stdout,
     )
     assert stdout.getvalue().strip() == 'Exported 7 rows across 6 mapped tables.'
 
-    assert {path.stem for path in output.glob('*.csv')} == {
+    assert {path.stem for path in output_dir.glob('*.csv')} == {
         spec['target'] for spec in MAPPING['tables']
     }
     exported = {}
     for spec in MAPPING['tables']:
-        data = _read_csv(output / f'{spec["target"]}.csv')
+        data = _read_csv(output_dir / f'{spec["target"]}.csv')
         source_data = _read_csv(FIXTURE_SNAPSHOT / f'{spec["source"]}.csv')
         assert data[0] == list(spec['columns'])
         assert len(data) - 1 == len(source_data) - 1
@@ -102,18 +102,19 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     assert exported['carrier_movement'][1:] == [
         ['91', '2026-11-09T10:00:00Z', '2026-11-08T12:00:00Z', '102', '101', '900']
     ]
-    call_command('export_data_snapshot', mapping=str(MAPPING_PATH), out=str(output))
+    call_command('export_data_snapshot', mapping=str(MAPPING_PATH), out=str(output_dir))
+    assert {target: _read_csv(output_dir / f'{target}.csv') for target in exported} == exported
 
 
 @pytest.mark.django_db(transaction=True)
 def test_export_snapshot_orders_rows_by_primary_key(tmp_path):
     _load_fixture()
     LocationRecord.objects.create(id=100, unlocode='AUSYD', name='Sydney')
-    output = tmp_path / 'target-export'
+    output_dir = tmp_path / 'target-export'
 
-    call_command('export_data_snapshot', mapping=str(MAPPING_PATH), out=str(output))
+    call_command('export_data_snapshot', mapping=str(MAPPING_PATH), out=str(output_dir))
 
-    assert [row[0] for row in _read_csv(output / 'location.csv')[1:]] == [
+    assert [row[0] for row in _read_csv(output_dir / 'location.csv')[1:]] == [
         '100',
         '101',
         '102',
