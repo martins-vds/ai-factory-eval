@@ -1,0 +1,13 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1859
+phase: 0
+decisions:
+  - "Pinned source verified: martins-vds/ai-factory-synthetic-target@563c316ed51462b08fd6e58f3781a3c8b2890453, path legacy."
+  - "Detected Java 17, JAX-RS/Jersey on Grizzly, JPA/Hibernate on H2, Maven; target stacks are Python 3.13, Django 5, Django templates, and PostgreSQL 17."
+  - "Characterization tier A: legacy/run.sh built and started, and HTTP responses were observed; see .migration/references/characterization.md."
+dispatched: []
+awaiting_human:
+  - "Resolve the ordering discrepancy: afs-bootstrap requires compose.yaml before install, but the ticket defers scaffolding; pinned bootstrap.py/validate.py show no compose-file preflight."
+next_step: "After the dispatcher/operator resolves compose-service sequencing, run bootstrap.py at f195ae3d25110bdcf4bd78cadd0676c25c614a5c with the profile, checklist, and java-to-django stack pack."
+handoff: .migration/handoffs/SY-01.md

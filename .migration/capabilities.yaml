@@ -1,0 +1,125 @@
+harness_version: 0.2.0
+checked_at: "2026-11-20T00:49:16Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    The pinned legacy/run.sh package completed and started the app; HTTP probes exercised
+    the loans, fees, payments, and about endpoints. Exact commands and responses are recorded
+    in .migration/references/characterization.md.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh (Maven package and Java launch)" }
+  - id: build-run
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Django target project and build/check commands are not scaffolded yet."
+  - id: characterization-harness
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "Tier-A HTTP probes ran, but no repeatable characterization harness exists."
+  - id: unit-integration-tests
+    applies_to: source
+    status: not-applicable
+    notes: "No legacy test source tree or test suite is present; tier-A endpoint probes are recorded separately."
+  - id: unit-integration-tests
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target test runner and tests are not scaffolded yet."
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No legacy test suite or coverage tooling is present; source coverage is best-effort."
+  - id: coverage
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target coverage tooling is not scaffolded yet."
+  - id: complexity
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No complexity measurement tool is configured for the legacy source."
+  - id: complexity
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target complexity tooling is not scaffolded yet."
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No legacy tests, coverage data, or CRAP tooling are present; source CRAP is best-effort."
+  - id: crap
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target CRAP and coverage tooling are not scaffolded yet."
+  - id: mutation-testing
+    applies_to: source
+    status: not-applicable
+    notes: "The legacy source has no test suite to validate with mutation testing."
+  - id: mutation-testing
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target mutation tooling and tests are not scaffolded yet."
+  - id: lint-format
+    applies_to: source
+    status: not-applicable
+    notes: "The read-only legacy project has no configured lint or format checks."
+  - id: lint-format
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target lint and format tooling are not scaffolded yet."
+  - id: stack-idioms
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "The pinned stack pack has Java documentation and JUnit skills but no dedicated source idiom checker."
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: django-patterns }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: "The H2-to-PostgreSQL snapshot, mapping, and load strategy have not been established."
+  - id: ui-end-to-end
+    applies_to: source
+    status: not-applicable
+    notes: "The source exposes HTML endpoints but has no browser-based client or UI test suite."
+  - id: ui-end-to-end
+    applies_to: target
+    status: gap
+    ticket: new
+    notes: "Target UI and end-to-end test tooling are not scaffolded yet."
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+    notes: "The stack pack enrichers supply required data and route links; the graph gate must verify their output."
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
