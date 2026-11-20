@@ -21,7 +21,7 @@ def test_legacy_about_response_is_unchanged(client):
 
 
 @pytest.mark.django_db
-def test_modern_about_page_renders_in_browser(client, live_server):
+def test_modern_about_page_renders_in_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
         try:
