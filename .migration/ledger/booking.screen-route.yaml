@@ -8,8 +8,11 @@ source:
 boundary: "Route page loads cargo and candidates, displays origin/destination/deadline and candidate count, shows an empty-state message or numbered itineraries with voyage, load/unload locations and dates, and lets the user select an index."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+status: migrated
+verification: characterized
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testRouteCandidates"
@@ -18,4 +21,9 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."
+  - "tests/booking/interfaces/test_route_selection.py::test_route_page_displays_cargo_details_candidate_count_and_numbered_legs"
+  - "tests/booking/interfaces/test_route_selection.py::test_candidate_assignment_redirects_to_details_and_persists_itinerary"
+  - ".migration/evidence/runs/BK-05F.md"
+notes: "Candidate properties are asserted in target tests; the unannotated source test is not counted as executed legacy evidence (#239). Assignment redirects to cargo details under ruling #236."
+quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#239]
+no_rules: "This screen displays candidates and their itinerary details; route eligibility is enforced by booking.routing-candidates."

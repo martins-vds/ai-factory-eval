@@ -1,0 +1,43 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1758
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1762
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.857
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_page_displays_cargo_details_candidate_count_and_numbered_legs
+  - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_populated_candidates
+  - tests/booking/interfaces/test_route_selection.py::test_empty_candidates_render_the_screen_specific_guidance
+  - tests/booking/interfaces/test_route_selection.py::test_candidate_assignment_redirects_to_details_and_persists_itinerary
+  - tests/booking/interfaces/test_route_selection.py::test_invalid_candidate_token_renders_an_error_response
+  - tests/booking/interfaces/test_route_selection.py::test_candidate_token_cannot_assign_itinerary_to_another_cargo
+  - tests/booking/interfaces/test_route_selection.py::test_signed_empty_itinerary_is_rejected
+  - tests/booking/interfaces/test_route_selection.py::test_unknown_cargo_route_selection_raises_not_found
+  - .migration/evidence/mutants/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: booking.routing-assign
+    rule: Assigning a selected itinerary persists its legs and recalculates cargo routing state.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery
+    enforced: true
+    ledger_rule: assigned-route-recalculates-state
+no_rules:
+  booking.routing-chain: Route candidate discovery and itinerary assignment compose existing application capabilities.
+  booking.screen-route: This screen displays route details and candidates; candidate eligibility is enforced by booking.routing-candidates.
+  booking.screen-select-itinerary: This screen renders candidates or no-route guidance; candidate eligibility is enforced by booking.routing-candidates.
