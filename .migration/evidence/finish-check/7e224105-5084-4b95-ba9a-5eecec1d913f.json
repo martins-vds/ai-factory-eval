@@ -1,0 +1,81 @@
+[
+  {
+    "at": "2026-11-20T01:07:50Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17033,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-04",
+    "role": "afs-migrator",
+    "changed": [],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-04.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-04`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-04.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-20T01:08:16Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17494,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-03",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/7e224105-5084-4b95-ba9a-5eecec1d913f.json"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-03.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 1,
+    "decision": "block",
+    "why": "block 2 of 2"
+  },
+  {
+    "at": "2026-11-20T01:08:40Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17801,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-04",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/7e224105-5084-4b95-ba9a-5eecec1d913f.json"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/LL-04.afs-migrator.yaml` with `role: afs-migrator`, `ticket: LL-04`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/LL-04.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 2,
+    "decision": "allow",
+    "why": "retry budget spent; wrote .migration/handoffs/LL-04.md"
+  }
+]
