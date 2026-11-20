@@ -1,0 +1,43 @@
+role: afs-migrator
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1857
+pr: martins-vds/ai-factory-eval#1862
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 9.0
+  mutation_changed: 0.900
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+ledger_updated:
+  - reports.monthly-spec
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: reports.monthly-spec
+    rule: Report activity in the prior calendar month using its first day inclusive and the current month's first day exclusive.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: prior-month-window
+  - capability: reports.monthly-spec
+    rule: Aggregate one row per member with loans started, late returns, and late fees in cents.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: member-aggregation
+  - capability: reports.monthly-spec
+    rule: Omit members who had no loans started in the reporting month.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: qualifying-members
+  - capability: reports.monthly-spec
+    rule: Sort by total late fees descending, then member id ascending.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report.py::test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member
+    enforced: true
+    ledger_rule: report-order

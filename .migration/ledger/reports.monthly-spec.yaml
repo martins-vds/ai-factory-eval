@@ -6,9 +6,32 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-eval#1857
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication.generate
+    - src.reports.management.commands.monthly_report.Command.handle
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_monthly_report.py::test_report_summarizes_previous_month_activity_and_sorts_by_fees_then_member
+  - tests/reports/test_monthly_report.py::test_monthly_report_command_reads_postgres_and_writes_csv
+rules:
+  - id: prior-month-window
+    rule: "Report activity in the prior calendar month, from its first day inclusive to the current month's first day exclusive."
+    source: legacy/docs/reports-spec.md:3; .migration/plan/monthly-report.md:5-12
+  - id: member-aggregation
+    rule: "Emit one row per member with loans started; count loans started and late returns and report late fees in cents."
+    source: legacy/docs/reports-spec.md:4
+  - id: qualifying-members
+    rule: "Omit members who had no loans started in the reporting month."
+    source: legacy/docs/reports-spec.md:6
+  - id: report-order
+    rule: "Sort by total late fees descending, then member id ascending."
+    source: legacy/docs/reports-spec.md:5
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
