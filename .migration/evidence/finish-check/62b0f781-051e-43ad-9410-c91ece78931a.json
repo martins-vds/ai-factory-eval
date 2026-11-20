@@ -1,0 +1,23 @@
+[
+  {
+    "at": "2026-11-20T01:14:27Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17607,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": null,
+    "role": "afs-analyst",
+    "changed": [],
+    "decision": "allow",
+    "why": "no ticket/role for this session"
+  }
+]
