@@ -63,6 +63,9 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     assert 'Hong Kong' in first_content
     assert 'Melbourne' in first_content
     assert 'id="destination-error"' not in first_content
+    assert 'aria-label="Dialog actions"' in first_content
+    assert '>Cancel</button>' in first_content
+    assert '>Update</button>' in first_content
     assert first_options == second_options
     assert first_options
     assert 'CNHKG' not in first_options
@@ -86,6 +89,9 @@ def test_deadline_dialog_displays_current_deadline(client):
     assert 'name="deadline"' in content
     assert f'value="{deadline}"' in content
     assert 'id="deadline-error"' not in content
+    assert 'aria-label="Dialog actions"' in content
+    assert '>Cancel</button>' in content
+    assert '>Update</button>' in content
 
 
 @pytest.mark.django_db

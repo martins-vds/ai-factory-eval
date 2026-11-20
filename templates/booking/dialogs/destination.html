@@ -30,13 +30,6 @@
         </option>
       {% endfor %}
     </select>
-    <nav aria-label="Dialog actions" class="flex justify-end gap-3">
-      <button
-        class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100"
-        type="button"
-        onclick="document.getElementById('cargo-edit-dialog').close()"
-      >Cancel</button>
-      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update</button>
-    </nav>
+    {% include "booking/dialogs/_actions.html" %}
   </form>
 </section>
