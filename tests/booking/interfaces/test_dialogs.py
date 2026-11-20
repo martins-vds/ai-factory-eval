@@ -82,10 +82,13 @@ def test_destination_dialog_shows_current_values_and_filters_options_stably(clie
     }
 
     assert first_response.status_code == second_response.status_code == 200
+    assert '<main' not in first_content
     assert cargo.route_specification.origin.name in first_content
     assert cargo.route_specification.destination.name in first_content
     assert len(first_options) == len(original_locations) - 2
     assert not excluded_codes.intersection(first_options)
+    assert f'value="{first_options[0]}" selected' in first_content
+    assert 'role="alert"' not in first_content
     assert first_options == second_options
     assert tuple(shipping_locations) == original_locations
 
@@ -150,6 +153,7 @@ def test_deadline_dialog_shows_current_route_and_deadline(client):
     content = response.content.decode()
 
     assert response.status_code == 200
+    assert '<main' not in content
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
@@ -210,6 +214,13 @@ def test_missing_cargo_renders_an_error_for_the_dialog(client, dialog):
 
     assert response.status_code == 404
     assert 'Cargo MISSING1 was not found.' in response.content.decode()
+
+
+@pytest.mark.parametrize('dialog', ['destination', 'deadline'])
+def test_dialogs_reject_unsupported_methods(client, dialog):
+    response = client.put(f'/admin/cargo/DEF789/{dialog}/')
+
+    assert response.status_code == 405
 
 
 def test_deadline_dialog_works_without_htmx(client):
