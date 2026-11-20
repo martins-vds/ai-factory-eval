@@ -79,3 +79,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-20T00:35:10+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T00:38:20+00:00 | build-compile-verifier | 0 | 0.1 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T00:38:22+00:00 | build-django-check-verifier | 0 | 1.43 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-20T00:39:26+00:00 | behavior-verifier | 0 | 63.79 | `pytest -q` | `6ca52fce65938e10` |  |  |
+| 2026-11-20T00:39:26+00:00 | idiom-ruff-check-verifier | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-20T00:39:26+00:00 | idiom-ruff-format-verifier | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-20T00:39:26+00:00 | idiom-layers-verifier | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-20T00:39:27+00:00 | idiom-ui-verifier | 0 | 0.81 | `python .migration/harness/tools/check_ui.py` | `577e13ceac8678c8` |  | gate=ui scope="templates changed since d2cb1ac816a29a9629f35c9470b1c35cc4937c49" templates=0 findings=0 |
