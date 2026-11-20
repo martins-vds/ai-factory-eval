@@ -7,9 +7,24 @@ source:
   flow: View About Page
   location: legacy/src/main/resources/static/about.html:1-9
   risk: {crap: 1, complexity: 1, coverage: 1.0}
-boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "GET /about serves the characterized static HTML page unchanged; GET /ui/about/ presents the same library information in the approved reading-room layout."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1918]
+target:
+  components:
+    - src.library_info.views.about
+    - src.library_info.views.legacy_about
+    - src.library_info.urls
+    - templates/library_info/about.html
+    - templates/library_info/about-legacy.html
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - .migration/evidence/runs/LL-04.md
+  - tests/library_info/test_about_page.py::test_legacy_about_response_is_unchanged
+  - tests/library_info/test_about_page.py::test_modern_about_page_renders_in_browser
+no_rules: "The capability displays static library information and has no rule-bearing inputs or state."
