@@ -6,7 +6,7 @@ def due_date(lent_on: date) -> date:
     return lent_on + timedelta(days=14)
 
 
-@dataclass(frozen=True)
+@dataclass
 class Loan:
     id: str
     member: str

@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 from .repositories import DjangoLoanRepository
-from .services import export_loans, get_loan, list_loans
+from .services import export_loans, format_loan, get_loan, list_loans
 
 
 def _repository() -> DjangoLoanRepository:
@@ -12,7 +12,7 @@ def _repository() -> DjangoLoanRepository:
 
 @require_GET
 def api_loan_list(request):
-    return HttpResponse(export_loans(list_loans(_repository())), content_type='text/plain')
+    return HttpResponse(export_loans(_repository()), content_type='text/plain')
 
 
 @require_GET
@@ -20,7 +20,7 @@ def api_loan_detail(request, loan_id: str):
     loan = get_loan(_repository(), loan_id)
     if loan is None:
         return HttpResponseNotFound('no such loan\n', content_type='text/plain')
-    return HttpResponse(export_loans([loan]), content_type='text/plain')
+    return HttpResponse(format_loan(loan), content_type='text/plain')
 
 
 @require_GET

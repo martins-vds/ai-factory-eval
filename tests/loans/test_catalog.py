@@ -2,8 +2,8 @@ from datetime import date
 
 import pytest
 
-from src.loans.domain import Loan
-from src.loans.services import calculate_due_date, export_loans, get_loan, list_loans
+from src.loans.domain import Loan, due_date
+from src.loans.services import export_loans, get_loan, list_loans
 
 SEED_EXPORT = (
     'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
@@ -22,10 +22,17 @@ def test_list_returns_seeded_loans_in_characterized_format(client):
 
 
 @pytest.mark.django_db
+def test_api_endpoints_reject_non_get_requests(client):
+    assert client.post('/loans').status_code == 405
+    assert client.post('/loans/L1').status_code == 405
+
+
+@pytest.mark.django_db
 def test_get_returns_one_loan_with_trailing_newline(client):
     response = client.get('/loans/L1')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
 
 
@@ -34,6 +41,7 @@ def test_get_missing_loan_returns_characterized_not_found_response(client):
     response = client.get('/loans/missing')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
 
 
@@ -43,6 +51,7 @@ def test_ui_missing_loan_renders_an_htmx_error_fragment(client):
 
     assert response.status_code == 404
     assert b'No such loan.' in response.content
+    assert b'<html' not in response.content
 
 
 @pytest.mark.django_db
@@ -52,6 +61,30 @@ def test_ui_htmx_detail_returns_a_record_fragment(client):
     assert response.status_code == 200
     assert b'Loan L1' in response.content
     assert b'9780134685991' in response.content
+    assert b'<html' not in response.content
+
+
+@pytest.mark.django_db
+def test_ui_list_and_detail_render_full_pages(client):
+    catalog = client.get('/ui/loans/')
+    detail = client.get('/ui/loans/L1/')
+    missing = client.get('/ui/loans/missing/')
+
+    assert catalog.status_code == 200
+    assert b'Books in good company.' in catalog.content
+    assert b'9780134685991' in catalog.content
+    assert detail.status_code == 200
+    assert b'<html' in detail.content
+    assert b'Loan L1' in detail.content
+    assert missing.status_code == 404
+    assert b'<html' in missing.content
+    assert b'No such loan.' in missing.content
+
+
+@pytest.mark.django_db
+def test_ui_endpoints_reject_non_get_requests(client):
+    assert client.post('/ui/loans/').status_code == 405
+    assert client.post('/ui/loans/L1/').status_code == 405
 
 
 @pytest.mark.django_db
@@ -60,7 +93,7 @@ def test_django_admin_is_not_available(client):
 
 
 def test_due_date_is_fourteen_calendar_days_after_lending():
-    assert calculate_due_date(date(2026, 1, 2)) == date(2026, 1, 16)
+    assert due_date(date(2026, 1, 2)) == date(2026, 1, 16)
 
 
 def test_list_use_case_orders_loans_by_identifier():
@@ -91,4 +124,10 @@ def test_export_escapes_delimiters_and_quotes_in_field_values():
         returned_on=None,
     )
 
-    assert export_loans([loan]) == 'L4;"a;b\nname";"123""456";2026-01-02;2026-01-16;\n'
+    class SingleLoanRepository:
+        def list_all(self):
+            return [loan]
+
+    assert (
+        export_loans(SingleLoanRepository()) == 'L4;"a;b\nname";"123""456";2026-01-02;2026-01-16;\n'
+    )

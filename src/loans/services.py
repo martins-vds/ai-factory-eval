@@ -1,13 +1,8 @@
 import csv
-from datetime import date
 from io import StringIO
 
-from .domain import Loan, due_date
+from .domain import Loan
 from .ports import LoanRepository
-
-
-def calculate_due_date(lent_on: date) -> date:
-    return due_date(lent_on)
 
 
 def list_loans(repository: LoanRepository) -> list[Loan]:
@@ -22,18 +17,21 @@ def store_loan(repository: LoanRepository, loan: Loan) -> Loan:
     return repository.store(loan)
 
 
-def export_loans(loans: list[Loan]) -> str:
+def format_loan(loan: Loan) -> str:
     output = StringIO(newline='')
     writer = csv.writer(output, delimiter=';', lineterminator='\n')
-    for loan in sorted(loans, key=lambda item: item.id):
-        writer.writerow(
-            (
-                loan.id,
-                loan.member,
-                loan.isbn,
-                loan.lent_on.isoformat(),
-                loan.due_on.isoformat(),
-                loan.returned_on.isoformat() if loan.returned_on else '',
-            )
+    writer.writerow(
+        (
+            loan.id,
+            loan.member,
+            loan.isbn,
+            loan.lent_on.isoformat(),
+            loan.due_on.isoformat(),
+            loan.returned_on.isoformat() if loan.returned_on else '',
         )
+    )
     return output.getvalue()
+
+
+def export_loans(repository: LoanRepository) -> str:
+    return ''.join(format_loan(loan) for loan in list_loans(repository))

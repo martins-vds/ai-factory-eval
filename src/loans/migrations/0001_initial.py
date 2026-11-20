@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='LoanRecord',
             fields=[
-                ('id', models.CharField(max_length=32, primary_key=True, serialize=False)),
+                ('id', models.TextField(primary_key=True, serialize=False)),
                 ('member', models.TextField()),
                 ('isbn', models.TextField()),
                 ('lent_on', models.DateField()),
@@ -49,7 +49,6 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'loans',
-                'ordering': ['id'],
             },
         ),
         migrations.RunPython(seed_example_loans, migrations.RunPython.noop),

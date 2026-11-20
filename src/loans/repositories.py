@@ -6,7 +6,7 @@ from .models import LoanRecord
 
 class DjangoLoanRepository:
     def list_all(self) -> list[Loan]:
-        return [self._to_domain(record) for record in LoanRecord.objects.order_by('id')]
+        return [self._to_domain(record) for record in LoanRecord.objects.all()]
 
     def find_by_id(self, loan_id: str) -> Loan | None:
         record = LoanRecord.objects.filter(pk=loan_id).first()

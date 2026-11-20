@@ -5,8 +5,16 @@ from django.core.management import call_command
 from django.db import IntegrityError
 
 from src.loans.domain import Loan
+from src.loans.models import LoanRecord
 from src.loans.repositories import DjangoLoanRepository
 from src.loans.services import store_loan
+
+
+def test_return_date_is_nullable_and_blank_in_the_persistent_model():
+    returned_on = LoanRecord._meta.get_field('returned_on')
+
+    assert returned_on.null
+    assert returned_on.blank
 
 
 @pytest.mark.django_db
