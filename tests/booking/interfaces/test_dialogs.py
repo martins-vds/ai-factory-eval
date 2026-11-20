@@ -130,7 +130,10 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert re.search(
+        r'<p[^>]*id="deadline-error"[^>]*role="alert">Enter a valid arrival deadline\.</p>',
+        content,
+    )
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
 
@@ -161,7 +164,10 @@ def test_invalid_destination_shows_field_error_without_updating_cargo(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in content
+    assert re.search(
+        r'<p[^>]*id="destination-error"[^>]*role="alert">Select a valid destination\.</p>',
+        content,
+    )
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
