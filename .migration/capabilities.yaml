@@ -1,0 +1,149 @@
+harness_version: 0.2.0
+checked_at: "2026-11-20T01:51:09Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    `./legacy/run.sh` built and started the pinned source; its HTTP behavior was exercised and recorded in
+    `.migration/characterization/SY-01-http.md`.
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: OpenJDK, version: "17.0.21"}
+      - {kind: tool, name: Maven, version: "3.10.0"}
+    notes: "`./legacy/run.sh` packaged successfully and started the app on port 8080."
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: "legacy-smoke.yml"}
+      - {kind: tool, name: curl}
+    notes: "The source CI smoke workflow and this tier-A endpoint run exercise the live HTTP boundary; see .migration/characterization/SY-01-http.md."
+  - id: unit-integration-tests
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: "legacy-smoke.yml"}
+    notes: "The source has an HTTP smoke workflow; no separate unit-test tree was present."
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "The source smoke workflow does not collect coverage."
+  - id: complexity
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard}
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "The source has no coverage report for CRAP analysis."
+  - id: mutation-testing
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No Java mutation-testing provider is configured in the source."
+  - id: lint-format
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No source lint or formatting gate is configured."
+  - id: stack-idioms
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: skill, name: java-docs}
+      - {kind: skill, name: java-junit}
+    notes: "Pinned stack-pack skills; the observed source uses Java 17, Jakarta REST/JAX-RS, Jersey/Grizzly, JPA/Hibernate, and H2."
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: "The source uses H2 and the target uses PostgreSQL 17; the pinned stack pack has no H2-to-PostgreSQL migration provider."
+  - id: ui-end-to-end
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: skill, name: agent-browser}
+    notes: "The source exposes HTML at /about and /fees/{loanId}."
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4"}
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: "enrich_graph.py (java-ee, django)", version: f195ae3d25110bdcf4bd78cadd0676c25c614a5c}
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: rtk-oss, version: "1.1.0"}
+  - id: build-run
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: Python, version: "3.13"}
+      - {kind: tool, name: Django, version: "5"}
+    notes: "Target build/check commands are defined in the profile for the post-bootstrap scaffold."
+  - id: characterization-harness
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: afs-evidence}
+      - {kind: skill, name: agent-browser}
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest}
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest-cov}
+      - {kind: skill, name: pytest-coverage}
+  - id: complexity
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard}
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: "crap.py"}
+      - {kind: tool, name: pytest-cov}
+      - {kind: tool, name: lizard}
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: afs-mutation}
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: ruff}
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: django-patterns}
+      - {kind: skill, name: django-security}
+      - {kind: skill, name: django-tdd}
+      - {kind: skill, name: django-verification}
+  - id: ui-end-to-end
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: agent-browser}
