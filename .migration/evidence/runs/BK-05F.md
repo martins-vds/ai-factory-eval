@@ -21,3 +21,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-20T23:56:12+00:00 | format-check | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
 | 2026-11-20T23:56:51+00:00 | mutation_changed | 0 | 0.14 | `python .migration/harness/tools/afs-mutation` | `45567ab2cd87d32e` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=5bd801689b3e8b857aaf6610b5e570837c7b0beb |
 | 2026-11-20T23:57:15+00:00 | regression | 0 | 63.36 | `pytest -q` | `950df45bcf3a2061` |  |  |
+| 2026-11-20T23:59:37+00:00 | behavior | 0 | 4.62 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `1cb8558b250f917d` |  |  |

@@ -58,7 +58,7 @@ def create_route_selection_views(
                 TrackingId(tracking_id),
                 candidates[candidate_index],
             )
-            return redirect(f'/admin/cargo/{tracking_id}/')
+            return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
         return _render_route(request, tracking_id, candidates, cargo)
 
     def itineraries(request: HttpRequest, tracking_id: str) -> HttpResponse:
@@ -75,7 +75,7 @@ def create_route_selection_views(
                 TrackingId(tracking_id),
                 candidates[candidate_index],
             )
-            return redirect(f'/admin/cargo/{tracking_id}/')
+            return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
         return _render_route(request, tracking_id, candidates, cargo)
 
     return route, itineraries
