@@ -52,3 +52,12 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-20T01:00:35+00:00 | export-format | 1 | 0.01 | `ruff format --check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `9cef11674c54885a` | -     assert { |  |
 | 2026-11-20T01:00:40+00:00 | export-format-fix | 0 | 0.01 | `ruff format tests/data_migration/test_export.py` | `413a709001976657` |  |  |
 | 2026-11-20T01:00:46+00:00 | export-test-review-fix | 0 | 1.58 | `pytest -q tests/data_migration/test_export.py` | `08a1ba19c890ef94` |  |  |
+| 2026-11-20T01:01:14+00:00 | build-compile | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T01:01:19+00:00 | build-check | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-20T01:02:01+00:00 | behavior | 0 | 35.97 | `pytest -q` | `cfb68e1eaaceb541` |  |  |
+| 2026-11-20T01:02:06+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-20T01:02:11+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |
+| 2026-11-20T01:02:50+00:00 | crap-coverage | 0 | 34.25 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f33aea2941b76d5b` |  |  |
+| 2026-11-20T01:02:56+00:00 | crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-20T01:03:03+00:00 | crap-check | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `37484b3765632376` |  | gate=crap max=26.0 threshold=30 over=0 methods=185 |
+| 2026-11-20T01:04:31+00:00 | mutation-changed | 0 | 83.19 | `python .migration/harness/tools/afs-mutation` | `6e5ddc172df55315` |  | gate=mutation score=0.803 threshold=0.8 killed=61 survived=15 files=2 base=bbd42f104df4a113ac65034b433328055fd8295b |
