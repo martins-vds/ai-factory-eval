@@ -80,4 +80,3 @@ Written by `afs-mutation` on its last run (base `b3b29def45ae6c8608e0427fddd7417
            if request.method == 'POST':
                deadline_value = request.POST.get('deadline', '')
   ```
-
