@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -115,6 +116,19 @@ def test_route_selection_renders_populated_candidates_and_numbered_legs(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_signs_candidate_tokens_for_its_purpose(client):
+    tracking_id = _create_cargo(_candidate_paths())
+
+    content = client.get(f'/admin/cargo/{tracking_id.value}/route/').content.decode()
+    candidate_token = re.search(r'name="candidate" value="([^"]+)"', content).group(1)
+
+    candidate = signing.loads(candidate_token, salt='booking.route_selection')
+
+    assert candidate['tracking_id'] == tracking_id.value
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     tracking_id = _create_cargo(())
 
@@ -188,6 +202,19 @@ def test_route_assignment_rejects_a_modified_candidate(client):
     ).group(1)
 
     response = client.post(route_url, {'candidate': f'{candidate_token}tampered'})
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_missing_candidate(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+
+    response = client.post(route_url)
 
     assert response.status_code == 404
     details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
