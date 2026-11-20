@@ -128,11 +128,14 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert 'No routes found that satisfy the route specification.' in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
+    assert re.search(
+        r'(?<!\w)Try setting an arrival deadline further into the future\.(?!\w)',
+        route_content,
+    )
     assert 'No routes found that satisfy the route specification.' in itinerary_content
-    assert (
-        'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
+    assert re.search(
+        r'(?<!\w)Try setting the arrival deadline further into the future \(a few weeks at least\)\.(?!\w)',
+        itinerary_content,
     )
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
@@ -198,9 +201,15 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 @override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
+    route_page = client.get(f'/admin/cargo/{tracking_id.value}/route/')
+    itinerary_page = client.get(f'/admin/cargo/{tracking_id.value}/itineraries/')
     route_response = client.put(f'/admin/cargo/{tracking_id.value}/route/')
     itinerary_response = client.post(f'/admin/cargo/{tracking_id.value}/itineraries/')
 
+    assert route_page.status_code == 200
+    assert f'Routing Details for Cargo {tracking_id.value}' in route_page.content.decode()
+    assert itinerary_page.status_code == 200
+    assert f'Select an Itinerary for Cargo {tracking_id.value}' in itinerary_page.content.decode()
     assert route_response.status_code == 405
     assert itinerary_response.status_code == 405
 
