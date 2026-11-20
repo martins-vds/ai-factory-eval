@@ -81,8 +81,31 @@ def test_deadline_dialog_displays_current_deadline(client):
     assert response.status_code == 200
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
-    assert f'name="deadline"' in content
+    assert 'name="deadline"' in content
     assert f'value="{deadline}"' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize('destination', ('CNHKG', 'AUMEL', 'UNKNOWN'))
+def test_destination_dialog_rejects_unavailable_destinations(client, destination):
+    call_command('seed_sample_data')
+    original = repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': destination},
+        HTTP_HX_REQUEST='true',
+    )
+    updated = repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Choose an available destination.' in content
+    assert 'aria-invalid="true"' in content
+    assert updated is not None
+    assert updated.route_specification == original.route_specification
 
 
 @pytest.mark.django_db
@@ -107,6 +130,16 @@ def test_deadline_dialog_shows_parse_error_and_preserves_input(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_dialog_requests_for_missing_cargo_return_not_found(client):
+    call_command('seed_sample_data')
+
+    response = client.get('/admin/cargo/MISSING1/destination/')
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_destination_dialog_updates_cargo_refreshes_rows_and_completes(client):
     call_command('seed_sample_data')
     original = repository.find(TrackingId('DEF789'))
@@ -121,10 +154,11 @@ def test_destination_dialog_updates_cargo_refreshes_rows_and_completes(client):
     updated = repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
-    assert response['HX-Reswap'] == 'delete'
+    assert response['HX-Trigger-After-Swap'] == 'cargo-dialog-close'
     assert 'hx-swap-oob="outerHTML"' in content
     assert 'Dallas' in content
     assert 'data-tracking-id="DEF789"' in content
+    assert 'id="cargo-edit-dialog"' not in content
     assert 'Widget for var' not in content
     assert updated is not None
     assert updated.route_specification.origin == original.route_specification.origin
@@ -152,10 +186,11 @@ def test_deadline_dialog_updates_cargo_refreshes_rows_and_completes(client):
     updated = repository.find(TrackingId('DEF789'))
 
     assert response.status_code == 200
-    assert response['HX-Reswap'] == 'delete'
+    assert response['HX-Trigger-After-Swap'] == 'cargo-dialog-close'
     assert 'hx-swap-oob="outerHTML"' in content
     assert new_deadline.strftime('%m/%d/%Y') in content
     assert 'data-tracking-id="DEF789"' in content
+    assert 'id="cargo-edit-dialog"' not in content
     assert 'Widget for var' not in content
     assert updated is not None
     assert updated.route_specification.origin == original.route_specification.origin
