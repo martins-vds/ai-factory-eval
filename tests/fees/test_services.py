@@ -59,6 +59,16 @@ def test_fee_for_unknown_loan_returns_no_quote():
     assert application.fee_for('missing') is None
 
 
+def test_fee_uses_return_date_and_clamps_early_returns_to_zero():
+    loan = Loan('L1', due_on=date(2026, 1, 1), returned_on=date(2025, 12, 31))
+    application = FeeApplication(LoanRepository(loan), FixedClock())
+
+    fee = application.fee_for('L1')
+
+    assert fee.late_days == 0
+    assert fee.amount == Decimal('0.00')
+
+
 @pytest.mark.parametrize(
     ('today', 'late_days', 'amount'),
     [
