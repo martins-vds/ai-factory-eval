@@ -38,8 +38,8 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
     }
     exported = {}
     for spec in MAPPING['tables']:
-        data = _read_csv(output / f"{spec['target']}.csv")
-        source_data = _read_csv(FIXTURE_SNAPSHOT / f"{spec['source']}.csv")
+        data = _read_csv(output / f'{spec["target"]}.csv')
+        source_data = _read_csv(FIXTURE_SNAPSHOT / f'{spec["source"]}.csv')
         assert data[0] == list(spec['columns'])
         assert len(data) - 1 == len(source_data) - 1
         exported[spec['target']] = data
@@ -49,16 +49,48 @@ def test_export_snapshot_round_trips_fixture_rows(tmp_path):
         ['102', 'NLRTM', 'Rotterdam'],
     ]
     assert exported['voyage'][1:] == [['900', '']]
+    assert exported['cargo'][1:] == [
+        [
+            '13',
+            'FIDELITY-0001',
+            '101',
+            '101',
+            '102',
+            '2026-12-30',
+            'NOT_RECEIVED',
+            r'\N',
+            '900',
+            'true',
+            '2026-12-29',
+            'LOAD',
+            r'\N',
+            r'\N',
+            'false',
+            'ROUTED',
+            '2026-11-07T10:11:12Z',
+            '71',
+        ]
+    ]
     cargo_header, cargo_row = exported['cargo'][0], exported['cargo'][1]
     assert cargo_row[cargo_header.index('last_known_location_id')] == r'\N'
-    assert cargo_row[cargo_header.index('eta')] == r'\N'
-    assert cargo_row[cargo_header.index('calculated_at')] == '2026-11-07T10:11:12Z'
-    event_header, event_row = exported['HandlingEvent'][0], exported['HandlingEvent'][1]
-    assert event_row[event_header.index('completionTime')] == '2026-11-07T08:12:13Z'
-    leg_header, leg_row = exported['leg'][0], exported['leg'][1]
-    assert leg_row[leg_header.index('load_time')] == '2026-11-08T08:00:00Z'
-    movement_header, movement_row = exported['carrier_movement'][0], exported['carrier_movement'][1]
-    assert movement_row[movement_header.index('arrival_time')] == '2026-11-09T10:00:00Z'
+    assert cargo_row[cargo_header.index('next_expected_location_id')] == r'\N'
+    assert exported['HandlingEvent'][1:] == [
+        [
+            '71',
+            'RECEIVE',
+            '900',
+            '102',
+            '2026-11-07T08:12:13Z',
+            '2026-11-07T10:13:14Z',
+            '13',
+        ]
+    ]
+    assert exported['leg'][1:] == [
+        ['81', '2026-11-08T08:00:00Z', '2026-11-09T11:00:00Z', '101', '102', '900', '13']
+    ]
+    assert exported['carrier_movement'][1:] == [
+        ['91', '2026-11-09T10:00:00Z', '2026-11-08T12:00:00Z', '102', '101', '900']
+    ]
 
 
 @pytest.mark.django_db(transaction=True)
