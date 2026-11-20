@@ -1,6 +1,7 @@
 import csv
 import hashlib
 import json
+from dataclasses import replace
 from itertools import groupby, pairwise
 from pathlib import Path
 
@@ -9,12 +10,15 @@ from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
+from cargotracker.cargo.infrastructure.models import LegRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.domain.handling_event import HandlingEvent, HandlingEventType
 from cargotracker.handling.domain.handling_history import HandlingHistory
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.location.domain.location import Location
+from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.domain.un_locode import UnLocode
+from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
 from cargotracker.voyage.domain.schedule import Schedule
 from cargotracker.voyage.domain.voyage import Voyage
 from cargotracker.voyage.domain.voyage_number import VoyageNumber
@@ -194,9 +198,45 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(loaded_snapsho
         calculated_at=cargo.delivery.calculated_at,
     )
 
-    assert cargo.delivery == derived.__class__(
-        **{
-            **derived.__dict__,
-            'last_event_id': history.most_recent_event_id,
-        }
+    assert cargo.delivery == replace(derived, last_event_id=history.most_recent_event_id)
+
+
+def test_loaded_itinerary_legs_connect(loaded_snapshot):
+    cargos = DjangoCargoRepository().find_all()
+    assert cargos
+
+    for cargo in cargos:
+        for previous, following in pairwise(cargo.itinerary.legs):
+            assert previous.unload_location == following.load_location
+
+
+def test_loaded_handling_events_reference_existing_voyages_and_locations(loaded_snapshot):
+    location_ids = set(LocationRecord.objects.values_list('pk', flat=True))
+    voyage_ids = set(VoyageRecord.objects.values_list('pk', flat=True))
+    events = list(HandlingEventRecord.objects.all())
+    assert events
+
+    for event in events:
+        assert event.location_id in location_ids
+        if event.voyage_id is not None:
+            assert event.voyage_id in voyage_ids
+        assert HandlingEventType(event.event_type).requires_voyage == (event.voyage_id is not None)
+
+
+def test_loaded_carrier_movement_schedules_are_contiguous_and_chronological(loaded_snapshot):
+    schedules = (
+        list(movements)
+        for _, movements in groupby(
+            CarrierMovementRecord.objects.order_by('voyage_id', 'departure_time', 'pk'),
+            key=lambda movement: movement.voyage_id,
+        )
     )
+    schedules = list(schedules)
+    assert any(len(schedule) > 1 for schedule in schedules)
+
+    for schedule in schedules:
+        for movement in schedule:
+            assert movement.departure_time <= movement.arrival_time
+        for previous, following in pairwise(schedule):
+            assert previous.arrival_time <= following.departure_time
+            assert previous.arrival_location_id == following.departure_location_id
