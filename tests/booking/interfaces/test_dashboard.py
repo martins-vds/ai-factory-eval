@@ -119,6 +119,30 @@ def test_dashboard_renders_empty_tables_without_custom_empty_state(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_dashboard_preserves_source_order_in_not_routed_and_claimed_tables(client):
+    call_command('seed_sample_data')
+    not_routed_cargo = repository.find(TrackingId('DEF789'))
+    claimed_cargo = repository.find(TrackingId('MNO456'))
+    assert not_routed_cargo is not None
+    assert claimed_cargo is not None
+
+    repository.ordered_cargos = [
+        replace(not_routed_cargo, tracking_id=TrackingId('NR0002')),
+        replace(claimed_cargo, tracking_id=TrackingId('CL0002')),
+        replace(not_routed_cargo, tracking_id=TrackingId('NR0001')),
+        replace(claimed_cargo, tracking_id=TrackingId('CL0001')),
+    ]
+
+    content = client.get('/admin/dashboard/').content.decode()
+    not_routed_table = content.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
+    claimed_table = content.split('id="claimed-cargo"', 1)[1].split('</section>', 1)[0]
+
+    assert re.findall(r'data-tracking-id="([^"]+)"', not_routed_table) == ['NR0002', 'NR0001']
+    assert re.findall(r'data-tracking-id="([^"]+)"', claimed_table) == ['CL0002', 'CL0001']
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_cargo_moves_from_not_routed_to_routed_after_assignment(client):
     call_command('seed_sample_data')
     cargo_repository = DjangoCargoRepository()
