@@ -1,0 +1,81 @@
+[
+  {
+    "at": "2026-11-20T01:47:40Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17956,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05C",
+    "role": "afs-migrator",
+    "changed": [],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05C.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-20T01:48:25Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18264,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/b47adb25-6f2c-444d-a1f9-fec5073ebff5.json"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/BK-05F.afs-migrator.yaml` with `role: afs-migrator`, `ticket: BK-05F`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/BK-05F.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 1,
+    "decision": "block",
+    "why": "block 2 of 2"
+  },
+  {
+    "at": "2026-11-20T01:49:00Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 18728,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05C",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/b47adb25-6f2c-444d-a1f9-fec5073ebff5.json"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05C.afs-migrator.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 2,
+    "decision": "allow",
+    "why": "retry budget spent; wrote .migration/handoffs/BK-05C.md"
+  }
+]
