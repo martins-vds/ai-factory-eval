@@ -6,9 +6,38 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#1920]
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication
+    - src.reports.repository.DjangoReportRepository
+    - src.reports.management.commands.monthly_report.Command
+    - src.reports.composition.monthly_report
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_uses_previous_calendar_month_across_year_boundary
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_and_orders_members_with_monthly_loans
+  - tests/reports/test_monthly_report.py::test_monthly_report_counts_late_returns_and_totals_calculated_fees
+  - tests/reports/test_monthly_report.py::test_monthly_report_command_outputs_previous_calendar_month
+rules:
+  - id: previous-calendar-month
+    rule: "Report the previous calendar month, using an inclusive start and exclusive end date."
+    source: legacy/docs/reports-spec.md:3; .migration/plan/monthly-report.md
+  - id: member-row-inclusion
+    rule: "Emit one row per member with at least one loan started in the report month."
+    source: .migration/plan/monthly-report.md
+  - id: monthly-event-counts
+    rule: "Count loan starts and late returns only when their event dates fall within the report month."
+    source: legacy/docs/reports-spec.md:3; .migration/plan/monthly-report.md
+  - id: late-fee-total
+    rule: "Sum calculated late-fee amounts in cents for loans returned during the report month."
+    source: legacy/docs/reports-spec.md:3; .migration/ledger/fees.calculation.yaml
+  - id: report-order
+    rule: "Sort rows by total late fees descending, then member id ascending."
+    source: legacy/docs/reports-spec.md:4
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."

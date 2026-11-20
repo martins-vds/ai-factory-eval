@@ -5,14 +5,23 @@ from typing import Protocol
 
 
 class LoanRecord(Protocol):
+    id: str
     member: str
     due_on: date
     lent_on: date
     returned_on: date | None
 
 
+class FeeAmount(Protocol):
+    amount_cents: int
+
+
 class LoanRepository(Protocol):
     def for_period(self, start: date, end: date) -> Iterable[LoanRecord]: ...
+
+
+class FeeCalculator(Protocol):
+    def fee_for(self, loan_id: str) -> FeeAmount | None: ...
 
 
 @dataclass(frozen=True)
@@ -31,8 +40,9 @@ class _MemberTotals:
 
 
 class MonthlyReportApplication:
-    def __init__(self, loans: LoanRepository):
+    def __init__(self, loans: LoanRepository, fees: FeeCalculator):
         self.loans = loans
+        self.fees = fees
 
     def run_previous_month(self, today: date) -> list[MemberReport]:
         end = today.replace(day=1)
@@ -49,18 +59,16 @@ class MonthlyReportApplication:
             if not started_this_month and not returned_this_month:
                 continue
 
-            totals.setdefault(loan.member, _MemberTotals())
+            member_totals = totals.setdefault(loan.member, _MemberTotals())
             if started_this_month:
-                totals[loan.member].loans_started += 1
+                member_totals.loans_started += 1
 
             if returned_this_month:
-                days_late = max(0, (loan.returned_on - loan.due_on).days)
-                if days_late:
-                    totals[loan.member].late_returns += 1
-                if days_late > 2:
-                    totals[loan.member].total_late_fees_cents += min(
-                        1000, days_late * 25
-                    )
+                if loan.returned_on > loan.due_on:
+                    member_totals.late_returns += 1
+                fee = self.fees.fee_for(loan.id)
+                if fee is not None:
+                    member_totals.total_late_fees_cents += fee.amount_cents
 
         return sorted(
             (

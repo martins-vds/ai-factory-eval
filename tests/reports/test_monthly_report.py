@@ -32,23 +32,39 @@ class LoanRepository:
         return self.loans
 
 
+@dataclass(frozen=True)
+class Fee:
+    amount_cents: int
+
+
+class FeeCalculator:
+    def __init__(self, amounts=None):
+        self.amounts = amounts or {}
+
+    def fee_for(self, loan_id):
+        return Fee(self.amounts.get(loan_id, 0))
+
+
+def report_application(loans, fees=None):
+    return MonthlyReportApplication(LoanRepository(loans), FeeCalculator(fees))
+
+
 def test_monthly_report_aggregates_and_orders_members_with_monthly_loans():
-    application = MonthlyReportApplication(
-        LoanRepository(
-            [
-                Loan('L1', 'B', date(2026, 10, 5), date(2026, 10, 22)),
-                Loan('L2', 'B', date(2026, 10, 10), date(2026, 10, 30)),
-                Loan('L3', 'A', date(2026, 10, 1), date(2026, 10, 18)),
-                Loan('L4', 'C', date(2026, 10, 3), date(2026, 10, 25)),
-                Loan('L8', 'D', date(2026, 10, 4), date(2026, 10, 22)),
-                Loan('L9', 'E', date(2026, 10, 4), date(2026, 10, 22)),
-                Loan('L5', 'Z', date(2026, 9, 1), date(2026, 10, 25)),
-                Loan('L6', 'BEFORE', date(2026, 9, 30)),
-                Loan('L7', 'END', date(2026, 11, 1)),
-                Loan('L10', 'A', date(2026, 1, 1), date(2026, 9, 30)),
-                Loan('L11', 'A', date(2026, 1, 1), date(2026, 11, 1)),
-            ]
-        )
+    application = report_application(
+        [
+            Loan('L1', 'B', date(2026, 10, 5), date(2026, 10, 22)),
+            Loan('L2', 'B', date(2026, 10, 10), date(2026, 10, 30)),
+            Loan('L3', 'A', date(2026, 10, 1), date(2026, 10, 18)),
+            Loan('L4', 'C', date(2026, 10, 3), date(2026, 10, 25)),
+            Loan('L8', 'D', date(2026, 10, 4), date(2026, 10, 22)),
+            Loan('L9', 'E', date(2026, 10, 4), date(2026, 10, 22)),
+            Loan('L5', 'Z', date(2026, 9, 1), date(2026, 10, 25)),
+            Loan('L6', 'BEFORE', date(2026, 9, 30)),
+            Loan('L7', 'END', date(2026, 11, 1)),
+            Loan('L10', 'A', date(2026, 1, 1), date(2026, 9, 30)),
+            Loan('L11', 'A', date(2026, 1, 1), date(2026, 11, 1)),
+        ],
+        {'L1': 75, 'L2': 150, 'L3': 75, 'L4': 200, 'L5': 1000, 'L8': 100, 'L9': 100},
     )
 
     report = application.run(date(2026, 10, 1), date(2026, 11, 1))
@@ -67,7 +83,7 @@ def test_monthly_report_aggregates_and_orders_members_with_monthly_loans():
 
 def test_monthly_report_uses_previous_calendar_month_across_year_boundary():
     repository = LoanRepository([])
-    application = MonthlyReportApplication(repository)
+    application = MonthlyReportApplication(repository, FeeCalculator())
 
     report = application.run_previous_month(date(2027, 1, 1))
 
@@ -79,18 +95,17 @@ def test_monthly_report_uses_previous_calendar_month_across_year_boundary():
     ('days_late', 'expected_late_returns', 'expected_fees'),
     [(0, 0, 0), (1, 1, 0), (2, 1, 0), (3, 1, 75), (40, 1, 1000), (100, 1, 1000)],
 )
-def test_monthly_report_applies_late_return_grace_period_and_fee_cap(
+def test_monthly_report_counts_late_returns_and_totals_calculated_fees(
     days_late, expected_late_returns, expected_fees
 ):
     due_on = date(2026, 10, 14) - timedelta(days=days_late)
     returned_on = due_on + timedelta(days=days_late)
-    application = MonthlyReportApplication(
-        LoanRepository(
-            [
-                Loan('L1', 'member', due_on - timedelta(days=14), returned_on),
-                Loan('L2', 'member', date(2026, 10, 2)),
-            ]
-        )
+    application = report_application(
+        [
+            Loan('L1', 'member', due_on - timedelta(days=14), returned_on),
+            Loan('L2', 'member', date(2026, 10, 2)),
+        ],
+        {'L1': expected_fees},
     )
 
     report = application.run(date(2026, 10, 1), date(2026, 11, 1))
