@@ -1,0 +1,54 @@
+[
+  {
+    "at": "2026-11-20T01:47:17Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17068,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-verifier",
+    "changed": [],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-02.afs-verifier.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-20T01:47:47Z",
+    "python": "/usr/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17375,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/costs/77b35dae-fdd2-4228-a349-841bfebd2c22.json"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-02.afs-verifier.yaml` exists but this branch didn't update it. Update it with this session's gates and PR, and commit it."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/LL-02.md"
+  }
+]
