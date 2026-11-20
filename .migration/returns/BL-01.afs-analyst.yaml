@@ -1,0 +1,27 @@
+role: afs-analyst
+ticket: BL-01
+issue: martins-vds/ai-factory-eval#1778
+graphs:
+  knowledge: null
+  domain: null
+  nodes: 0
+  edges: 0
+  flows: 0
+ledger:
+  entries: 6
+  by_kind:
+    structural: 2
+    behavioral: 3
+    ui: 0
+    integration: 1
+    data: 0
+risk_map:
+  path: "n/a: operator decision; no risk map for this scope"
+  methods: "n/a: operator decision; no risk map for this scope"
+  above_threshold: "n/a: operator decision; no risk map for this scope"
+  hot_spots: []
+quirk_tickets:
+  - .migration/quirks/billing-hardcoded-sample-charges.md
+  - .migration/quirks/billing-payment-interruption.md
+  - .migration/quirks/billing-null-line-amount.md
+graph_discrepancies: []
