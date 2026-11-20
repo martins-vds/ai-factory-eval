@@ -6,3 +6,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 |---|---|---|---|---|---|---|---|
 | 2026-11-20T00:34:40+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-20T00:35:59+00:00 | snapshot-check | 0 | 0.04 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-20T00:38:20+00:00 | delivery-invariant-red | 0 | 1.48 | `pytest -q tests/data_migration/test_invariants.py::test_loaded_cargo_delivery_state_matches_its_handling_history` | `ab19f6473f2f72d9` |  |  |
