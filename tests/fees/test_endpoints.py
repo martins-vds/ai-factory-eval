@@ -58,12 +58,12 @@ def test_payment_endpoint_maps_gateway_failure_to_bad_gateway(client, payment_ga
     payment_gateway.body = b'declined\n'
     expected = GATEWAY_GOLDENS['responses']['POST /payments/L2 via test gateway']['response']
 
-    response = client.post('/payments/L1')
+    response = client.post('/payments/L2')
 
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
-    assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
+    assert payment_gateway.requests == [('POST', '/charge?loan=L2', b'')]
 
 
 @pytest.mark.django_db
