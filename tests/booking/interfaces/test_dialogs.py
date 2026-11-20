@@ -97,6 +97,16 @@ def test_unknown_cargo_dialog_returns_not_found(client):
     assert response.status_code == 404
 
 
+def test_change_destination_rejects_origin_when_called_through_use_case():
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        specification.change_destination(cargo.tracking_id, cargo.route_specification.origin)
+
+    assert cargo_repository.find(cargo.tracking_id) == cargo
+
+
 def test_deadline_dialog_shows_current_route_and_deadline(client):
     cargo = cargo_repository.find(TrackingId('DEF789'))
     assert cargo is not None
