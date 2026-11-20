@@ -1,0 +1,15 @@
+id: billing.invoice-line
+kind: structural
+title: Represent an invoice charge line
+source:
+  location: legacy-billing/src/main/java/billing/InvoiceLine.java:5-11
+boundary: "An invoice line carries a description and amount; construction rejects negative amounts."
+tickets: [martins-vds/ai-factory-eval#1778]
+status: pending
+verification: pending
+quirks: []
+rules:
+  - id: nonnegative-amount
+    rule: An invoice line with a negative amount is rejected with IllegalArgumentException.
+    source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
+notes: A null amount dereferences in the constructor and raises NullPointerException; see .migration/quirks/billing-null-line-amount.md.

@@ -1,0 +1,21 @@
+id: billing.monthly-batch
+kind: behavioral
+title: Process a monthly batch of member charges
+source:
+  location: legacy-billing/src/main/java/billing/BillingJob.java:7-24
+boundary: "For each map entry, calculate a member total, charge it or print a carry-over message, and print the approved reference after a successful charge."
+tickets: [martins-vds/ai-factory-eval#1778]
+status: pending
+verification: pending
+rules:
+  - id: all-entries-are-members
+    rule: Treat every map entry as a member and calculate its total with the monthly membership fee enabled.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:15-18
+  - id: charge-or-carry
+    rule: Charge totals of at least $1.00; otherwise print that the amount is carried over.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:18-22
+  - id: batch-interruption-on-decline
+    rule: Allow a declined charge exception to propagate out of the run, stopping processing of later entries.
+    source: legacy-billing/src/main/java/billing/BillingJob.java:16-23; legacy-billing/src/main/java/billing/CardVault.java:18-20
+quirks: []
+notes: No recovery or per-member error handling is present; see .migration/quirks/billing-payment-interruption.md.
