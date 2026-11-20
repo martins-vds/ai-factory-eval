@@ -146,6 +146,7 @@ def test_lend_use_case_sets_a_due_date_fourteen_days_after_lending():
 
     loan = lend_loan('reader', '123')
 
+    assert loan.id == 'L4'
     assert loan.lent_on == lent_on
     assert loan.due_on == lent_on + timedelta(days=14)
 
@@ -197,6 +198,25 @@ def test_return_use_case_rejects_repeat_without_replacing_date():
     assert updated is False
     assert loan.returned_on == original_return_date
     assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_records_today_on_first_return():
+    returned_on = timezone.localdate()
+
+    loan, updated = return_loan('L1')
+
+    assert updated is True
+    assert loan.returned_on == returned_on
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_return_use_case_rejects_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert updated is False
 
 
 @pytest.mark.django_db
