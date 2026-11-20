@@ -15,7 +15,7 @@ evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/
 target:
   components:
     - src.loans.domain.Loan.due_on
-    - src.loans.services.calculate_due_date
+    - src.loans.domain.due_date
 status: migrated
 verification: differential
 evidence:
