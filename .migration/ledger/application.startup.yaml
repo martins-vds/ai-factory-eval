@@ -8,9 +8,12 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 0.85}
 boundary: "PORT selects the listening port (default 8080); startup creates the library persistence unit, wires four HTTP resources, binds Grizzly to 0.0.0.0, and shutdown closes the server and EntityManagerFactory."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json]
+target:
+  components: [config/settings.py, config/urls.py, src/loans/apps.py]
+no_rules: "Startup wiring is structural and carries no catalog business rule."
 notes: "Restart reset behavior is raised in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]

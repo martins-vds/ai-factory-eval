@@ -8,7 +8,13 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans/{id} returns the formatted loan line and newline with HTTP 200, or HTTP 404 with `no such loan` and a newline when the id is absent."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components: [src/loans/views.py, src/loans/repository.py, src/loans/services.py]
+rules:
+  - id: unknown-loan-not-found
+    rule: A lookup for an absent loan ID returns HTTP 404 and no such loan with a trailing newline.
+    source: legacy/src/main/java/lib/LoanResource.java:30-35

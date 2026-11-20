@@ -1,0 +1,1 @@
+"""Loan catalog bounded context."""

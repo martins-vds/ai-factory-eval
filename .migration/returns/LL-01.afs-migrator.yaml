@@ -1,0 +1,59 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#1905
+pr: martins-vds/ai-factory-eval#1910
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: "n/a: no-mutable-code-before-commit"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: null
+rules:
+  - capability: loan.due-date
+    rule: Every loan is due 14 calendar days after lent_on.
+    use_case: src.loans.services.due_date
+    test: tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lent_date
+    enforced: true
+    ledger_rule: fourteen-calendar-days
+  - capability: loan.get
+    rule: A lookup for an absent loan ID returns no loan.
+    use_case: src.loans.repository.LoanRepository.get
+    test: tests/loans/test_catalog.py::test_repository_refuses_absent_lookup
+    enforced: true
+    ledger_rule: unknown-loan-not-found
+  - capability: loan.list
+    rule: The loan list contains every loan ordered by ID.
+    use_case: src.loans.repository.LoanRepository.list
+    test: tests/loans/test_catalog.py::test_repository_returns_loans_in_id_order
+    enforced: true
+    ledger_rule: ordered-trailing-newline
+  - capability: loan.text-export
+    rule: Export semicolon and newline delimiter characters in loan fields.
+    use_case: src.loans.services.format_loan
+    test: tests/loans/test_catalog.py::test_export_escapes_delimiter_characters
+    enforced: true
+    ledger_rule: escaped-semicolon-fields
+no_rules:
+  application.build: "Build tooling has no input-refusal or state-transition business rule."
+  application.startup: "Startup wiring is structural and carries no catalog business rule."
+  data.loan-storage: "Persistence is an implementation constraint; retained data behavior is exercised without domain refusal."
+  data.seed-records: "Seed data is fixed initialization data with no runtime input or refusal rule."
+  repository.transactions: "Transaction lifecycle is structural and carries no input or state rule."
