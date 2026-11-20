@@ -17,6 +17,11 @@ findings:
     where: templates/library_info/about.html:6,9-10
     what: Three used utilities (py-8, leading-relaxed, mt-8) are absent from committed CSS, so the browser ignores them.
     evidence: "run: idiom-final"
+inherited:
+  - where: templates/base.html:18-20
+    what: The shared navigation exposes only Loans, not /ui/about/, unlike the approved reading-room prototype.
+    origin: LL-01
+    evidence: "run: inherited-about-nav"
 tests_added:
   - tests/library_info/test_about_page.py::test_about_routes_reject_post_requests
 ledger_issues: []
