@@ -7,8 +7,12 @@ source:
   risk: {crap: 6, complexity: 2, coverage: 0.0}
 boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-eval#1765]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/deadline.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +20,11 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_displays_current_deadline"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_parse_error_and_preserves_input"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_rejects_a_missing_deadline"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_updates_cargo_refreshes_rows_and_completes"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "The view parses the submitted date string and renders field feedback; booking rules remain enforced by CargoSpecification and RouteSpecification."
+notes: "Parse failures render an inline field error under ruling #234; successful edits preserve other route-specification fields and close the dialog under ruling #251."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]

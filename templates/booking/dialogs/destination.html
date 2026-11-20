@@ -1,0 +1,35 @@
+<section aria-labelledby="destination-dialog-heading" class="flex flex-col gap-5">
+  <h2 id="destination-dialog-heading" class="text-xl font-semibold">Change Destination</h2>
+  <p>Origin: {{ cargo.route_specification.origin.name }}</p>
+  <p>Current destination: {{ cargo.route_specification.destination.name }}</p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-target="#cargo-edit-dialog-content"
+    hx-swap="innerHTML"
+    hx-on::response-error="document.getElementById('cargo-dialog-request-error').textContent = 'The destination could not be updated. Please try again.'"
+    class="flex flex-col gap-5"
+  >
+    {% csrf_token %}
+    <label class="font-medium" for="destination">New destination</label>
+    {% if destination_error %}
+      <p class="text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <select
+      class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      id="destination"
+      name="destination"
+      required
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    >
+      <option value="" selected disabled>Choose a destination</option>
+      {% for location in destinations %}
+        <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
+          {{ location.name }} ({{ location.unlocode.value }})
+        </option>
+      {% endfor %}
+    </select>
+    {% include "booking/dialogs/_actions.html" %}
+  </form>
+</section>
