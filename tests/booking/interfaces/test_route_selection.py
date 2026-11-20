@@ -71,9 +71,7 @@ def _itinerary(cargo, voyage_numbers):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_route_page_displays_cargo_details_candidate_count_and_numbered_legs(
-    client, monkeypatch
-):
+def test_route_page_displays_cargo_details_candidate_count_and_numbered_legs(client, monkeypatch):
     call_command('seed_sample_data')
     cargo = repository.find(TrackingId('DEF789'))
     assert cargo is not None
@@ -94,8 +92,14 @@ def test_route_page_displays_cargo_details_candidate_count_and_numbered_legs(
     assert 'Leg 1' in content and 'Leg 2' in content
     assert '0100S' in content and '0200T' in content
     assert '0300A' in content and '0400S' in content
-    assert candidates[0].legs[0].load_location.unlocode.value in content
-    assert candidates[0].legs[1].unload_location.unlocode.value in content
+    for candidate in candidates:
+        for leg in candidate.legs:
+            assert leg.load_location.name in content
+            assert leg.load_location.unlocode.value in content
+            assert leg.load_time.strftime('%m/%d/%Y') in content
+            assert leg.unload_location.name in content
+            assert leg.unload_location.unlocode.value in content
+            assert leg.unload_time.strftime('%m/%d/%Y') in content
 
 
 @pytest.mark.django_db
@@ -146,9 +150,7 @@ def test_empty_candidates_render_the_screen_specific_guidance(client, path, mess
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_candidate_assignment_redirects_to_details_and_persists_itinerary(
-    client, monkeypatch
-):
+def test_candidate_assignment_redirects_to_details_and_persists_itinerary(client, monkeypatch):
     call_command('seed_sample_data')
     cargo = repository.find(TrackingId('DEF789'))
     assert cargo is not None
@@ -176,3 +178,17 @@ def test_candidate_assignment_redirects_to_details_and_persists_itinerary(
     assert '0100S' in response.content.decode() and '0200T' in response.content.decode()
     assert stored is not None
     assert stored.itinerary == candidate
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_invalid_candidate_token_renders_an_error_response(client):
+    call_command('seed_sample_data')
+
+    response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'itinerary_token': 'not-a-signed-itinerary'},
+    )
+
+    assert response.status_code == 400
+    assert 'Select a route shown on this page.' in response.content.decode()
