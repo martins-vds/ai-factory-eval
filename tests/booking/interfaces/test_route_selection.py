@@ -2,8 +2,10 @@ import re
 from datetime import timedelta
 
 import pytest
+from django.core import signing
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -85,8 +87,10 @@ def test_route_page_displays_cargo_details_candidate_count_and_numbered_legs(cli
     content = response.content.decode()
 
     assert response.status_code == 200
+    assert 'Route Cargo for Cargo DEF789' in content
     assert cargo.route_specification.origin.name in content
     assert cargo.route_specification.destination.name in content
+    assert cargo.route_specification.arrival_deadline.strftime('%m/%d/%Y') in content
     assert 'Potential routes: 2' in content
     assert 'Route 1' in content and 'Route 2' in content
     assert 'Leg 1' in content and 'Leg 2' in content
@@ -115,6 +119,7 @@ def test_select_itinerary_renders_populated_candidates(client, monkeypatch):
     content = response.content.decode()
 
     assert response.status_code == 200
+    assert 'Select Itinerary for Cargo DEF789' in content
     assert 'Potential routes: 1' in content
     assert 'Route 1' in content
     assert '0100S' in content and '0200T' in content
@@ -192,3 +197,56 @@ def test_invalid_candidate_token_renders_an_error_response(client):
 
     assert response.status_code == 400
     assert 'Select a route shown on this page.' in response.content.decode()
+    assert 'Try setting an arrival deadline further into the future.' in response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_candidate_token_cannot_assign_itinerary_to_another_cargo(client, monkeypatch):
+    call_command('seed_sample_data')
+    cargo = repository.find(TrackingId('DEF789'))
+    assert cargo is not None
+    candidate = _itinerary(cargo, ('0100S', '0200T'))
+    monkeypatch.setattr(routing, 'route_candidates', lambda tracking_id: (candidate,))
+
+    page = client.get('/admin/cargo/DEF789/route/')
+    token = re.search(r'name="itinerary_token" value="([^"]+)"', page.content.decode())
+    assert token is not None
+
+    response = client.post(
+        '/admin/cargo/MNO456/route/',
+        {'itinerary_token': token.group(1)},
+    )
+
+    assert response.status_code == 400
+    assert 'Select a route shown on this page.' in response.content.decode()
+    assert repository.find(TrackingId('MNO456')).itinerary.legs
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_signed_empty_itinerary_is_rejected(client):
+    call_command('seed_sample_data')
+    token = signing.dumps(
+        {'tracking_id': 'DEF789', 'legs': []},
+        salt='cargotracker.booking.route-selection',
+    )
+
+    response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'itinerary_token': token},
+    )
+
+    assert response.status_code == 400
+    assert 'Select a route shown on this page.' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_unknown_cargo_route_selection_raises_not_found():
+    call_command('seed_sample_data')
+
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        route_selection_view(
+            RequestFactory().get('/admin/cargo/UNKNOWN/route/'),
+            'UNKNOWN',
+        )

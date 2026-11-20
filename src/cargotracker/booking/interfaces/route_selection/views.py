@@ -29,7 +29,7 @@ def create_route_selection_views(
         if request.method == 'POST':
             try:
                 itinerary = _decode_itinerary(
-                    request.POST.get('itinerary_token', ''),
+                    request.POST['itinerary_token'],
                     cargo.tracking_id,
                 )
             except (signing.BadSignature, KeyError, TypeError, ValueError):
@@ -126,10 +126,10 @@ def _encode_leg(leg: Leg) -> dict[str, str]:
 def _decode_itinerary(token: str, tracking_id: TrackingId) -> Itinerary:
     payload = signing.loads(token, salt=_ITINERARY_SALT)
     if not isinstance(payload, dict) or payload.get('tracking_id') != tracking_id.value:
-        raise ValueError('The selected itinerary does not belong to this cargo.')
+        raise ValueError
     legs = payload.get('legs')
     if not isinstance(legs, list) or not legs:
-        raise ValueError('The selected itinerary has no legs.')
+        raise ValueError
     return Itinerary(
         tuple(
             Leg(
