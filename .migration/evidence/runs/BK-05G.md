@@ -38,3 +38,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:01:27+00:00 | mutation-changed | 0 | 144.27 | `python .migration/harness/tools/afs-mutation` | `14e68a076660cf06` |  | gate=mutation score=0.961 threshold=0.8 killed=49 survived=2 files=1 base=b773736ccfce81b6efe150bd40331263565175d5 |
 | 2026-11-21T23:02:33+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T23:02:36+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T23:03:06+00:00 | final-build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:03:10+00:00 | final-build-django-check | 0 | 0.34 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T23:03:18+00:00 | final-behavior-dialogs | 0 | 5.53 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `ffc4b0afa903101d` |  |  |
+| 2026-11-21T23:03:20+00:00 | final-idiom-ruff | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T23:03:22+00:00 | final-idiom-format | 0 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/dialogs/views.py tests/booking/interfaces/test_dialogs.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-21T23:03:29+00:00 | final-idiom-layers | 0 | 0.14 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T23:03:31+00:00 | final-idiom-ui | 0 | 0.53 | `python .migration/harness/tools/check_ui.py` | `ed2097a95ff239c0` |  | gate=ui scope="templates changed since b773736ccfce81b6efe150bd40331263565175d5" templates=4 findings=0 |
+| 2026-11-21T23:04:29+00:00 | final-regression-suite | 0 | 55.61 | `pytest -q` | `4178bd0f26242c7e` |  |  |
+| 2026-11-21T23:05:29+00:00 | final-crap-coverage | 0 | 57.64 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f5154807c84479b3` |  |  |
+| 2026-11-21T23:05:31+00:00 | final-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:05:33+00:00 | final-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9ed199729e2449b0` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-21T23:08:00+00:00 | final-mutation-changed | 0 | 143.91 | `python .migration/harness/tools/afs-mutation` | `14e68a076660cf06` |  | gate=mutation score=0.961 threshold=0.8 killed=49 survived=2 files=1 base=b773736ccfce81b6efe150bd40331263565175d5 |
+| 2026-11-21T23:08:05+00:00 | final-idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T23:08:08+00:00 | final-idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
