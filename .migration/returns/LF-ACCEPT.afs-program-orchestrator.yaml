@@ -1,0 +1,26 @@
+role: afs-program-orchestrator
+ticket: LF-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#117
+phase: 6
+decisions:
+  - "Use the archived acceptance run 42912984554 attempt 1 for commit 8f9a11640eef9801378f3db53a76903363c5e5b5; do not rerun gates or mutation."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#117: compare legacy against target for an overdue loan's late days, fee amount, displayed amount, and rounding; a non-overdue loan's fee and presentation; an unknown loan's status, exact body, and gateway contact; API and UI payment success behavior; and non-200 plus I/O/interruption gateway failures and their API/UI results."
+next_step: "Operator performs and records the side-by-side check; leave the human_check requested and the slice unsigned until an authorized human review."
+acceptance:
+  slice: fees-payments
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/fees-payments/acceptance.md
+  gates: all-green
+  mutation_score: 0.975
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#40
+    - martins-vds/ai-factory-synthetic-target#42
