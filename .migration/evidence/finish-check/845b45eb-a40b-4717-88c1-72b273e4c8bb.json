@@ -77,5 +77,42 @@
     "blocks_before": 1,
     "decision": "block",
     "why": "block 2 of 2"
+  },
+  {
+    "at": "2026-11-21T03:00:17Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20180,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/845b45eb-a40b-4717-88c1-72b273e4c8bb.json",
+      ".migration/evidence/mutants/BK-05F.md",
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/ledger/booking.routing-assign.yaml",
+      ".migration/ledger/booking.routing-chain.yaml",
+      ".migration/ledger/booking.screen-route.yaml",
+      ".migration/ledger/booking.screen-select-itinerary.yaml",
+      ".migration/returns/BK-05F.afs-migrator.yaml",
+      "src/cargotracker/booking/interfaces/route_selection/views.py",
+      "templates/booking/route_selection/_candidate.html",
+      "templates/booking/route_selection/itineraries.html",
+      "templates/booking/route_selection/route.html",
+      "tests/booking/interfaces/test_route_selection.py"
+    ],
+    "findings": [],
+    "blocks_before": 2,
+    "decision": "allow",
+    "why": "clean"
   }
 ]

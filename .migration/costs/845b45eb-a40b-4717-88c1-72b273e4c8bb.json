@@ -207,18 +207,18 @@
       ]
     },
     "event_types": {
-      "assistant.message": 95,
-      "assistant.turn_end": 95,
-      "assistant.turn_start": 95,
+      "assistant.message": 109,
+      "assistant.turn_end": 109,
+      "assistant.turn_start": 109,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 284,
-      "hook.start": 285,
-      "permission.completed": 160,
-      "permission.requested": 160,
+      "hook.end": 319,
+      "hook.start": 320,
+      "permission.completed": 177,
+      "permission.requested": 177,
       "session.model_change": 2,
       "session.start": 1,
-      "session.usage_record": 95,
+      "session.usage_record": 109,
       "skill.context_delivered_ref": 9,
       "skill.invoked": 7,
       "skill.invoked_ref": 2,
@@ -227,16 +227,21 @@
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 169,
-      "tool.execution_start": 169,
-      "user.message": 4
+      "tool.execution_complete": 186,
+      "tool.execution_start": 186,
+      "user.message": 5
     },
-    "events": 1646,
+    "events": 1841,
     "usage_fields": []
   },
-  "ended_at": "2026-11-21T02:57:54.676Z",
+  "ended_at": "2026-11-21T03:00:17.053Z",
   "event": "agentStop",
   "harness_tools": [
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-finish-check"
+    },
     {
       "count": 2,
       "exit": 0,
@@ -278,7 +283,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 8,
+      "count": 10,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -298,7 +303,7 @@
       "tool": "crap.py"
     },
     {
-      "count": 7,
+      "count": 9,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -321,11 +326,11 @@
     },
     "mai-code-2-flash": {
       "output": 0,
-      "requests": 85
+      "requests": 99
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-21T02:58:32+00:00",
+  "recorded_at": "2026-11-21T03:00:55+00:00",
   "schema": "afs-cost/1",
   "session_id": "845b45eb-a40b-4717-88c1-72b273e4c8bb",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
