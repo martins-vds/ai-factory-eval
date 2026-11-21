@@ -1,0 +1,28 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+pr: martins-vds/ai-factory-eval#1969
+phase: 6
+decisions:
+  - "martins-vds/ai-factory-synthetic-target#64: record acceptance evidence and request the human side-by-side check; no pass or approval is declared"
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#122
+    status: returned
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#127: complete the requested legacy-versus-target side-by-side check"
+next_step: "Wait for the operator's human check decision; a later return may record passed or issues and require the named approver's PR review."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets: []
