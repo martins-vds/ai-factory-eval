@@ -14,7 +14,6 @@ Written by `afs-mutation` on its last run (base `256fbe36bcab1dc38117715631d54b7
                    )
                cargo_specification.change_destination(cargo.tracking_id, destination)
   ```
-
 - `src/cargotracker/booking/interfaces/dialogs/views.py:105 Mutant #42`
 
   ```diff
@@ -68,4 +67,3 @@ Written by `afs-mutation` on its last run (base `256fbe36bcab1dc38117715631d54b7
                        },
                    )
   ```
-
