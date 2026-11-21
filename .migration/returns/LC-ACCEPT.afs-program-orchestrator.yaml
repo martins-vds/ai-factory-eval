@@ -1,0 +1,36 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+pr: null
+phase: 6
+decisions:
+  - "Use the archived acceptance run 42752283868, attempt 1, on commit 70fef8e7bc822092770b04b1bf9b5288e04d8bb6; do not rerun gates or mutation."
+  - "Keep human_check requested; the approver must perform and report the side-by-side sign-off."
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#100
+    status: returned
+  - agent: afs-program-orchestrator
+    ticket: martins-vds/ai-factory-synthetic-target#108
+    status: running
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#108: perform and report the specified legacy-versus-target side-by-side check."
+next_step: "An approver reviews this PR head and then reports passed or issues for the exact flows documented in the evidence report."
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 1
+    merged: 1
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/report.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#42
+    - martins-vds/ai-factory-synthetic-target#43
