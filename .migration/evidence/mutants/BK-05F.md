@@ -70,4 +70,3 @@ Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a553
        route_candidates = [
            {'itinerary': itinerary, 'token': _candidate_token(cargo.tracking_id, itinerary)}
   ```
-

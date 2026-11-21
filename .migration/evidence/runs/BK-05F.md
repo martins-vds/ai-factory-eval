@@ -65,3 +65,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:22:12+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-21T19:23:01+00:00 | regression-suite-final | 0 | 45.46 | `pytest -q` | `0e55212a99519a70` |  |  |
 | 2026-11-21T19:23:13+00:00 | migration-state-validation-final | 0 | 4.53 | `python .migration/harness/tools/validate.py .migration` | `ef34805838431398` |  |  |
+| 2026-11-21T19:24:13+00:00 | finish-check-final | 0 | 46.04 | `.migration/harness/tools/afs-finish-check --ticket BK-05F --role afs-migrator` | `94e1291ae50fc1ee` |  | gate=finish-check ticket=BK-05F role=afs-migrator findings=0 |
