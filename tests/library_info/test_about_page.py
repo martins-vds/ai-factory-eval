@@ -19,6 +19,26 @@ def test_about_endpoint_matches_characterized_response(client):
     assert response.content.decode() == expected['body']
 
 
+@pytest.mark.parametrize('route', ['/about', '/ui/about/'])
+def test_about_routes_reject_post(client, route):
+    response = client.post(route)
+
+    assert response.status_code == 405
+
+
+def test_modern_about_template_utilities_are_in_built_css():
+    template = (
+        Path(__file__).resolve().parents[2] / 'templates/library_info/about.html'
+    ).read_text(encoding='utf-8')
+    css = (
+        Path(__file__).resolve().parents[2] / 'static/css/tailwind.css'
+    ).read_text(encoding='utf-8')
+
+    for utility in ('py-8', 'mt-8', 'leading-relaxed'):
+        assert utility in template
+        assert utility in css
+
+
 @pytest.mark.django_db
 def test_modern_about_page_shows_library_information_in_browser(live_server):
     with sync_playwright() as playwright:
