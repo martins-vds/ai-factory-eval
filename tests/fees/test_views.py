@@ -62,18 +62,21 @@ def test_payment_api_does_not_call_gateway_for_an_unknown_loan(client, payment_g
     response = client.post('/payments/unknown')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'no such loan\n'
     assert payment_gateway.requests == []
 
 
 @pytest.mark.django_db
-def test_payment_api_maps_gateway_connection_failures_to_bad_gateway(client, monkeypatch):
+def test_payment_api_maps_gateway_connection_failures_to_bad_gateway(client, monkeypatch, caplog):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
 
     response = client.post('/payments/L1')
 
     assert response.status_code == 502
     assert response.content == b'payment gateway unavailable\n'
+    assert 'Payment gateway request failed' in caplog.text
+    assert 'ConnectionRefusedError' in caplog.text
 
 
 @pytest.mark.django_db
@@ -95,6 +98,15 @@ def test_fee_page_shows_the_fee_and_payment_action(client):
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L9/"' in response.content
     assert b'htmx:beforeSwap' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_renders_an_error_for_an_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
 
 
 @pytest.mark.django_db
@@ -120,6 +132,7 @@ def test_htmx_payment_failure_renders_an_error_panel(client, payment_gateway):
     assert b'declined' in response.content
     assert b'&lt;script&gt;' in response.content
     assert b'<script>' not in response.content
+    assert b'hx-post="/ui/payments/L1/"' in response.content
 
 
 @pytest.mark.django_db
@@ -129,6 +142,60 @@ def test_htmx_payment_for_unknown_loan_renders_an_error_panel(client, payment_ga
     assert response.status_code == 404
     assert b'role="alert"' in response.content
     assert b'No such loan.' in response.content
+    assert b'<!doctype html>' not in response.content
+    assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_standard_payment_failure_renders_an_error_page(client, payment_gateway):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 502
+    assert b'<!doctype html>' in response.content
+    assert b'role="alert"' in response.content
+    assert b'declined' in response.content
+    assert b'action="/ui/payments/L1/"' in response.content
+
+
+@pytest.mark.django_db
+def test_standard_payment_for_an_unknown_loan_renders_an_error_page(client):
+    response = client.post('/ui/payments/unknown/')
+
+    assert response.status_code == 404
+    assert b'<!doctype html>' in response.content
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_standard_payment_connection_failure_is_logged_and_rendered(client, monkeypatch, caplog):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 502
+    assert b'payment gateway unavailable' in response.content
+    assert 'Payment gateway request failed' in caplog.text
+    assert 'ConnectionRefusedError' in caplog.text
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/ui/fees/L1/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, payment_gateway, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
     assert payment_gateway.requests == []
 
 

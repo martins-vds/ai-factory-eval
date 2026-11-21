@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Protocol
 
 
-@dataclass(frozen=True)
+@dataclass
 class GatewayResponse:
     status_code: int
     body: str
@@ -18,7 +18,7 @@ class PaymentGatewayFailure(Exception):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass
 class PaymentResult:
     status_code: int
     body: str
@@ -38,7 +38,7 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
-@dataclass(frozen=True)
+@dataclass
 class FeeQuote:
     loan: LoanRecord
     late_days: int

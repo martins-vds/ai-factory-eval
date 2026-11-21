@@ -100,6 +100,7 @@ def test_payment_maps_only_gateway_success_to_success(gateway_status, expected_s
 
     assert result.status_code == expected_status
     assert result.body == 'gateway body\n'
+    assert result.failure is None
     assert gateway.calls == ['L1']
 
 

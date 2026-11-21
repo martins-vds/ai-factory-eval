@@ -9,6 +9,11 @@ from .composition import fee_application
 logger = logging.getLogger(__name__)
 
 
+def _log_gateway_failure(result):
+    if result.failure is not None:
+        logger.warning('Payment gateway request failed', exc_info=result.failure)
+
+
 @require_GET
 def fee_api(request, loan_id):
     quote = fee_application.fee_for(loan_id)
@@ -39,8 +44,7 @@ def payment_api(request, loan_id):
     result = fee_application.pay(loan_id)
     if result is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-    if result.failure is not None:
-        logger.warning('Payment gateway request failed', exc_info=result.failure)
+    _log_gateway_failure(result)
     return HttpResponse(result.body, status=result.status_code, content_type='text/plain')
 
 
@@ -52,13 +56,12 @@ def payment_page(request, loan_id):
             return render(
                 request,
                 'fees/payment-panel.html',
-                {'loan_id': loan_id, 'not_found': True},
+                {'not_found': True},
                 status=404,
             )
-        return render(request, 'fees/page.html', {'quote': None}, status=404)
+        return render(request, 'fees/page.html', {}, status=404)
 
-    if result.failure is not None:
-        logger.warning('Payment gateway request failed', exc_info=result.failure)
+    _log_gateway_failure(result)
     if request.headers.get('HX-Request') == 'true':
         return render(
             request,
