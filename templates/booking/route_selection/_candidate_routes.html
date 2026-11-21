@@ -1,0 +1,59 @@
+<p id="potential-routes" class="font-medium text-gray-800">
+  Potential routes: {{ candidate_count }}
+</p>
+
+{% if routes %}
+  <div class="space-y-6">
+    {% for route in routes %}
+      <section aria-labelledby="itinerary-{{ route.number }}" class="rounded-lg border border-gray-200 p-4">
+        <h2 id="itinerary-{{ route.number }}" class="mb-4 text-xl font-semibold text-gray-900">
+          Itinerary {{ route.number }}
+        </h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-left">
+            <thead>
+              <tr class="border-b border-gray-300">
+                <th scope="col" class="p-3">Leg</th>
+                <th scope="col" class="p-3">Voyage</th>
+                <th scope="col" class="p-3">Load</th>
+                <th scope="col" class="p-3">Date</th>
+                <th scope="col" class="p-3">Unload</th>
+                <th scope="col" class="p-3">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leg in route.itinerary.legs %}
+                <tr class="border-b border-gray-200">
+                  <th scope="row" class="p-3">Leg {{ forloop.counter }}</th>
+                  <td class="p-3">{{ leg.voyage.voyage_number.value }}</td>
+                  <td class="p-3">
+                    {{ leg.load_location.name }}<br>
+                    <span class="text-sm text-gray-600">{{ leg.load_location.unlocode.value }}</span>
+                  </td>
+                  <td class="p-3">{{ leg.load_time|date:"m/d/Y" }}</td>
+                  <td class="p-3">
+                    {{ leg.unload_location.name }}<br>
+                    <span class="text-sm text-gray-600">{{ leg.unload_location.unlocode.value }}</span>
+                  </td>
+                  <td class="p-3">{{ leg.unload_time|date:"m/d/Y" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <input type="hidden" name="candidate" value="{{ route.selection }}">
+          <button
+            class="rounded bg-blue-700 px-4 py-2 font-medium text-white hover:bg-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+            type="submit"
+          >Assign itinerary {{ route.number }}</button>
+        </form>
+      </section>
+    {% endfor %}
+  </div>
+{% else %}
+  <p role="status" class="rounded border border-amber-300 bg-amber-50 p-4 text-gray-900">
+    {{ no_candidate_message }}
+  </p>
+{% endif %}
