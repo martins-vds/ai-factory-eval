@@ -20,7 +20,7 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_count_and_numbered_leg"
   - "tests/booking/interfaces/test_route_selection.py::test_route_selection_and_itinerary_selection_render_empty_guidance"
-  - ".migration/runs/BK-05F/20261121T011118739741Z-route-selection-targeted.log"
+  - ".migration/evidence/runs/BK-05F.md"
 target:
   components:
     - templates/booking/route_selection/route.html

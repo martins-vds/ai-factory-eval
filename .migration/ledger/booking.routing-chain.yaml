@@ -18,7 +18,7 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_count_and_numbered_leg"
-  - ".migration/runs/BK-05F/20261121T011118739741Z-route-selection-targeted.log"
+  - ".migration/evidence/runs/BK-05F.md"
 target:
   components:
     - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views

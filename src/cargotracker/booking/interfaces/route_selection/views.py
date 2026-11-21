@@ -3,8 +3,8 @@ from collections.abc import Callable
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
-from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.application.dashboard import CargoDashboard
+from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.cargo.domain.tracking_id import TrackingId
 
 

@@ -1,0 +1,29 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1931
+pr: null
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.667
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+  - .migration/runs/BK-05F/20261121T012246199138Z-mutation_changed.log
+  - .migration/runs/BK-05F/20261121T011942459053Z-behavior.log
+  - .migration/runs/BK-05F/20261121T011811172891Z-idiom.log
+  - .migration/runs/BK-05F/20261121T011303242739Z-crap.log
+  - .migration/runs/BK-05F/20261121T012030074980Z-mutation_changed.log
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty: ui
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py
