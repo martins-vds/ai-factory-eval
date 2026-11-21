@@ -4,10 +4,13 @@ issue: martins-vds/ai-factory-synthetic-target#117
 phase: 6
 decisions:
   - "Acceptance run 42912984554 attempt 1 passed on commit 8f9a11640eef9801378f3db53a76903363c5e5b5; LF-AUDIT #114 returned complete."
+  - "The reconciliation and concurrent-work CI checks were blocked by repeated GitHub installation API rate limits; do not retry until access is restored."
 dispatched: []
 awaiting_human:
   - "Operator: perform the legacy-versus-target side-by-side comparison listed in .migration/evidence/fees-payments/report.md, then report the outcome. Human check remains requested; no approval is asserted."
-next_step: Await the operator's comparison and record its actual outcome in a later acceptance return.
+  - "Operator: after the GitHub installation API rate limit is confirmed cleared, recheck the failed reconciliation and concurrent-work CI jobs for PR #2031; do not rerun acceptance gates."
+next_step: After API access is restored, recheck the two failed CI jobs and continue with the operator's pending human comparison.
+handoff: .migration/handoffs/LF-ACCEPT.md
 acceptance:
   slice: fees-payments
   tickets:
