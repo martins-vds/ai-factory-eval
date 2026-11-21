@@ -46,6 +46,9 @@ class Repository:
     def find_all(self):
         return self.cargo.find_all()
 
+    def upsert(self, cargo):
+        return self.cargo.upsert(cargo)
+
 
 repository = Repository()
 dashboard = CargoDashboard(repository)
