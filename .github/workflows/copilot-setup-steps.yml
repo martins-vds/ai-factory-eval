@@ -118,6 +118,11 @@ jobs:
       # from $HOME/.afs/understand-anything.
       - name: Install Understand Anything (4e6d329)
         run: |
+          # ADR-0055: its patches come with the harness; before bootstrap there is no graph work to do
+          if [ ! -d .migration/harness/patches ]; then
+            echo "harness not installed yet; Understand Anything not needed"
+            exit 0
+          fi
           ua="$HOME/.afs/understand-anything"
           git init -q "$ua"
           git -C "$ua" fetch -q --depth 1 https://github.com/Egonex-AI/Understand-Anything 4e6d3299017a7432da15957874992837a315c5b4
