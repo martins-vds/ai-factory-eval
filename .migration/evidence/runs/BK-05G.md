@@ -48,3 +48,13 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T13:35:31+00:00 | post-codeql-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-21T13:37:57+00:00 | post-codeql-mutation-changed | 0 | 142.37 | `python .migration/harness/tools/afs-mutation` | `f8db28256c6add14` |  | gate=mutation score=0.904 threshold=0.8 killed=47 survived=5 files=1 base=256fbe36bcab1dc38117715631d54b7d8cefc2c0 |
 | 2026-11-21T13:39:04+00:00 | post-codeql-regression-suite | 0 | 63.24 | `pytest -q` | `cb3ca1931a3d4eb9` |  |  |
+| 2026-11-21T13:41:03+00:00 | finish-build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:41:07+00:00 | finish-build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T13:42:12+00:00 | finish-behavior | 0 | 63.1 | `pytest -q` | `b8c0f2f3e0ca0ee8` |  |  |
+| 2026-11-21T13:42:16+00:00 | finish-idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T13:42:19+00:00 | finish-idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T13:42:23+00:00 | finish-idiom-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T13:42:27+00:00 | finish-idiom-ui | 0 | 0.68 | `python .migration/harness/tools/check_ui.py` | `4be95899e1f4062a` |  | gate=ui scope="templates changed since 256fbe36bcab1dc38117715631d54b7d8cefc2c0" templates=4 findings=0 |
+| 2026-11-21T13:43:34+00:00 | finish-crap-coverage | 0 | 64.15 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `6b92af925b853b33` |  |  |
+| 2026-11-21T13:43:38+00:00 | finish-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:43:41+00:00 | finish-crap-report | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
