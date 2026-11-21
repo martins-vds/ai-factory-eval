@@ -1,12 +1,12 @@
 # Slice library-info — acceptance evidence
 
-- Tickets: LL-04 (#65), LI-AUDIT (#122) · Commit: `7d4b249e342a94e7176ebf3e1d370f81d7156b16` · Date: 2026-11-11
+- Tickets: LL-04 (#65), LL-04 verification (#104, #113), LI-AUDIT (#122), LI-ACCEPT (#127) · Commit: `7d4b249e342a94e7176ebf3e1d370f81d7156b16` · Acceptance review: 2026-11-21
 - Acceptance run: [42938753426, attempt 1](https://github.com/martins-vds/ai-factory-synthetic-target/actions/runs/42938753426); artifact `afs-acceptance-7d4b249e342a94e7176ebf3e1d370f81d7156b16-42938753426-1`
 - Verified archive: `.migration/evidence/acceptance-runs/42938753426-1.json`
 
 ## Verification and graph
 
-Fetched and verified the run through `afs-run`. The archive identifies repository `martins-vds/ai-factory-synthetic-target`, attempt 1, the exact commit above, and a passed result. GitHub reports successful `graph / understand`, `acceptance`, and `publish` jobs. The archive's target graph was built for the same commit and passed its ownership-enforced gate. Its report lists 27 entry points, 18 reaching data, and explicitly lists both `GET /about` and `GET /ui/about/` as having no data path. These static information routes are correctly non-data flows, not missing ledger data paths. The artifact expires 2026-12-11.
+The Auditor fetched and verified the run evidence. The archive identifies repository `martins-vds/ai-factory-synthetic-target`, attempt 1, the exact commit above, and a passed result. GitHub reports successful `graph / understand`, `acceptance`, and `publish` jobs. The archive's target graph was built for the same commit and passed its ownership-enforced gate. Its report lists 27 entry points, 18 reaching data, and explicitly lists both `GET /about` and `GET /ui/about/` as having no data path. These static information routes are correctly non-data flows, not missing ledger data paths. The artifact expires 2026-12-11.
 
 The source graph was fresh and its gate passed in this audit. Relevant target paths, the slice spec, plan, ledger, characterization golden, and LL-04 evidence have no changes between the acceptance commit and the audited checkout.
 
@@ -42,6 +42,10 @@ The single capability in `.migration/slices/library-info.yaml` is `about.page`. 
 
 The six full-run survivors in `.migration/runs/acceptance-42938753426-1/mutants.md` affect loan catalog templates/context, loan URL routing, fee dataclass mutability, and loan form metadata. None touches library-info. LL-04's own last mutation record reports score 1.000, 8 killed, 0 survived (`.migration/evidence/mutants/LL-04.md`); its final verifier return is `pass`.
 
+## Ticket reconciliation
+
+The five live descendants are #65, #104, #113, #122, and this acceptance ticket (#127). Four have attributable completed evidence or are covered by this PR as if merged. Issue #104 is closed completed by merged PR #105, but its verifier return at that landing is `blocked` and names parent issue #65, not #104. The later passing return names sibling issue #113. Because #104 is not closed as `not planned` and PR #105 is merged, neither a completed nor superseded disposition can be supported under the reconciliation rules. Its reconciliation entry remains `needs_review`; slice acceptance is blocked pending a human resolution of that lineage.
+
 ## Human check
 
-Independent Auditor review completed 2026-11-11: one capability checked, no gaps, no graph inconsistencies. **Audit verdict: complete.** The operator's human flow sign-off remains the Slice Coordinator's subsequent step; this report does not represent that sign-off.
+Independent Auditor review completed 2026-11-11: one capability checked, no gaps, no graph inconsistencies. **Audit verdict: complete.** The human side-by-side check is requested, not passed. Compare legacy `GET /about` against target `GET /about` for the page text and library details (including opening hours, lending policy, and contact information); compare the legacy page and target `GET /ui/about/` for the library details, then compare the target's modernized layout against the approved reading-room decisions (#38 and #50). This report does not represent human sign-off.
