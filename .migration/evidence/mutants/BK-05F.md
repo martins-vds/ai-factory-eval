@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a55398131911e`): score 0.849, threshold 0.8, killed 45, survived 8. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a55398131911e`): score 0.906, threshold 0.8, killed 48, survived 5. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:49 Mutant #16`
 
@@ -13,20 +13,6 @@ Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a553
   +        raise signing.BadSignature('XXInvalid itinerary selectionXX')
        return Itinerary(
            tuple(
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:74 Mutant #27`
-
-  ```diff
-  @@ -71,7 +71,7 @@
-   ]:
-       def route_selection(request: HttpRequest, tracking_id: str) -> HttpResponse:
-           if request.method != 'GET':
-  -            return HttpResponseNotAllowed(['GET'])
-  +            return HttpResponseNotAllowed(['XXGETXX'])
-           return _render_selection(
-               request,
-               tracking_id,
   ```
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:87 Mutant #33`
@@ -69,34 +55,6 @@ Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a553
                cargo_routing.assign_route(cargo.tracking_id, itinerary)
                return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
            if request.method != 'GET':
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:98 Mutant #41`
-
-  ```diff
-  @@ -95,7 +95,7 @@
-               cargo_routing.assign_route(cargo.tracking_id, itinerary)
-               return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
-           if request.method != 'GET':
-  -            return HttpResponseNotAllowed(['GET', 'POST'])
-  +            return HttpResponseNotAllowed(['XXGETXX', 'POST'])
-           return _render_selection(
-               request,
-               tracking_id,
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:98 Mutant #42`
-
-  ```diff
-  @@ -95,7 +95,7 @@
-               cargo_routing.assign_route(cargo.tracking_id, itinerary)
-               return redirect(f'/admin/cargo/{cargo.tracking_id.value}/')
-           if request.method != 'GET':
-  -            return HttpResponseNotAllowed(['GET', 'POST'])
-  +            return HttpResponseNotAllowed(['GET', 'XXPOSTXX'])
-           return _render_selection(
-               request,
-               tracking_id,
   ```
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:120 Mutant #47`
