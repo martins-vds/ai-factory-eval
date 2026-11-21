@@ -61,3 +61,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T18:53:48+00:00 | mutation_changed | 0 | 0.27 | `python .migration/harness/tools/afs-mutation` | `6aa1dd76effd5e59` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=6841d295c763202849db8ff9ba328b66673af1dc |
 | 2026-11-21T18:55:19+00:00 | route-selection-tests-baseline | 0 | 3.39 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `f5536f16082d2c6b` |  |  |
 | 2026-11-21T19:00:20+00:00 | mutation-route-selection-diagnostic | 0 | 242.84 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `8f2491b815e74391` |  | gate=mutation score=0.823 threshold=0.8 killed=51 survived=11 files=1 base=explicit |
+| 2026-11-21T19:02:27+00:00 | route-selection-guidance-tests | 0 | 1.91 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `6c2e5a4496d51b64` |  |  |
+| 2026-11-21T19:06:26+00:00 | mutation_changed | 0 | 227.95 | `python .migration/harness/tools/afs-mutation` | `f5a8a0f484db3a9e` |  | gate=mutation score=0.869 threshold=0.8 killed=53 survived=8 files=1 base=6841d295c763202849db8ff9ba328b66673af1dc |
+| 2026-11-21T19:06:35+00:00 | route-selection-tests-final | 0 | 1.84 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `8ee8f83d7f7b3cd7` |  |  |
+| 2026-11-21T19:06:56+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T19:06:56+00:00 | build-django-check | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
