@@ -8,6 +8,7 @@ from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
+from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
@@ -22,7 +23,9 @@ destination_dialog_view, deadline_dialog_view = create_booking_dialog_views(
     CargoDashboard(cargo_repository),
     lambda: available_locations,
 )
+dashboard_view, _ = create_booking_views(CargoDashboard(cargo_repository))
 urlpatterns = [
+    path('admin/dashboard/', dashboard_view),
     path('admin/cargo/<str:tracking_id>/destination/', destination_dialog_view),
     path('admin/cargo/<str:tracking_id>/deadline/', deadline_dialog_view),
 ]
@@ -49,9 +52,11 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     first_content = first_response.content.decode()
     second_content = second_response.content.decode()
 
-    first_options = re.search(r'<select\b[^>]*id="destination"[^>]*>(.*?)</select>', first_content)
+    first_options = re.search(
+        r'<select\b[^>]*id="destination"[^>]*>(.*?)</select>', first_content, re.DOTALL
+    )
     second_options = re.search(
-        r'<select\b[^>]*id="destination"[^>]*>(.*?)</select>', second_content
+        r'<select\b[^>]*id="destination"[^>]*>(.*?)</select>', second_content, re.DOTALL
     )
     assert first_response.status_code == 200
     assert not_routed_cargo.route_specification.origin.name in first_content
@@ -82,6 +87,20 @@ def test_deadline_dialog_shows_current_values(client, not_routed_cargo):
     )
     assert 'Cancel' in content
     assert 'Update' in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_not_routed_rows_open_dialogs_with_error_response_handling(client, not_routed_cargo):
+    response = client.get('/admin/dashboard/')
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'hx-get="/admin/cargo/DEF789/destination/"' in content
+    assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
+    assert 'hx-target="#booking-edit-dialog"' in content
+    assert 'hx-on:htmx:beforeSwap=' in content
+    assert 'hx-on:htmx:afterSwap=' in content
 
 
 @pytest.mark.django_db
@@ -129,6 +148,7 @@ def test_destination_update_preserves_other_specification_fields_and_refreshes_r
     assert 'New York' in content
     assert response.headers['HX-Retarget'] == '#not-routed-cargo'
     assert response.headers['HX-Reswap'] == 'outerHTML'
+    assert 'id="destination-form"' not in content
     assert 'Widget for var' not in content
 
 
@@ -155,6 +175,7 @@ def test_deadline_update_preserves_other_specification_fields_and_refreshes_rows
     assert '01/03/2027' in content
     assert response.headers['HX-Retarget'] == '#not-routed-cargo'
     assert response.headers['HX-Reswap'] == 'outerHTML'
+    assert 'id="deadline-form"' not in content
     assert 'Widget for var' not in content
 
 
