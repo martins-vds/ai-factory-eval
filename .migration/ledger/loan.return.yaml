@@ -15,3 +15,11 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components: [src.loans.services.return_loan, src.loans.views.loan_return, src.loans.repository.LoanRepository]
+status: migrated
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/evidence/runs/LL-02.md, tests/loans/test_catalog.py::test_return_endpoint_rejects_repeated_return_and_preserves_date]
+rules:
+  - id: repeat-return-rejected
+    rule: A repeat return for an already-returned loan is rejected.
+    source: martins-vds/ai-factory-synthetic-target#41

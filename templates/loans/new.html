@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <script>
+    htmx.config.responseHandling = [
+      {code: "2..", swap: true},
+      {code: "[45]..", swap: true, error: true},
+      {code: "...", swap: false}
+    ];
+  </script>
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
+      <h1 class="card-title text-4xl">Lend a book</h1>
+      {% if error %}
+      <p class="mt-6 border border-[#d8cdbb] text-[#a94e37]" role="alert">{{ error }}</p>
+      {% endif %}
+      <form class="mt-6 grid gap-4" method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="closest article" hx-swap="outerHTML">
+        {% csrf_token %}
+        <label class="form-control">
+          <span class="label-text mt-2">Member</span>
+          <input class="input input-bordered bg-[#fffdf7]" name="member" value="{{ member|default:'' }}" required>
+        </label>
+        <label class="form-control">
+          <span class="label-text mt-2">ISBN</span>
+          <input class="input input-bordered bg-[#fffdf7]" name="isbn" value="{{ isbn|default:'' }}" required>
+        </label>
+        <button class="btn btn-outline mt-6" type="submit">Create loan</button>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}
