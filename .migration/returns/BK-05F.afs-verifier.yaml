@@ -1,0 +1,58 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2089
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46
+    what: CargoRouting.assign_route accepts and persists a late itinerary; the route-specification guard exists only in the view.
+    evidence: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_screens_raise_not_found_for_unknown_cargo
+  - tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline
+ledger_issues:
+  - booking.routing-assign route-specification-satisfied has no direct passing application evidence; the added use-case test fails.
+quirk_tickets: []
+rules:
+  - capability: booking.routing-assign
+    rule: Assignment requires a submitted, valid signed candidate token associated with the requested cargo.
+    use_case: route_selection signed-token boundary (the application receives only the decoded itinerary)
+    test: tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
+    enforced: true
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: The selected itinerary must satisfy the cargo's current route specification before assignment.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline
+    enforced: false
+    ledger_rule: route-specification-satisfied
+no_rules:
+  booking.routing-chain: Structural delegation flow; no independent business rule.
+  booking.screen-route: Candidate presentation and selection UI; no independent business rule.
+  booking.screen-select-itinerary: Candidate and empty-state presentation UI; no independent business rule.
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: The BK-05C use case imports django.http.Http404, a known ADR-0001 layering violation.
+    origin: BK-05C
+    evidence: "run: idiom-layers-final (reported as known, not failing)"
+mutation_context: "The profile mutation command returned n/a because this verifier checkout has no mutable code diff; the original BK-05F journal records 0.855 for changed-code mutation."
+survivors:
+  - "#1: no; changing the signing salt changes only opaque tokens produced and verified by the same code."
+  - "#2: no; both signing operations use Django's matching default salt."
+  - "#10: no; only the internal Http404 detail changes; production DEBUG is off and the response remains 404."
+  - "#13: no; only the internal Http404 detail changes; production DEBUG is off and the response remains 404."
+  - "#14: no; X is URL-unreserved, so safe=\"XXXX\" and safe=\"\" produce the same redirect."
+  - "#27: no; only the internal Http404 detail changes; production DEBUG is off and the response remains 404."
+  - "#40: no; both missing-candidate values fail signature validation and yield the same 404."
+  - "#44: no; the changed BadSignature detail is caught and does not change the response."
+  - "#46: no; only the internal Http404 detail changes; production DEBUG is off and the response remains 404."
