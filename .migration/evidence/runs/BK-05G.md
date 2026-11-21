@@ -13,3 +13,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T20:40:07+00:00 | ruff-check | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T20:40:09+00:00 | ruff-format | 1 | 0.02 | `ruff format --check` | `ca6ca915a5f83088` | 76 \|     assert 'AUMEL' not in option_values |  |
 | 2026-11-21T20:40:16+00:00 | ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T20:42:20+00:00 | dialogs-targeted | 0 | 6.75 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `e775328d13fd99ad` |  |  |
+| 2026-11-21T20:42:24+00:00 | ui-check | 0 | 0.64 | `python .migration/harness/tools/check_ui.py` | `9ee0b634c816ea1f` |  | gate=ui scope="templates changed since b491ff4233bc289cdda3c2c7fa6163c4a55acd78" templates=5 findings=0 |

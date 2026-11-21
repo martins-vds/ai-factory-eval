@@ -46,6 +46,8 @@ def test_not_routed_table_opens_both_edit_dialogs(client):
     assert 'Change deadline' in content
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
     assert 'id="booking-dialog"' in content
+    assert 'hx-on::before-swap' in content
+    assert 'hx-on::after-swap' in content
 
 
 @pytest.mark.django_db

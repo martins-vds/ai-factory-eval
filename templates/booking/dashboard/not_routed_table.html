@@ -23,6 +23,7 @@
     id="booking-dialog"
     role="status"
     aria-live="polite"
+    hx-on::before-swap="this.querySelector('dialog[open]')?.close()"
     hx-on::after-swap="this.querySelector('dialog')?.showModal()"
   ></div>
 </section>
