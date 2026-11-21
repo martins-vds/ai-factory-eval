@@ -1,0 +1,13 @@
+<div id="loan-return-status" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+  {% if error %}<p class="text-sm text-[#a94e37]" role="alert">{{ error }}</p>{% endif %}
+  {% if loan %}
+    {% if loan.returned_on %}
+    <p>Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+    {% else %}
+    <form method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#loan-return-status" hx-swap="outerHTML">
+      {% csrf_token %}
+      <button class="btn btn-primary mt-2">Return this book</button>
+    </form>
+    {% endif %}
+  {% endif %}
+</div>

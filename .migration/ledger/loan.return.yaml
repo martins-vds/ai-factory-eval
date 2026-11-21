@@ -7,11 +7,17 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, HTTP 404 with `no such loan` and a newline when the id is absent, and HTTP 409 for a repeated return."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-synthetic-target#61]
+target:
+  components: [src.loans.services.return_loan, src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan, tests/loans/test_circulation.py::test_return_api_persists_and_returns_the_formatted_loan, tests/loans/test_circulation.py::test_return_api_returns_the_characterized_not_found_response, tests/loans/test_circulation.py::test_repeat_return_ui_renders_error_and_preserves_saved_date, tests/loans/test_circulation.py::test_unknown_return_ui_renders_the_htmx_not_found_response, tests/loans/test_circulation.py::test_return_endpoints_only_accept_post]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - id: existing-loan-required
+    rule: "A return request for an unknown loan is rejected as not found."
+    source: legacy/src/main/java/lib/LoanResource.java:45-50

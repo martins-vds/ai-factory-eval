@@ -1,0 +1,42 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#1911
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1916
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 6.0
+  mutation_changed: 0.919
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN must be nonempty and not whitespace-only.
+    use_case: lend_loan
+    test: tests/loans/test_circulation.py::test_lending_rejects_empty_or_whitespace_required_fields
+    enforced: true
+    ledger_rule: required-member-and-isbn
+  - capability: loan.return-date
+    rule: A loan's first return date is preserved; a repeated return is rejected.
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_the_original_date
+    enforced: true
+    ledger_rule: preserve-first-return-date
+  - capability: loan.return
+    rule: A return request for an unknown loan is rejected as not found.
+    use_case: return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan-required
