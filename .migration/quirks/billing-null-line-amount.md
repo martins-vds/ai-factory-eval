@@ -5,7 +5,7 @@
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/InvoiceLine.java:6-10`
-- Characterization: Not performed in analyst ticket BL-01; constructor behavior follows directly from the null dereference in `amount.signum()`.
+- Characterization: BL-02 Tier B seam test observed `NullPointerException` for `new InvoiceLine("late", null)`; the suite is `.migration/characterization/billing/BillingCharacterization.java`.
 - Why it looks wrong: The constructor explicitly validates invalid negative amounts but leaves null amounts to fail incidentally.
 
 ## Impact

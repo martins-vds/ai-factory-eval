@@ -5,7 +5,7 @@
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/BillingJob.java:26-30`; `legacy-billing/run.sh:2-6`
-- Characterization: Not performed in analyst ticket BL-01; the entry point calls the real `CardVault` with the sample batch.
+- Characterization: BL-02 Tier B seam test ran `BillingJob.main` with stand-in Northgate and observed hard-coded `ana` and `ben` charges using `NORTHGATE_MERCHANT` and `NORTHGATE_KEY`; evidence is `.migration/characterization/billing/BillingCharacterization.java`.
 - Why it looks wrong: Running the documented job can submit charges for fixed sample member IDs instead of loading the month's actual billing data.
 
 ## Impact

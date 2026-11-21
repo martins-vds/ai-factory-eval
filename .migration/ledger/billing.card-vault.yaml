@@ -6,7 +6,8 @@ source:
 boundary: "CardVault sends the member ID and exact whole-cent amount to Northgate in USD, raises on a decline, and returns the approved reference."
 tickets: [martins-vds/ai-factory-eval#1778]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
 quirks: []
 rules:
   - id: usd-minor-units
@@ -18,4 +19,8 @@ rules:
   - id: approved-reference
     rule: Return the provider reference for an approved charge.
     source: legacy-billing/src/main/java/billing/CardVault.java:18-22
-notes: Credentials are supplied by the caller to VaultCredentials; the executable entry point reads them from NORTHGATE_MERCHANT and NORTHGATE_KEY.
+evidence:
+  - .migration/characterization/billing/run.sh
+  - .migration/characterization/billing/BillingCharacterization.java
+  - .migration/evidence/runs/BL-02.md
+notes: "Credentials are supplied by the caller to VaultCredentials; the executable entry point reads them from NORTHGATE_MERCHANT and NORTHGATE_KEY. Characterized at Tier B with a compile-only stand-in for com.northgate.vault; the private Maven artifact is not part of the seam harness."

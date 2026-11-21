@@ -1,0 +1,42 @@
+[
+  {
+    "at": "2026-11-21T00:02:55Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16921,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BL-02",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/characterization/billing/BillingCharacterization.java",
+      ".migration/characterization/billing/com/northgate/vault/ChargeResult.java",
+      ".migration/characterization/billing/com/northgate/vault/VaultClient.java",
+      ".migration/characterization/billing/com/northgate/vault/VaultCredentials.java",
+      ".migration/characterization/billing/run.sh",
+      ".migration/evidence/runs/BL-02.md",
+      ".migration/ledger/billing.card-vault.yaml",
+      ".migration/ledger/billing.chargeability.yaml",
+      ".migration/ledger/billing.invoice-line.yaml",
+      ".migration/ledger/billing.invoice-total.yaml",
+      ".migration/ledger/billing.job-entrypoint.yaml",
+      ".migration/ledger/billing.monthly-batch.yaml",
+      ".migration/quirks/billing-hardcoded-sample-charges.md",
+      ".migration/quirks/billing-null-line-amount.md",
+      ".migration/quirks/billing-payment-interruption.md",
+      ".migration/returns/BL-02.afs-characterizer.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]

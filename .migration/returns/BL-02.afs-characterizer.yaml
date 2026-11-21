@@ -1,0 +1,22 @@
+role: afs-characterizer
+ticket: BL-02
+issue: martins-vds/ai-factory-eval#1927
+tier_used: {A: 0, B: 6, C: 0}
+suite:
+  path: .migration/characterization/billing/run.sh
+  cases: 22
+  passing: 22
+  run_log: .migration/evidence/runs/BL-02.md
+predicted_vs_observed: {match: 22, differs: 0}
+ledger_updated:
+  - billing.card-vault
+  - billing.chargeability
+  - billing.invoice-line
+  - billing.invoice-total
+  - billing.job-entrypoint
+  - billing.monthly-batch
+quirk_tickets:
+  - .migration/quirks/billing-hardcoded-sample-charges.md
+  - .migration/quirks/billing-null-line-amount.md
+  - .migration/quirks/billing-payment-interruption.md
+review_only_requests: []

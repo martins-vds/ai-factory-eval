@@ -6,10 +6,16 @@ source:
 boundary: "Totals of at least $1.00 are chargeable; smaller totals carry over."
 tickets: [martins-vds/ai-factory-eval#1778]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
 quirks: []
 rules:
   - id: minimum-charge
     rule: A total less than $1.00 is not charged; a total equal to or above $1.00 is chargeable.
     source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:27-30
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java
+  - .migration/characterization/billing/run.sh
+  - .migration/characterization/billing/BillingCharacterization.java
+  - .migration/evidence/runs/BL-02.md
 notes: Covered by the legacy test at legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java:37-41.
