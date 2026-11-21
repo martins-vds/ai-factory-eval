@@ -1,0 +1,42 @@
+[
+  {
+    "at": "2026-11-21T00:09:52Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 23842,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-05",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/3b82d9ba-2489-487a-accd-697a633a9cd0.json",
+      ".migration/evidence/mutants/LL-05.md",
+      ".migration/evidence/runs/LL-05.md",
+      ".migration/handoffs/LL-05.md",
+      ".migration/ledger/reports.monthly-spec.yaml",
+      ".migration/quirks/LL-05-fee-attribution.md",
+      ".migration/returns/LL-05.afs-migrator.yaml",
+      "config/settings.py",
+      "src/reports/__init__.py",
+      "src/reports/composition.py",
+      "src/reports/management/__init__.py",
+      "src/reports/management/commands/__init__.py",
+      "src/reports/management/commands/monthly_report.py",
+      "src/reports/repository.py",
+      "src/reports/services.py",
+      "tests/reports/test_monthly_report.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
