@@ -1,4 +1,4 @@
-<dialog open class="modal" aria-modal="true" aria-labelledby="destination-dialog-title">
+<dialog class="modal" aria-modal="true" aria-labelledby="destination-dialog-title">
   <div class="modal-box max-w-xl rounded-lg bg-white p-6 shadow-xl">
     <h2 id="destination-dialog-title" class="mb-4 text-xl font-semibold">Change destination</h2>
     <p class="mb-2"><span class="font-semibold">Origin:</span> {{ cargo.route_specification.origin.name }}</p>
@@ -13,10 +13,14 @@
     >
       {% csrf_token %}
       <label class="font-medium" for="destination">New destination</label>
+      {% if destination_error %}
+        <p class="text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+      {% endif %}
       <select
         class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2"
         id="destination"
         name="destination"
+        {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
         required
       >
         {% for location in locations %}

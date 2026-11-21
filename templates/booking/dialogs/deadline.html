@@ -1,4 +1,4 @@
-<dialog open class="modal" aria-modal="true" aria-labelledby="deadline-dialog-title">
+<dialog class="modal" aria-modal="true" aria-labelledby="deadline-dialog-title">
   <div class="modal-box max-w-xl rounded-lg bg-white p-6 shadow-xl">
     <h2 id="deadline-dialog-title" class="mb-4 text-xl font-semibold">Change arrival deadline</h2>
     <p class="mb-2"><span class="font-semibold">Origin:</span> {{ cargo.route_specification.origin.name }}</p>
@@ -13,12 +13,16 @@
     >
       {% csrf_token %}
       <label class="font-medium" for="arrival-deadline">Arrival deadline</label>
+      {% if deadline_error %}
+        <p class="text-red-700" id="deadline-error" role="alert">{{ deadline_error }}</p>
+      {% endif %}
       <input
         class="input input-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2"
         id="arrival-deadline"
         name="deadline"
         type="date"
         value="{{ deadline_value }}"
+        {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
         required
       >
       <nav aria-label="Deadline dialog actions" class="flex justify-end gap-3">
