@@ -1,0 +1,67 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#2178
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2183
+gates: {build: 0, behavior: 0, idiom: 0, crap: 0, mutation_changed: 1.000, regression: 0}
+evidence_logs: [.migration/evidence/runs/LL-01.md]
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: data.loan-storage
+    rule: Persisted loans remain available after the application migrations are rerun.
+    use_case: GetLoan
+    test: tests/loans/test_catalog.py::test_migration_restart_does_not_replace_persisted_records
+    enforced: true
+    ledger_rule: keep-loans-across-startup
+  - capability: data.seed-records
+    rule: The initial migration inserts L1-L3 and later startup migrations do not overwrite persisted records.
+    use_case: ListLoans
+    test: tests/loans/test_catalog.py::test_seeded_loans_are_available_through_list_use_case
+    enforced: true
+    ledger_rule: seed-only-once
+  - capability: repository.transactions
+    rule: A successful repository save commits, and a failed save leaves no loan row.
+    use_case: SaveLoan
+    test: tests/loans/test_catalog.py::test_save_use_case_rolls_back_a_failed_transaction
+    enforced: true
+    ledger_rule: atomic-loan-save
+  - capability: loan.due-date
+    rule: A loan is due 14 calendar days after its lent-on date.
+    use_case: Loan.due_on
+    test: tests/loans/test_services.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: fourteen-day-loan
+  - capability: loan.get
+    rule: An unknown loan id is rejected as LoanNotFound and returned as HTTP 404.
+    use_case: GetLoan
+    test: tests/loans/test_services.py::test_get_loan_rejects_an_unknown_id
+    enforced: true
+    ledger_rule: missing-loan
+  - capability: loan.list
+    rule: Loans are returned in ascending id order.
+    use_case: ListLoans
+    test: tests/loans/test_services.py::test_list_loans_returns_records_in_id_order
+    enforced: true
+    ledger_rule: list-order
+  - capability: loan.text-export
+    rule: Text export quotes field values containing semicolons, quotes, or line breaks.
+    use_case: ExportLoans
+    test: tests/loans/test_services.py::test_export_quotes_delimiters_and_preserves_a_round_trippable_record
+    enforced: true
+    ledger_rule: escape-delimiters
+no_rules:
+  application.build: Build and routing have no business input rules.
+  application.startup: Startup has no business input rules; persistence and seeding invariants are recorded under their data capabilities.
