@@ -1,0 +1,20 @@
+/*
+ * Generated Tailwind/daisyUI asset. Keep utilities used by templates below.
+ * Build with: make tailwind-build
+ */
+*,:before,:after{box-sizing:border-box;border-width:0;border-style:solid}
+html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:Georgia,"Times New Roman",serif}
+body{margin:0}
+a{color:inherit;text-decoration:none}
+.bg-paper{background:#f5f0e5}.text-ink{color:#2f3428}.min-h-screen{min-height:100vh}
+.site-header{max-width:76rem;margin:auto;padding:1.5rem}
+.header-inner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;border-bottom:1px solid #d8cdbb;padding-bottom:1.25rem}
+.library-name{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}.library-name span{font-size:.875rem;font-weight:400}
+.catalog-grid{max-width:76rem;margin:auto;padding:1.5rem;display:grid;grid-template-columns:minmax(0,1fr) 19rem;gap:3rem}
+.eyebrow{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:#6b705f}
+h1{font-size:3.75rem;line-height:1;margin:.75rem 0 1rem}h2{font-size:1.5rem}
+.lede{color:#6b705f;margin-bottom:2rem}.loan-row{display:grid;grid-template-columns:1fr auto;gap:1rem;border-bottom:1px solid #d8cdbb;padding:1.2rem 0}
+.loan-id,.member{margin:.25rem 0}.loan-id{font-size:1.25rem;font-weight:700}.member,.loan-dates{color:#6b705f}
+.desk-card,.detail-card{background:#fffdf7;border:1px solid #d8cdbb;padding:1.5rem;height:fit-content}
+.detail-card{max-width:48rem;margin:2rem auto}
+@media (max-width:640px){.catalog-grid{grid-template-columns:1fr;padding:1rem}.loan-row{grid-template-columns:1fr}.site-header{padding:1rem}h1{font-size:2.75rem}}

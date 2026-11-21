@@ -9,7 +9,13 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans returns every loan ordered by id as one semicolon-separated text line per record, with a trailing newline."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+target:
+  components: [src/loans/views.py, src/loans/repository.py, src/loans/services.py]
+rules:
+  - id: ordered-trailing-newline
+    rule: The loan list contains every loan ordered by ID and ends with exactly one trailing newline.
+    source: legacy/src/main/java/lib/LoanResource.java:25-28

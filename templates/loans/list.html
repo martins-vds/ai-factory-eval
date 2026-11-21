@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Loans · The Lending Library{% endblock %}
+{% block content %}
+<div class="catalog-grid">
+  <section>
+    <p class="eyebrow">The collection · {{ loans|length }} loans in view</p>
+    <h1>Books in good company.</h1>
+    <p class="lede">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    <div class="loan-list">
+      {% for loan in loans %}
+        <article class="loan-row">
+          <div>
+            <p class="loan-id">{{ loan.id }}</p>
+            <p class="member">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+          </div>
+          <div class="loan-dates">
+            <p>Due {{ loan.due_on|date:"Y-m-d" }}</p>
+            {% if loan.returned_on %}
+              <p>Returned {{ loan.returned_on|date:"Y-m-d" }}</p>
+            {% else %}
+              <p>Not yet returned</p>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="desk-card">
+    <p class="eyebrow">At the desk</p>
+    <h2>Current loans</h2>
+  </aside>
+</div>
+{% endblock %}
