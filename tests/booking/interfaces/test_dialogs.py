@@ -15,7 +15,6 @@ from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
-
 cargo_repository = DjangoCargoRepository()
 dialog_dashboard = CargoDashboard(cargo_repository)
 dashboard_view, _ = create_booking_views(dialog_dashboard)
@@ -90,6 +89,49 @@ def test_dialog_completes_update_and_refreshes_the_not_routed_table(client):
     not_routed_table = refreshed.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
     assert 'New York' in not_routed_table
     assert 'Melbourne' not in not_routed_table
+
+
+@pytest.mark.django_db
+def test_destination_dialog_supports_full_page_fallback_and_posts_to_its_url(
+    booking_dialog_views,
+):
+    destination_dialog, deadline_dialog, _ = booking_dialog_views
+
+    destination_response = destination_dialog(
+        RequestFactory().get('/admin/cargo/DEF789/destination/'),
+        'DEF789',
+    )
+    deadline_response = deadline_dialog(
+        RequestFactory().get('/admin/cargo/DEF789/deadline/'),
+        'DEF789',
+    )
+    destination_content = destination_response.content.decode()
+    deadline_content = deadline_response.content.decode()
+
+    assert destination_response.status_code == 200
+    assert deadline_response.status_code == 200
+    assert '<!doctype html>' in destination_content.lower()
+    assert 'action="/admin/cargo/DEF789/destination/"' in destination_content
+    assert 'action="/admin/cargo/DEF789/deadline/"' in deadline_content
+    assert 'role="alert"' not in destination_content
+    assert 'role="alert"' not in deadline_content
+
+
+@pytest.mark.django_db
+def test_dialog_views_reject_unsupported_methods(booking_dialog_views):
+    destination_dialog, deadline_dialog, _ = booking_dialog_views
+
+    destination_response = destination_dialog(
+        RequestFactory().put('/admin/cargo/DEF789/destination/'), 'DEF789'
+    )
+    deadline_response = deadline_dialog(
+        RequestFactory().put('/admin/cargo/DEF789/deadline/'), 'DEF789'
+    )
+
+    assert destination_response.status_code == 405
+    assert destination_response['Allow'] == 'GET, POST'
+    assert deadline_response.status_code == 405
+    assert deadline_response['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
@@ -176,11 +218,67 @@ def test_invalid_deadline_is_reported_without_changing_cargo(booking_dialog_view
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert (
+        '<p id="deadline-error" role="alert" class="text-red-700">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
     assert 'aria-invalid="true"' in content
     assert 'not-a-date' in content
     assert before is not None and after is not None
     assert after.route_specification == before.route_specification
+
+
+@pytest.mark.django_db
+def test_missing_deadline_shows_field_error_and_keeps_empty_input(booking_dialog_views):
+    call_command('seed_sample_data')
+    _, deadline_dialog, _ = booking_dialog_views
+
+    response = deadline_dialog(
+        RequestFactory().post(
+            '/admin/cargo/DEF789/deadline/',
+            {},
+            HTTP_HX_REQUEST='true',
+        ),
+        'DEF789',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert (
+        '<p id="deadline-error" role="alert" class="text-red-700">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
+    assert 'aria-invalid="true"' in content
+    assert 'name="deadline"' in content
+    assert 'value=""' in content
+
+
+@pytest.mark.django_db
+def test_invalid_destination_is_reported_without_changing_cargo(booking_dialog_views):
+    call_command('seed_sample_data')
+    destination_dialog, _, _ = booking_dialog_views
+    cargo_repository = DjangoCargoRepository()
+    before = cargo_repository.find(TrackingId('DEF789'))
+    assert before is not None
+
+    response = destination_dialog(
+        RequestFactory().post(
+            '/admin/cargo/DEF789/destination/',
+            {'destination': 'CNHKG'},
+            HTTP_HX_REQUEST='true',
+        ),
+        'DEF789',
+    )
+    after = cargo_repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert (
+        '<p id="destination-error" role="alert" class="text-red-700">'
+        'Select a valid destination.</p>'
+    ) in content
+    assert 'aria-invalid="true"' in content
+    assert before.route_specification == after.route_specification
 
 
 @pytest.mark.django_db
@@ -195,14 +293,13 @@ def test_destination_update_preserves_other_specification_fields(booking_dialog_
         RequestFactory().post(
             '/admin/cargo/DEF789/destination/',
             {'destination': 'USNYC'},
-            HTTP_HX_REQUEST='true',
         ),
         'DEF789',
     )
     after = cargo_repository.find(TrackingId('DEF789'))
 
-    assert response.status_code == 204
-    assert response['HX-Redirect'] == '/admin/dashboard/'
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/dashboard/'
     assert after is not None
     assert after.route_specification.origin == before.route_specification.origin
     assert after.route_specification.arrival_deadline == before.route_specification.arrival_deadline

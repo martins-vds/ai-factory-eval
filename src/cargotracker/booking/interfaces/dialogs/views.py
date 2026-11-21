@@ -65,7 +65,7 @@ def create_booking_dialog_views(
         error = ''
         if request.method == 'POST':
             destination_by_code = {location.unlocode.value: location for location in destinations}
-            destination = destination_by_code.get(request.POST.get('destination', ''))
+            destination = destination_by_code.get(request.POST.get('destination'))
             if destination is None:
                 error = 'Select a valid destination.'
             else:

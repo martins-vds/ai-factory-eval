@@ -7,9 +7,15 @@ source:
   risk: {crap: 2, complexity: 1, coverage: 0.0}
 boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
-verification: legacy-test
+tickets: [martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dashboard/not_routed_table.html
+    - templates/booking/dialogs/_destination_form.html
+    - templates/booking/dialogs/_deadline_form.html
+status: migrated
+verification: spec-derived
 characterization_tier: A
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
@@ -17,4 +23,9 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_destination_and_deadline_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialog_completes_update_and_refreshes_the_not_routed_table"
+  - ".migration/evidence/runs/BK-05G.md"
+quirks: [martins-vds/ai-factory-pilot-target#251]
+no_rules: "The capability is dialog presentation and completion; business updates are enforced by CargoSpecification."
+notes: "The table actions open the destination and deadline dialogs; successful updates trigger a full dashboard navigation without the unavailable-widget warning (#251)."
