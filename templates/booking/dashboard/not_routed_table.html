@@ -8,6 +8,7 @@
           <th scope="col" class="p-3">Origin</th>
           <th scope="col" class="p-3">Destination</th>
           <th scope="col" class="p-3">Deadline</th>
+          <th scope="col" class="p-3">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -30,9 +31,42 @@
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
             </td>
             <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              <a
+                class="mr-3 inline-block rounded px-2 py-1 font-medium text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog-content"
+                hx-swap="innerHTML"
+                hx-on::response-error="document.getElementById('cargo-edit-error').textContent = 'Unable to load the destination dialog.'"
+              >Change destination</a>
+              <a
+                class="inline-block rounded px-2 py-1 font-medium text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog-content"
+                hx-swap="innerHTML"
+                hx-on::response-error="document.getElementById('cargo-edit-error').textContent = 'Unable to load the deadline dialog.'"
+              >Change deadline</a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <p id="cargo-edit-error" class="mt-2 text-red-700" role="alert" aria-live="assertive"></p>
+  <dialog
+    class="relative w-full max-w-2xl rounded-lg p-0 shadow-xl backdrop:bg-black/50"
+    id="cargo-edit-dialog"
+    aria-label="Cargo editor"
+    hx-on::response-error="document.getElementById('cargo-edit-error').textContent = 'Unable to update cargo.'"
+  >
+    <button
+      class="absolute right-4 top-4 rounded px-2 py-1 focus-visible:ring-2 focus-visible:ring-blue-600"
+      type="button"
+      aria-label="Close edit dialog"
+      hx-on:click="this.closest('dialog').close()"
+    >Close</button>
+    <div id="cargo-edit-dialog-content" hx-on::after-swap="this.closest('dialog').showModal()"></div>
+  </dialog>
 </section>

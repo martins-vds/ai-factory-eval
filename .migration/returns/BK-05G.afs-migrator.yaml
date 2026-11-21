@@ -1,0 +1,32 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2023
+specialty: ui
+specialty_evidence:
+  - .migration/runs/BK-05G/20261121T133053304118Z-behavior.log
+  - tests/booking/interfaces/test_dialogs.py::test_dialog_completes_update_and_refreshes_the_not_routed_table
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.971
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+rules: []
+quirk_tickets:
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/234
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/235
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/251
+new_tickets: []
+handoff: none
+no_rules:
+  booking.dialog-chain: Dialog presentation and completion; update rules remain enforced by CargoSpecification.
+  booking.dialog-deadline: Dialog validation feedback is presentation; update rules remain enforced by CargoSpecification.
+  booking.dialog-destination: Available destinations are presentation filtering; update rules remain enforced by CargoSpecification.
