@@ -5,10 +5,14 @@ source:
   graph_node: class:src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:ChangeDestinationDialog
   location: src/main/java/org/eclipse/cargotracker/interfaces/booking/web/ChangeDestinationDialog.java:15-43
   risk: {crap: 2, complexity: 1, coverage: 0.0}
-boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
+boundary: "Not-routed table actions open destination/deadline dialogs; Cancel closes the dialog, and successful updates close it and refresh the not-routed rows."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +21,10 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_both_edit_dialogs"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_refreshes_rows"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_completes_dialog"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "This capability composes dialog opening, cancellation, completion and row refresh; domain invariants belong to the change use cases."
+quirks: [martins-vds/ai-factory-pilot-target#251]
+notes: "The target closes the dialog and refreshes the not-routed table without the unavailable-widget warning, as approved by #251."

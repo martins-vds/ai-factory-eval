@@ -5,10 +5,14 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeDestination.xhtml:src/main/webapp/admin/dialogs/changeDestination.xhtml
   location: src/main/webapp/admin/dialogs/changeDestination.xhtml:9-40
   risk: {crap: 20, complexity: 4, coverage: 0.0}
-boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and refreshes the not-routed rows after a successful update."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/destination.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +20,14 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_initial_values_and_stable_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_refreshes_rows"
+  - "tests/booking/interfaces/test_dialogs.py::test_change_destination_use_case_rejects_the_cargos_origin"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_reports_when_the_origin_is_submitted"
+  - ".migration/evidence/runs/BK-05G.md"
+rules:
+  - id: destination-differs-from-origin
+    rule: A cargo destination must not be its origin.
+    source: RouteSpecification.__post_init__; martins-vds/ai-factory-pilot-target#235
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
+notes: "Destination choices exclude origin and current destination without mutating the backing location list under #235; successful updates omit the unavailable-widget warning under #251."

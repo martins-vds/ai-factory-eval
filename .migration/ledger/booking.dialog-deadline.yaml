@@ -5,10 +5,14 @@ source:
   graph_node: page:src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml:src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml
   location: src/main/webapp/admin/dialogs/changeArrivalDeadlineDate.xhtml:9-33
   risk: {crap: 6, complexity: 2, coverage: 0.0}
-boundary: "Deadline dialog receives trackingId, displays origin/destination, offers a date picker, and provides Cancel and Update with a full-page refresh on completion."
+boundary: "Deadline dialog receives trackingId, displays origin/destination and the current deadline, shows a field error for an unparseable date, and refreshes the not-routed rows after an update."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/deadline.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +20,10 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal interaction, parsing errors, cancellation or refresh behavior. Parse failures only print a stack trace (quirk #234); successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_the_cargos_current_deadline"
+  - "tests/booking/interfaces/test_dialogs.py::test_unparseable_deadline_shows_a_field_error_without_changing_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_completes_dialog"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "The dialog handles date-string parsing and delegates valid deadlines; it adds no business invariant beyond the deadline-change use case."
+notes: "Parse failures show a field error under #234, and successful updates do not emit the unavailable-widget warning under #251."
 quirks: [martins-vds/ai-factory-pilot-target#234, martins-vds/ai-factory-pilot-target#251]

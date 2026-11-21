@@ -1,0 +1,37 @@
+{% for cargo in not_routed_cargos %}
+  <tr class="border-b border-gray-200" data-tracking-id="{{ cargo.tracking_id.value }}">
+    <td class="p-3">
+      <a
+        href="/admin/cargo/{{ cargo.tracking_id.value }}/route/"
+        title="This cargo is not routed. Click on its tracking ID to route it!"
+      >
+        {{ cargo.tracking_id.value }}
+      </a>
+    </td>
+    <td class="p-3">
+      {{ cargo.route_specification.origin.name }}<br>
+      <span class="text-sm text-gray-600">{{ cargo.route_specification.origin.unlocode.value }}</span>
+    </td>
+    <td class="p-3">
+      {{ cargo.route_specification.destination.name }}<br>
+      <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+      <button
+        class="btn btn-ghost min-h-11 rounded-md px-3 py-2 font-semibold text-blue-700 hover:bg-blue-50"
+        type="button"
+        hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+        hx-target="#booking-dialog"
+        hx-swap="innerHTML"
+      >Change destination</button>
+    </td>
+    <td class="p-3">
+      {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+      <button
+        class="btn btn-ghost min-h-11 rounded-md px-3 py-2 font-semibold text-blue-700 hover:bg-blue-50"
+        type="button"
+        hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+        hx-target="#booking-dialog"
+        hx-swap="innerHTML"
+      >Change deadline</button>
+    </td>
+  </tr>
+{% endfor %}
