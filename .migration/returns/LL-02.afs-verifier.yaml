@@ -2,6 +2,7 @@ role: afs-verifier
 ticket: LL-02
 issue: martins-vds/ai-factory-synthetic-target#61
 pr: https://github.com/martins-vds/ai-factory-eval/pull/2185
+handoff: .migration/handoffs/LL-02.md
 verdict: changes-required
 gates:
   build: 0
