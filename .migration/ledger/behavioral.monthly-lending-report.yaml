@@ -1,0 +1,14 @@
+id: behavioral.monthly-lending-report
+kind: behavioral
+title: Specify the monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-7
+boundary: "The legacy specification describes a report run on the first day of each month for the prior month, grouped by member with loans started, loans returned late and total late fees in cents, sorted by fee descending then member ID."
+status: pending
+verification: spec-derived
+characterization_tier: C
+rules:
+  - { id: prior-month-range, rule: "The report covers the previous calendar month and runs on the first day of the current month.", source: "legacy/docs/reports-spec.md:4" }
+  - { id: omit-members-no-loans, rule: "Members with no loans in the reporting month are omitted.", source: "legacy/docs/reports-spec.md:7" }
+  - { id: report-sort, rule: "Rows sort by total late fees highest first, then member ID on ties.", source: "legacy/docs/reports-spec.md:6" }

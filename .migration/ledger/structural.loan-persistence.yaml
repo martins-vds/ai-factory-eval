@@ -1,0 +1,9 @@
+id: structural.loan-persistence
+kind: structural
+title: Configure the in-memory H2 JPA persistence unit
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:1-17
+boundary: "The library persistence unit registers Loan against an in-memory H2 database, recreates the schema on startup, and loads seed.sql."
+status: pending
+verification: pending

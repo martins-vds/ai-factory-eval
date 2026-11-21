@@ -1,0 +1,9 @@
+id: structural.maven-run
+kind: structural
+title: Build and launch the legacy application with Maven
+source:
+  graph_node: config:legacy/pom.xml
+  location: legacy/run.sh:1-6
+boundary: "Invoking legacy/run.sh runs Maven package -DskipTests, then starts lib.App with target/classes and target/dependency on the Java classpath."
+status: pending
+verification: pending

@@ -1,0 +1,15 @@
+id: ui.late-fee-view
+kind: ui
+title: Display a loan's late fee as HTML
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "GET /fees/{id} displays the loan ID, due date, days late and fee HTML. Unknown IDs return an HTML 404; open loans use the current date."
+status: pending
+verification: pending
+rules:
+  - { id: fee-grace-period, rule: "Loans returned or evaluated at most 2 days after due pay no fee.", source: "legacy/src/main/java/lib/LateFeeView.java:35" }
+  - { id: fee-daily-rate, rule: "Late fees are 25 cents per day beyond the grace period.", source: "legacy/src/main/java/lib/LateFeeView.java:35" }
+  - { id: fee-cap, rule: "Late fees never exceed 1000 cents.", source: "legacy/src/main/java/lib/LateFeeView.java:35" }

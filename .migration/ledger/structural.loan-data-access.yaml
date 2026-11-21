@@ -1,0 +1,11 @@
+id: structural.loan-data-access
+kind: structural
+title: Manage JPA reads and transactions for loans
+source:
+  graph_node: class:legacy/src/main/java/lib/LoanRepository.java:LoanRepository
+  flow: lend-book
+  location: legacy/src/main/java/lib/LoanRepository.java:47-69
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "Each repository read opens and closes an EntityManager; each write begins a transaction, commits on success, and rolls back if an active transaction remains on exit."
+status: pending
+verification: pending

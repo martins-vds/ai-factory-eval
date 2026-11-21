@@ -1,0 +1,11 @@
+id: integration.fine-payment
+kind: integration
+title: Charge a loan's fine through the payment gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-42
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "POST /payments/{id} looks up the loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL (default https://payments.lending-library.invalid). It returns gateway 200 or its status body as 502 for a non-200 response, and 502 with unavailable text on I/O failure."
+status: pending
+verification: pending
