@@ -1,0 +1,13 @@
+id: loan.return-date
+kind: data
+title: Record the loan return date
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned
+  flow: Return Book
+  location: legacy/src/main/java/lib/LoanRepository.java:36-45
+  risk: {crap: 6, complexity: 2, coverage: 0}
+boundary: For an existing loan, the write transaction sets returnedOn to the requested date and merges the entity; a missing id yields no update.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+notes: A repeated return overwrites the original date; see .migration/quirks/repeated-loan-return.md.

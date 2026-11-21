@@ -1,0 +1,12 @@
+id: about.page
+kind: ui
+title: Serve the public About page
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/java/lib/AboutPage.java:13-21; legacy/src/main/resources/static/about.html:1-9
+boundary: GET /about serves the classpath HTML page with the library name, Monday-to-Saturday 09:00-18:00 opening hours, 14-day loan period, and contact address.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+no_rules: The page is static public information without interactive behavior.

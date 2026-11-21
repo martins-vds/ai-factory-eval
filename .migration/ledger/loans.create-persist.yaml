@@ -1,0 +1,13 @@
+id: loans.create-persist
+kind: data
+title: Persist a newly lent loan
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.lend
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanRepository.java:27-34
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: The write transaction counts existing loans, creates id L<count+1>, stores the supplied member, ISBN, and date, then commits.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+notes: Count-based ids can collide under concurrent requests; see .migration/quirks/loan-id-collision.md.

@@ -1,0 +1,17 @@
+id: loan.entity
+kind: data
+title: Persist loan identity and dates
+source:
+  graph_node: class:legacy/src/main/java/lib/Loan.java:Loan
+  location: legacy/src/main/java/lib/Loan.java:13-51
+boundary: LOAN rows have an id, member, ISBN, lending date, and optional returned date; dueOn is 14 days after lentOn.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+rules:
+  - id: required-loan-fields
+    rule: Member, ISBN, and lentOn are required; returnedOn may be null.
+    source: legacy/src/main/java/lib/Loan.java:18-26
+  - id: loan-period
+    rule: A loan is due 14 days after it was lent.
+    source: legacy/src/main/java/lib/Loan.java:13,44-46

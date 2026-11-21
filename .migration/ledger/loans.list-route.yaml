@@ -1,0 +1,12 @@
+id: loans.list-route
+kind: behavioral
+title: Route requests to the loan list
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:18-28
+boundary: GET /loans is served as text/plain and delegates to the loan repository.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+no_rules: This entry records the HTTP route and delegation boundary; list behavior is captured separately.

@@ -1,0 +1,11 @@
+id: monthly-report.spec
+kind: behavioral
+title: Specify the retired monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-9
+boundary: The surviving specification describes a first-of-month report for the previous month, one row per member with loans started, late returns, and late fees in cents, ordered by fees descending then member id; members with no loans are omitted.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+notes: The document states that the reporting module's code and runtime are unavailable; this is a specification-only capability.

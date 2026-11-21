@@ -1,0 +1,17 @@
+id: loans.create-input
+kind: behavioral
+title: Accept a loan request
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanResource.java:LoanResource.lend
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43
+  risk: {crap: 12, complexity: 3, coverage: 0}
+boundary: POST /loans reads form parameters member and isbn; if either is null it returns 400 with "member and isbn are required", otherwise it delegates a loan dated today.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+rules:
+  - id: required-form-fields
+    rule: A missing member or ISBN form parameter returns HTTP 400; empty strings are not rejected by this check.
+    source: legacy/src/main/java/lib/LoanResource.java:38-40
+notes: Accepted values are not sanitized before output; see .migration/quirks/unescaped-loan-export-fields.md.

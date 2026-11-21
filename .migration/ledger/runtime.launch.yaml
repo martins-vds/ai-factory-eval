@@ -1,0 +1,11 @@
+id: runtime.launch
+kind: structural
+title: Build and launch the application
+source:
+  graph_node: file:legacy/run.sh
+  location: legacy/run.sh:1-6
+boundary: Running legacy/run.sh packages the app with tests skipped, then replaces the shell with lib.App using target/classes and copied dependencies.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+no_rules: The launcher is operational structure; its command and process handoff are the observable contract.
