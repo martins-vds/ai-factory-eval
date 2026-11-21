@@ -1,0 +1,26 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+phase: 6
+decisions:
+  - "martins-vds/ai-factory-synthetic-target#65: LL-04 landed in PR #103."
+  - "martins-vds/ai-factory-synthetic-target#104 and #113: verification history landed in PRs #105 and #115; final re-verification returned pass."
+  - "martins-vds/ai-factory-synthetic-target#122: LI-AUDIT returned complete in PR #125 with no gaps or graph inconsistencies."
+  - "The archived acceptance run 42938753426 attempt 1 reports all gates green; about.page remains migrated with differential verification."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#127: compare legacy GET /about with target GET /about for unchanged About text, opening hours, lending policy, and contact information; compare those details with target GET /ui/about/; compare the modern page layout with the approved reading-room plan decisions. Record any mismatch or the outcome of the review."
+next_step: "The operator completes and records the side-by-side review; do not close the slice or record sign-off before the human check and approver review."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets: []
