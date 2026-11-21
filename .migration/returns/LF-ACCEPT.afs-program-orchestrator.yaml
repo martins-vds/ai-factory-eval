@@ -1,0 +1,25 @@
+role: afs-program-orchestrator
+ticket: LF-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#117
+pr: martins-vds/ai-factory-synthetic-target#118
+phase: 6
+decisions: []
+dispatched: []
+awaiting_human:
+  - "Compare legacy against target side by side for the overdue fee amount and rounding, a non-overdue loan, an unknown loan, fee payment through the API and UI, and gateway failures; record the observed values and responses."
+next_step: "The operator performs and records the requested side-by-side check; leave human_check as requested until the operator reports the result."
+acceptance:
+  slice: fees-payments
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/fees-payments/acceptance.md
+  gates: all-green
+  mutation_score: 0.975
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#40
+    - martins-vds/ai-factory-synthetic-target#42
