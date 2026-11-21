@@ -34,7 +34,7 @@ class PaymentGateway:
         return self.response
 
 
-def test_pay_refuses_unknown_loan_without_calling_gateway():
+def test_fee_pay_refuses_unknown_loan_without_calling_gateway():
     gateway = PaymentGateway(GatewayResponse(200, 'charged\n'))
     application = FeeApplication(LoanRepository(None), Clock(), gateway)
 
@@ -42,7 +42,7 @@ def test_pay_refuses_unknown_loan_without_calling_gateway():
     assert gateway.charges == []
 
 
-def test_pay_calls_gateway_for_existing_loan_and_returns_response():
+def test_fee_pay_calls_gateway_for_existing_loan_and_returns_response():
     response = GatewayResponse(200, 'charged\n')
     gateway = PaymentGateway(response)
     application = FeeApplication(LoanRepository(Loan('L1', date(2026, 1, 1))), Clock(), gateway)
