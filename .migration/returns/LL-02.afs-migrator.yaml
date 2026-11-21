@@ -1,0 +1,66 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#2107
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2110
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: A loan requires a member value containing a non-whitespace character.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: true
+    ledger_rule: member-nonblank
+  - capability: loan.lend
+    rule: A loan requires an ISBN value containing a non-whitespace character.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: true
+    ledger_rule: isbn-nonblank
+  - capability: loan.lend
+    rule: Semicolons, quotes and line breaks in loan fields are escaped in text exports.
+    use_case: src.loans.services.loan_line
+    test: tests/loans/test_circulation.py::test_loan_line_escapes_delimiters_quotes_and_line_breaks
+    enforced: true
+    ledger_rule: export-escaped
+  - capability: loan.return-date
+    rule: The first return persists the supplied date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_records_the_supplied_date
+    enforced: true
+    ledger_rule: first-return-date
+  - capability: loan.return-date
+    rule: A repeat return is rejected without changing the original return date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_original_date
+    enforced: true
+    ledger_rule: preserve-original-return-date
+  - capability: loan.return
+    rule: A return request for an unknown loan is rejected.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_reports_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan
+  - capability: loan.return
+    rule: An already-returned loan cannot be returned again.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_original_date
+    enforced: true
+    ledger_rule: return-once
