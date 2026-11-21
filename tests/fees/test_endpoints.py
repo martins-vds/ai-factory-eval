@@ -152,6 +152,23 @@ def test_interrupted_payment_request_returns_gateway_failure(monkeypatch, client
     assert response.content == b'payment gateway unavailable\n'
 
 
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L1'),
+        ('get', '/payments/L1'),
+        ('post', '/ui/fees/L1/'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+@pytest.mark.django_db
+def test_routes_reject_unsupported_http_methods(client, payment_gateway, method, path):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert payment_gateway.requests == []
+
+
 @pytest.mark.django_db
 def test_io_failure_returns_gateway_failure(monkeypatch, client):
     def unavailable(_request):
@@ -178,5 +195,48 @@ def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway):
             status.wait_for()
             assert status.inner_text().strip() == 'charged'
             assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_displays_gateway_failure(live_server, payment_gateway):
+    payment_gateway.status = 503
+    payment_gateway.body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for(timeout=2000)
+            assert alert.inner_text().strip() == 'declined'
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_displays_missing_loan_payment_error(live_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.route(
+                '**/ui/payments/L3/',
+                lambda route: route.fulfill(
+                    status=404,
+                    content_type='text/plain',
+                    body='no such loan\n',
+                ),
+            )
+            page.get_by_role('button', name='Pay late fee').click()
+
+            alert = page.get_by_role('alert')
+            alert.wait_for(timeout=2000)
+            assert alert.inner_text().strip() == 'no such loan'
         finally:
             browser.close()

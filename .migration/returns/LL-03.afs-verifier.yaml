@@ -1,0 +1,70 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2037
+verdict: changes-required
+handoff: .migration/handoffs/LL-03.md
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 7.0
+  mutation_changed: "n/a: mutmut aborted after the failing UI 404 test; no score was produced"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "The htmx missing-loan 404 is not swapped into the page, so the member gets no visible error."
+    evidence: "tests/fees/test_endpoints.py::test_real_browser_displays_missing_loan_payment_error (behavior-2 exit 1)"
+  - severity: minor
+    where: templates/fees/payment-form.html:5
+    what: "The committed stylesheet lacks bg-[#a94e37], text-white, and hover:bg-[#873b2a]; check_ui reports all three."
+    evidence: "run: idiom-ui"
+  - severity: minor
+    where: .migration/evidence/runs/LL-03.md
+    what: "Mutation stopped before survivor accounting because the browser 404 test fails; route literals and allowed/rejected HTTP methods are checked behaviorally, and LL-03 defines no form Meta.model."
+    evidence: "run: mutation-changed"
+tests_added:
+  - tests/fees/test_fee_services.py::test_fee_pay_refuses_unknown_loan_without_calling_gateway
+  - tests/fees/test_fee_services.py::test_fee_pay_calls_gateway_for_existing_loan_and_returns_response
+  - tests/fees/test_endpoints.py::test_routes_reject_unsupported_http_methods
+  - tests/fees/test_endpoints.py::test_real_browser_displays_gateway_failure
+  - tests/fees/test_endpoints.py::test_real_browser_displays_missing_loan_payment_error
+ledger_issues:
+  - "The LL-03 ledger entries have no explicit rules/no_rules declarations; record the formula, unknown-loan payment guard, and the page's no-business-rule rationale before marking them migrated."
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#40
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+rules:
+  - capability: fees.calculation
+    rule: "Late days are nonnegative; up to two days are waived, then 25 cents per day up to $10."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "A returned loan's return date, rather than today, determines its late days."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_returned_loan_uses_return_date_instead_of_today
+    enforced: true
+  - capability: fees.calculation
+    rule: "An unknown loan has no calculated fee."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "An unknown loan is refused before the payment gateway is called."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_fee_pay_refuses_unknown_loan_without_calling_gateway
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "An existing loan's payment is delegated to the gateway and its response is returned."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_fee_pay_calls_gateway_for_existing_loan_and_returns_response
+    enforced: true
+no_rules:
+  fees.page: "The page only presents the fee calculation and payment status; it contains no separate business policy."
