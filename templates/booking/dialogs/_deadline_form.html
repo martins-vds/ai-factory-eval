@@ -1,0 +1,31 @@
+<form
+  method="post"
+  action="{{ action }}"
+  hx-post="{{ action }}"
+  hx-target="this"
+  hx-swap="outerHTML"
+  class="flex flex-col gap-5 p-6"
+>
+  {% csrf_token %}
+  <h2 id="deadline-dialog-heading" class="text-xl font-semibold">Change arrival deadline</h2>
+  <p>
+    Cargo {{ cargo.tracking_id.value }} travels from {{ cargo.route_specification.origin.name }}
+    to {{ cargo.route_specification.destination.name }}.
+  </p>
+  <label class="font-medium" for="deadline">Arrival deadline</label>
+  {% if error %}
+    <p id="deadline-error" role="alert" class="text-red-700">{{ error }}</p>
+  {% endif %}
+  <input
+    class="input input-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+    type="date"
+    id="deadline"
+    name="deadline"
+    value="{{ deadline_value }}"
+    {% if error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+  >
+  <nav aria-label="Deadline dialog actions" class="flex justify-end gap-3">
+    <a class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" href="/admin/dashboard/">Cancel</a>
+    <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update deadline</button>
+  </nav>
+</form>

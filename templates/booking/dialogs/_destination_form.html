@@ -1,0 +1,33 @@
+<form
+  method="post"
+  action="{{ action }}"
+  hx-post="{{ action }}"
+  hx-target="this"
+  hx-swap="outerHTML"
+  class="flex flex-col gap-5 p-6"
+>
+  {% csrf_token %}
+  <h2 id="destination-dialog-heading" class="text-xl font-semibold">Change destination</h2>
+  <p>
+    Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}
+    is currently destined for {{ cargo.route_specification.destination.name }}.
+  </p>
+  <label class="font-medium" for="destination">New destination</label>
+  {% if error %}
+    <p id="destination-error" role="alert" class="text-red-700">{{ error }}</p>
+  {% endif %}
+  <select
+    class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+    id="destination"
+    name="destination"
+    {% if error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+  >
+    {% for location in destinations %}
+      <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+    {% endfor %}
+  </select>
+  <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+    <a class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" href="/admin/dashboard/">Cancel</a>
+    <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update destination</button>
+  </nav>
+</form>
