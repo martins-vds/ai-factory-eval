@@ -1,0 +1,13 @@
+id: loan.return
+kind: behavioral
+title: Mark a loan returned
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans/{id}/return
+  flow: Return Book
+  location: legacy/src/main/java/lib/LoanResource.java:46-50
+  risk: { complexity: 2, coverage: 0.83 }
+boundary: "POST /loans/{id}/return records today and returns the updated row or 404"
+status: pending
+verification: pending
+rules:
+  - { id: unknown-return, rule: "Returning an unknown loan id is refused with HTTP 404.", source: "legacy/src/main/java/lib/LoanResource.java:46-50" }

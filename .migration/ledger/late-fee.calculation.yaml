@@ -1,0 +1,14 @@
+id: late-fee.calculation
+kind: behavioral
+title: Calculate the late fee
+source:
+  graph_node: function:legacy/src/main/java/lib/LateFeeView.java:page
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: { complexity: 4, coverage: 0.90 }
+boundary: "Fee uses current date or return date as end, 25 cents per late day, waived through 2 late days, capped at $10"
+status: pending
+verification: pending
+rules:
+  - { id: waive-two-days, rule: "A loan at most 2 days late has a $0 fee.", source: "legacy/src/main/java/lib/LateFeeView.java:26-38" }
+  - { id: fee-rate, rule: "Days beyond grace cost 25 cents each.", source: "legacy/src/main/java/lib/LateFeeView.java:26-38" }
+  - { id: fee-cap, rule: "The late fee never exceeds $10.", source: "legacy/src/main/java/lib/LateFeeView.java:26-38" }

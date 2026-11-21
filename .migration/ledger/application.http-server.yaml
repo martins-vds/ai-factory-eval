@@ -1,0 +1,11 @@
+id: application.http-server
+kind: structural
+title: Host JAX-RS resources with Grizzly
+source:
+  graph_node: file:legacy/src/main/java/lib/App.java
+  location: legacy/src/main/java/lib/App.java:13-26
+  risk: { complexity: 14, coverage: 0.85 }
+boundary: "The application listens on 0.0.0.0:{PORT}, registering loan, fee, payment, and About resources"
+status: pending
+verification: pending
+no_rules: "This is server composition rather than a business rule."

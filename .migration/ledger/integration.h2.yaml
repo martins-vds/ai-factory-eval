@@ -1,0 +1,10 @@
+id: integration.h2
+kind: integration
+title: Use the in-memory H2 database
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:6-10
+boundary: "Hibernate connects to jdbc:h2:mem:library and recreates the schema at startup"
+status: pending
+verification: pending
+quirks: []

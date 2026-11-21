@@ -1,0 +1,11 @@
+id: build.package
+kind: structural
+title: Build and launch the legacy application
+source:
+  graph_node: file:legacy/run.sh
+  location: legacy/run.sh:1-6
+  risk: { complexity: 1, coverage: 1 }
+boundary: "Running legacy/run.sh from the source directory packages Maven dependencies and execs lib.App"
+status: pending
+verification: pending
+no_rules: "This is build and process behavior rather than a business rule."
