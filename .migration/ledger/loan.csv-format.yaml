@@ -1,0 +1,11 @@
+id: loan.csv-format
+kind: behavioral
+title: Format loans as semicolon-separated text
+source:
+  graph_node: document:legacy/docs/export-csv.md
+  location: legacy/src/main/java/lib/LoanResource.java:52-55
+  risk: { complexity: 2, coverage: 1 }
+boundary: "Loan rows contain id, member, isbn, lentOn, dueOn, and returnedOn separated by semicolons"
+status: pending
+verification: pending
+no_rules: "This is a serialization contract with no branch-specific business rule."

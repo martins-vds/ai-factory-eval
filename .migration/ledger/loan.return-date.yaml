@@ -1,0 +1,11 @@
+id: loan.return-date
+kind: behavioral
+title: Record the return date
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned
+  location: legacy/src/main/java/lib/LoanRepository.java:36-45
+  risk: { crap: 6, complexity: 2, coverage: 0.83 }
+boundary: "The repository overwrites returnedOn whenever markReturned is called"
+status: pending
+verification: pending
+quirks: []

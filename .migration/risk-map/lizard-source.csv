@@ -1,0 +1,18 @@
+afs-run: source-lizard ok exit=0 0.07s · 19 lines, 4213 bytes
+log: .migration/runs/SY-04/20261121T065243917529Z-source-lizard.log
+-- last 15 line(s) --
+  6,3,84,2,6,"LoanResource::lend@38-43@.source/legacy/src/main/java/lib/LoanResource.java",".source/legacy/src/main/java/lib/LoanResource.java","LoanResource::lend","LoanResource::lend( @ FormParam('member') String member , @ FormParam('isbn'
+  5,1,72,0,5,"LoanResource::Path@46-50@.source/legacy/src/main/java/lib/LoanResource.java",".source/legacy/src/main/java/lib/LoanResource.java","LoanResource::Path","LoanResource::Path( '{id}/return')",46,50
+  4,2,73,1,4,"LoanResource::line@52-55@.source/legacy/src/main/java/lib/LoanResource.java",".source/legacy/src/main/java/lib/LoanResource.java","LoanResource::line","LoanResource::line( Loan l)",52,55
+  3,1,13,1,3,"LoanRepository::LoanRepository@15-17@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::LoanRepository","LoanRepository::LoanRepository( EntityManagerFac
+  3,1,26,0,3,"LoanRepository::all@19-21@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::all","LoanRepository::all()",19,21
+  3,1,29,1,3,"LoanRepository::find@23-25@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::find","LoanRepository::find( String id)",23,25
+  8,1,71,3,8,"LoanRepository::lend@27-34@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::lend","LoanRepository::lend( String member , String isbn , LocalDate on)",2
+  10,2,68,2,10,"LoanRepository::markReturned@36-45@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::markReturned","LoanRepository::markReturned( String id , LocalDat
+  8,1,41,1,8,"LoanRepository::read@47-54@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::read","LoanRepository::read( Function<EntityManager,T> work)",47,54
+  14,2,90,1,14,"LoanRepository::write@56-69@.source/legacy/src/main/java/lib/LoanRepository.java",".source/legacy/src/main/java/lib/LoanRepository.java","LoanRepository::write","LoanRepository::write( Function<EntityManager,T> work)",56,69
+  14,1,162,1,14,"App::main@13-26@.source/legacy/src/main/java/lib/App.java",".source/legacy/src/main/java/lib/App.java","App::main","App::main( String [ ] args)",13,26
+  3,1,13,1,3,"LateFeeView::LateFeeView@19-21@.source/legacy/src/main/java/lib/LateFeeView.java",".source/legacy/src/main/java/lib/LateFeeView.java","LateFeeView::LateFeeView","LateFeeView::LateFeeView( LoanRepository loans)",19,21
+  13,4,183,1,13,"LateFeeView::page@26-38@.source/legacy/src/main/java/lib/LateFeeView.java",".source/legacy/src/main/java/lib/LateFeeView.java","LateFeeView::page","LateFeeView::page( @ PathParam('id') String id)",26,38
+  3,1,13,1,3,"FinePayments::FinePayments@22-24@.source/legacy/src/main/java/lib/FinePayments.java",".source/legacy/src/main/java/lib/FinePayments.java","FinePayments::FinePayments","FinePayments::FinePayments( LoanRepository loans)",22,24
+  13,4,170,1,13,"FinePayments::pay@29-41@.source/legacy/src/main/java/lib/FinePayments.java",".source/legacy/src/main/java/lib/FinePayments.java","FinePayments::pay","FinePayments::pay( @ PathParam('id') String id)",29,41

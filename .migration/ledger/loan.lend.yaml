@@ -1,0 +1,14 @@
+id: loan.lend
+kind: behavioral
+title: Lend a book to a member
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:38-43
+  risk: { complexity: 3, coverage: 0.67 }
+boundary: "POST /loans with member and isbn form fields creates a loan today and returns 201 text"
+status: pending
+verification: pending
+rules:
+  - { id: required-form-fields, rule: "Missing member or isbn is refused with HTTP 400.", source: "legacy/src/main/java/lib/LoanResource.java:38-43" }
+  - { id: generated-loan-id, rule: "New loans use L followed by count plus one.", source: "legacy/src/main/java/lib/LoanRepository.java:27-34" }

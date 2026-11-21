@@ -1,0 +1,12 @@
+id: loan.get
+kind: behavioral
+title: Retrieve one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+  risk: { complexity: 2, coverage: 0.83 }
+boundary: "GET /loans/{id} returns the loan row or 404 text no such loan"
+status: pending
+verification: pending
+rules:
+  - { id: unknown-loan, rule: "An unknown loan id is refused with HTTP 404.", source: "legacy/src/main/java/lib/LoanResource.java:30-35" }

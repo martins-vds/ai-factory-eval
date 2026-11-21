@@ -1,0 +1,11 @@
+id: payment.gateway-errors
+kind: integration
+title: Map payment gateway outages
+source:
+  graph_node: function:legacy/src/main/java/lib/FinePayments.java:pay
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: { complexity: 4, coverage: 0.75 }
+boundary: "IOException or InterruptedException returns HTTP 502 and payment gateway unavailable"
+status: pending
+verification: pending
+quirks: []

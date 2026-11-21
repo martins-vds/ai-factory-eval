@@ -1,0 +1,12 @@
+id: library.about-ui
+kind: ui
+title: Serve the static library About page
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-8
+  risk: { complexity: 1, coverage: 1 }
+boundary: "GET /about returns the HTML page containing hours, lending term, and contact"
+status: pending
+verification: pending
+no_rules: "The static page carries presentation data but no separate business rule."

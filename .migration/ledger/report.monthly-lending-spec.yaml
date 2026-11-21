@@ -1,0 +1,13 @@
+id: report.monthly-lending-spec
+kind: data
+title: Preserve the retired monthly report specification
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-8
+boundary: "The only report contract is a spec for previous-month rows grouped by member"
+status: pending
+verification: pending
+rules:
+  - { id: report-schedule, rule: "The report runs on the first day for the previous calendar month.", source: "legacy/docs/reports-spec.md:6-8" }
+  - { id: report-omit-empty-members, rule: "Members with no loans in the month are omitted.", source: "legacy/docs/reports-spec.md:6-8" }
+  - { id: report-sort, rule: "Rows sort by total late fees descending, then member id ascending.", source: "legacy/docs/reports-spec.md:6-8" }

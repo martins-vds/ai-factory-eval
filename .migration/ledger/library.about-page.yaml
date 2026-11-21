@@ -1,0 +1,11 @@
+id: library.about-page
+kind: behavioral
+title: Load About page from the classpath
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/AboutPage.java:GET /about
+  location: legacy/src/main/java/lib/AboutPage.java:15-21
+  risk: { complexity: 1, coverage: 1 }
+boundary: "GET /about reads /static/about.html from the classpath as UTF-8 HTML"
+status: pending
+verification: pending
+no_rules: "This endpoint has no domain branch or authorization rule."
