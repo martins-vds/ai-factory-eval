@@ -119,9 +119,9 @@ def test_loaded_cargo_delivery_matches_handling_history(tmp_path):
             cargo.delivery.calculated_at,
         )
 
-        assert (
-            cargo.delivery.eta.date() if cargo.delivery.eta is not None else None
-        ) == (derived.eta.date() if derived.eta is not None else None)
+        assert (cargo.delivery.eta.date() if cargo.delivery.eta is not None else None) == (
+            derived.eta.date() if derived.eta is not None else None
+        )
         assert replace(cargo.delivery, eta=derived.eta) == replace(
             derived,
             last_event_id=history.most_recent_event_id,
