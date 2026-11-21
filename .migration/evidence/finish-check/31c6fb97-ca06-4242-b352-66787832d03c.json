@@ -1,0 +1,51 @@
+[
+  {
+    "at": "2026-11-21T06:55:14Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17464,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "SY-04",
+    "role": "afs-analyst",
+    "changed": [
+      ".migration/evidence/runs/SY-04.md",
+      ".migration/ledger/application.http-server.yaml",
+      ".migration/ledger/application.startup.yaml",
+      ".migration/ledger/build.package.yaml",
+      ".migration/ledger/data.jpa-persistence.yaml",
+      ".migration/ledger/data.loan-storage.yaml",
+      ".migration/ledger/data.seed-records.yaml",
+      ".migration/ledger/docs.export-csv.yaml",
+      ".migration/ledger/integration.h2.yaml",
+      ".migration/ledger/integration.payment-gateway.yaml",
+      ".migration/ledger/late-fee.calculation.yaml",
+      ".migration/ledger/late-fee.view.yaml",
+      ".migration/ledger/library.about-page.yaml",
+      ".migration/ledger/library.about-ui.yaml",
+      ".migration/ledger/loan.csv-format.yaml",
+      ".migration/ledger/loan.get.yaml",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.list.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/ledger/payment.charge.yaml",
+      ".migration/ledger/payment.gateway-errors.yaml",
+      ".migration/ledger/report.monthly-lending-spec.yaml",
+      ".migration/returns/SY-04.afs-analyst.yaml",
+      ".migration/risk-map/lizard-source.csv"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
