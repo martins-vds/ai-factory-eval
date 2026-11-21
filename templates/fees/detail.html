@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee {{ fee.loan_id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<script>
+  htmx.config.responseHandling = [
+    { selector: '[45]..', swap: true },
+  ];
+</script>
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Late fee · {{ fee.loan_id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee</h1>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ fee.due_on|date:"Y-m-d" }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">Late</dt><dd>{{ fee.late_days }} day(s)</dd></div>
+      </dl>
+      <p class="mt-6 text-5xl font-bold text-[#a94e37]">${{ fee.amount|floatformat:2 }}</p>
+      <div id="payment-status" class="mt-6">
+        <form method="post" action="/ui/payments/{{ fee.loan_id }}/"
+              hx-post="/ui/payments/{{ fee.loan_id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+          {% csrf_token %}
+          <button class="btn btn-primary" type="submit">Pay late fee</button>
+        </form>
+      </div>
+    </div>
+  </article>
+</section>
+{% endblock %}

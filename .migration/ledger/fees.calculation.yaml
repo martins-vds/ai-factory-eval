@@ -9,7 +9,16 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.fees.services.FeeApplication.calculate]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, tests/fees/test_fee_services.py::test_fee_calculation_waives_exactly_two_late_days, tests/fees/test_fee_services.py::test_fee_calculation_charges_three_late_days_at_twenty_five_cents, tests/fees/test_fee_services.py::test_fee_calculation_caps_at_ten_dollars]
+rules:
+  - id: grace-period
+    rule: "A loan returned or evaluated no more than two calendar days after its due date has a zero fee"
+    source: "legacy/src/main/java/lib/LateFeeView.java:31-37"
+  - id: fee-rate-and-cap
+    rule: "Late fees are 25 cents per late day after the grace period, capped at $10"
+    source: "legacy/src/main/java/lib/LateFeeView.java:31-37"
