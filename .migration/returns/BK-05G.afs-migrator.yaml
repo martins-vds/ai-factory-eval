@@ -1,0 +1,34 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-eval#2088
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2093
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.902
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_initial_values_and_stable_filtered_options
+  - tests/booking/interfaces/test_dialogs.py::test_unparseable_deadline_is_reported_at_the_deadline_field
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_completes_dialog_and_refreshes_the_not_routed_row
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_completes_dialog_and_refreshes_the_not_routed_row
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_edit_dialogs_and_refreshes_after_completion
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules:
+  booking.dialog-chain: "This capability coordinates presentation, successful dialog completion, and row refresh; business updates stay in CargoSpecification."
+  booking.dialog-deadline: "Date parsing and field feedback are UI format handling; deadline invariants remain in CargoSpecification and RouteSpecification."
+  booking.dialog-destination: "Destination option filtering and selection are UI presentation behavior; route invariants remain in CargoSpecification and RouteSpecification."
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+  - .migration/evidence/mutants/BK-05G.md
