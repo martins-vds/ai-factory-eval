@@ -1,0 +1,116 @@
+harness_version: 0.2.0
+checked_at: "2026-11-21T19:22:16Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: >-
+    Built and ran legacy/run.sh on port 18080, then exercised the HTTP routes; see
+    .migration/handoffs/SY-01.md for exact commands and observed responses.
+capabilities:
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4" }
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: "enrich_graph.py (java-ee, django)" }
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "Maven and legacy/run.sh" }
+  - id: build-run
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: "Python 3.13 and Django 5" }
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: curl }
+  - id: unit-integration-tests
+    applies_to: source
+    status: not-applicable
+    notes: The pinned source tree contains no test sources.
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: pytest }
+      - { kind: skill, name: django-tdd }
+  - id: coverage
+    applies_to: source
+    status: not-applicable
+    best_effort: true
+    notes: No source test suite is present to measure.
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: pytest-cov }
+      - { kind: skill, name: pytest-coverage }
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+  - id: crap
+    applies_to: source
+    status: not-applicable
+    best_effort: true
+    notes: No source test suite or coverage data is present.
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: lizard }
+      - { kind: tool, name: coverage.py }
+  - id: mutation-testing
+    applies_to: source
+    status: not-applicable
+    notes: The source is read-only and contains no test sources.
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: mutmut }
+  - id: lint-format
+    applies_to: source
+    status: not-applicable
+    notes: The source remains pinned and read-only; lint and format are target gates.
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: tool, name: ruff }
+  - id: stack-idioms
+    applies_to: source
+    status: not-applicable
+    notes: Source idioms are characterized, not changed; stack-idiom guidance applies to the target.
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - { kind: skill, name: django-patterns }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+    notes: >-
+      The source stores records in an in-process H2 database, which has no external JDBC endpoint;
+      the snapshot/export approach and snapshot owner need an operator decision.
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: skill, name: agent-browser }
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - { kind: tool, name: rtk-oss, version: "1.1.0" }
