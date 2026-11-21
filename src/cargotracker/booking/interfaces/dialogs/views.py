@@ -26,7 +26,6 @@ def _destination_dialog(
     request: HttpRequest,
     cargo: Cargo,
     locations: list[Location],
-    value: str = '',
     error: str = '',
 ) -> HttpResponse:
     available_destinations = [
@@ -40,7 +39,6 @@ def _destination_dialog(
         {
             'cargo': cargo,
             'locations': available_destinations,
-            'destination_value': value,
             'destination_error': error,
         },
     )
@@ -69,20 +67,18 @@ def create_booking_dialog_views(
         if request.method != 'POST':
             return _destination_dialog(request, cargo, locations)
 
-        value = request.POST.get('destination', '')
+        value = request.POST.get('destination')
         destination = next(
             (location for location in locations if location.unlocode.value == value),
             None,
         )
         if destination is None:
-            return _destination_dialog(
-                request, cargo, locations, value, 'Select a valid destination.'
-            )
+            return _destination_dialog(request, cargo, locations, 'Select a valid destination.')
         try:
             specification.change_destination(cargo_id, destination)
         except ValueError:
             return _destination_dialog(
-                request, cargo, locations, value, 'Destination must differ from origin.'
+                request, cargo, locations, 'Destination must differ from origin.'
             )
         return _updated_rows(request, dashboard)
 
@@ -95,7 +91,6 @@ def create_booking_dialog_views(
                 {
                     'cargo': cargo,
                     'deadline_value': cargo.route_specification.arrival_deadline.date().isoformat(),
-                    'deadline_error': '',
                 },
             )
 

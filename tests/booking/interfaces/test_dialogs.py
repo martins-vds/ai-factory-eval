@@ -2,7 +2,8 @@ import re
 
 import pytest
 from django.core.management import call_command
-from django.test import override_settings
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -76,8 +77,18 @@ def test_destination_dialog_shows_initial_values_and_stable_filtered_options(cli
     assert 'Hong Kong' in first and 'Melbourne' in first
     assert 'CNHKG' not in option_values
     assert 'AUMEL' not in option_values
+    assert len(option_values) == len(locations_before) - 2
+    assert 'id="destination-error"' not in first
     assert option_values == re.findall(r'<option\b[^>]*value="([^"]+)"', second_options.group(1))
     assert location_repository.find_all() == locations_before
+
+
+@pytest.mark.django_db
+def test_missing_cargo_is_reported_as_not_found():
+    with pytest.raises(Http404) as error:
+        destination_dialog_view(RequestFactory().get('/'), 'UNKNOWN')
+
+    assert str(error.value) == 'Cargo with tracking ID UNKNOWN not found.'
 
 
 @pytest.mark.django_db
@@ -92,20 +103,31 @@ def test_deadline_dialog_shows_the_cargos_current_deadline(client):
     )
 
     assert response.status_code == 200
-    assert f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in (
-        response.content.decode()
-    )
+    content = response.content.decode()
+    assert f'value="{cargo.route_specification.arrival_deadline:%Y-%m-%d}"' in content
+    assert 'Hong Kong' in content and 'Melbourne' in content
+    assert 'id="deadline-error"' not in content
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_unparseable_deadline_shows_a_field_error_without_changing_cargo(client):
+@pytest.mark.parametrize(
+    ('deadline', 'form_data'),
+    [
+        ('2027-02-31', {'deadline': '2027-02-31'}),
+        ('', {}),
+    ],
+    ids=('invalid-calendar-date', 'missing-date'),
+)
+def test_unparseable_deadline_shows_a_field_error_without_changing_cargo(
+    client, deadline, form_data
+):
     original = cargo_repository.find(TrackingId('DEF789'))
     assert original is not None
 
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
-        {'deadline': '2027-02-31'},
+        form_data,
         HTTP_HX_REQUEST='true',
     )
     content = response.content.decode()
@@ -115,6 +137,33 @@ def test_unparseable_deadline_shows_a_field_error_without_changing_cargo(client)
     assert 'id="deadline-error"' in content
     assert 'aria-invalid="true"' in content
     assert 'aria-describedby="deadline-error"' in content
+    assert (
+        '<p class="mt-2 text-red-700" id="deadline-error" role="alert">'
+        'Enter a valid arrival deadline.</p>'
+    ) in content
+    assert f'value="{deadline}"' in content
+    assert 'Cargo DEF789' in content
+    assert cargo_repository.find(TrackingId('DEF789')) == original
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_reports_a_missing_location(client):
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert (
+        '<p class="mt-2 text-red-700" id="destination-error" role="alert">'
+        'Select a valid destination.</p>'
+    ) in content
     assert cargo_repository.find(TrackingId('DEF789')) == original
 
 
@@ -176,6 +225,10 @@ def test_destination_dialog_reports_when_the_origin_is_submitted(client):
 
     assert response.status_code == 200
     assert 'Destination must differ from origin.' in response.content.decode()
+    assert (
+        '<p class="mt-2 text-red-700" id="destination-error" role="alert">'
+        'Destination must differ from origin.</p>'
+    ) in response.content.decode()
     assert cargo_repository.find(TrackingId('DEF789')) == original
 
 

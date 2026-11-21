@@ -1,0 +1,42 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-eval#2165
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2171
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 1.0
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_both_edit_dialogs
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_initial_values_and_stable_filtered_options
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_specification_fields_and_refreshes_rows
+  - tests/booking/interfaces/test_dialogs.py::test_change_destination_use_case_rejects_the_cargos_origin
+  - tests/booking/interfaces/test_dialogs.py::test_destination_dialog_reports_when_the_origin_is_submitted
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_the_cargos_current_deadline
+  - tests/booking/interfaces/test_dialogs.py::test_unparseable_deadline_shows_a_field_error_without_changing_cargo
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_specification_fields_and_completes_dialog
+  - .migration/evidence/mutants/BK-05G.md
+  - .migration/evidence/runs/BK-05G.md
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: booking.dialog-destination
+    rule: A cargo destination must not be its origin.
+    use_case: CargoSpecification.change_destination
+    test: tests/booking/interfaces/test_dialogs.py::test_change_destination_use_case_rejects_the_cargos_origin
+    enforced: true
+    ledger_rule: destination-differs-from-origin
+no_rules:
+  booking.dialog-chain: Dialog sequencing and row refresh introduce no business invariant.
+  booking.dialog-deadline: The dialog parses dates and delegates valid deadlines; it adds no business invariant.
