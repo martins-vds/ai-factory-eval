@@ -215,8 +215,9 @@ def test_route_screens_reject_unsupported_http_methods(client):
 
 
 @pytest.mark.django_db
-def test_route_selection_raises_not_found_for_unknown_cargo():
+@pytest.mark.parametrize('view', [route_view, itinerary_view])
+def test_route_selection_screens_raise_not_found_for_unknown_cargo(view):
     request = RequestFactory().get('/admin/cargo/MISSING1/route/')
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
-        route_view(request, 'MISSING1')
+        view(request, 'MISSING1')
