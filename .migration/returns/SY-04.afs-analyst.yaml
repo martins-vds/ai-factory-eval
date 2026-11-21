@@ -1,0 +1,25 @@
+role: afs-analyst
+ticket: SY-04
+issue: martins-vds/ai-factory-eval#2231
+graphs:
+  knowledge: null
+  domain: null
+  nodes: null
+  edges: null
+  flows: null
+ledger:
+  entries: null
+  by_kind:
+    structural: null
+    behavioral: null
+    ui: null
+    integration: null
+    data: null
+risk_map:
+  path: null
+  methods: null
+  above_threshold: null
+  hot_spots: null
+quirk_tickets: null
+graph_discrepancies: null
+handoff: .migration/handoffs/SY-04.md
