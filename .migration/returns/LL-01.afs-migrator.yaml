@@ -1,0 +1,59 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#2101
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2106
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.978
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.due-date
+    rule: A loan is due 14 calendar days after its lent date.
+    use_case: Loan.due_on
+    test: tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: due-date
+  - capability: loan.get
+    rule: Requesting an unknown loan raises LoanNotFound.
+    use_case: LoanCatalog.get_loan
+    test: tests/loans/test_catalog.py::test_catalog_use_case_refuses_an_unknown_loan_without_a_request
+    enforced: true
+    ledger_rule: unknown-loan
+  - capability: loan.list
+    rule: List every loan in ascending identifier order.
+    use_case: LoanCatalog.list_loans
+    test: tests/loans/test_catalog.py::test_catalog_use_case_orders_records_inserted_out_of_sequence
+    enforced: true
+    ledger_rule: ascending-order
+  - capability: loan.text-export
+    rule: Semicolon-delimited export quotes delimiters and line breaks while preserving values and a trailing newline.
+    use_case: LoanCatalog.text_export
+    test: tests/loans/test_catalog.py::test_text_export_escapes_semicolons_and_line_breaks
+    enforced: true
+    ledger_rule: delimited-escaping
+no_rules:
+  application.build: Build and wiring do not enforce business input rules.
+  application.startup: Startup initializes Django and migrations without business input validation.
+  data.loan-storage: Persistence and restart survival are storage guarantees, not input validation rules.
+  data.seed-records: The seed migration provides initial examples without business input rules.
+  repository.transactions: Catalog queries use Django autocommit and this ticket adds no multi-step writes.
