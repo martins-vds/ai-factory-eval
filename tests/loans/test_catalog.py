@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
 from src.loans.services import lend_loan, return_loan
@@ -128,6 +129,15 @@ def test_lend_endpoint_returns_field_errors_for_missing_values(client):
 
 
 @pytest.mark.django_db
+def test_loan_form_declares_required_member_and_isbn_fields():
+    form = LoanForm()
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert form.fields['member'].required
+    assert form.fields['isbn'].required
+
+
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     ('member', 'isbn'),
     [('', '123'), (' ', '123'), ('reader', ''), ('reader', ' ')],
@@ -179,6 +189,14 @@ def test_return_use_case_preserves_the_original_date_on_repeat():
     assert not updated
     assert loan.returned_on == returned_on
     assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_return_use_case_does_not_update_an_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert not updated
 
 
 @pytest.mark.django_db
