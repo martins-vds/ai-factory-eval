@@ -1,0 +1,140 @@
+harness_version: 0.2.0
+checked_at: "2026-11-21T20:56:38Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  tier: A
+  reason: "The pinned legacy tree builds and runs; live HTTP probes and their outputs are recorded in .migration/references/characterization.md."
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - kind: tool
+        name: legacy/run.sh (Maven, Java 17)
+    notes: "Built and started successfully from a temporary copy of the pinned tree."
+  - id: build-run
+    applies_to: target
+    status: met
+    provided_by:
+      - kind: tool
+        name: Django management checks and Python 3.13
+        version: "Django 5"
+    notes: "Target build gates are declared in .migration/profile.yaml; scaffolding follows bootstrap."
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - kind: tool
+        name: curl HTTP probes
+      - kind: tool
+        name: Playwright Chromium
+        version: "1.64.1"
+    notes: "The running legacy HTTP boundary was probed; detailed inputs and outputs are in .migration/references/characterization.md."
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - kind: tool
+        name: pytest and pytest-django
+    notes: "Target test gate is declared in .migration/profile.yaml; no legacy test sources exist."
+  - id: coverage
+    applies_to: source
+    status: met
+    best_effort: true
+    provided_by:
+      - kind: tool
+        name: JaCoCo agent and Maven report
+        version: "0.8.13"
+    notes: "No legacy test sources were found; source coverage remains best-effort and can use tier-A characterization probes."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - kind: tool
+        name: pytest-cov and coverage.py
+    notes: "Target coverage is part of the declared CRAP gate."
+  - id: complexity
+    applies_to: both
+    status: met
+    provided_by:
+      - kind: tool
+        name: lizard
+    notes: "Installed by the pinned harness bootstrap."
+  - id: crap
+    applies_to: source
+    status: met
+    best_effort: true
+    provided_by:
+      - kind: tool
+        name: lizard and .migration/harness/tools/crap.py
+    notes: "Source CRAP is best-effort under ADR-0013."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - kind: tool
+        name: lizard, pytest-cov, and harness crap.py
+    notes: "Configured in the target CRAP gate."
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - kind: tool
+        name: mutmut and afs-mutation
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - kind: tool
+        name: Ruff check and format gates
+  - id: stack-idioms
+    applies_to: both
+    status: met
+    provided_by:
+      - kind: skill
+        name: java-docs
+      - kind: skill
+        name: java-junit
+      - kind: skill
+        name: django-patterns
+      - kind: skill
+        name: django-security
+      - kind: skill
+        name: django-tdd
+      - kind: skill
+        name: django-verification
+  - id: data-migration
+    applies_to: both
+    status: waived
+    waiver:
+      reason: "The synthetic legacy data is only a seed script, no planted scenario needs data migration, and the pilot exercises data migration end to end (operator ruling on martins-vds/ai-factory-synthetic-target#20, 2026-11-08)."
+      approved_by: martins-vds
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - kind: tool
+        name: Playwright Chromium
+        version: "1.64.1"
+    notes: "The harness/browser setup supports the legacy HTML endpoints and Django-template target."
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - kind: tool
+        name: understand-anything
+        version: 4e6d3299017a7432da15957874992837a315c5b4
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - kind: tool
+        name: enrich_graph.py (java-ee, django)
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - kind: tool
+        name: rtk-oss
+        version: "1.1.0"

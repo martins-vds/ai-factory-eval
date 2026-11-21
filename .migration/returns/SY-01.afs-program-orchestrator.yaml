@@ -1,0 +1,14 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#2210
+phase: 0
+decisions:
+  - "Characterization tier A: the pinned legacy tree built and ran, and endpoint probes are recorded in .migration/references/characterization.md."
+  - "Target stacks are Python 3.13, Django 5, Django templates, and PostgreSQL 17; source pin and stack mapping are in .migration/profile.yaml."
+  - "DDD per bounded context follows the operator's decision map #38; data migration is waived by martins-vds in the read-only ruling on issue #20."
+dispatched: []
+awaiting_human:
+  - "Dispatcher to run bootstrap.py step 5 from harness commit f195ae3d25110bdcf4bd78cadd0676c25c614a5c using the profile, checklist, and java-to-django stack pack."
+  - "Operator review of .migration/quirks/loan-form-content-type-500.md; no live tracker issue was created."
+next_step: "Dispatcher runs the pinned bootstrap installer; target application scaffolding follows only after bootstrap."
+handoff: .migration/handoffs/SY-01.md
