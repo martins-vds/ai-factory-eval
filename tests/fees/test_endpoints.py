@@ -28,7 +28,7 @@ def test_fee_api_returns_characterized_not_found_response(client):
     response = client.get('/fees/unknown')
 
     assert response.status_code == 404
-    assert response['Content-Type'] == 'text/html; charset=utf-8'
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == '<p>No such loan.</p>'
 
 
