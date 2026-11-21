@@ -1,0 +1,14 @@
+id: data.loan-storage
+kind: data
+title: Persist loans in the LOAN table
+source:
+  graph_node: table:LOAN
+  location: legacy/src/main/java/lib/LoanRepository.java:15-69
+  risk: {crap: 6, complexity: 2, coverage: 0}
+boundary: "Loan creation, lookup, listing, and return operations read or write JPA Loan entities in the LOAN table."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "The migration ledger records the persistence boundary here; concrete domain invariants belong to the loan capabilities."

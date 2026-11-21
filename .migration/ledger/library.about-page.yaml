@@ -1,0 +1,15 @@
+id: library.about-page
+kind: ui
+title: Show public library information
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/AboutPage.java:GET /about
+  flow: View About Page
+  location: legacy/src/main/java/lib/AboutPage.java:16-21
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "GET /about renders the static HTML about page with opening hours, 14-day lending period, and contact address."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "The about page is static public information."

@@ -1,0 +1,14 @@
+id: data.seed-records
+kind: data
+title: Seed three sample loans
+source:
+  graph_node: table:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "The startup database contains seed loans L1, L2, and L3 with their members, ISBNs, dates, and return states."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "Seed data is an initialization fixture rather than a refusal or state-transition rule."

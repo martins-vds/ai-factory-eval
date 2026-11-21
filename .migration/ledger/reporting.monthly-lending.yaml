@@ -1,0 +1,13 @@
+id: reporting.monthly-lending
+kind: behavioral
+title: Produce the monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-9
+boundary: "A monthly external report covers the prior calendar month, lists members with loans started that month, and sorts by late-fee cents descending."
+status: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/evidence/runs/SY-04.md
+no_rules: "The source implementation is unavailable; this entry preserves only the remaining specification."

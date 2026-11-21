@@ -1,0 +1,14 @@
+id: export.csv-loans
+kind: structural
+title: Export loans as semicolon-separated text
+source:
+  graph_node: document:legacy/docs/export-csv.md
+  flow: List Loans
+  location: legacy/docs/export-csv.md:1-4
+boundary: "GET /loans is a spreadsheet export: six semicolon-separated fields per loan, with returned date blank for active loans."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "CSV framing is an output format with no separate domain refusal or invariant."
