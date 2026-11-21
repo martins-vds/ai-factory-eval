@@ -1,0 +1,17 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Select Itinerary | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  {% if candidates %}
+    <h1 class="mb-6 text-2xl font-semibold text-gray-900">Route options for Cargo {{ cargo.tracking_id.value }}</h1>
+    {% for candidate in candidates %}
+      {% include "booking/route_selection/_candidate.html" %}
+    {% endfor %}
+  {% else %}
+    <p class="my-6 text-gray-800">
+      No routes found that satisfy the route specification.
+      Try setting an arrival deadline further into the future.
+    </p>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1939
+pr: null
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.968
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty: ui
+specialty_evidence:
+  - .migration/evidence/runs/BK-05F.md
+rules: []
+no_rules:
+  booking.routing-chain: "Structural composition; no eligibility or refusal rule."
+  booking.screen-route: "This screen presents routing details and candidates; it does not own a business rule."
+  booking.screen-select-itinerary: "Candidate eligibility is enforced by the routing use case."
+  booking.routing-assign: "Assignment persists a selected candidate and recalculates delivery; it has no separate refused-input rule."

@@ -11,6 +11,7 @@ tickets: [martins-vds/ai-factory-pilot-target#290]
 target:
   components:
     - cargotracker.booking.application.routing.CargoRouting.assign_route
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
 status: migrated
 verification: legacy-test
 characterization_tier: A
@@ -21,6 +22,9 @@ evidence:
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery"
+  - "tests/booking/interfaces/test_route_selection.py::test_assignment_redirects_to_cargo_details_and_result_renders"
   - ".migration/evidence/runs/BK-05C.md"
+  - ".migration/evidence/runs/BK-05F.md"
 notes: "The bean returns a show.html outcome, while the running UI resolved the selected route to show.xhtml; preserve this observed result for quirk #236 review. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]
+no_rules: "Assignment persists the selected candidate and recalculates delivery; candidate validity and the post-assignment destination are orchestration/UI behavior rather than a separate refused input rule."

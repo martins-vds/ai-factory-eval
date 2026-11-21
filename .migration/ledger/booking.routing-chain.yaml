@@ -8,7 +8,7 @@ source:
 boundary: "CargoDetails and ItinerarySelection call BookingServiceFacade, DefaultBookingService, RoutingService and the configured graph-traversal endpoint; assignment maps route DTOs to JPA Voyage/Location entities and stores Cargo."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +17,13 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_count_and_numbered_legs"
+  - "tests/booking/interfaces/test_route_selection.py::test_assignment_redirects_to_cargo_details_and_result_renders"
+  - ".migration/evidence/runs/BK-05F.md"
+target:
+  components:
+    - cargotracker.booking.application.routing.CargoRouting.route_candidates
+    - cargotracker.booking.application.routing.CargoRouting.assign_route
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
 notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
+no_rules: "This capability is structural composition and does not itself refuse input or impose a business rule."
