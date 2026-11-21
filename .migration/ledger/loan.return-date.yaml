@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_marks_an_unreturned_loan_with_the_supplied_date, tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_the_original_date, tests/loans/test_circulation.py::test_repeat_return_api_answers_conflict_without_replacing_the_saved_date]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_marks_an_unreturned_loan_with_the_supplied_date, tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_the_original_date, tests/loans/test_circulation.py::test_return_use_case_handles_a_concurrent_return, tests/loans/test_circulation.py::test_repeat_return_api_answers_conflict_without_replacing_the_saved_date]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
 rules:
