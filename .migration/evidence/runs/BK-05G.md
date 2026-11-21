@@ -63,3 +63,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:16:37+00:00 | finish-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T23:16:40+00:00 | finish-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9ed199729e2449b0` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-21T23:17:03+00:00 | finish-return-validation | 0 | 5.54 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-21T23:19:02+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:19:06+00:00 | finish2-build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:19:08+00:00 | finish2-build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T23:20:08+00:00 | finish2-behavior-suite | 0 | 57.32 | `pytest -q` | `2e2474604911e914` |  |  |
+| 2026-11-21T23:21:19+00:00 | finish2-crap-coverage | 0 | 67.82 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `433ff900764deb58` |  |  |
+| 2026-11-21T23:21:22+00:00 | finish2-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:21:25+00:00 | finish2-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9ed199729e2449b0` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
