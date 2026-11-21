@@ -1,0 +1,44 @@
+<dialog id="deadline-dialog" class="modal" aria-modal="true" aria-labelledby="deadline-dialog-title">
+  <div class="modal-box">
+    <h2 id="deadline-dialog-title" class="text-xl font-semibold">Change arrival deadline</h2>
+    <p class="mt-2">
+      {{ cargo.route_specification.origin.name }} →
+      {{ cargo.route_specification.destination.name }}
+    </p>
+    <div class="mt-4">
+      <form
+        method="post"
+        action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline-dialog/"
+        hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline-dialog/"
+        hx-target="#cargo-dialog"
+        hx-swap="innerHTML"
+      >
+        {% csrf_token %}
+        <label for="deadline" class="block font-medium">Arrival deadline</label>
+        <input
+          id="deadline"
+          name="deadline"
+          type="date"
+          value="{{ deadline_value }}"
+          class="input input-bordered mt-1 w-full focus:ring-2 focus:ring-blue-500"
+          {% if error %}aria-describedby="deadline-error"{% endif %}
+          autofocus
+        >
+        {% if error %}
+          <p id="deadline-error" class="mt-2 text-sm text-red-700">{{ error }}</p>
+        {% endif %}
+        <button type="submit" class="btn btn-primary mt-4 focus:ring-2 focus:ring-blue-500">
+          Update
+        </button>
+      </form>
+      <form method="dialog" class="inline-block">
+        <button type="submit" class="btn btn-ghost mt-4 focus:ring-2 focus:ring-blue-500">
+          Cancel
+        </button>
+      </form>
+    </div>
+  </div>
+  <form method="dialog" class="modal-backdrop">
+    <button type="submit" aria-label="Close deadline dialog">Close</button>
+  </form>
+</dialog>

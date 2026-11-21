@@ -7,8 +7,13 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - src.cargotracker.booking.interfaces.dialogs.views
+    - templates/booking/dialogs/destination.html
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +21,10 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_values_and_repeated_filtered_options"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_fields_and_refreshes_the_table"
+  - "tests/booking/interfaces/test_dialogs.py::test_dialogs_open_update_and_refresh_the_not_routed_table"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "Destination option filtering and repeatable rendering are presentation behavior; the dialog has no additional business input rule."
+notes: "The destination dialog filters origin/current destination without mutating the location list per ruling #235. Successful updates preserve other specification fields and omit the unavailable-widget warning per ruling #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
