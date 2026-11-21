@@ -13,9 +13,10 @@ evidence_logs:
   - .migration/evidence/runs/LL-05.md
 ledger_updated:
   - reports.monthly-spec
-quirk_tickets: []
+quirk_tickets:
+  - .migration/quirks/LL-05-fee-attribution.md
 new_tickets: []
-handoff: none
+handoff: .migration/handoffs/LL-05.md
 rules:
   - capability: reports.monthly-spec
     rule: Report the previous calendar month, using an inclusive start and exclusive end date.
@@ -35,12 +36,6 @@ rules:
     test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_and_orders_members_with_monthly_loans
     enforced: true
     ledger_rule: monthly-event-counts
-  - capability: reports.monthly-spec
-    rule: Sum calculated late-fee amounts in cents for loans returned during the report month.
-    use_case: MonthlyReportApplication.run
-    test: tests/reports/test_monthly_report.py::test_monthly_report_counts_late_returns_and_totals_calculated_fees
-    enforced: true
-    ledger_rule: late-fee-total
   - capability: reports.monthly-spec
     rule: Sort rows by total late fees descending, then member id ascending.
     use_case: MonthlyReportApplication.run

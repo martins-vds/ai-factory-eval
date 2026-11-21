@@ -13,7 +13,7 @@ target:
     - src.reports.repository.DjangoReportRepository
     - src.reports.management.commands.monthly_report.Command
     - src.reports.composition.monthly_report
-status: migrated
+status: in-progress
 verification: spec-derived
 characterization_tier: C
 evidence:
@@ -35,9 +35,9 @@ rules:
     rule: "Count loan starts and late returns only when their event dates fall within the report month."
     source: legacy/docs/reports-spec.md:3; .migration/plan/monthly-report.md
   - id: late-fee-total
-    rule: "Sum calculated late-fee amounts in cents for loans returned during the report month."
-    source: legacy/docs/reports-spec.md:3; .migration/ledger/fees.calculation.yaml
+    rule: "Include late-fee totals in cents; the date used to attribute a fee to a report period remains unresolved."
+    source: legacy/docs/reports-spec.md:3; .migration/plan/monthly-report.md
   - id: report-order
     rule: "Sort rows by total late fees descending, then member id ascending."
     source: legacy/docs/reports-spec.md:4
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable. Fee attribution is unresolved; see .migration/quirks/LL-05-fee-attribution.md."
