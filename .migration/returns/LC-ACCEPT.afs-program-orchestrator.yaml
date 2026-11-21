@@ -1,0 +1,26 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+phase: 6
+decisions: []
+dispatched: []
+awaiting_human:
+  - "Compare legacy and target side by side: API lending required/blank fields, 14-day due date and delimiter escaping; first and repeated returns (HTTP 409 with saved date unchanged); and the /ui/loans/new/ and /ui/loans/{id}/return/ forms, including success and validation/error behavior."
+next_step: "Await the operator's legacy-versus-target side-by-side check; no sign-off or approval is recorded."
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#43
