@@ -56,3 +56,10 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:09:24+00:00 | final-return-validation | 1 | 5.41 | `python .migration/harness/tools/validate.py .migration` | `4bf2175061f90b26` | 195 file(s) checked, 1 error(s) |  |
 | 2026-11-21T23:09:34+00:00 | final-return-validation | 0 | 5.42 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
 | 2026-11-21T23:14:19+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:14:36+00:00 | finish-build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:14:38+00:00 | finish-build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T23:15:36+00:00 | finish-behavior-suite | 0 | 54.97 | `pytest -q` | `5c01facc66d53c93` |  |  |
+| 2026-11-21T23:16:34+00:00 | finish-crap-coverage | 0 | 55.54 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `84dc378c3c7c08b8` |  |  |
+| 2026-11-21T23:16:37+00:00 | finish-crap-lizard | 0 | 0.13 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:16:40+00:00 | finish-crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `9ed199729e2449b0` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-21T23:17:03+00:00 | finish-return-validation | 0 | 5.54 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
