@@ -52,3 +52,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:08:00+00:00 | final-mutation-changed | 0 | 143.91 | `python .migration/harness/tools/afs-mutation` | `14e68a076660cf06` |  | gate=mutation score=0.961 threshold=0.8 killed=49 survived=2 files=1 base=b773736ccfce81b6efe150bd40331263565175d5 |
 | 2026-11-21T23:08:05+00:00 | final-idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T23:08:08+00:00 | final-idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T23:09:14+00:00 | final-return-validation | 2 | 0.13 | `python .migration/harness/tools/validate.py` | `8ccf6c31e456c000` | validate.py: error: the following arguments are required: folder |  |
+| 2026-11-21T23:09:24+00:00 | final-return-validation | 1 | 5.41 | `python .migration/harness/tools/validate.py .migration` | `4bf2175061f90b26` | 195 file(s) checked, 1 error(s) |  |
+| 2026-11-21T23:09:34+00:00 | final-return-validation | 0 | 5.42 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
