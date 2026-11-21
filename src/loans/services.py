@@ -1,7 +1,8 @@
 import csv
+from collections.abc import Iterable
 from datetime import date
 from io import StringIO
-from typing import Iterable, Protocol
+from typing import Protocol
 
 
 class Loan(Protocol):
@@ -58,8 +59,6 @@ def lend_loan(
         isbn=isbn,
         lent_on=lent_on,
     )
-
-from .repository import LoanRepository
 
 
 def return_loan(store: LoanStore, loan_id: str, returned_on: date) -> Loan:

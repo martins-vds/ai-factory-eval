@@ -37,7 +37,9 @@ def test_lend_endpoint_creates_a_loan_with_a_fourteen_day_due_date(client):
 )
 @pytest.mark.django_db
 def test_lend_endpoint_rejects_missing_or_blank_fields(client, member, isbn):
-    data = {field: value for field, value in (('member', member), ('isbn', isbn)) if value is not None}
+    data = {
+        field: value for field, value in (('member', member), ('isbn', isbn)) if value is not None
+    }
     response = client.post('/loans', data)
 
     assert response.status_code == 400

@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 import pytest
 
+from src.loans.repository import LoanRepository
 from src.loans.services import (
     InvalidLoan,
     LoanAlreadyReturned,
@@ -64,11 +65,18 @@ def test_lending_rejects_missing_or_blank_fields(member, isbn, field):
     assert store.loans == {}
 
 
-def test_lending_preserves_values_and_sets_a_fourteen_day_due_date():
+def test_lending_preserves_field_values():
     loan = lend_loan(LoanStore(), ' reader ', ' 123 ', date(2026, 11, 1))
 
     assert loan.member == ' reader '
     assert loan.isbn == ' 123 '
+
+
+@pytest.mark.django_db
+def test_lending_use_case_sets_a_fourteen_day_due_date():
+    loan = lend_loan(LoanRepository(), 'reader', '123', date(2026, 11, 1))
+
+    assert loan.id == 'L4'
     assert loan.due_on == date(2026, 11, 15)
 
 
@@ -80,9 +88,7 @@ def test_lending_export_escapes_field_and_record_delimiters():
         date(2026, 11, 1),
     )
 
-    assert loan_line(loan) == (
-        'L1;"reader; one\nreader two";"123;456";2026-11-01;2026-11-15;\n'
-    )
+    assert loan_line(loan) == ('L1;"reader; one\nreader two";"123;456";2026-11-01;2026-11-15;\n')
 
 
 def test_return_records_a_date_for_an_unreturned_loan():

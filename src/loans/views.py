@@ -51,7 +51,9 @@ def loan_lend_page(request):
             return redirect(f'/ui/loans/{loan.id}/')
 
     context = {'form': form}
-    template = 'loans/_lend_form.html' if request.headers.get('HX-Request') == 'true' else 'loans/new.html'
+    template = (
+        'loans/_lend_form.html' if request.headers.get('HX-Request') == 'true' else 'loans/new.html'
+    )
     status = 400 if request.method == 'POST' and form.errors else 200
     return render(request, template, context, status=status)
 
