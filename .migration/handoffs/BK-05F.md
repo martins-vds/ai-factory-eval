@@ -1,5 +1,5 @@
 ## Handoff — afs-migrator · 2026-11-21T01:20:30Z
-**State:** in progress · **Branch / PR:** current ticket branch · **Last commit:** pending
+**State:** in progress · **Branch / PR:** current ticket branch · **Last commit:** 0a365d77f990ca85e4c18d89cbac20dcc769fa08
 ### Done
 - Implemented route-selection and itinerary views plus templates under the BK-05F scope.
 - Added populated, empty, assignment, redirect, details-page, 404, and POST-index target tests.
