@@ -17,6 +17,9 @@ findings:
     where: templates/library_info/about.html:6,9-10
     what: Three Tailwind utilities used by the changed About page are absent from built CSS, so the browser ignores those styles.
     evidence: "run: idiom"
+  - severity: minor
+    where: .migration/harness/installed.json:4
+    what: The LL-04 PR changes the pinned harness manifest timestamp outside the ticket file scope; the harness integrity check found no content drift.
 tests_added:
   - tests/library_info/test_about_page.py::test_about_routes_reject_post_requests
 ledger_issues:
