@@ -1,0 +1,21 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+phase: 6
+decisions: []
+dispatched: []
+awaiting_human:
+  - "Compare legacy /about with target /about for About text and preserved static behavior; compare the legacy About information with target /ui/about/ for the library description, opening hours, 14-day lending period, and contact address (noting /ui/about/ is target-only); compare the target /ui/about/ layout and navigation with the approved reading-room plan and prototype (#38, #50)."
+next_step: "The operator completes the requested side-by-side check and records its outcome; do not claim human sign-off or close the epic before that outcome."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
