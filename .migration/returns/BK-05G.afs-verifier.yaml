@@ -1,0 +1,34 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2094
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.926
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: major
+    where: templates/booking/dashboard/not_routed_table.html:32
+    what: "The table and both dialog forms issue htmx requests without 4xx/5xx handling, so the required cargo-not-found 404 is not swapped into the dialog."
+    evidence: "run: idiom"
+  - severity: minor
+    where: templates/booking/dashboard/not_routed_table.html:32
+    what: "The editor buttons are htmx-only and provide no non-JavaScript fallback, contrary to ADR-0002's requirement that the page work without JavaScript."
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_returns_not_found[destination]
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_cargo_dialog_returns_not_found[deadline]
+  - tests/booking/interfaces/test_dialogs.py::test_invalid_deadline_shows_field_error_and_keeps_dialog_open
+  - tests/booking/interfaces/test_dialogs.py::test_invalid_destination_shows_field_error_without_updating_cargo
+ledger_issues: []
+quirk_tickets: []
+rules: []
+no_rules:
+  booking.dialog-chain: "Presentation flow only; no business predicate to enforce in a use case."
+  booking.dialog-deadline: "Date parsing is dialog validation; CargoSpecification.change_deadline owns the application update and BK-05A tests its state reset."
+  booking.dialog-destination: "Destination option filtering is dialog UI behavior; CargoSpecification.change_destination owns the application update and BK-05A tests its state reset."
