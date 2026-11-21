@@ -1,0 +1,27 @@
+role: afs-program-orchestrator
+ticket: LF-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#117
+phase: 6
+decisions:
+  - Acceptance run 42912984554 attempt 1 passed on commit 8f9a11640eef9801378f3db53a76903363c5e5b5; LF-AUDIT #114 returned complete.
+  - The human side-by-side check is requested and has not been reported or approved.
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#62: compare legacy against target for an overdue loan's fee and rounding, a not-overdue loan, an unknown loan, API and UI payment, and non-200 plus I/O/interruption gateway failures."
+next_step: "Await the operator's side-by-side results; keep human_check requested until the human reports an outcome."
+acceptance:
+  slice: fees-payments
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/fees-payments/acceptance.md
+  gates: all-green
+  mutation_score: 0.975
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#40
+    - martins-vds/ai-factory-synthetic-target#42
