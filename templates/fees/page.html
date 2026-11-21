@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  {% if quote %}
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">The collection · Late fee</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ quote.loan.id }}</h1>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm text-[#66705b]">Due</dt>
+          <dd>{{ quote.loan.due_on|date:"M j, Y" }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-[#66705b]">Late by</dt>
+          <dd>{{ quote.late_days }} day{{ quote.late_days|pluralize }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm text-[#66705b]">Fee</dt>
+          <dd class="text-2xl">${{ quote.amount|floatformat:2 }}</dd>
+        </div>
+      </dl>
+      {% include "fees/payment-panel.html" with loan_id=quote.loan.id %}
+    </div>
+  </article>
+  {% else %}
+  <p class="mt-6" role="alert">No such loan.</p>
+  {% endif %}
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    if (event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,91 @@
+[
+  {
+    "at": "2026-11-21T19:49:18Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17077,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-03",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-03.md",
+      ".migration/ledger/fees.calculation.yaml",
+      ".migration/ledger/fees.page.yaml",
+      ".migration/ledger/integration.payment-gateway.yaml",
+      ".migration/returns/LL-03.afs-migrator.yaml",
+      "config/urls.py",
+      "src/fees/__init__.py",
+      "src/fees/composition.py",
+      "src/fees/gateway.py",
+      "src/fees/services.py",
+      "src/fees/urls.py",
+      "src/fees/views.py",
+      "templates/fees/page.html",
+      "templates/fees/payment-panel.html",
+      "tests/fees/__init__.py",
+      "tests/fees/conftest.py",
+      "tests/fees/test_gateway.py",
+      "tests/fees/test_services.py",
+      "tests/fees/test_views.py"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-03.afs-migrator.yaml` reports failing gates and no handoff: `crap: 7.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-21T19:50:46Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17588,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-03",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/3e9b3d5e-0a34-43ab-ac41-d9e2982015f4.json",
+      ".migration/evidence/runs/LL-03.md",
+      ".migration/ledger/fees.calculation.yaml",
+      ".migration/ledger/fees.page.yaml",
+      ".migration/ledger/integration.payment-gateway.yaml",
+      ".migration/returns/LL-03.afs-migrator.yaml",
+      "config/urls.py",
+      "src/fees/__init__.py",
+      "src/fees/composition.py",
+      "src/fees/gateway.py",
+      "src/fees/services.py",
+      "src/fees/urls.py",
+      "src/fees/views.py",
+      "templates/fees/page.html",
+      "templates/fees/payment-panel.html",
+      "tests/fees/__init__.py",
+      "tests/fees/conftest.py",
+      "tests/fees/test_gateway.py",
+      "tests/fees/test_services.py",
+      "tests/fees/test_views.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
