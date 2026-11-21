@@ -9,8 +9,10 @@ from django.db import IntegrityError
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
+from src.loans.forms import LoanForm
 from src.loans.models import Loan
 from src.loans.repository import LoanRepository
+from src.loans.services import lend_loan, return_loan
 
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
@@ -22,6 +24,14 @@ HTTP_GOLDENS = json.loads(
         else Path(__file__).parent / 'fixtures/http.json'
     ).read_text(encoding='utf-8')
 )
+
+
+def test_loan_form_requires_member_and_isbn():
+    form = LoanForm()
+
+    assert tuple(form.fields) == ('member', 'isbn')
+    assert form.fields['member'].required
+    assert form.fields['isbn'].required
 
 
 @pytest.mark.django_db
@@ -101,7 +111,9 @@ def test_lend_endpoint_escapes_delimiters_in_loan_fields(client):
     [
         ({}, 'member'),
         ({'member': 'dee'}, 'isbn'),
+        ({'member': '', 'isbn': '123'}, 'member'),
         ({'member': ' ', 'isbn': '123'}, 'member'),
+        ({'member': 'dee', 'isbn': ''}, 'isbn'),
         ({'member': 'dee', 'isbn': ' '}, 'isbn'),
     ],
 )
@@ -153,6 +165,36 @@ def test_return_endpoint_rejects_repeated_return_without_replacing_date(client):
 
 
 @pytest.mark.django_db
+def test_return_use_case_rejects_repeated_return_without_replacing_date():
+    original_return_date = date(2026, 1, 20)
+
+    loan, updated = return_loan('L2')
+
+    assert loan.returned_on == original_return_date
+    assert not updated
+    assert Loan.objects.get(pk='L2').returned_on == original_return_date
+
+
+@pytest.mark.django_db
+def test_return_use_case_sets_today_on_first_return():
+    today = timezone.localdate()
+
+    loan, updated = return_loan('L1')
+
+    assert updated
+    assert loan.returned_on == today
+    assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
+def test_return_use_case_does_not_update_an_unknown_loan():
+    loan, updated = return_loan('unknown')
+
+    assert loan is None
+    assert not updated
+
+
+@pytest.mark.django_db
 def test_return_endpoint_returns_not_found_for_unknown_loan(client):
     response = client.post('/loans/unknown/return')
 
@@ -197,6 +239,28 @@ def test_due_date_is_fourteen_calendar_days_after_lending():
     )
 
     assert loan.due_on == date(2024, 2, 29)
+
+
+@pytest.mark.django_db
+def test_lend_use_case_sets_a_due_date_fourteen_days_after_lending():
+    today = timezone.localdate()
+
+    loan = lend_loan(member='reader', isbn='123')
+
+    assert loan.lent_on == today
+    assert loan.due_on == today + timedelta(days=14)
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('member', 'isbn'),
+    [('', '123'), (' ', '123'), ('reader', ''), ('reader', ' ')],
+)
+def test_lend_use_case_rejects_blank_required_fields(member, isbn):
+    with pytest.raises((ValidationError, ValueError)):
+        lend_loan(member=member, isbn=isbn)
+
+    assert Loan.objects.count() == 3
 
 
 @pytest.mark.django_db
@@ -318,6 +382,7 @@ def test_browser_lending_page_shows_errors_for_blank_fields(client):
     response = client.post('/ui/loans/new/')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' in response.content.lower()
     assert response.content.count(b'This field is required.') == 2
     assert Loan.objects.count() == 3
 
@@ -379,6 +444,15 @@ def test_browser_regular_return_redirects_to_the_updated_loan(client):
 
 
 @pytest.mark.django_db
+def test_browser_return_page_returns_not_found_for_unknown_loan(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
 def test_real_browser_can_lend_and_return_a_book(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
@@ -424,6 +498,7 @@ def test_browser_regular_repeat_return_shows_an_error(client):
     assert response.status_code == 409
     assert b'role="alert"' in response.content
     assert b'already been returned' in response.content
+    assert b'Loan record \xc2\xb7 L2' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
 
 
