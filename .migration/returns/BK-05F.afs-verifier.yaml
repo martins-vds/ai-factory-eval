@@ -1,0 +1,60 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2012
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 0
+  crap: 26.0
+  mutation_changed: "n/a: no mutable code changed"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/application/routing.py:46-60
+    what: CargoRouting.assign_route accepts and persists an itinerary that misses the cargo's arrival deadline; the view guard does not protect direct use-case callers.
+    evidence: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline
+tests_added:
+  - tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1
+    what: "Known, non-failing layer violation: the application use case imports django.http.Http404."
+    origin: BK-05C
+    evidence: "run: idiom-layers"
+rules:
+  - capability: booking.routing-chain
+    rule: Candidate routes come from RoutingService through CargoRouting and are filtered against the current arrival deadline.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+  - capability: booking.routing-assign
+    rule: A submitted signed candidate must be valid and associated with the requested cargo.
+    use_case: create_route_selection_views.route_selection
+    test: tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
+    enforced: true
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: The selected itinerary must satisfy the cargo's current route specification before assignment.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline
+    enforced: false
+    ledger_rule: route-specification-satisfied
+no_rules:
+  booking.screen-route: The remaining capability is screen presentation; candidate filtering is covered under booking.routing-chain.
+  booking.screen-select-itinerary: The capability is screen presentation; approved candidate display and empty-state behavior are checked by the UI tests.
+mutation_survivor_classifications:
+  - "#1: changing _CANDIDATE_SALT to another string is equivalent; token creation and verification use the same constant."
+  - "#2: changing _CANDIDATE_SALT to None is equivalent; signing and verification use the same Django default."
+  - "#10: wrapping the unknown-cargo 404 text is equivalent at the production UI boundary."
+  - "#13: wrapping the stale-route-specification 404 text is equivalent at the production UI boundary."
+  - "#14: safe=\"XXXX\" leaves the redirect unchanged because X is URL-unreserved."
+  - "#27: wrapping the unknown-cargo 404 text is equivalent at the production UI boundary."
+  - "#40: changing the missing-token fallback to XXXX still fails signature validation and produces the same 404."
+  - "#44: changing caught BadSignature diagnostic text does not change the rendered 404."
+  - "#46: wrapping the invalid-route 404 text is equivalent at the production UI boundary."
