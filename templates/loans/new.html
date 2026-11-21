@@ -4,6 +4,13 @@
 
 {% block content %}
 <section class="mx-auto max-w-3xl">
+  <script>
+    htmx.config.responseHandling = [
+      {code: "2..", swap: true},
+      {code: "[45]..", swap: true, error: true},
+      {code: "...", swap: false}
+    ];
+  </script>
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
