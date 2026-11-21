@@ -7,7 +7,9 @@ from src.loans.models import Loan
 from src.loans.services import (
     LoanAlreadyReturned,
     LoanInputError,
+    LoanNotFound,
     lend_loan,
+    loan_line,
     return_loan,
 )
 
@@ -38,6 +40,49 @@ def test_return_use_case_rejects_repeat_without_changing_original_date():
         return_loan('L1', Store(), date(2026, 11, 21))
 
     assert loan.returned_on == original_date
+
+
+def test_return_use_case_reports_unknown_loan():
+    class Store:
+        def find(self, loan_id):
+            return None
+
+        def mark_returned(self, loan_id, returned_on):
+            raise AssertionError('an unknown loan must not be updated')
+
+    with pytest.raises(LoanNotFound):
+        return_loan('unknown', Store(), date(2026, 11, 21))
+
+
+def test_return_use_case_records_the_supplied_date():
+    loan = SimpleNamespace(returned_on=None)
+
+    class Store:
+        def find(self, loan_id):
+            return loan
+
+        def mark_returned(self, loan_id, returned_on):
+            loan.returned_on = returned_on
+            return loan
+
+    returned = return_loan('L1', Store(), date(2026, 11, 21))
+
+    assert returned.returned_on == date(2026, 11, 21)
+
+
+def test_loan_line_escapes_delimiters_quotes_and_line_breaks():
+    loan = SimpleNamespace(
+        id='L9',
+        member='Reader; Example\nSecond line',
+        isbn='978"xyz',
+        lent_on=date(2026, 3, 1),
+        due_on=date(2026, 3, 15),
+        returned_on=None,
+    )
+
+    assert loan_line(loan) == (
+        'L9;"Reader; Example\nSecond line";"978""xyz";2026-03-01;2026-03-15;\n'
+    )
 
 
 @pytest.mark.django_db
