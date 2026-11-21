@@ -26,6 +26,18 @@ CASES = (
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
 )
+EDGE_CASES = (
+    ('GET /loans/{id} unknown', 'GET', '/loans/unknown', None),
+    ('POST /loans missing ISBN', 'POST', '/loans', {'member': 'dee'}),
+    ('POST /loans blank fields', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    ('GET /fees/{id} unknown', 'GET', '/fees/unknown', None),
+    ('GET /fees/{id} capped', 'GET', '/fees/L1', None),
+    ('GET /fees/{id} returned before due', 'GET', '/fees/L2', None),
+    ('POST /payments/{id} unknown', 'POST', '/payments/unknown', None),
+    ('POST /loans/{id}/return unknown', 'POST', '/loans/unknown/return', None),
+    ('POST /loans/{id}/return already returned', 'POST', '/loans/L2/return', None),
+    ('GET /loans/{id} after repeated return', 'GET', '/loans/L2', None),
+)
 
 
 def verify_graph_coverage():
@@ -85,6 +97,20 @@ def exercise_http():
     return observations
 
 
+def exercise_edge_http():
+    observations = {}
+    for name, method, path, form in EDGE_CASES:
+        observations[name] = {
+            'request': {
+                'method': method,
+                'path': path,
+                'form': form,
+            },
+            'response': get_response(method, path, form),
+        }
+    return observations
+
+
 def exercise_browser():
     pages = []
     with sync_playwright() as playwright:
@@ -110,7 +136,7 @@ def exercise_browser():
 def normalize(observation, endpoint):
     response = observation['response']
     body = re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', response['body'])
-    if endpoint == 'GET /fees/{id}':
+    if endpoint.startswith('GET /fees/'):
         body = re.sub(r'\d+ day\(s\) late', '<days> day(s) late', body)
         body = re.sub(r'Fee: \$\d+\.\d{2}', 'Fee: $<amount>', body)
     return {
@@ -123,6 +149,16 @@ def normalize(observation, endpoint):
     }
 
 
+def normalize_dates(value):
+    if isinstance(value, str):
+        return re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', value)
+    if isinstance(value, list):
+        return [normalize_dates(item) for item in value]
+    if isinstance(value, dict):
+        return {key: normalize_dates(item) for key, item in value.items()}
+    return value
+
+
 def write_or_compare(name, observation, record):
     path = GOLDENS / f'{name}.json'
     rendered = json.dumps(observation, indent=2, sort_keys=True) + '\n'
@@ -131,9 +167,12 @@ def write_or_compare(name, observation, record):
         path.write_text(rendered, encoding='utf-8')
         return
     expected = json.loads(path.read_text(encoding='utf-8'))
-    if name == 'http':
+    if name in ('http', 'http-edge'):
         actual = {key: normalize(value, key) for key, value in observation.items()}
         baseline = {key: normalize(value, key) for key, value in expected.items()}
+    elif name == 'restart':
+        actual = normalize_dates(observation)
+        baseline = normalize_dates(expected)
     else:
         actual = observation
         baseline = expected
@@ -165,17 +204,42 @@ def main():
             wait_until_ready(process, output)
             http = exercise_http()
             browser = exercise_browser()
-        finally:
+            edge_http = exercise_edge_http()
+            before_restart = get_response('GET', '/loans', None)
             process.terminate()
             try:
                 process.wait(timeout=10)
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+            with tempfile.TemporaryFile() as restart_output:
+                process = subprocess.Popen(
+                    ['bash', str(RUN_SCRIPT)],
+                    cwd=SOURCE,
+                    env=os.environ.copy(),
+                    stdout=restart_output,
+                    stderr=subprocess.STDOUT,
+                )
+                wait_until_ready(process, restart_output)
+                after_restart = get_response('GET', '/loans', None)
+            restart = {'before': before_restart, 'after': after_restart}
+        finally:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
     write_or_compare('http', http, args.record)
+    write_or_compare('http-edge', edge_http, args.record)
     write_or_compare('browser', browser, args.record)
+    write_or_compare('restart', restart, args.record)
     action = 'recorded' if args.record else 'verified'
-    print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
+    print(
+        f'{action} {len(http)} source endpoints, {len(edge_http)} edge cases, '
+        f'1 restart scenario, and {len(browser["pages"])} browser pages'
+    )
 
 
 if __name__ == '__main__':

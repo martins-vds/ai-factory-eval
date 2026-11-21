@@ -1,0 +1,12 @@
+id: report.monthly-spec
+kind: behavioral
+title: Monthly lending report specification
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-9
+boundary: "The document specifies a first-of-month report for the previous month, aggregated by member, sorted by fees descending and member id, omitting members without loans."
+status: pending
+verification: spec-derived
+characterization_tier: C
+evidence: [.migration/references/characterization.md]
+notes: "The same document says the reporting module's code and runtime are unavailable. This is unresolved scope, not characterized runtime behavior; see .migration/quirks/monthly-report-spec-only.md."

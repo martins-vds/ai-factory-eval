@@ -5,7 +5,7 @@ At every application startup, the source creates an in-memory H2 database with a
 
 ## Evidence
 - Source: `config:legacy/src/main/resources/META-INF/persistence.xml`, `legacy/src/main/resources/META-INF/persistence.xml:6-10`
-- Characterization: tier A confirms startup connects to in-memory H2, the seed loans are served, and a new loan can be created; restart persistence was not separately exercised.
+- Characterization: the tier-A restart scenario observed L4 and L5 before restart; after the app restarted, GET /loans returned only the original L1, L2, and L3 seed records.
 - Why it looks wrong: loans added or returned while the app runs are discarded when it restarts, despite the interface allowing users to create and update loans.
 
 ## Impact

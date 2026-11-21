@@ -1,0 +1,14 @@
+id: integration.payment-gateway
+kind: integration
+title: Charge a late fee through the payment gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-37
+  risk: { crap: 20, complexity: 4 }
+boundary: "POST /payments/{id} checks the loan and sends a bodyless POST to PAYMENT_GATEWAY_URL/charge?loan={id}; a gateway HTTP 200 is returned as 200 and other gateway statuses map to 502."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "The default gateway URL is payments.lending-library.invalid. Error and interruption handling is separately inventoried as payment.gateway-errors."

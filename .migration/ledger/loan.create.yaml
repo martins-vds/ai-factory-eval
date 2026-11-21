@@ -1,0 +1,14 @@
+id: loan.create
+kind: behavioral
+title: Create a loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43
+  risk: { crap: 12, complexity: 3 }
+boundary: "POST /loans accepts member and ISBN form fields, returns 400 if either is absent, and otherwise creates a loan dated today and responds 201 with its semicolon-separated record."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "Only null values are rejected by the source; the tier-A edge case confirmed blank member and ISBN values return 201 with both fields empty. Quirk draft: .migration/quirks/blank-loan-fields.md."

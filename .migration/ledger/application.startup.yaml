@@ -1,0 +1,13 @@
+id: application.startup
+kind: integration
+title: Start the Lending Library HTTP service
+source:
+  graph_node: file:legacy/src/main/java/lib/App.java
+  location: legacy/src/main/java/lib/App.java:13-25
+  risk: { crap: 2, complexity: 1 }
+boundary: "Process startup initializes persistence and routes, binds Grizzly on PORT or 8080, and shuts down on JVM exit."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "Persistence is in-memory H2 with drop-and-create schema and seed loading (legacy/src/main/resources/META-INF/persistence.xml:6-10). The tier-A restart scenario confirmed that new loans are discarded and the seeds reload; quirk draft: .migration/quirks/restart-data-loss.md."

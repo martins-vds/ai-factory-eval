@@ -1,0 +1,12 @@
+id: loan.get
+kind: behavioral
+title: Retrieve one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+  risk: { crap: 2, complexity: 1 }
+boundary: "GET /loans/{id} returns the semicolon-separated loan record with HTTP 200, or `no such loan` with HTTP 404."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
