@@ -32,13 +32,13 @@ references below hold detail — read one only when your procedure points to it.
    (`afs-evidence`). "Should pass" is not evidence.
 6. **No hidden state.** New work, reorderings, deferrals and decisions go to the tracker or ledger the
    moment they happen. Another agent must be able to continue from the ticket alone.
-7. **Stay in scope.** Do exactly your ticket. Record anything else you find as a new ticket.
+7. **Stay in scope.** Do exactly your ticket. Its scope is the `files` list in `.migration/plan/<slice>.tickets.yaml`, plus `AFS-SCOPE: <path>` lines in the issue (operator extensions). If the work needs any other file, stop and write a handoff that names it. Record anything else you find as a new ticket. Before you stop, `afs-finish-check` (the stop hook, ADR-0034) checks your return file, the CI rules and your scope, and may send you back once or twice to fix them.
 8. **Follow the requested approach; never assume limits.** Do not sample, skip, batch or approximate to
    save effort. If a real limit blocks you (quota, tool cap, context), stop and say so with specifics.
 9. **Keep context small.** Load only the skills your agent file lists. Run commands through `rtk` (or
    `afs-run` for gates); never paste large outputs. At the context soft limit, hand off (`afs-handoff`).
 10. **Learn.** Recall relevant lessons before starting; record a lesson when something surprises you
-    (`lessons-learned`).
+    (`lessons-learned`, where your agent file lists it).
 
 ## Stop and escalate
 Stop, write a handoff, and escalate (do not keep trying) when:
@@ -70,6 +70,9 @@ session is a **committed file on your branch**, in the same PR as the work:
 | Gate runs | `.migration/evidence/runs/<ticket>.md` (written by `afs-run`) | `afs-evidence` |
 | Surviving mutants | `.migration/evidence/mutants/<ticket>.md` (written by `afs-mutation`; each survivor carries the diff mutmut made) | `afs-handoff`: cite it |
 | Session record | `.migration/costs/<session>.json` (written by the session hook, ADR-0021) | none: expected in every agent PR |
+
+A return's `pr` is its own PR (`owner/repo#N` or the PR URL) before you finish; a first WIP commit may use
+`pr: null`, and a handoff may keep it (`validate.py` refuses it otherwise).
 
 **Session records are expected, never edited.** The harness's session hook commits one record per agent
 session (cost and the harness tools it ran). It belongs in the PR even though no ticket names it; never
@@ -121,6 +124,7 @@ drafts into issues, links them and removes the drafts.
 ## References (read on demand)
 - [lifecycle.md](references/lifecycle.md) — phases 0–8, who owns what, human gates.
 - [gates.md](references/gates.md) — the seven gates, per-PR and slice acceptance, project acceptance.
+- [verification.md](references/verification.md) — the Verifier's review in detail: rules, error paths, findings and verdict.
 - [characterization.md](references/characterization.md) — tiers A/B/C and the tier-B recipe.
 - [capability-coverage.md](references/capability-coverage.md) — gate 7 and graph enrichment.
 - [final-verification.md](references/final-verification.md) — the final audit and its A–G report.
