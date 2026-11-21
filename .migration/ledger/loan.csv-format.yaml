@@ -7,5 +7,9 @@ source:
   risk: { complexity: 2, coverage: 1 }
 boundary: "Loan rows contain id, member, isbn, lentOn, dueOn, and returnedOn separated by semicolons"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "This is a serialization contract with no branch-specific business rule."

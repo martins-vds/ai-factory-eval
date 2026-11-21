@@ -5,7 +5,7 @@ When `POST /loans/{id}/return` is called for a loan that is already returned, th
 
 ## Evidence
 - Source: `method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned`, `legacy/src/main/java/lib/LoanRepository.java:36-44`; route `legacy/src/main/java/lib/LoanResource.java:45-50`
-- Characterization: the tier-A HTTP suite exercised the return route's general behavior; this repeated-return sequence was not separately exercised.
+- Characterization: tier-A HTTP suite sent `POST /loans/L2/return` twice. Both requests returned HTTP 200 and changed `returnedOn` from `2026-01-20` to the current date.
 - Why it looks wrong: repeating the request changes the historical return date and can change the late fee shown for that loan.
 
 ## Impact

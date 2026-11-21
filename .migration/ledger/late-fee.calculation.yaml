@@ -7,7 +7,11 @@ source:
   risk: { complexity: 4, coverage: 0.90 }
 boundary: "Fee uses current date or return date as end, 25 cents per late day, waived through 2 late days, capped at $10"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - { id: waive-two-days, rule: "A loan at most 2 days late has a $0 fee.", source: "legacy/src/main/java/lib/LateFeeView.java:26-38" }
   - { id: fee-rate, rule: "Days beyond grace cost 25 cents each.", source: "legacy/src/main/java/lib/LateFeeView.java:26-38" }

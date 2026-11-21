@@ -7,5 +7,9 @@ source:
   risk: { complexity: 1, coverage: 1 }
 boundary: "Running legacy/run.sh from the source directory packages Maven dependencies and execs lib.App"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "This is build and process behavior rather than a business rule."

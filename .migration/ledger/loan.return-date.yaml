@@ -7,5 +7,9 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0.83 }
 boundary: "The repository overwrites returnedOn whenever markReturned is called"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 quirks: []

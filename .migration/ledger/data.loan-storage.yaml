@@ -7,7 +7,11 @@ source:
   risk: { complexity: 14, coverage: 0.88 }
 boundary: "Loan entities map to LOAN rows and repository operations use JPA transactions"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - { id: loan-fields, rule: "A loan has id, member, isbn, lentOn, and optional returnedOn.", source: "legacy/src/main/java/lib/Loan.java:13-51" }
   - { id: loan-term, rule: "A loan is due exactly 14 days after lentOn.", source: "legacy/src/main/java/lib/Loan.java:13-51" }
