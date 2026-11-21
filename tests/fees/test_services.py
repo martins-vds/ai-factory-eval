@@ -112,6 +112,15 @@ def test_payment_maps_non_success_gateway_status_to_bad_gateway():
     assert (result.status, result.body) == (502, 'declined\n')
 
 
+def test_payment_maps_io_failure_to_bad_gateway():
+    gateway = PaymentGateway(error=OSError('gateway unavailable'))
+    app = application(Loan('L1', date(2026, 11, 1)), gateway=gateway)
+
+    result = app.pay('L1')
+
+    assert (result.status, result.body) == (502, 'payment gateway unavailable\n')
+
+
 def test_payment_surfaces_interruption_without_losing_it():
     interruption = InterruptedError('gateway call interrupted')
     gateway = PaymentGateway(error=interruption)

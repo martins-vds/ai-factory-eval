@@ -1,11 +1,16 @@
 import os
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from .services import GatewayResponse
 
 DEFAULT_PAYMENT_GATEWAY_URL = 'https://payments.lending-library.invalid'
+
+
+class NoRedirectHandler(HTTPRedirectHandler):
+    def redirect_request(self, request, file, code, message, headers, new_url):
+        return None
 
 
 class HttpPaymentGateway:
@@ -15,7 +20,7 @@ class HttpPaymentGateway:
         request = Request(url, method='POST')
 
         try:
-            with urlopen(request) as response:
+            with build_opener(NoRedirectHandler).open(request) as response:
                 body = response.read().decode('utf-8', errors='replace')
                 return GatewayResponse(response.status, body)
         except HTTPError as response:

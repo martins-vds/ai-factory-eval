@@ -9,9 +9,47 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
-verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+notes: "The source swallowed InterruptedException; the approved fix in #40 retains interruption information while returning 502."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+target:
+  components:
+    - src.fees.services.FeeApplication.pay
+    - src.fees.gateway.HttpPaymentGateway
+    - src.fees.views.payment_api
+    - src.fees.views.payment_page
+    - src.fees.urls
+status: migrated
+verification: differential
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_services.py::test_payment_requires_an_existing_loan_before_calling_gateway
+  - tests/fees/test_services.py::test_payment_forwards_success_response
+  - tests/fees/test_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
+  - tests/fees/test_services.py::test_payment_maps_io_failure_to_bad_gateway
+  - tests/fees/test_services.py::test_payment_surfaces_interruption_without_losing_it
+  - tests/fees/test_endpoints.py::test_payment_api_posts_expected_request_and_forwards_success
+  - tests/fees/test_endpoints.py::test_payment_api_maps_gateway_failure_to_502_and_preserves_body
+  - tests/fees/test_endpoints.py::test_payment_api_does_not_follow_gateway_redirects
+  - tests/fees/test_endpoints.py::test_payment_api_does_not_call_gateway_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_payment_api_maps_connection_failure_to_502
+  - tests/fees/test_endpoints.py::test_ui_payment_shows_success_fragment
+  - tests/fees/test_endpoints.py::test_ui_payment_renders_gateway_failure_for_htmx
+  - tests/fees/test_endpoints.py::test_ui_payment_renders_unknown_loan_error_for_htmx
+rules:
+  - id: loan-exists-before-charge
+    rule: "Reject an unknown loan before making a payment-gateway request."
+    source: "legacy/src/main/java/lib/FinePayments.java:29-31"
+  - id: gateway-status
+    rule: "Return HTTP 200 only for gateway HTTP 200; map other gateway statuses to HTTP 502 and preserve their body."
+    source: "legacy/src/main/java/lib/FinePayments.java:35-37"
+  - id: gateway-io-failure
+    rule: "Map gateway I/O failures to HTTP 502 with the unavailable message."
+    source: "legacy/src/main/java/lib/FinePayments.java:38-40"
+  - id: preserve-interruption
+    rule: "An interrupted gateway call returns HTTP 502 while retaining the interruption."
+    source: "martins-vds/ai-factory-synthetic-target#40"

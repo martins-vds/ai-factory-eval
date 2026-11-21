@@ -52,6 +52,15 @@ def test_payment_api_maps_gateway_failure_to_502_and_preserves_body(client, paym
 
 
 @pytest.mark.django_db
+def test_payment_api_does_not_follow_gateway_redirects(client, payment_gateway):
+    response = client.post('/payments/L3')
+
+    assert response.status_code == 502
+    assert response.content.decode() == 'redirected\n'
+    assert payment_gateway.requests == [('POST', '/charge?loan=L3', b'')]
+
+
+@pytest.mark.django_db
 def test_payment_api_does_not_call_gateway_for_unknown_loan(client, payment_gateway):
     response = client.post('/payments/unknown')
 
@@ -103,6 +112,19 @@ def test_ui_payment_renders_gateway_failure_for_htmx(client, payment_gateway):
     assert response.status_code == 502
     assert 'role="alert"' in response.content.decode()
     assert 'declined' in response.content.decode()
+
+
+@pytest.mark.django_db
+def test_ui_payment_renders_unknown_loan_error_for_htmx(client, payment_gateway):
+    response = client.post(
+        '/ui/payments/unknown/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+    assert 'role="alert"' in response.content.decode()
+    assert 'no such loan' in response.content.decode()
+    assert payment_gateway.requests == []
 
 
 @pytest.mark.django_db

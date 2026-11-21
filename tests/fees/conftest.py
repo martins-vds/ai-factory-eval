@@ -9,13 +9,31 @@ def payment_gateway(monkeypatch):
     requests = []
 
     class GatewayHandler(BaseHTTPRequestHandler):
-        def do_POST(self):
-            requests.append((self.command, self.path, self.rfile.read(int(self.headers['Content-Length'] or 0))))
-            status, body = (503, b'declined\n') if self.path.endswith('L2') else (200, b'charged\n')
+        def _handle_request(self):
+            body_length = int(self.headers['Content-Length'] or 0)
+            requests.append((self.command, self.path, self.rfile.read(body_length)))
+            headers = {}
+            if self.path.endswith('L2'):
+                status, body = 503, b'declined\n'
+            elif self.path.endswith('L3'):
+                status, body = 302, b'redirected\n'
+                headers = {'Location': '/redirect'}
+            elif self.path == '/redirect':
+                status, body = 200, b'followed redirect\n'
+            else:
+                status, body = 200, b'charged\n'
             self.send_response(status)
+            for name, value in headers.items():
+                self.send_header(name, value)
             self.send_header('Content-Length', str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        def do_GET(self):
+            self._handle_request()
+
+        def do_POST(self):
+            self._handle_request()
 
         def log_message(self, format, *args):
             return
