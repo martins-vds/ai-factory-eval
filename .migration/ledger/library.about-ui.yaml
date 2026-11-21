@@ -8,5 +8,9 @@ source:
   risk: { complexity: 1, coverage: 1 }
 boundary: "GET /about returns the HTML page containing hours, lending term, and contact"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "The static page carries presentation data but no separate business rule."

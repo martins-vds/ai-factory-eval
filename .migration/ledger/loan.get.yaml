@@ -7,6 +7,10 @@ source:
   risk: { complexity: 2, coverage: 0.83 }
 boundary: "GET /loans/{id} returns the loan row or 404 text no such loan"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - { id: unknown-loan, rule: "An unknown loan id is refused with HTTP 404.", source: "legacy/src/main/java/lib/LoanResource.java:30-35" }

@@ -7,5 +7,9 @@ source:
   risk: { complexity: 14, coverage: 0.85 }
 boundary: "PORT selects the listening port, default 8080; startup creates JPA and registers the JAX-RS resources"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "This is process bootstrap and wiring, not a business rule."

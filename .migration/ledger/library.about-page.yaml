@@ -7,5 +7,9 @@ source:
   risk: { complexity: 1, coverage: 1 }
 boundary: "GET /about reads /static/about.html from the classpath as UTF-8 HTML"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "This endpoint has no domain branch or authorization rule."

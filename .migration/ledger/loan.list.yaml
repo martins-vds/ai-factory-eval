@@ -8,5 +8,9 @@ source:
   risk: { complexity: 1, coverage: 1 }
 boundary: "GET /loans returns 200 text with every loan as semicolon-separated rows"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "Listing has no refusal or authorization rule."

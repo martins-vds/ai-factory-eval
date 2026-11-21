@@ -8,6 +8,10 @@ source:
   risk: { complexity: 2, coverage: 0.83 }
 boundary: "POST /loans/{id}/return records today and returns the updated row or 404"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - { id: unknown-return, rule: "Returning an unknown loan id is refused with HTTP 404.", source: "legacy/src/main/java/lib/LoanResource.java:46-50" }

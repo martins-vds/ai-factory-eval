@@ -7,5 +7,9 @@ source:
   risk: { complexity: 4, coverage: 0.75 }
 boundary: "IOException or InterruptedException returns HTTP 502 and payment gateway unavailable"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 quirks: []

@@ -6,5 +6,9 @@ source:
   location: legacy/src/main/resources/META-INF/persistence.xml:6-10
 boundary: "Hibernate connects to jdbc:h2:mem:library and recreates the schema at startup"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 quirks: []

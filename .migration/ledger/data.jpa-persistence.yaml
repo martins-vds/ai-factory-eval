@@ -6,5 +6,9 @@ source:
   location: legacy/src/main/resources/META-INF/persistence.xml:3-11
 boundary: "The library persistence unit registers lib.Loan and configures H2 for the application"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "This entry records configuration rather than a domain rule."

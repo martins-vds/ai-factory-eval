@@ -6,5 +6,9 @@ source:
   location: legacy/src/main/resources/META-INF/seed.sql:1-3
 boundary: "The H2 schema load creates L1, L2, and L3 with fixed 2025/2026 dates"
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05-characterization.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: "Seed fixtures are persisted example data; they impose no user-facing validation rule."
