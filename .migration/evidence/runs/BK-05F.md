@@ -105,3 +105,14 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T20:46:23+00:00 | finish-crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T20:46:23+00:00 | finish-crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-21T20:47:14+00:00 | finish-regression | 0 | 50.96 | `pytest -q` | `62954eaa4df32abe` |  |  |
+| 2026-11-21T20:49:56+00:00 | build-compile-rerun | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T20:49:56+00:00 | build-django-rerun | 0 | 0.28 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T20:49:56+00:00 | idiom-ruff-rerun | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T20:49:56+00:00 | idiom-format-rerun | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T20:49:56+00:00 | idiom-layers-rerun | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T20:49:57+00:00 | idiom-ui-rerun | 0 | 0.5 | `python .migration/harness/tools/check_ui.py` | `2deb4154b244e27c` |  | gate=ui scope="templates changed since ad1144de1f03e12b9333932512272e7454fbf0e6" templates=0 findings=0 |
+| 2026-11-21T20:50:40+00:00 | behavior-rerun | 0 | 42.72 | `pytest -q` | `43a9ccabd62f3e8f` |  |  |
+| 2026-11-21T20:51:23+00:00 | crap-coverage-rerun | 0 | 43.53 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `02e46caa064a7161` |  |  |
+| 2026-11-21T20:51:23+00:00 | crap-lizard-rerun | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T20:51:24+00:00 | crap-score-rerun | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-21T20:52:09+00:00 | regression-rerun | 0 | 44.99 | `pytest -q` | `7c410e2cb7bebbaa` |  |  |

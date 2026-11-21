@@ -42,6 +42,7 @@
       "hook.end": [
         "hookInvocationId",
         "hookType",
+        "output",
         "success"
       ],
       "hook.start": [
@@ -149,29 +150,29 @@
       ]
     },
     "event_types": {
-      "assistant.message": 96,
-      "assistant.turn_end": 42,
-      "assistant.turn_start": 42,
-      "external_tool.completed": 1,
-      "external_tool.requested": 1,
-      "hook.end": 183,
-      "hook.start": 184,
-      "permission.completed": 76,
-      "permission.requested": 76,
+      "assistant.message": 107,
+      "assistant.turn_end": 51,
+      "assistant.turn_start": 51,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 208,
+      "hook.start": 209,
+      "permission.completed": 84,
+      "permission.requested": 84,
       "session.start": 1,
-      "session.usage_record": 42,
+      "session.usage_record": 51,
       "skill.context_delivered_ref": 4,
       "skill.invoked": 4,
       "subagent.selected": 1,
       "system.message": 1,
-      "tool.execution_complete": 106,
-      "tool.execution_start": 106,
-      "user.message": 1
+      "tool.execution_complete": 117,
+      "tool.execution_start": 117,
+      "user.message": 2
     },
-    "events": 967,
+    "events": 1096,
     "usage_fields": []
   },
-  "ended_at": "2026-11-21T20:43:41.603Z",
+  "ended_at": "2026-11-21T20:47:56.831Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -180,7 +181,7 @@
       "tool": "afs-mutation"
     },
     {
-      "count": 15,
+      "count": 26,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -195,7 +196,7 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 4,
+      "count": 6,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -205,12 +206,12 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 1,
+      "count": 2,
       "exit": 0,
       "tool": "check_ui.py"
     },
     {
-      "count": 3,
+      "count": 5,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -229,11 +230,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 96
+      "requests": 107
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-21T20:44:26+00:00",
+  "recorded_at": "2026-11-21T20:48:42+00:00",
   "schema": "afs-cost/1",
   "session_id": "43426b3c-2213-4b85-a516-972589f7221b",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
