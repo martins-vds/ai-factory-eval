@@ -1,0 +1,14 @@
+id: loans.list-query
+kind: behavioral
+title: Read all loans in id order
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.all
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanRepository.java:19-21
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: GET /loans reads every Loan entity in ascending id order using a read EntityManager.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+no_rules: The repository query exposes the complete ordered loan set without additional filtering.
+notes: The HTTP formatter still returns a newline for an empty result; see .migration/quirks/empty-loan-list-newline.md.

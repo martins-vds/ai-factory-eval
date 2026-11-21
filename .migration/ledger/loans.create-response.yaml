@@ -1,0 +1,14 @@
+id: loans.create-response
+kind: behavioral
+title: Return the created loan
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanResource.java:LoanResource.lend
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:41-43
+  risk: {crap: 12, complexity: 3, coverage: 0}
+boundary: A successfully persisted loan is returned with HTTP 201 and its semicolon-separated loan line followed by a newline.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+no_rules: The response carries the persisted representation and create status.
+notes: See .migration/quirks/loan-id-collision.md and .migration/quirks/unescaped-loan-export-fields.md.

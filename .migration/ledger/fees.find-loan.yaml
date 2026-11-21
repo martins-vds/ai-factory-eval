@@ -1,0 +1,13 @@
+id: fees.find-loan
+kind: behavioral
+title: Find a loan for its fee page
+source:
+  graph_node: function:legacy/src/main/java/lib/LateFeeView.java:page
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-31
+  risk: {crap: 20, complexity: 4, coverage: 0}
+boundary: GET /fees/{id} looks up the loan; a missing loan returns HTTP 404 with the HTML fragment "<p>No such loan.</p>".
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+no_rules: This entry captures lookup and missing-record handling for the fee page.

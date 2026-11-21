@@ -1,0 +1,13 @@
+id: loans.csv-contract
+kind: behavioral
+title: Format loans as semicolon-separated lines
+source:
+  graph_node: document:legacy/docs/export-csv.md
+  flow: List Loans
+  location: legacy/docs/export-csv.md:1-4; legacy/src/main/java/lib/LoanResource.java:52-55
+  risk: {crap: 6, complexity: 2, coverage: 0}
+boundary: GET /loans returns id, member, ISBN, lent date, due date, and returned date separated by semicolons, one loan per line; a null returned date is an empty field and the response ends in a newline.
+tickets: [martins-vds/ai-factory-eval#2152]
+status: pending
+verification: pending
+notes: Member and ISBN values are inserted unescaped; see .migration/quirks/unescaped-loan-export-fields.md. Empty results still produce one newline; see .migration/quirks/empty-loan-list-newline.md.
