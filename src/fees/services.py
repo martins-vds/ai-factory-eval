@@ -20,7 +20,7 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
-@dataclass(frozen=True)
+@dataclass
 class GatewayResponse:
     status: int
     body: str
@@ -30,14 +30,14 @@ class PaymentGateway(Protocol):
     def charge(self, loan_id: str) -> GatewayResponse: ...
 
 
-@dataclass(frozen=True)
+@dataclass
 class FeeQuote:
     loan: LoanRecord
     days_late: int
     amount: Decimal
 
 
-@dataclass(frozen=True)
+@dataclass
 class PaymentResult:
     status: int
     body: str

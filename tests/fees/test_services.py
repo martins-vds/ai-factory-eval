@@ -100,6 +100,7 @@ def test_payment_forwards_success_response():
     result = app.pay('L1')
 
     assert (result.status, result.body) == (200, 'charged\n')
+    assert result.interruption is None
     assert gateway.charges == ['L1']
 
 

@@ -32,14 +32,19 @@ evidence:
   - tests/fees/test_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
   - tests/fees/test_services.py::test_payment_maps_io_failure_to_bad_gateway
   - tests/fees/test_services.py::test_payment_surfaces_interruption_without_losing_it
+  - tests/fees/test_gateway.py::test_payment_gateway_uses_legacy_default_and_replaces_invalid_utf8
   - tests/fees/test_endpoints.py::test_payment_api_posts_expected_request_and_forwards_success
   - tests/fees/test_endpoints.py::test_payment_api_maps_gateway_failure_to_502_and_preserves_body
   - tests/fees/test_endpoints.py::test_payment_api_does_not_follow_gateway_redirects
+  - tests/fees/test_endpoints.py::test_payment_api_decodes_gateway_bodies_with_replacement
   - tests/fees/test_endpoints.py::test_payment_api_does_not_call_gateway_for_unknown_loan
   - tests/fees/test_endpoints.py::test_payment_api_maps_connection_failure_to_502
+  - tests/fees/test_endpoints.py::test_gateway_url_trims_trailing_slash_without_removing_path
   - tests/fees/test_endpoints.py::test_ui_payment_shows_success_fragment
   - tests/fees/test_endpoints.py::test_ui_payment_renders_gateway_failure_for_htmx
   - tests/fees/test_endpoints.py::test_ui_payment_renders_unknown_loan_error_for_htmx
+  - tests/fees/test_endpoints.py::test_regular_ui_payment_returns_not_found_page_for_unknown_loan
+  - tests/fees/test_endpoints.py::test_regular_ui_payment_renders_fee_and_loan_list
 rules:
   - id: loan-exists-before-charge
     rule: "Reject an unknown loan before making a payment-gateway request."

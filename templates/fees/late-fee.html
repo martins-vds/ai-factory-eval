@@ -11,7 +11,7 @@
     <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
       <div class="card-body">
         <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan {{ fee.loan.id }}</p>
-        <h2 class="card-title mt-2 text-3xl">{{ fee.loan.member }}</h2>
+        <h2 class="card-title mt-2 text-2xl">{{ fee.loan.member }}</h2>
         <p>ISBN {{ fee.loan.isbn }}</p>
         <dl class="mt-6 grid gap-4 sm:grid-cols-2">
           <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ fee.loan.due_on|date:"Y-m-d" }}</dd></div>
@@ -30,7 +30,7 @@
           <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
                 hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-result" hx-swap="outerHTML">
             {% csrf_token %}
-            <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+            <button class="btn btn-outline text-[#a94e37]" type="submit">Pay late fee</button>
           </form>
           {% endif %}
         </div>
@@ -43,7 +43,7 @@
       <h2 class="card-title text-2xl">Choose a loan</h2>
       <div class="divide-y divide-[#d8cdbb]">
         {% for loan_fee in fees %}
-        <a class="block py-4 text-[#2f3428]" href="/ui/fees/{{ loan_fee.loan.id }}/">
+        <a class="block py-5 text-[#2f3428]" href="/ui/fees/{{ loan_fee.loan.id }}/">
           <span class="font-semibold">{{ loan_fee.loan.id }} · {{ loan_fee.loan.member }}</span>
           <span class="block text-sm text-[#66705b]">${{ loan_fee.amount|floatformat:2 }}</span>
         </a>

@@ -18,6 +18,10 @@ def payment_gateway(monkeypatch):
             elif self.path.endswith('L3'):
                 status, body = 302, b'redirected\n'
                 headers = {'Location': '/redirect'}
+            elif self.path.endswith('L4'):
+                status, body = 200, b'\xff'
+            elif self.path.endswith('L5'):
+                status, body = 503, b'\xff'
             elif self.path == '/redirect':
                 status, body = 200, b'followed redirect\n'
             else:
