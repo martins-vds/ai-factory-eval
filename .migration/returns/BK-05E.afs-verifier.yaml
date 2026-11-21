@@ -2,6 +2,7 @@ role: afs-verifier
 ticket: BK-05E
 issue: martins-vds/ai-factory-eval#2003
 pr: https://github.com/martins-vds/ai-factory-eval/pull/2007
+handoff: .migration/handoffs/BK-05E.md
 verdict: blocked
 blocked_reason: >-
   behavior: The eval checkout is an earlier BK-05E snapshot, not the current
