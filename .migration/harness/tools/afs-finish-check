@@ -6,11 +6,14 @@ by hand. It checks the session's own work, with the same rules CI applies:
 
   mechanical  the return file `.migration/returns/<ticket>.<role>.yaml` is committed on this branch, and
               `validate.py` (the CI check) reports nothing about a file this branch changed: schema, gates
-              matching the `afs-run` journal, PR reference, ledger evidence, handoff sections.
+              matching the `afs-run` journal, PR reference, ledger evidence, handoff sections. Without a
+              handoff, no gate in the return fails, and none was run before the newest code edit (ADR-0056).
   scope       every file this branch changed is in the ticket's planned files (`check_plan.py`), plus the
               session's own records, plus `AFS-SCOPE: <path>` lines in the issue (an operator extension).
               A file outside them needs a handoff that names it: an agent never widens its own scope.
   stuck gate  a return that reports a handoff (`handoff:` set) must have committed that handoff.
+  own return  no other return file differs from the base branch: a session writes only its own (pilot:
+              a Verifier rewrote the Migrator's return to point at its own PR).
 
 As a hook it reads the hook payload on stdin and prints `{"decision": "block", "reason": …}` to send the
 agent back with the exact fix, or nothing to let it stop. It allows the stop:
@@ -61,33 +64,45 @@ def git(*args):
     return r.stdout if r.returncode == 0 else ""
 
 
-def other_branch_tips(branch):
-    """Commits at the tip of every other branch on the remote that HEAD already contains.
+def base_points(branch):
+    """The commits this session's work started from: the merge-base of HEAD with every other branch.
 
-    The cloud agent's clone may track only its own branch, so the remote-tracking refs can miss the base
-    branch of a stacked PR (pilot, 2026-11-07: a Verifier on a Migrator's branch was charged with the
-    Migrator's files). `git ls-remote` lists every branch; a tip HEAD contains is base history, not this
-    session's work."""
-    tips = set()
-    for line in git("ls-remote", "--heads", "origin").splitlines():
-        sha, _, ref = line.partition("\t")
-        if not sha or ref == f"refs/heads/{branch}":
+    Branch tips alone aren't enough. The cloud clone may not track a stacked PR's base branch, and `main`
+    moves on while a session runs (pilot, 2026-11-08: three sessions were charged with BK-05F's return,
+    merged to `main` after they started). So fetch every branch, then take the merge-base with each:
+    for `main` that is where the session branched off, for a stack's base it is that base's tip."""
+    subprocess.run(["git", "fetch", "-q", "origin", "+refs/heads/*:refs/remotes/origin/*"],
+                   capture_output=True, timeout=90)
+    points = set()
+    for ref in git("for-each-ref", "--format=%(refname)", "refs/remotes/origin").split():
+        if ref in (f"refs/remotes/origin/{branch}", "refs/remotes/origin/HEAD"):
             continue
-        if subprocess.run(["git", "merge-base", "--is-ancestor", sha, "HEAD"], capture_output=True).returncode == 0:
-            tips.add(sha)
-    tips |= {r for r in git("for-each-ref", "--format=%(refname)", "refs/remotes/origin").split()
-             if r not in (f"refs/remotes/origin/{branch}", "refs/remotes/origin/HEAD")}
-    return sorted(tips)
+        mb = git("merge-base", "HEAD", ref).strip()
+        if mb:
+            points.add(mb)
+    return sorted(points)
+
+
+def changed_since_bases(pathspec=()):
+    """Paths whose content differs from every base point: this session's net work. A file added and removed
+    again matches the base; work merged in from `main` or the stack's base matches that branch."""
+    branch = git("rev-parse", "--abbrev-ref", "HEAD").strip()
+    paths = None
+    for point in base_points(branch):
+        diff = {p for p in git("diff", "--name-only", point, "--", *pathspec).splitlines() if p}
+        paths = diff if paths is None else paths & diff
+    return set(paths or ())
+
+
+def net_changed_returns():
+    """Return files this session changed (net)."""
+    untracked = git("ls-files", "--others", "--exclude-standard", "--", ".migration/returns/")
+    return sorted(changed_since_bases((".migration/returns/",)) | {p for p in untracked.splitlines() if p})
 
 
 def branch_changes():
-    """Paths this branch changed: commits on no other branch, plus uncommitted work."""
-    branch = git("rev-parse", "--abbrev-ref", "HEAD").strip()
-    others = other_branch_tips(branch)
-    paths = set()
-    if others:
-        out = git("log", "--format=", "--name-only", "HEAD", "--not", *others)
-        paths |= {p for p in out.splitlines() if p}
+    """Paths this session changed (net, see changed_since_bases), plus uncommitted work."""
+    paths = changed_since_bases()
     for line in git("status", "--porcelain", "--untracked-files=all").splitlines():
         p = line[3:].split(" -> ")[-1].strip().strip('"')
         if p:
@@ -154,8 +169,97 @@ def own_records(ticket, role):
             f".migration/evidence/mutants/{ticket}.md", f".migration/handoffs/{ticket}.md"}
 
 
+# Roles whose return reports changed-code mutation (eval b3b: the most common failure was a return that left it
+# empty, often with green Gates).
+MUTATION_ROLES = {"afs-migrator", "afs-specialist-migrator", "afs-verifier"}
+
+
 def always_allowed(path):
-    return path.startswith((".migration/costs/", ".migration/quirks/", ".migration/evidence/finish-check/"))
+    return (path.startswith((".migration/costs/", ".migration/quirks/", ".migration/evidence/finish-check/"))
+            or path in shared_test_files())
+
+
+def shared_test_files():
+    """`target.shared_test_files`: project-wide test setup every ticket may change (eval base-r1: LL-01 to LL-04
+    stopped because the isolation fixture the migrator rule asks for was in no ticket's files)."""
+    try:
+        profile = yaml.safe_load((MIG / "profile.yaml").read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError):
+        return set()
+    return set(((profile.get("target") or {}).get("shared_test_files")) or [])
+
+
+# Gates a return reports as an exit code, and the journal rows that back them (ADR-0056).
+EXIT_GATES = ("build", "behavior", "idiom", "crap", "regression")
+JOURNAL_ROW = re.compile(r"^\| (\d{4}-\d\d-\d\dT[^|]+?) \| ([^|]+?) \| (-?\d+) \|")
+
+
+def mutation_min():
+    try:
+        prof = yaml.safe_load((MIG / "profile.yaml").read_text(encoding="utf-8")) or {}
+        return float(((prof.get("thresholds") or {}).get("mutation_score_min")) or 0.8)
+    except (OSError, yaml.YAMLError, TypeError, ValueError):
+        return 0.8
+
+
+def is_number(v):
+    return isinstance(v, (int, float)) and not isinstance(v, bool)
+
+
+def failing_gates(gates):
+    """Gates the return itself reports as failing: a non-zero exit, or mutation below the profile's minimum."""
+    bad = []
+    for g in EXIT_GATES:
+        v = gates.get(g)
+        if is_number(v) and not isinstance(v, int):
+            # eval p5u: `crap: 26.0` was the worst method's score (passing, under 30), not the gate's exit code
+            bad.append(f"`{g}: {v}` (an exit gate takes the gate command's exit code, 0 when it passed, not a score)")
+        elif is_number(v) and v != 0:
+            bad.append(f"`{g}: {v}`")
+    m, floor = gates.get("mutation_changed"), mutation_min()
+    if is_number(m) and m < floor:
+        bad.append(f"`mutation_changed: {m}` (minimum {floor})")
+    return bad
+
+
+def journal_runs(ticket):
+    """{normalized gate-run name: latest epoch seconds} from the ticket's afs-run journal."""
+    path = MIG / "evidence" / "runs" / f"{ticket}.md"
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return {}
+    runs = {}
+    for line in lines:
+        m = JOURNAL_ROW.match(line)
+        if not m:
+            continue
+        try:
+            at = datetime.datetime.fromisoformat(m.group(1).strip().replace("Z", "+00:00")).timestamp()
+        except ValueError:
+            continue
+        name = m.group(2).strip().replace("-", "_")
+        runs[name] = max(at, runs.get(name, 0))
+    return runs
+
+
+def stale_gates(ticket, gates, changed):
+    """Gates whose last journal run is older than the newest edit to the branch's code: the result no longer
+    describes the code CI will check (eval p5w-r2: idiom passed, then mutation-test edits broke ruff)."""
+    code = [p for p in changed if not p.startswith(".migration/") and pathlib.Path(p).is_file()]
+    if not code:
+        return [], None
+    newest_path = max(code, key=lambda p: pathlib.Path(p).stat().st_mtime)
+    newest = pathlib.Path(newest_path).stat().st_mtime
+    runs = journal_runs(ticket)
+    stale = []
+    for g in (*EXIT_GATES, "mutation_changed"):
+        if not is_number(gates.get(g)):
+            continue
+        last = max((at for name, at in runs.items() if name.startswith(g)), default=None)
+        if last is not None and last + 1 < newest:
+            stale.append(g)
+    return stale, newest_path
 
 
 def in_scope(path, allowed):
@@ -189,6 +293,12 @@ def findings(ticket, role, changed, prompt):
         found.append(("mechanical", "stale-return",
                       f"`{ret_rel}` exists but this branch didn't update it. Update it with this session's gates "
                       "and PR, and commit it."))
+    others = [p for p in net_changed_returns() if p != ret_rel]
+    if others:
+        found.append(("mechanical", "other-returns:" + ",".join(others),
+                      "You changed another role's or ticket's return file: " + ", ".join(f"`{p}`" for p in others)
+                      + ". A session writes only its own return (`" + ret_rel + "`). Restore each one exactly as it "
+                      "was on your base branch (`git checkout <base> -- <file>`) and commit."))
     for err in validate_errors(changed):
         found.append(("mechanical", "validate:" + err.split(":")[0],
                       f"CI's validate.py will fail on this: {err}. Fix it and commit."))
@@ -198,6 +308,13 @@ def findings(ticket, role, changed, prompt):
             doc = yaml.safe_load(ret.read_text(encoding="utf-8")) or {}
         except yaml.YAMLError:
             doc = {}
+        gates = doc.get("gates") if isinstance(doc.get("gates"), dict) else {}
+        if role in MUTATION_ROLES and gates.get("mutation_changed") is None:
+            found.append(("mechanical", "no-mutation-score",
+                          f"`{ret_rel}` has no `gates.mutation_changed`. Copy the score `afs-mutation` printed for "
+                          "your changed files from your journal; if it truly doesn't apply, write `n/a: <reason>` "
+                          "(e.g. `n/a: no mutable code changed`, or `n/a: not run, handed off`). It can't be "
+                          "left empty."))
         handoff = doc.get("handoff")
         if handoff not in (None, "", "none", "null"):
             hpath = str(handoff).split("#")[0]
@@ -205,6 +322,19 @@ def findings(ticket, role, changed, prompt):
                 found.append(("stuck", "no-handoff",
                               f"Your return reports a handoff (`{handoff}`) but this branch didn't commit it. Write "
                               f"the `## Handoff` section with afs-handoff and commit `{hpath}`."))
+        else:
+            bad = failing_gates(gates)
+            if bad:
+                found.append(("mechanical", "failing-gates:" + ",".join(sorted(bad)),
+                              f"`{ret_rel}` reports failing gates and no handoff: " + ", ".join(bad) + ". CI will "
+                              "fail the same way. Fix the code or tests and re-run the gate through afs-run; if you "
+                              "can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop."))
+            stale, newest = stale_gates(ticket, gates, changed)
+            if stale:
+                found.append(("mechanical", "stale-gates:" + ",".join(stale),
+                              "You changed `" + newest + "` after your last run of " + ", ".join(f"`{g}`" for g in stale)
+                              + ", so those results don't describe the code CI will check. Re-run each through "
+                              "afs-run and copy the new results into your return."))
 
     planned = check_plan.ticket_files(MIG, ticket) if role in SCOPED_ROLES else None
     if planned is not None:
