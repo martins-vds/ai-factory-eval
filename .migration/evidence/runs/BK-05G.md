@@ -5,3 +5,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | UTC | Gate | Exit | Seconds | Command | Log SHA-256 | First highlight | Result |
 |---|---|---|---|---|---|---|---|
 | 2026-11-07T23:07:55+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T18:59:54+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T19:02:46+00:00 | validate | 0 | 4.64 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
