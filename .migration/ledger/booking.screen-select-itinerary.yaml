@@ -5,14 +5,26 @@ source:
   graph_node: page:src/main/webapp/admin/selectItinerary.xhtml:src/main/webapp/admin/selectItinerary.xhtml
   location: src/main/webapp/admin/selectItinerary.xhtml:9-23
   risk: {crap: 12, complexity: 3, coverage: 0.0}
-boundary: "The select-itinerary page reads trackingId and loads ItinerarySelection; when routeCandidates is empty it advises moving the arrival deadline further into the future."
+boundary: "The select-itinerary page reads the cargo and candidate routes, renders numbered itineraries when candidates exist, and shows no-route guidance otherwise."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#293]
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/route.html
+status: migrated
 verification: characterized
 characterization_tier: A
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "This page contains only an empty-route state; the populated candidate table is in route.xhtml. With candidates present, its body is blank (.migration/quirks/booking-select-itinerary-blank-with-candidates.md). No named JUnit class exercises the page."
+  - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidates_when_routes_exist"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_page_shows_no_route_guidance_when_candidates_are_empty"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "This capability renders candidate routes or the characterized no-route guidance; candidate filtering is enforced by CargoRouting."
+notes: "Candidates are rendered on the itinerary-selection screen under the approved fix in #252."
 quirks: [martins-vds/ai-factory-pilot-target#252]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-pilot-target#252
+  reason: Render candidate routes when present, as approved by the ruling.

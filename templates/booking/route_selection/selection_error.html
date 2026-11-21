@@ -1,0 +1,14 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Route Selection Error | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-4 text-2xl font-semibold text-gray-900">Route selection error</h1>
+  <p class="mb-4 text-red-700" role="alert">
+    This route selection is invalid. Reload the route page and choose an itinerary.
+  </p>
+  <a
+    class="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
+    href="/admin/cargo/{{ tracking_id.value }}/route/"
+  >Reload route candidates</a>
+{% endblock %}

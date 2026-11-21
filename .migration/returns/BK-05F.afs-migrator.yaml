@@ -1,0 +1,31 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#2158
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2164
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.87
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets:
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/236
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/239
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/250
+  - https://github.com/martins-vds/ai-factory-pilot-target/issues/252
+new_tickets: []
+handoff: none
+rules: []
+no_rules:
+  booking.routing-chain: Candidate filtering and assignment are owned by the routing use cases; this entry records the interface flow.
+  booking.screen-route: This capability presents cargo and candidate itinerary data; candidate filtering is enforced by CargoRouting.
+  booking.screen-select-itinerary: This capability renders candidates or no-route guidance; candidate filtering is enforced by CargoRouting.
+  booking.routing-assign: Candidate selection is presentation; route filtering is owned by booking.routing-candidates.
