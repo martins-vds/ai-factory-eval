@@ -2,7 +2,6 @@ import sys
 from datetime import UTC, datetime
 
 import pytest
-from django.core.management import call_command
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -10,9 +9,8 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
-from cargotracker.cargo.domain.itinerary import Itinerary
-from cargotracker.cargo.domain.leg import Leg
 from cargotracker.cargo.domain.repository import CargoRepository
+from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
 from cargotracker.location.domain.un_locode import UnLocode
@@ -20,7 +18,6 @@ from cargotracker.location.infrastructure.models import LocationRecord
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
-from cargotracker.voyage.domain.voyage_number import VoyageNumber
 from cargotracker.voyage.infrastructure.models import VoyageRecord
 from cargotracker.voyage.infrastructure.repository import DjangoVoyageRepository
 
@@ -157,8 +154,8 @@ def test_route_pages_show_no_route_guidance_when_candidates_are_empty(client, ro
     )
     assert route_response.status_code == 200
     assert itinerary_response.status_code == 200
-    assert guidance in route_response.content.decode()
-    assert guidance in itinerary_response.content.decode()
+    assert guidance in ' '.join(route_response.content.decode().split())
+    assert guidance in ' '.join(itinerary_response.content.decode().split())
 
 
 @pytest.mark.django_db

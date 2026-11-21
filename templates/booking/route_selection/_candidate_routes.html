@@ -1,0 +1,37 @@
+<ol class="space-y-6">
+  {% for candidate in route_candidates %}
+    <li>
+      <article class="rounded border border-gray-300 p-4" aria-labelledby="route-{{ forloop.counter }}">
+        <h3 id="route-{{ forloop.counter }}" class="mb-3 text-lg font-semibold text-gray-900">
+          Route {{ forloop.counter }}
+        </h3>
+        <ol class="divide-y divide-gray-200">
+          {% for leg in candidate.itinerary.legs %}
+            <li class="py-3" data-leg-number="{{ forloop.counter }}">
+              <p class="font-semibold">Leg {{ forloop.counter }} · Voyage {{ leg.voyage.voyage_number.value }}</p>
+              <dl class="grid gap-x-4 sm:grid-cols-[max-content_1fr]">
+                <dt class="font-medium">Load:</dt>
+                <dd>{{ leg.load_location.name }} ({{ leg.load_location.unlocode.value }})</dd>
+                <dt class="font-medium">Departure:</dt>
+                <dd>{{ leg.load_time|date:"m/d/Y" }}</dd>
+                <dt class="font-medium">Unload:</dt>
+                <dd>{{ leg.unload_location.name }} ({{ leg.unload_location.unlocode.value }})</dd>
+                <dt class="font-medium">Arrival:</dt>
+                <dd>{{ leg.unload_time|date:"m/d/Y" }}</dd>
+              </dl>
+            </li>
+          {% endfor %}
+        </ol>
+        <form method="post" action="/admin/cargo/{{ cargo.tracking_id.value }}/itineraries/" class="mt-4">
+          {% csrf_token %}
+          <button
+            class="rounded bg-blue-700 px-4 py-3 text-white hover:bg-blue-800"
+            type="submit"
+            name="itinerary_token"
+            value="{{ candidate.token }}"
+          >Select itinerary {{ forloop.counter }}</button>
+        </form>
+      </article>
+    </li>
+  {% endfor %}
+</ol>
