@@ -1,0 +1,27 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+phase: 6
+decisions:
+  - "Slice acceptance evidence is recorded from the archived run; gates and mutation were not rerun."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#108: compare legacy and target API lending (required member and ISBN fields, 14-day due date, delimiter escaping), first and repeated API returns (409 with the saved date unchanged), and the target new-loan and return forms against the corresponding legacy API behavior."
+next_step: "The operator completes the requested side-by-side comparison; no sign-off is recorded."
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#43
