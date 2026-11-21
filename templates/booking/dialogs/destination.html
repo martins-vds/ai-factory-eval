@@ -1,0 +1,36 @@
+<dialog class="modal" aria-modal="true" aria-labelledby="destination-dialog-title">
+  <div class="modal-box max-w-xl rounded-lg bg-white p-6 shadow-xl">
+    <h2 id="destination-dialog-title" class="mb-4 text-xl font-semibold">Change destination</h2>
+    <p class="mb-2"><span class="font-semibold">Origin:</span> {{ cargo.route_specification.origin.name }}</p>
+    <p class="mb-4"><span class="font-semibold">Current destination:</span> {{ cargo.route_specification.destination.name }}</p>
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog-container"
+      hx-swap="innerHTML"
+      class="flex flex-col gap-4"
+    >
+      {% csrf_token %}
+      <label class="font-medium" for="destination">New destination</label>
+      {% if destination_error %}
+        <p class="text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+      {% endif %}
+      <select
+        class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2"
+        id="destination"
+        name="destination"
+        {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+        required
+      >
+        {% for location in locations %}
+          <option value="{{ location.unlocode.value }}">{{ location.name }} ({{ location.unlocode.value }})</option>
+        {% endfor %}
+      </select>
+      <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+        <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2" type="button" onclick="this.closest('dialog').close()">Cancel</button>
+        <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 text-white hover:bg-blue-800" type="submit">Update</button>
+      </nav>
+    </form>
+  </div>
+</dialog>
