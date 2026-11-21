@@ -13,8 +13,7 @@ def fee_api(request, loan_id):
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
     content = format_html(
-        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p>'
-        '<p class="fee">Fee: ${}</p>',
+        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: ${}</p>',
         fee.loan.id,
         fee.loan.due_on.isoformat(),
         fee.late_days,

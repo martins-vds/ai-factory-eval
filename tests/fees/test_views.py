@@ -13,9 +13,13 @@ def payment_gateway(status, body):
 
     class Handler(BaseHTTPRequestHandler):
         def do_POST(self):
-            requests.append((self.command, self.path, self.rfile.read(
-                int(self.headers.get('Content-Length', 0))
-            )))
+            requests.append(
+                (
+                    self.command,
+                    self.path,
+                    self.rfile.read(int(self.headers.get('Content-Length', 0))),
+                )
+            )
             self.send_response(status)
             self.send_header('Content-Length', str(len(response_body)))
             self.end_headers()
@@ -100,9 +104,7 @@ def test_payment_api_posts_to_the_gateway_and_maps_its_response(
 
 
 @pytest.mark.django_db
-def test_payment_api_returns_gateway_unavailable_on_connection_failure(
-    client, monkeypatch
-):
+def test_payment_api_returns_gateway_unavailable_on_connection_failure(client, monkeypatch):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
 
     response = client.post('/payments/L1')
@@ -149,9 +151,7 @@ def test_htmx_payment_failure_renders_an_error_fragment(client, monkeypatch):
 
 
 @pytest.mark.django_db
-def test_htmx_payment_for_unknown_loan_renders_not_found_without_gateway(
-    client, monkeypatch
-):
+def test_htmx_payment_for_unknown_loan_renders_not_found_without_gateway(client, monkeypatch):
     with payment_gateway(200, 'charged\n') as (gateway_url, requests):
         monkeypatch.setenv('PAYMENT_GATEWAY_URL', gateway_url)
 

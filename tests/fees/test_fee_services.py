@@ -43,7 +43,7 @@ class PaymentGateway:
         return self.response
 
 
-def test_fee_for_loan_charges_one_quarter_after_the_two_day_grace_period():
+def test_fee_application_charges_daily_fee_after_the_two_day_grace_period():
     loan = Loan('L1', due_on=date(2026, 1, 1))
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
@@ -101,9 +101,7 @@ def test_payment_for_unknown_loan_does_not_call_gateway():
     ('gateway_status', 'expected_status'),
     [(200, 200), (503, 502)],
 )
-def test_payment_maps_gateway_status_and_preserves_response_body(
-    gateway_status, expected_status
-):
+def test_payment_maps_gateway_status_and_preserves_response_body(gateway_status, expected_status):
     loan = Loan('L1', due_on=date(2026, 1, 1))
     gateway = PaymentGateway(GatewayResponse(gateway_status, 'charged\n'))
     application = PaymentApplication(LoanRepository(loan), gateway)

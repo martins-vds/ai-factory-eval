@@ -20,7 +20,7 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/characterization/source/goldens/browser.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_fee_for_unknown_loan_returns_no_quote
+  - tests/fees/test_fee_services.py::test_fee_for_unknown_loan_returns_no_quote
   - tests/fees/test_views.py::test_fee_api_renders_the_characterized_html_fragment
   - tests/fees/test_views.py::test_fee_api_returns_the_characterized_not_found_response
   - tests/fees/test_views.py::test_fee_page_shows_loan_fee_and_payment_action

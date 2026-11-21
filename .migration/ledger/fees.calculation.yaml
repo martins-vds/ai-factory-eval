@@ -20,8 +20,8 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_fee_for_loan_observes_grace_period_and_cap
-  - tests/fees/test_services.py::test_fee_uses_return_date_and_clamps_early_returns_to_zero
+  - tests/fees/test_fee_services.py::test_fee_for_loan_observes_grace_period_and_cap
+  - tests/fees/test_fee_services.py::test_fee_uses_return_date_and_clamps_early_returns_to_zero
 rules:
   - id: late-days
     rule: Late days are max(0, days from due date to returnedOn or today).
