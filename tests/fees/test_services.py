@@ -57,7 +57,7 @@ def application(*loans, today=date(2026, 11, 9), gateway=None):
         (0, Decimal('0.00')),
         (1, Decimal('0.00')),
         (2, Decimal('0.00')),
-        (3, Decimal('0.25')),
+        (3, Decimal('0.75')),
         (60, Decimal('10.00')),
     ],
 )
