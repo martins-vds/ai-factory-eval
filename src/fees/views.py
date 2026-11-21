@@ -44,7 +44,7 @@ def payment_api(request, loan_id):
 def payment_page(request, loan_id):
     payment = payment_application.pay(loan_id)
     if payment is None:
-        context = {'payment_status': 404, 'payment_message': 'No such loan.'}
+        context = {'payment_message': 'No such loan.'}
         status = 404
     else:
         context = {'payment_status': payment.status_code, 'payment_message': payment.body}
