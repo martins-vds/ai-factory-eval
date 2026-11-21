@@ -1,0 +1,29 @@
+role: afs-program-orchestrator
+ticket: LF-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#117
+phase: 6
+decisions:
+  - "Acceptance evidence is run 42912984554 attempt 1 for commit 8f9a11640eef9801378f3db53a76903363c5e5b5; LF-AUDIT returned complete."
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#114
+    status: returned
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#117: perform and record the side-by-side comparison listed in .migration/evidence/fees-payments/report.md."
+next_step: "Await the human side-by-side comparison; keep the slice pending until the human reports its outcome."
+slice: fees-payments
+tickets:
+  total: 5
+  merged: 5
+  open: 0
+  blocked: []
+acceptance:
+  report: .migration/evidence/fees-payments/report.md
+  gates: all-green
+  mutation_score: 0.975
+  coverage_gaps: 0
+human_check: requested
+human_check_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+  - martins-vds/ai-factory-synthetic-target#42
