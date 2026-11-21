@@ -39,3 +39,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:15:01+00:00 | focused-dialog-tests | 0 | 7.31 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `1afa4c54d84389d8` |  |  |
 | 2026-11-21T19:15:05+00:00 | focused-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T19:15:08+00:00 | focused-ruff-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T19:17:51+00:00 | mutation-changed-rerun | 0 | 146.3 | `python .migration/harness/tools/afs-mutation` | `e845148ec27ddba4` |  | gate=mutation score=0.902 threshold=0.8 killed=46 survived=5 files=1 base=715133b6d39c3c7e9d5a0ead603b7c04446096df |
+| 2026-11-21T19:19:19+00:00 | regression | 0 | 63.58 | `pytest -q` | `171e7e77a0c92753` |  |  |
