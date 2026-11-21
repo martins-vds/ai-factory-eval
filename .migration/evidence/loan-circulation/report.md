@@ -49,4 +49,12 @@ The full run reports 11 survivors: six URL literals, four HTTP-method decorators
 
 ## Human check
 
-The independent re-audit reviewed all three ledger capabilities. Their target references now resolve, with no ledger gaps; the graph-path inconsistency remains for coordinator follow-up. The operator's side-by-side flow sign-off is the coordinator's subsequent step and is not represented as a gap in this verdict.
+The independent re-audit reviewed all three ledger capabilities. Their target references now resolve, with no ledger gaps; the graph-path inconsistency remains for coordinator follow-up.
+
+The human side-by-side check is requested. Compare legacy against target:
+
+1. Lending through the API: required member and ISBN fields, the 14-day due date, and delimiter escaping in the loan record.
+2. Returning: the first return succeeds and saves its date; a repeat return answers `409` and leaves the saved date unchanged.
+3. The `/ui/loans/new/` lending form and `/ui/loans/{id}/return/` return form, including success and validation/error behavior.
+
+No pass or approval is recorded here.

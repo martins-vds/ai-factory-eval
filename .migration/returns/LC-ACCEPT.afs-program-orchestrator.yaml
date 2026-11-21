@@ -1,0 +1,34 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+pr: null
+phase: 6
+decisions:
+  - "martins-vds/ai-factory-synthetic-target#108: acceptance assembled from the archived run and re-audit; no gate or mutation was rerun"
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#100
+    status: returned
+  - agent: afs-slice-coordinator
+    ticket: LC-ACCEPT
+    status: returned
+awaiting_human:
+  - "Request the approver to complete the legacy-versus-target side-by-side check specified in `.migration/evidence/loan-circulation/acceptance.md`"
+next_step: "Do not close or accept the slice until the human records the side-by-side check outcome"
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#43
