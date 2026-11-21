@@ -8,4 +8,7 @@ source:
   risk: {crap: 4.0, complexity: 4, coverage: 0.90}
 boundary: "GET /fees/{id} renders the due date and fee HTML or HTTP 404 for an unknown loan."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

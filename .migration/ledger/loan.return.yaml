@@ -7,5 +7,8 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:45-50
 boundary: "POST /loans/{id}/return records today's return date or returns HTTP 404 for an unknown loan."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
 notes: "Quirk draft: .migration/quirks/repeated-loan-return.md"

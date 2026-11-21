@@ -8,5 +8,8 @@ source:
   risk: {crap: 4.0, complexity: 4, coverage: 0.75}
 boundary: "Gateway HTTP failures map to 502; I/O and interruption failures return payment gateway unavailable."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
 notes: "Quirk draft: .migration/quirks/payment-interrupt.md"

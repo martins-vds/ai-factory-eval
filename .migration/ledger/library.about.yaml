@@ -7,4 +7,7 @@ source:
   location: legacy/src/main/resources/static/about.html:1-10
 boundary: "GET /about returns the classpath HTML page with title and Lending Library opening/lending information."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

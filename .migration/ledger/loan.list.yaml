@@ -7,4 +7,7 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:25-28
 boundary: "GET /loans returns HTTP 200 and semicolon-separated loan lines ordered by id."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

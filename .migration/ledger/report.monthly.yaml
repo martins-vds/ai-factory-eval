@@ -7,3 +7,7 @@ source:
 boundary: "The remaining specification defines a first-of-month previous-month report grouped and sorted by member."
 status: pending
 verification: pending
+characterization_tier: C
+verification: spec-derived
+evidence:
+- .migration/references/characterization.md

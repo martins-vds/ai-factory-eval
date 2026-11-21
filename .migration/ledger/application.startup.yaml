@@ -7,5 +7,8 @@ source:
   risk: {crap: 1.0, complexity: 1, coverage: 0.85}
 boundary: "Starting legacy/run.sh starts Grizzly/Jersey on PORT and initializes the JPA/H2 library."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
 notes: "Quirk draft: .migration/quirks/restart-data-loss.md"

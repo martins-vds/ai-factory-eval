@@ -7,4 +7,7 @@ source:
   location: legacy/docs/export-csv.md:1-4
 boundary: "GET /loans emits one semicolon-separated loan line per row."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

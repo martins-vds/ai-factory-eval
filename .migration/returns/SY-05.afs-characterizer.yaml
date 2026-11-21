@@ -1,0 +1,35 @@
+role: afs-characterizer
+ticket: SY-05
+issue: martins-vds/ai-factory-eval#1978
+tier_used:
+  A: 13
+  B: 0
+  C: 1
+suite:
+  path: .migration/characterization/source/characterize.py
+  cases: 7
+  passing: 7
+  run_log: .migration/evidence/runs/SY-05.md
+predicted_vs_observed:
+  match: 7
+  differs: 0
+ledger_updated:
+- application.startup
+- data.loan-storage
+- data.seed-records
+- export.csv
+- integration.payment-gateway
+- late-fee.view
+- library.about
+- loan.lend
+- loan.list
+- loan.lookup
+- loan.return
+- loan.return-date
+- payment.gateway-errors
+- report.monthly
+quirk_tickets:
+- .migration/quirks/restart-data-loss.md
+- .migration/quirks/repeated-loan-return.md
+- .migration/quirks/payment-interrupt.md
+review_only_requests: []

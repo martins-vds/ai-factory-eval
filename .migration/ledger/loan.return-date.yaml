@@ -8,5 +8,8 @@ source:
   risk: {crap: 2.0, complexity: 2, coverage: 0.83}
 boundary: "markReturned overwrites returnedOn with the supplied date."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
 notes: "Quirk draft: .migration/quirks/repeated-loan-return.md"

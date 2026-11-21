@@ -8,4 +8,7 @@ source:
   risk: {crap: 3.0, complexity: 3, coverage: 0.67}
 boundary: "POST /loans accepts member and isbn form fields and creates an HTTP 201 loan dated today due in 14 days."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

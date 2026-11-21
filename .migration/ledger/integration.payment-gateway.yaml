@@ -8,5 +8,8 @@ source:
   risk: {crap: 4.0, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} posts to PAYMENT_GATEWAY_URL/charge?loan=<id>; unknown loans return 404."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
 notes: "Quirk draft: .migration/quirks/payment-interrupt.md"

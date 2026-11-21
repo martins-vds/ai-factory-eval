@@ -6,5 +6,8 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:12-69
 boundary: "Loan entities are read and written through JPA; data lifecycle is observable through the loan HTTP endpoints."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
 notes: "Quirk draft: .migration/quirks/restart-data-loss.md"
