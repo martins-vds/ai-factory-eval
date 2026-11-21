@@ -7,11 +7,17 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
+boundary: "The first successful return persists its date; a repeat return is rejected and leaves the original date unchanged per the approved fix."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.services.return_loan, src.loans.repository.LoanRepository.set_return_date_if_unreturned]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_services.py::test_return_records_a_date_for_an_unreturned_loan, tests/loans/test_services.py::test_return_rejects_a_repeat_and_keeps_the_original_date, tests/loans/test_circulation.py::test_return_endpoint_records_the_date, tests/loans/test_circulation.py::test_return_endpoint_rejects_a_repeat_and_keeps_the_original_date, tests/loans/test_circulation_ui.py::test_regular_repeat_return_renders_the_loan_and_original_date, tests/loans/test_circulation_ui.py::test_htmx_return_renders_a_repeat_error_and_keeps_the_date, tests/loans/test_circulation_ui.py::test_real_browser_can_lend_and_return_a_book]
+rules:
+  - id: preserve-first-return-date
+    rule: Reject a return when the loan already has a return date and preserve that original date.
+    source: martins-vds/ai-factory-synthetic-target#41
+notes: "The source overwrites returnedOn on repeat calls; the approved fix is martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
