@@ -6,7 +6,7 @@ gates:
   build: 0
   behavior: 0
   idiom: 0
-  crap: 7.0
+  crap: 0
   mutation_changed: 0.896
   regression: 0
 evidence_logs:
