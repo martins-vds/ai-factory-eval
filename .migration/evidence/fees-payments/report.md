@@ -8,6 +8,8 @@ AFS acceptance gates run [42912984554](https://github.com/martins-vds/ai-factory
 
 The auditor checkout is the acceptance commit plus audit evidence only; no fees implementation, test, ledger, or graph-input paths changed after that commit.
 
+For LF-ACCEPT, the orchestrator reviewed this archived run and the auditor's journal rather than rerunning any acceptance gate or mutation command.
+
 ## Gates
 
 All rows below are from the verified acceptance artifact; the original rows are preserved in `.migration/evidence/runs/LF-AUDIT.md`.
@@ -58,6 +60,14 @@ The accepted target graph lists all four slice anchors and traces each to `loans
 
 The verified full run reports six survivors. Four are in loan views/routes/forms, outside this slice. The two fees survivors change `Fee` and `GatewayResponse` from frozen to mutable dataclasses (`.migration/runs/acceptance-42912984554-1/mutants.md`). The reviewed fee/payment boundaries expose HTTP behavior, not these internal value objects; no path mutates either value. I therefore assess these two as equivalent for the specified observable contract, not as missing capability coverage. They remain documented survivors rather than being represented as killed.
 
-## Human check
+## Human side-by-side check — requested
 
-Independent auditor review completed 2026-11-10. No missing, misplaced, broken-flow, integration, or untested capability gap was found; graph inconsistencies: none. Audit verdict: **complete**. Coordinator/operator flow sign-off remains the next step (ADR-0031); this report does not substitute for it.
+The independent auditor completed its review on 2026-11-10 and found no missing, misplaced, broken-flow, integration, or untested capability gap; graph inconsistencies: none. Audit verdict: **complete**. The human side-by-side check has not yet been reported. Compare legacy and target using identical loan data, dates/clocks, requests, and gateway outcomes, and record both observations for:
+
+1. An overdue loan: late-day count, fee in cents, displayed dollar amount, and rounding/precision.
+2. A loan that is not overdue: calculated fee and page/API presentation.
+3. An unknown loan: exact status and response body, and whether either side calls the gateway.
+4. Paying through the API and through the UI: request/interaction and the success response or visible page update.
+5. Gateway failures: a non-200 response and an I/O/interruption failure, including the resulting status/body or UI state.
+
+The target's HTTP 502 handling for gateway failures follows the approved quirk ruling. Keep this check requested until the operator reports its outcome; this report does not substitute for human sign-off (ADR-0031).

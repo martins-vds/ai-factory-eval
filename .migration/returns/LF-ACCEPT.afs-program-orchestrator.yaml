@@ -1,0 +1,28 @@
+role: afs-program-orchestrator
+ticket: LF-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#117
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/118
+phase: 6
+decisions: []
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#114
+    status: returned
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#62: Compare legacy and target for an overdue loan's late days, fee cents, displayed amount and rounding; a non-overdue loan's fee and presentation; an unknown loan's exact status/body and whether it calls the gateway; API and UI payment requests and success behavior; and non-200 plus I/O/interruption gateway failures, including resulting status/body or UI state."
+next_step: "Keep human_check requested until the operator records the side-by-side check; do not close the slice before human sign-off."
+acceptance:
+  slice: fees-payments
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked: []
+  report: .migration/evidence/fees-payments/report.md
+  gates: all-green
+  mutation_score: 0.975
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#40
+    - martins-vds/ai-factory-synthetic-target#42
