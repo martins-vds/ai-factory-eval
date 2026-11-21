@@ -1,4 +1,5 @@
 role: afs-slice-coordinator
+# Human sign-off remains requested; this return does not record approval.
 ticket: LC-ACCEPT
 issue: martins-vds/ai-factory-synthetic-target#108
 slice: loan-circulation
