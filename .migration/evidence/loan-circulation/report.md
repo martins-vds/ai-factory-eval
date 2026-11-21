@@ -49,4 +49,12 @@ The full run reports 11 survivors: six URL literals, four HTTP-method decorators
 
 ## Human check
 
-The independent re-audit reviewed all three ledger capabilities. Their target references now resolve, with no ledger gaps; the graph-path inconsistency remains for coordinator follow-up. The operator's side-by-side flow sign-off is the coordinator's subsequent step and is not represented as a gap in this verdict.
+Human_check: requested. The independent re-audit reviewed all three ledger capabilities. Their target references now resolve, with no ledger gaps; the graph-path inconsistency remains for coordinator follow-up.
+
+Compare the legacy Lending Library against the target implementation side by side:
+
+- Lending through the API: legacy and target must require member and ISBN fields; a valid lend must create a loan dated today with a 14-day due date and return HTTP 201; lending fields containing delimiters must be escaped in text/export output.
+- Returning through the API: the first return must succeed and persist today's return date; a repeated return must answer HTTP 409 without replacing the saved date, and an unknown loan must answer HTTP 404.
+- Browser flows: compare `/ui/loans/new/` lending and the loan return form. Blank-field errors, successful HTMX lending/return, and repeat-return error behavior must match the characterized target expectations.
+
+This request does not record human approval or a pass verdict; sign-off remains for the approver.

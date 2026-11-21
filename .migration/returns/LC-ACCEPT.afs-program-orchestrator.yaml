@@ -1,0 +1,36 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+pr: martins-vds/ai-factory-synthetic-target#109
+phase: 6
+decisions:
+  - "Used the verified acceptance archive for Actions run 42752283868, attempt 1, commit 70fef8e7bc822092770b04b1bf9b5288e04d8bb6."
+  - "Recorded a human side-by-side check request; did not set passed or approve the slice."
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#94
+    status: returned
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#100
+    status: returned
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#108: complete the requested legacy-versus-target side-by-side check."
+next_step: "After the human reports the check result, update human_check and follow the sign-off procedure for an approver."
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 1
+    merged: 1
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/report.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+human_check: requested
+human_check_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
