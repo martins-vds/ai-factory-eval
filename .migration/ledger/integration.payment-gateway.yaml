@@ -1,0 +1,15 @@
+id: integration.payment-gateway
+kind: integration
+title: Pay a loan late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: {crap: 20, complexity: 4, coverage: 0}
+boundary: "POST /payments/{id} charges PAYMENT_GATEWAY_URL; an unknown loan is HTTP 404 and gateway/non-200 outcomes map to HTTP 502 or the gateway status."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "Gateway behavior and interruption policy are external-integration behavior unresolved only where noted by the quirk."

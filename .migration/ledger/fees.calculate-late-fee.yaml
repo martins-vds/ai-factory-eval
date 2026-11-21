@@ -1,0 +1,14 @@
+id: fees.calculate-late-fee
+kind: behavioral
+title: Calculate the late fee
+source:
+  graph_node: method:legacy/src/main/java/lib/LateFeeView.java:LateFeeView.page
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: {crap: 20, complexity: 4, coverage: 0}
+boundary: "Fees are 25 cents per day after the due date, returns at most 2 days late are waived, and fees cap at $10."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "Characterization inventory records the fee formula; no migration implementation is present in this ticket."

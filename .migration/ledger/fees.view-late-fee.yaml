@@ -1,0 +1,15 @@
+id: fees.view-late-fee
+kind: ui
+title: View a loan's late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: {crap: 20, complexity: 4, coverage: 0}
+boundary: "GET /fees/{id} renders an HTML heading and due-date/days-late/fee paragraph, or a no-such-loan paragraph with HTTP 404."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "Fee calculation rules are documented in the integration capability rather than this view's rendering boundary."

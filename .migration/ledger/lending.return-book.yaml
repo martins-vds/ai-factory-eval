@@ -1,0 +1,15 @@
+id: lending.return-book
+kind: behavioral
+title: Return a loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans/{id}/return
+  flow: Return Book
+  location: legacy/src/main/java/lib/LoanResource.java:45-50
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "POST /loans/{id}/return records today's return date and returns the loan line, or HTTP 404 for an unknown loan."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "The known/unknown route behavior is characterized; repeated-return policy is unresolved in a quirk."

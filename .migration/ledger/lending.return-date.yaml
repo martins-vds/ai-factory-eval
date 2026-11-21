@@ -1,0 +1,14 @@
+id: lending.return-date
+kind: behavioral
+title: Store and replace loan return dates
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned
+  location: legacy/src/main/java/lib/LoanRepository.java:36-44
+  risk: {crap: 6, complexity: 2, coverage: 0}
+boundary: "The LOAN return date is set to the supplied date, including overwriting a previous return date."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "The repeated-return policy is unresolved by a quirk and is not silently defined as an invariant."

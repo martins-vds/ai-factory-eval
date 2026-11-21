@@ -1,0 +1,15 @@
+id: lending.list-loans
+kind: behavioral
+title: List all loans
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:25-28
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "GET /loans returns HTTP 200 with one semicolon-separated loan line per row and a trailing newline."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+no_rules: "Listing is a data projection without a domain refusal or mutation rule."
