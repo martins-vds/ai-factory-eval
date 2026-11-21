@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+<main class="catalog-shell py-8">
+  <section class="mb-8">
+    <p class="text-xs uppercase tracking-[.2em] text-library-muted">The collection · {{ loans|length }} loans</p>
+    <h1 class="mt-3 text-5xl font-bold leading-tight">Books in good company.</h1>
+    <p class="mt-3 max-w-2xl text-lg text-library-muted">
+      A quiet ledger of what is out, who has it, and when it comes home.
+    </p>
+  </section>
+
+  <div class="catalog-grid">
+    <section aria-label="Loan catalog">
+      {% for loan in loans %}
+        <article class="loan-entry flex flex-wrap items-center justify-between gap-4 py-5">
+          <div>
+            <h2 class="text-xl font-semibold">
+              <a class="text-library-rust underline-offset-4 hover:underline"
+                 href="/ui/loans/{{ loan.id }}/">Loan {{ loan.id }}</a>
+            </h2>
+            <p class="mt-1 text-library-muted">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+          </div>
+          <div class="text-sm sm:text-right">
+            <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+            {% if loan.returned_on %}
+              <p class="mt-1 text-library-muted">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+            {% else %}
+              <p class="mt-1 font-medium text-library-rust">On loan</p>
+            {% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <p class="rounded-box border border-library-line bg-library-surface p-6">
+          No loans are currently in the catalog.
+        </p>
+      {% endfor %}
+    </section>
+
+    <aside class="catalog-note card rounded-box border border-library-line bg-library-surface p-6">
+      <p class="text-xs uppercase tracking-widest text-library-muted">At the desk</p>
+      <h2 class="mt-2 text-2xl font-semibold">A fourteen-day loan</h2>
+      <p class="mt-3 leading-relaxed text-library-muted">
+        Each book is due two weeks after it leaves the shelves. Select a record to see its dates.
+      </p>
+    </aside>
+  </div>
+</main>
+{% endblock %}

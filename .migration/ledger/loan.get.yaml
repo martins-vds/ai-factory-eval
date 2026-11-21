@@ -7,8 +7,18 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:30-35
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans/{id} returns the formatted loan line and newline with HTTP 200, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#2101, martins-vds/ai-factory-synthetic-target#35]
+target:
+  components: [src.loans.services.LoanCatalog.get_loan, src.loans.views.api_detail]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_catalog_api_matches_characterized_source_responses
+  - tests/loans/test_catalog.py::test_catalog_use_case_refuses_an_unknown_loan_without_a_request
+rules:
+  - id: unknown-loan
+    rule: Requesting an unknown loan raises LoanNotFound.
+    source: legacy/src/main/java/lib/LoanResource.java:30-35

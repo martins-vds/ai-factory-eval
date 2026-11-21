@@ -6,10 +6,17 @@ source:
   graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
   location: legacy/src/main/resources/META-INF/seed.sql:1-3
 boundary: "The persistence unit loads three fixed example loan rows at startup: L1, L2, and L3, with their member, ISBN, and lent/returned dates."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#2101, martins-vds/ai-factory-synthetic-target#35]
+target:
+  components: [src.loans.migrations.0002_seed_loans]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/restart.json]
-notes: "Seed reload and reset-on-restart behavior are raised in martins-vds/ai-factory-synthetic-target#42."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_api_lists_seeded_loans_in_id_order
+  - tests/loans/test_catalog.py::test_catalog_use_case_lists_seed_records_in_id_order
+notes: "Initial seeds are inserted only into an empty table per quirk ruling martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+no_rules: The seed migration provides initial examples; it does not enforce business input rules.

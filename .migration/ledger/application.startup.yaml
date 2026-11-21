@@ -7,10 +7,17 @@ source:
   location: legacy/src/main/java/lib/App.java:13-25
   risk: {crap: 1, complexity: 1, coverage: 0.85}
 boundary: "PORT selects the listening port (default 8080); startup creates the library persistence unit, wires four HTTP resources, binds Grizzly to 0.0.0.0, and shutdown closes the server and EntityManagerFactory."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#2101, martins-vds/ai-factory-synthetic-target#35]
+target:
+  components: [src.loans.apps.LoansConfig, src.loans.migrations.0002_seed_loans, config.urls]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json]
-notes: "Restart reset behavior is raised in martins-vds/ai-factory-synthetic-target#42."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_reapplying_migrations_does_not_overwrite_persisted_loans
+  - tests/loans/test_catalog.py::test_loan_records_survive_a_database_connection_restart
+no_rules: Startup initializes Django and migrations; no business input rules are enforced here.
+notes: "PostgreSQL persistence replaces reset-on-restart per quirk ruling martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
