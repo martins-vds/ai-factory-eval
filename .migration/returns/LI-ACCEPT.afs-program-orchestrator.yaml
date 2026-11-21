@@ -1,0 +1,27 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+pr: null
+phase: 6
+decisions:
+  - "https://github.com/martins-vds/ai-factory-synthetic-target/issues/104: reconciliation is blocked; do not infer a disposition from the blocked verifier return."
+dispatched: []
+awaiting_human:
+  - "https://github.com/martins-vds/ai-factory-synthetic-target/issues/104: resolve the closed-completed issue's missing attributable passing verifier evidence or correct its tracker lineage."
+next_step: "Resolve #104's evidence/lineage, then regenerate and pass ticket reconciliation; keep the slice epic open until reconciliation and human sign-off are complete."
+handoff: .migration/handoffs/LI-ACCEPT.md
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked:
+      - "https://github.com/martins-vds/ai-factory-synthetic-target/issues/104: no valid completed/superseded reconciliation evidence"
+  report: .migration/evidence/library-info/report.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets: []

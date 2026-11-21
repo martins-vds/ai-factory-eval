@@ -1,0 +1,25 @@
+epic: 64
+scope: slice-epic-descendants
+issues:
+  - number: 65
+    disposition: completed
+    pull_requests: [103]
+    returns:
+      - .migration/returns/LL-04.afs-migrator.yaml
+  - number: 104
+    needs_review: "Closed completed by merged PR #105, but its only verifier return at that landing is blocked and identifies parent issue #65, not #104; the later passing return identifies sibling #113. The closed-completed state and merged failure PR do not support either completed or superseded disposition."
+  - number: 113
+    disposition: completed
+    pull_requests: [115]
+    returns:
+      - .migration/returns/LL-04.afs-verifier.yaml
+  - number: 122
+    disposition: completed
+    pull_requests: [125]
+    returns:
+      - .migration/returns/LI-AUDIT.afs-auditor.yaml
+  - number: 127
+    disposition: completed
+    pull_requests: [128]
+    returns:
+      - .migration/returns/LI-ACCEPT.afs-program-orchestrator.yaml
