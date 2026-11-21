@@ -13,8 +13,8 @@ commit and attempt above. The downloaded artifact ZIP SHA-256 matches GitHub's a
 (`a907578356db5d3f689b4a08a7cb4dd7f7ee3cd5b7e9ad68bc4f859bb39a1af8`); its `result.json` is
 byte-identical to `.migration/evidence/acceptance-runs/42912984554-1.json`
 (`d819963580a985d4e441f23f599dfc1fc01d786dde2d197d10f71087cbb08364`). The artifact expires
-2026-12-10 22:28:25 UTC. The acceptance rows below are preserved from the artifact's
-`journals/LF-ACCEPT.md`.
+2026-12-10 22:28:25 UTC. The acceptance rows in the committed
+`.migration/evidence/runs/LF-ACCEPT.md` are preserved from the artifact's `journals/LF-ACCEPT.md`.
 
 The independent Auditor's report records a successful `afs-acceptance verify` for this run and
 commit, an audit verdict of `complete`, and no coverage gaps or graph inconsistencies. In this
@@ -79,9 +79,10 @@ responses. Check:
 
 1. For an overdue loan, the fee amount and rounding (including the two-day waiver and $10 cap).
 2. For a loan that is not overdue, that no fee is charged or displayed.
-3. For an unknown loan, the API response and UI behavior.
-4. Paying a fee through both the API and UI, including the gateway request and successful response.
-5. A failed payment gateway response or I/O/interruption failure, including the resulting error
-   status and user-visible/API behavior.
+3. For an unknown loan, compare the API status/body and the fee page's not-found behavior.
+4. Pay through both the API and UI; compare the gateway request and successful status/body or UI
+   result.
+5. Trigger a non-200 response and an I/O/interruption failure at the gateway; compare the resulting
+   API status/body and user-visible UI behavior.
 
 This is a request for human comparison only; no side-by-side sign-off has been recorded.
