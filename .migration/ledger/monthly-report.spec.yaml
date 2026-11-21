@@ -1,0 +1,15 @@
+id: monthly-report.spec
+kind: data
+title: Specify the monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-8
+boundary: A monthly report runs on the first day for the previous month and produces one member row with started loans, late returns, and late fees.
+slice: lending-library
+status: pending
+verification: pending
+rules:
+  - {id: report-period, rule: "Run on the first day of each month for the previous month", source: "legacy/docs/reports-spec.md:4"}
+  - {id: report-row-shape, rule: "Each row contains member id, loans started, loans returned late, and total late fees in cents", source: "legacy/docs/reports-spec.md:5"}
+  - {id: report-order, rule: "Sort descending by total late fees, then member id for ties", source: "legacy/docs/reports-spec.md:6"}
+  - {id: report-members, rule: "Omit members with no loans in the month", source: "legacy/docs/reports-spec.md:7"}

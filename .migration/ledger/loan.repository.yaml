@@ -1,0 +1,11 @@
+id: loan.repository
+kind: structural
+title: Manage loan database transactions
+source:
+  graph_node: class:legacy/src/main/java/lib/LoanRepository.java:LoanRepository
+  location: legacy/src/main/java/lib/LoanRepository.java:10-70
+  risk: {crap: 6, complexity: 2, coverage: 0}
+boundary: Repository operations open and close EntityManagers, commit writes, roll back on close, and manage loan reads and updates.
+slice: lending-library
+status: pending
+verification: pending

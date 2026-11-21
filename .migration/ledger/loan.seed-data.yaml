@@ -1,0 +1,10 @@
+id: loan.seed-data
+kind: data
+title: Seed sample loans at startup
+source:
+  graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+boundary: Startup inserts L1 ana, L2 bo, and L3 cy with fixed dates and one current open loan.
+slice: lending-library
+status: pending
+verification: pending

@@ -1,0 +1,12 @@
+id: payment.charge
+kind: integration
+title: Charge a late fee through the gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: {crap: 20, complexity: 4, coverage: 0}
+boundary: POST /payments/{id} verifies the loan then sends a gateway POST; gateway 200 maps to 200, other statuses map to 502.
+slice: lending-library
+status: pending
+verification: pending
