@@ -1,0 +1,25 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+phase: 6
+decisions: []
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#122
+    status: returned
+awaiting_human:
+  - "Compare the legacy /about page with target /about for About text, opening hours, lending policy, and contact information; compare those facts on target /ui/about/ and its layout with the approved reading-room plan."
+next_step: "Await the human side-by-side check and approver review; keep the slice epic open until the human check is recorded."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets: []
