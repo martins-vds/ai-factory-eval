@@ -33,9 +33,7 @@ def test_export_data_snapshot_round_trips_fixture_rows_and_preserves_nulls(tmp_p
 
     exported = {}
     for spec in mapping['tables']:
-        with (output / f"{spec['target']}.csv").open(
-            newline='', encoding='utf-8'
-        ) as stream:
+        with (output / f'{spec["target"]}.csv').open(newline='', encoding='utf-8') as stream:
             reader = csv.DictReader(stream)
             rows = list(reader)
         assert reader.fieldnames == list(spec['columns'])
