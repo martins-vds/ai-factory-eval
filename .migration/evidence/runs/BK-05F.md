@@ -25,3 +25,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T01:22:39+00:00 | migration-validation | 1 | 3.53 | `rtk python .migration/harness/tools/validate.py .migration` | `1511a340c9c170a0` | 194 file(s) checked, 1 error(s) |  |
 | 2026-11-21T01:24:08+00:00 | mutation_changed | 1 | 82.72 | `python .migration/harness/tools/afs-mutation` | `5aa3030db61655ba` | afs-mutation: FAILED score=0.667 threshold=0.8 killed=28 survived=14 skipped=0 files=1 jobs=1 base=b9e468fb6683d78aed40e | gate=mutation score=0.667 threshold=0.8 killed=28 survived=14 files=1 base=b9e468fb6683d78aed40e0cfcfc50bc216e9812d |
 | 2026-11-21T01:24:20+00:00 | migration-validation | 0 | 3.53 | `rtk python .migration/harness/tools/validate.py .migration` | `a3cead9cf227b8af` |  |  |
+| 2026-11-21T01:26:09+00:00 | route-selection-security-fix | 0 | 3.01 | `rtk pytest -q tests/booking/interfaces/test_route_selection.py` | `0c72c91ad48b83be` |  |  |

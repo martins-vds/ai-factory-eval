@@ -85,7 +85,10 @@ def create_route_selection_views(
         candidates = cargo_routing.route_candidates(TrackingId(tracking_id))
         if index < 0 or index >= len(candidates):
             raise Http404('The route candidate was not found.')
-        cargo_routing.assign_route(TrackingId(tracking_id), candidates[index])
-        return redirect(f'/admin/cargo/{tracking_id}/')
+        assigned_cargo = cargo_routing.assign_route(
+            TrackingId(tracking_id),
+            candidates[index],
+        )
+        return redirect(f'/admin/cargo/{assigned_cargo.tracking_id.value}/')
 
     return route_selection, itinerary_selection, assign_candidate
