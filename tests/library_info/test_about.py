@@ -30,8 +30,9 @@ def test_browser_about_page_shows_library_information(client):
 
     assert response.status_code == 200
     assert b'About the Lending Library' in response.content
-    assert b'Open Monday to Saturday, 9:00 to 18:00.' in response.content
-    assert b'Books are lent for 14 days.' in response.content
+    assert b'Monday to Saturday, 9:00 to 18:00' in response.content
+    assert b'Lending period' in response.content
+    assert b'14 days' in response.content
     assert b'href="mailto:desk@lending-library.invalid"' in response.content
 
 
