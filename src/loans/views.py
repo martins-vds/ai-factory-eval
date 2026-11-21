@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .models import Loan
 from .repository import LoanRepository
@@ -17,6 +17,7 @@ from .services import (
 )
 
 
+@require_http_methods(['GET', 'POST'])
 def loan_catalog(request):
     if request.method == 'POST':
         return loan_catalog_lend(request)
@@ -84,6 +85,7 @@ def loan_catalog_return(request, loan_id):
     return render(request, 'loans/return_status.html', {'loan': loan, 'error': ''})
 
 
+@require_http_methods(['GET', 'POST'])
 def loan_list(request):
     if request.method == 'POST':
         try:

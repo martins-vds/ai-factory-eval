@@ -190,3 +190,21 @@ def test_repeat_return_ui_renders_error_and_preserves_saved_date(client, monkeyp
     assert b'already been returned' in response.content
     assert b'Jan 20, 2026' in response.content
     assert b'hx-on::before-swap=' in response.content
+
+
+@pytest.mark.django_db
+def test_unknown_return_ui_renders_the_htmx_not_found_response(client):
+    response = client.post('/ui/loans/missing/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
+    assert b'hx-on::before-swap=' in response.content
+
+
+@pytest.mark.django_db
+def test_loan_collections_reject_unsupported_methods(client):
+    api_response = client.put('/loans')
+    browser_response = client.put('/ui/loans/')
+
+    assert api_response.status_code == 405
+    assert browser_response.status_code == 405
