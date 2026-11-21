@@ -25,7 +25,7 @@ acceptance:
     blocked: []
   report: .migration/evidence/loan-circulation/report.md
   gates: all-green
-  mutation_score: 0.920
+  mutation_score: "n/a: full mutation was not rerun; verified archive 42752283868-1 reports 0.920"
   coverage_gaps: 0
 human_check: requested
 human_check_issues: []
