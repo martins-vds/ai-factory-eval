@@ -39,5 +39,46 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-21T13:44:34Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21900,
+    "prompt_from": "transcript",
+    "scope_lines": [
+      "templates/booking/dashboard/not_routed_table.html"
+    ],
+    "enabled": true,
+    "ticket": "BK-05G",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/dc0a0265-665b-4ffa-917c-a4c9ffe4ec37.json",
+      ".migration/evidence/mutants/BK-05G.md",
+      ".migration/evidence/runs/BK-05G.md",
+      ".migration/ledger/booking.dialog-chain.yaml",
+      ".migration/ledger/booking.dialog-deadline.yaml",
+      ".migration/ledger/booking.dialog-destination.yaml",
+      ".migration/returns/BK-05G.afs-migrator.yaml",
+      "src/cargotracker/booking/interfaces/dialogs/views.py",
+      "templates/booking/dashboard/not_routed_table.html",
+      "templates/booking/dialogs/deadline.html",
+      "templates/booking/dialogs/destination.html",
+      "templates/booking/dialogs/error.html",
+      "tests/booking/interfaces/test_dialogs.py"
+    ],
+    "findings": [
+      "[mechanical] You changed `src/cargotracker/booking/interfaces/dialogs/views.py` after your last run of `build`, `behavior`, `idiom`, `crap`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/BK-05G.md"
   }
 ]
