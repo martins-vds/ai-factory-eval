@@ -1,0 +1,29 @@
+role: afs-program-orchestrator
+ticket: LF-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#117
+phase: 6
+decisions:
+  - "Archived acceptance run 42912984554 attempt 1 passed for commit 8f9a11640eef9801378f3db53a76903363c5e5b5; LF-AUDIT returned complete."
+dispatched:
+  - agent: afs-auditor
+    ticket: martins-vds/ai-factory-synthetic-target#114
+    status: returned
+awaiting_human:
+  - "Compare the legacy and target fees flows side by side as listed in .migration/evidence/fees-payments/acceptance.md; record the result without treating this request as approval."
+next_step: "Await the operator's side-by-side comparison and required approver sign-off; do not mark acceptance passed."
+acceptance:
+  slice: fees-payments
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/fees-payments/acceptance.md
+  gates: all-green
+  mutation_score: 0.975
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#40
+    - martins-vds/ai-factory-synthetic-target#42
