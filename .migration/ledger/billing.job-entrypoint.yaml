@@ -6,7 +6,8 @@ source:
 boundary: "The executable entry point creates a Northgate client from environment credentials and invokes the monthly batch with hard-coded sample members."
 tickets: [martins-vds/ai-factory-eval#1778]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
 quirks: []
 rules:
   - id: environment-credentials
@@ -15,4 +16,8 @@ rules:
   - id: fixed-sample-members
     rule: The entry point always submits ana with a $4.75 late fee and ben with no late fees.
     source: legacy-billing/src/main/java/billing/BillingJob.java:28-30
-notes: The Maven run script invokes BillingJob.main; see .migration/quirks/billing-hardcoded-sample-charges.md.
+evidence:
+  - .migration/characterization/billing/run.sh
+  - .migration/characterization/billing/BillingCharacterization.java
+  - .migration/evidence/runs/BL-02.md
+notes: "The Maven run script invokes BillingJob.main. Characterization observed both fixed sample charges and environment credential forwarding; see .migration/quirks/billing-hardcoded-sample-charges.md."

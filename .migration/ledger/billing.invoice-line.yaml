@@ -6,10 +6,16 @@ source:
 boundary: "An invoice line carries a description and amount; construction rejects negative amounts."
 tickets: [martins-vds/ai-factory-eval#1778]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
 quirks: []
 rules:
   - id: nonnegative-amount
     rule: An invoice line with a negative amount is rejected with IllegalArgumentException.
     source: legacy-billing/src/main/java/billing/InvoiceLine.java:7-10
-notes: A null amount dereferences in the constructor and raises NullPointerException; see .migration/quirks/billing-null-line-amount.md.
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java
+  - .migration/characterization/billing/run.sh
+  - .migration/characterization/billing/BillingCharacterization.java
+  - .migration/evidence/runs/BL-02.md
+notes: "A null amount dereferences in the constructor and raises NullPointerException; see .migration/quirks/billing-null-line-amount.md."

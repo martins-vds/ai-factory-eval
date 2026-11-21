@@ -6,7 +6,8 @@ source:
 boundary: "For each map entry, calculate a member total, charge it or print a carry-over message, and print the approved reference after a successful charge."
 tickets: [martins-vds/ai-factory-eval#1778]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
 rules:
   - id: all-entries-are-members
     rule: Treat every map entry as a member and calculate its total with the monthly membership fee enabled.
@@ -18,4 +19,8 @@ rules:
     rule: Allow a declined charge exception to propagate out of the run, stopping processing of later entries.
     source: legacy-billing/src/main/java/billing/BillingJob.java:16-23; legacy-billing/src/main/java/billing/CardVault.java:18-20
 quirks: []
-notes: No recovery or per-member error handling is present; see .migration/quirks/billing-payment-interruption.md.
+evidence:
+  - .migration/characterization/billing/run.sh
+  - .migration/characterization/billing/BillingCharacterization.java
+  - .migration/evidence/runs/BL-02.md
+notes: "No recovery or per-member error handling is present; characterization observed that a decline propagates and stops later entries. See .migration/quirks/billing-payment-interruption.md."

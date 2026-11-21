@@ -6,7 +6,8 @@ source:
 boundary: "The total combines late fees, the member fee when applicable, and tax, returning a two-decimal BigDecimal."
 tickets: [martins-vds/ai-factory-eval#1778]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: B
 quirks: []
 rules:
   - id: late-fee-cap
@@ -18,4 +19,9 @@ rules:
   - id: tax
     rule: Apply 5% tax to the subtotal, round tax half-up once to two decimal places, then return the subtotal plus tax at scale 2.
     source: legacy-billing/src/main/java/billing/InvoiceCalculator.java:10,16,23-24
+evidence:
+  - legacy-billing/src/test/java/billing/InvoiceCalculatorTest.java
+  - .migration/characterization/billing/run.sh
+  - .migration/characterization/billing/BillingCharacterization.java
+  - .migration/evidence/runs/BL-02.md
 notes: Covered by the legacy tests for member and non-member totals, fee cap, and half-up tax rounding.

@@ -5,7 +5,7 @@ A declined payment propagates out of `BillingJob.run` and prevents later members
 
 ## Evidence
 - Source: `legacy-billing/src/main/java/billing/BillingJob.java:15-23`; `legacy-billing/src/main/java/billing/CardVault.java:16-20`
-- Characterization: Not performed in analyst ticket BL-01; `CardVault.charge` throws for a declined result and the loop does not catch it.
+- Characterization: BL-02 Tier B seam test observed `IllegalStateException` on decline and confirmed that no later member output was produced; evidence is `.migration/characterization/billing/BillingCharacterization.java`.
 - Why it looks wrong: One member's decline prevents subsequent independent member charges from being attempted.
 
 ## Impact
