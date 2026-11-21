@@ -49,4 +49,13 @@ The full run reports 11 survivors: six URL literals, four HTTP-method decorators
 
 ## Human check
 
-The independent re-audit reviewed all three ledger capabilities. Their target references now resolve, with no ledger gaps; the graph-path inconsistency remains for coordinator follow-up. The operator's side-by-side flow sign-off is the coordinator's subsequent step and is not represented as a gap in this verdict.
+The independent re-audit reviewed all three ledger capabilities. Their target references now resolve, with no ledger gaps; the graph-path inconsistency remains for coordinator follow-up.
+
+**Side-by-side check requested.** A human approver should compare the pinned legacy application against the target implementation for these flows:
+
+- API lending: legacy `POST /loans` versus target `POST /loans`; compare rejection of missing or blank member and ISBN fields, the HTTP 201 success response, today's lending date, the 14-day due date, and delimiter escaping in returned loan text.
+- API and persisted returns: legacy `POST /loans/{id}/return` versus target `POST /loans/{id}/return`; compare first return behavior and persistence, unknown-loan `404` / `no such loan` behavior, and repeated-return `409` / `already returned` behavior while preserving the original saved return date.
+- UI lending: the legacy lending flow versus `/ui/loans/new/` and the target browser/HTMX form; compare valid lending and blank-field validation.
+- UI returns: the legacy return flow versus the target return form and browser/HTMX behavior; compare successful first return, unknown-loan handling, and repeated-return handling.
+
+This request is not a passed or approved sign-off. `human_check` remains `requested` until an approver explicitly reviews the exact PR head and reports the result.
