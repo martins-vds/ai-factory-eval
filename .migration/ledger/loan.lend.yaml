@@ -15,3 +15,11 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+target:
+  components: [src.loans.services.lend_loan, src.loans.views.loan_create, src.loans.repository.LoanRepository]
+status: migrated
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/evidence/runs/LL-02.md, tests/loans/test_catalog.py::test_lend_endpoint_creates_loan_and_returns_fourteen_day_due_date, tests/loans/test_catalog.py::test_lending_use_case_rejects_blank_fields]
+rules:
+  - id: required-member-isbn
+    rule: Missing, empty, or whitespace-only member and ISBN values are refused.
+    source: martins-vds/ai-factory-synthetic-target#39

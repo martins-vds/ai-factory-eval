@@ -1,0 +1,42 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#2036
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2041
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.858
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Missing, empty, or whitespace-only member and ISBN values are refused.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lending_use_case_rejects_blank_fields
+    enforced: true
+    ledger_rule: required-member-isbn
+  - capability: loan.return-date
+    rule: The first return records the server date and later returns preserve that date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_and_preserves_original_date
+    enforced: true
+    ledger_rule: preserve-first-return-date
+  - capability: loan.return
+    rule: A repeat return for an already-returned loan is rejected.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_and_preserves_original_date
+    enforced: true
+    ledger_rule: repeat-return-rejected
