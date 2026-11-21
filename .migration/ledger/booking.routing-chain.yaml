@@ -8,7 +8,7 @@ source:
 boundary: "CargoDetails and ItinerarySelection call BookingServiceFacade, DefaultBookingService, RoutingService and the configured graph-traversal endpoint; assignment maps route DTOs to JPA Voyage/Location entities and stores Cargo."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +17,11 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_count_and_numbered_leg"
+  - ".migration/runs/BK-05F/20261121T011118739741Z-route-selection-targeted.log"
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - cargotracker.booking.application.routing.CargoRouting.route_candidates
+no_rules: "Route-chain composition has no input check or eligibility rule; it resolves candidates and delegates assignment."
 notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
