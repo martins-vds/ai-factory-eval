@@ -9,4 +9,8 @@ source:
 boundary: POST /loans/{id}/return records today's date and 200; unknown id returns 404.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md

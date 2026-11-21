@@ -8,4 +8,8 @@ source:
 boundary: Repository operations open and close EntityManagers, commit writes, roll back on close, and manage loan reads and updates.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md

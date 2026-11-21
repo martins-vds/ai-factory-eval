@@ -9,7 +9,11 @@ source:
 boundary: GET /fees/{id} renders heading, due date, days late, and fee, or 404 HTML for unknown loan.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
 rules:
   - {id: fee-grace, rule: "Loans up to 2 days late have no fee", source: "legacy/src/main/java/lib/LateFeeView.java:35"}
   - {id: fee-rate, rule: "Each day beyond the grace period adds 25 cents", source: "legacy/src/main/java/lib/LateFeeView.java:35"}

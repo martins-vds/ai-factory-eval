@@ -9,6 +9,10 @@ source:
 boundary: GET /loans returns text with one line per loan, newline terminated, ordered by loan id.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
 rules:
   - {id: loan-line-format, rule: "Each loan line has id, member, ISBN, lent date, due date, and optional returned date separated by semicolons", source: "legacy/src/main/java/lib/LoanResource.java:52-55"}

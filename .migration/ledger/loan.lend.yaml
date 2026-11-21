@@ -9,7 +9,11 @@ source:
 boundary: POST form member and isbn; missing either returns 400, otherwise returns 201 and a loan line dated today.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
 rules:
   - {id: lend-required-fields, rule: "member and isbn are both required", source: "legacy/src/main/java/lib/LoanResource.java:38-41"}
   - {id: lending-period, rule: "A loan is due 14 days after lentOn", source: "legacy/src/main/java/lib/Loan.java:17"}

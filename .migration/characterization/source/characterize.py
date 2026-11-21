@@ -26,6 +26,14 @@ CASES = (
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
 )
+EDGE_CASES = (
+    ('GET /loans/{id} (missing)', 'GET', '/loans/UNKNOWN', None),
+    ('POST /loans (missing fields)', 'POST', '/loans', None),
+    ('POST /loans (empty fields)', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    ('POST /loans/{id}/return (missing)', 'POST', '/loans/UNKNOWN/return', None),
+    ('GET /fees/{id} (missing)', 'GET', '/fees/UNKNOWN', None),
+    ('POST /payments/{id} (missing)', 'POST', '/payments/UNKNOWN', None),
+)
 
 
 def verify_graph_coverage():
@@ -73,7 +81,7 @@ def wait_until_ready(process, output):
 
 def exercise_http():
     observations = {}
-    for endpoint, method, path, form in CASES:
+    for endpoint, method, path, form in CASES + EDGE_CASES:
         observations[endpoint] = {
             'request': {
                 'method': method,

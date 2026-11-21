@@ -7,6 +7,10 @@ source:
 boundary: Spreadsheet users depend on GET /loans using semicolon-separated fields and one loan per newline.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
 rules:
   - {id: export-fields, rule: "Loan export fields are id, member, ISBN, lent date, due date, and returned date", source: "legacy/docs/export-csv.md:3"}

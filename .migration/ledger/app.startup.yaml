@@ -8,4 +8,8 @@ source:
 boundary: The process listens on PORT (default 8080), registers loan, fee, payment, and about resources, and shuts down JPA and HTTP state.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md

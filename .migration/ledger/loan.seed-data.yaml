@@ -7,4 +7,8 @@ source:
 boundary: Startup inserts L1 ana, L2 bo, and L3 cy with fixed dates and one current open loan.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md

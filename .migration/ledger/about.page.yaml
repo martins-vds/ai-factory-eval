@@ -10,4 +10,8 @@ boundary: GET /about serves the UTF-8 classpath HTML containing hours, lending p
 slice: lending-library
 status: pending
 verification: pending
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
 no_rules: "This capability is static public information and carries no enforced business rule in the page handler."

@@ -7,4 +7,8 @@ source:
 boundary: GET /loans/{id} returns the loan line with a trailing newline, or 404 with no such loan.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
