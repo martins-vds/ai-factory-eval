@@ -1,0 +1,12 @@
+id: application.startup
+kind: behavioral
+title: Configure and start the HTTP application
+source:
+  graph_node: "method:legacy/src/main/java/lib/App.java:App.main"
+  location: "legacy/src/main/java/lib/App.java:13-25"
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "PORT selects the listening port (default 8080); startup creates the library persistence unit, registers four JAX-RS resources, binds Grizzly on 0.0.0.0, and closes the server and EntityManagerFactory on shutdown."
+tickets: ["martins-vds/ai-factory-synthetic-target#35"]
+quirks: ["martins-vds/ai-factory-synthetic-target#42"]
+status: pending
+verification: pending

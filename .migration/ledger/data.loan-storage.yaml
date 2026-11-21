@@ -1,0 +1,11 @@
+id: data.loan-storage
+kind: data
+title: Store loan records
+source:
+  graph_node: "table:legacy/src/main/java/lib/Loan.java:LOAN"
+  location: "legacy/src/main/java/lib/Loan.java:11-26"
+boundary: "The LOAN table stores ID, required MEMBER, ISBN and LENT_ON fields, plus nullable RETURNED_ON; persistence.xml configures in-memory H2 with drop-and-create schema generation."
+tickets: ["martins-vds/ai-factory-synthetic-target#35"]
+quirks: ["martins-vds/ai-factory-synthetic-target#42"]
+status: pending
+verification: pending

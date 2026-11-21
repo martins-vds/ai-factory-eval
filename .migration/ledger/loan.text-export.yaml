@@ -1,0 +1,13 @@
+id: loan.text-export
+kind: behavioral
+title: Format loans as semicolon-separated text
+source:
+  graph_node: "method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line"
+  flow: List Loans
+  location: "legacy/src/main/java/lib/LoanResource.java:52-55"
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "Each record contains ID, member, ISBN, lentOn, dueOn, and returnedOn (empty when not returned), separated by semicolons; values are not escaped."
+tickets: ["martins-vds/ai-factory-synthetic-target#35"]
+quirks: ["martins-vds/ai-factory-synthetic-target#43"]
+status: pending
+verification: pending
