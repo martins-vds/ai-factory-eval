@@ -1,5 +1,5 @@
-from dataclasses import dataclass
 from collections.abc import Iterable
+from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Protocol
 
