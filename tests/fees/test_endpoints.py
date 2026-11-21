@@ -104,6 +104,14 @@ def test_fee_page_shows_late_fee_and_posts_payment_to_ui_route(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_configures_htmx_to_swap_error_responses(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    assert b'responseHandling' in response.content or b'htmx:beforeSwap' in response.content
+
+
+@pytest.mark.django_db
 def test_fee_page_payment_returns_gateway_status_fragment(client, payment_gateway):
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
