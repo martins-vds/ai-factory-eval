@@ -170,18 +170,69 @@ def test_unknown_route_selection_returns_not_found(client, route_pages):
 
 
 @pytest.mark.django_db
-def test_invalid_itinerary_token_does_not_assign_a_route(client, route_pages):
+@pytest.mark.parametrize('post_data', ({}, {'itinerary_token': 'invalid'}))
+def test_invalid_itinerary_token_does_not_assign_a_route(client, route_pages, post_data):
     tracking_id = route_pages(_candidate_paths())
 
     response = client.post(
         f'/admin/cargo/{tracking_id.value}/itineraries/',
-        {'itinerary_token': 'invalid'},
+        post_data,
     )
     cargo = DjangoCargoRepository().find(tracking_id)
 
     assert response.status_code == 400
     assert cargo is not None
     assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
+def test_itinerary_token_cannot_assign_to_a_different_cargo(client, route_pages):
+    tracking_id = route_pages(_candidate_paths())
+    itinerary_response = client.get(f'/admin/cargo/{tracking_id.value}/itineraries/')
+    token = itinerary_response.context['route_candidates'][0]['token']
+    other_tracking_id = CargoRegistration(DjangoCargoRepository()).register(
+        ORIGIN, DESTINATION, DEADLINE
+    )
+
+    response = client.post(
+        f'/admin/cargo/{other_tracking_id.value}/itineraries/',
+        {'itinerary_token': token},
+    )
+    cargo = DjangoCargoRepository().find(other_tracking_id)
+
+    assert response.status_code == 400
+    assert cargo is not None
+    assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
+def test_posting_itinerary_for_unknown_cargo_returns_not_found(client, route_pages):
+    route_pages(())
+
+    response = client.post(
+        '/admin/cargo/UNKNOWN/itineraries/',
+        {'itinerary_token': 'invalid'},
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    (
+        ('post', 'route/'),
+        ('put', 'itineraries/'),
+    ),
+)
+def test_route_selection_rejects_unsupported_methods(client, route_pages, method, path):
+    tracking_id = route_pages(())
+
+    response = getattr(client, method)(
+        f'/admin/cargo/{tracking_id.value}/{path}',
+    )
+
+    assert response.status_code == 405
 
 
 @pytest.mark.django_db

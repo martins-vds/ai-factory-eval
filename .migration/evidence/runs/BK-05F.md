@@ -32,3 +32,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:08:31+00:00 | crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T19:08:33+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-21T19:09:31+00:00 | mutation-changed | 0 | 54.75 | `python .migration/harness/tools/afs-mutation` | `d846f808b9d3d0c5` |  | gate=mutation score=0.830 threshold=0.8 killed=44 survived=9 files=1 base=36fae5a689c9209c673e36ecb81a55398131911e |
+| 2026-11-21T19:10:14+00:00 | behavior-security-edges | 0 | 1.96 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `004181ebcbfe5d9e` |  |  |
+| 2026-11-21T19:10:19+00:00 | lint-edge-guards | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T19:10:21+00:00 | format-edge-guards | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `3bc53bf3e981a98a` |  |  |
