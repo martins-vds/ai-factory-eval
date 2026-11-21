@@ -54,15 +54,17 @@ def test_monthly_report_groups_prior_month_and_orders_by_fees_then_member():
             ReportLoan('Z1', 'zoe', date(2025, 12, 3), date(2025, 12, 17), date(2025, 12, 20)),
             ReportLoan('Z2', 'zoe', date(2025, 12, 4), date(2025, 12, 18)),
             ReportLoan('A1', 'amy', date(2025, 12, 5), date(2025, 12, 19), date(2025, 12, 22)),
+            ReportLoan('Y1', 'yara', date(2025, 12, 6), date(2025, 12, 20), date(2025, 12, 24)),
             ReportLoan('N1', 'nina', date(2025, 12, 6), date(2025, 12, 20)),
             ReportLoan('OUT', 'outside', date(2026, 1, 1), date(2026, 1, 15)),
         ]
     )
     fees = FeeCalculator(
         {
-            'Z1': Fee(days_late=3, amount_cents=300),
-            'Z2': Fee(days_late=0, amount_cents=200),
-            'A1': Fee(days_late=4, amount_cents=500),
+            'Z1': Fee(days_late=3, amount_cents=75),
+            'Z2': Fee(days_late=4, amount_cents=100),
+            'A1': Fee(days_late=7, amount_cents=175),
+            'Y1': Fee(days_late=4, amount_cents=100),
             'N1': Fee(days_late=0, amount_cents=0),
         }
     )
@@ -75,8 +77,9 @@ def test_monthly_report_groups_prior_month_and_orders_by_fees_then_member():
         (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents)
         for row in rows
     ] == [
-        ('amy', 1, 1, 500),
-        ('zoe', 2, 1, 500),
+        ('amy', 1, 1, 175),
+        ('zoe', 2, 1, 175),
+        ('yara', 1, 1, 100),
         ('nina', 1, 0, 0),
     ]
 
