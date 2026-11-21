@@ -25,3 +25,31 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-21T19:16:03Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-implement-changed-code-mutation` / PR pending in the eval repository · **Last commit:** ccc990a5
+
+### Done
+- The changed-code mutation gate passes at 0.869 (53 killed, 8 survived), above the 0.8 threshold; journal: `.migration/evidence/runs/BK-05F.md`.
+- The focused route-selection tests pass, and the final full suite passes with 469 tests. Build, idiom, and CRAP gates also pass; CRAP maximum is 26.0 against 30.
+- The two user-visible empty-state guidance mutants are killed by full-message page assertions. The internal `BadSignature` message mutant was removed by simplifying the caught error. The remaining eight diffs and classifications are recorded in the return.
+- The candidate-salt variants remain behaviorally equivalent at the UI boundary: signing and verification use the same salt, and default-context signed candidates are rejected by an interface test.
+
+### Remaining
+- [ ] Resolve the route-assignment rule's layer/scope before recording this as a finished `afs-migrator` return.
+- [ ] After scope is approved, add a direct use-case test and enforcement if required, update the capability ledger rules, rerun the gates, then replace this handoff with a finished return.
+
+### Decisions made
+- No source file outside BK-05F's planned files was changed. The mutation repair stays in the planned route-selection view and interface test.
+- No writes were made to the live pilot-target tracker; this follow-up is escalated in this handoff.
+
+### Blockers / questions
+- Migrator self-verification requires each capability's business rules to be recorded and tested directly through the use case. `booking.routing-assign` rejects a selected itinerary that no longer satisfies the route specification in the route-selection view, but `CargoRouting.assign_route` accepts the itinerary and records a misrouted delivery.
+- Enforcing that rule at the use-case boundary requires `src/cargotracker/booking/application/routing.py` and `tests/booking/application/test_routing.py`, which are outside BK-05F's planned files. The ticket also has ledger entries without `rules`/`no_rules`; resolving them honestly depends on that boundary decision.
+- The operator/orchestrator must approve a follow-up ticket/scope for those files before implementation.
+
+### Failing commands
+- None. All profile gates passed in this session.
+
+### Next step for the next session
+Ask the Program Orchestrator to approve a follow-up scope for route-specification enforcement and a direct `CargoRouting.assign_route` test; resume only after the scope decision, then complete ledger rules and final return validation.
