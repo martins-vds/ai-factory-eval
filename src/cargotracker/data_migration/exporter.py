@@ -70,7 +70,7 @@ def _prepare_tables(mapping):
             fields.append(field)
         if model._meta.pk not in fields:
             raise DataExportError(f'{target}: mapping must include its primary key')
-        prepared.append((target, model, fields))
+        prepared.append((target, model, fields, list(columns)))
     return prepared
 
 
@@ -96,12 +96,12 @@ def export_snapshot(mapping_path, output_path):
         raise DataExportError(f'{output}: unable to create output directory: {error}') from error
 
     exported = []
-    for target, model, fields in tables:
+    for target, model, fields, columns in tables:
         path = output / f'{target}.csv'
         try:
             with path.open('w', newline='', encoding='utf-8') as stream:
                 writer = csv.writer(stream)
-                writer.writerow([field.column for field in fields])
+                writer.writerow(columns)
                 rows = model._base_manager.order_by(model._meta.pk.name).values_list(
                     *(field.attname for field in fields)
                 )

@@ -13,19 +13,28 @@ MAPPING_FILE = ROOT / '.migration' / 'data' / 'mapping.yaml'
 
 @pytest.mark.django_db(transaction=True)
 def test_export_data_snapshot_round_trips_fixture_rows_and_preserves_nulls(tmp_path):
+    mapping = yaml.safe_load(MAPPING_FILE.read_text(encoding='utf-8'))
+    handling_event = next(
+        table for table in mapping['tables'] if table['target'] == 'HandlingEvent'
+    )
+    handling_event['columns']['completion_time'] = handling_event['columns'].pop(
+        'completionTime'
+    )
+    mapping_file = tmp_path / 'mapping.yaml'
+    mapping_file.write_text(yaml.safe_dump(mapping, sort_keys=False), encoding='utf-8')
+
     call_command(
         'load_data_snapshot',
         snapshot=str(FIXTURE_SNAPSHOT),
-        mapping=str(MAPPING_FILE),
+        mapping=str(mapping_file),
     )
     output = tmp_path / 'export'
     call_command(
         'export_data_snapshot',
-        mapping=str(MAPPING_FILE),
+        mapping=str(mapping_file),
         out=str(output),
     )
 
-    mapping = yaml.safe_load(MAPPING_FILE.read_text(encoding='utf-8'))
     manifest = json.loads((FIXTURE_SNAPSHOT / 'manifest.json').read_text(encoding='utf-8'))
     assert {path.stem for path in output.glob('*.csv')} == {
         table['target'] for table in mapping['tables']
