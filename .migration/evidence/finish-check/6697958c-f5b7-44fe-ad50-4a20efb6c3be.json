@@ -1,0 +1,47 @@
+[
+  {
+    "at": "2026-11-21T05:58:14Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17040,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "SY-05",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/characterization/source/characterize.py",
+      ".migration/characterization/source/goldens/http.json",
+      ".migration/evidence/SY-05-characterization.md",
+      ".migration/evidence/runs/SY-05.md",
+      ".migration/ledger/about.page.yaml",
+      ".migration/ledger/app.startup.yaml",
+      ".migration/ledger/csv.export-contract.yaml",
+      ".migration/ledger/fee.view.yaml",
+      ".migration/ledger/loan.entity.yaml",
+      ".migration/ledger/loan.get.yaml",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.list.yaml",
+      ".migration/ledger/loan.persistence.yaml",
+      ".migration/ledger/loan.repository.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/ledger/loan.seed-data.yaml",
+      ".migration/ledger/monthly-report.spec.yaml",
+      ".migration/ledger/payment.charge.yaml",
+      ".migration/ledger/payment.gateway-config.yaml",
+      ".migration/quirks/empty-loan-fields.md",
+      ".migration/returns/SY-05.afs-characterizer.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
