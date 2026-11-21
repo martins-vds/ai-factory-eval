@@ -22,5 +22,8 @@ evidence:
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery"
   - ".migration/evidence/runs/BK-05C.md"
+  - "tests/booking/interfaces/test_route_selection.py::test_candidate_assignment_redirects_to_cargo_details"
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "Assignment persists a selected itinerary and redirects; the ticket adds no independent eligibility or refusal rule."
 notes: "The bean returns a show.html outcome, while the running UI resolved the selected route to show.xhtml; preserve this observed result for quirk #236 review. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]

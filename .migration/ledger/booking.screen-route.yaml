@@ -8,7 +8,7 @@ source:
 boundary: "Route page loads cargo and candidates, displays origin/destination/deadline and candidate count, shows an empty-state message or numbered itineraries with voyage, load/unload locations and dates, and lets the user select an index."
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -18,4 +18,12 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_count_and_numbered_leg"
+  - "tests/booking/interfaces/test_route_selection.py::test_route_selection_and_itinerary_selection_render_empty_guidance"
+  - ".migration/evidence/runs/BK-05F.md"
+target:
+  components:
+    - templates/booking/route_selection/route.html
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+no_rules: "The route screen is presentation only; empty-candidate guidance is a state, not a validation rule."
 notes: "Named tests cover routing behavior, not view rendering. `ItinerarySelection.assignItinerary` returns a `.html` suffix although Faces Servlet maps `*.xhtml` (.migration/quirks/booking-route-selection-redirect.md)."

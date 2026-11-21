@@ -1,0 +1,43 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Select Itinerary | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  {% if not candidates %}
+    <p>
+      No routes found that satisfy the route specification. Try
+      setting an arrival deadline further into the future (a few weeks at
+      least).
+    </p>
+  {% else %}
+    {% for itinerary in candidates %}
+      <section class="my-6" data-candidate-index="{{ forloop.counter0 }}">
+        <h2 class="mb-4 text-xl font-semibold text-gray-900">Route option #{{ forloop.counter }}</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-left">
+            <thead>
+              <tr class="border-b border-gray-300">
+                <th scope="col" class="p-3">Voyage</th>
+                <th scope="col" class="p-3">Load</th>
+                <th scope="col" class="p-3">Date</th>
+                <th scope="col" class="p-3">Unload</th>
+                <th scope="col" class="p-3">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for leg in itinerary.legs %}
+                <tr class="border-b border-gray-200">
+                  <td class="p-3">{{ leg.voyage.voyage_number.value }}</td>
+                  <td class="p-3">{{ leg.load_location.name }} ({{ leg.load_location.unlocode.value }})</td>
+                  <td class="p-3">{{ leg.load_time|date:"m/d/Y" }}</td>
+                  <td class="p-3">{{ leg.unload_location.name }} ({{ leg.unload_location.unlocode.value }})</td>
+                  <td class="p-3">{{ leg.unload_time|date:"m/d/Y" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    {% endfor %}
+  {% endif %}
+{% endblock %}
