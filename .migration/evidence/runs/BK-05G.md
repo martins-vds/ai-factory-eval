@@ -55,3 +55,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:09:14+00:00 | final-return-validation | 2 | 0.13 | `python .migration/harness/tools/validate.py` | `8ccf6c31e456c000` | validate.py: error: the following arguments are required: folder |  |
 | 2026-11-21T23:09:24+00:00 | final-return-validation | 1 | 5.41 | `python .migration/harness/tools/validate.py .migration` | `4bf2175061f90b26` | 195 file(s) checked, 1 error(s) |  |
 | 2026-11-21T23:09:34+00:00 | final-return-validation | 0 | 5.42 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-21T23:14:19+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
