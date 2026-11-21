@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import sync_playwright
 
-from src.fees.gateway import DEFAULT_PAYMENT_GATEWAY_URL, HttpPaymentGateway
+from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import PaymentGatewayFailure
 
 HTTP_GOLDENS = json.loads(
@@ -157,6 +157,8 @@ def test_non_htmx_payment_returns_complete_fee_page(client, payment_gateway):
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/html; charset=utf-8'
     assert b'<!doctype html>' in response.content
+    assert b'Late fee for L1' in response.content
+    assert b'2026-01-16' in response.content
     assert b'Fee: $10.00' in response.content
     assert b'<p role="status">charged\n</p>' in response.content
     assert payment_gateway.requests == [('POST', '/charge?loan=L1', b'')]
@@ -228,7 +230,7 @@ def test_payment_gateway_uses_the_configured_default_url(monkeypatch):
 
     assert response.status == 200
     assert response.body == 'charged\n'
-    assert requests[0].full_url == f'{DEFAULT_PAYMENT_GATEWAY_URL}/charge?loan=L1'
+    assert requests[0].full_url == 'https://payments.lending-library.invalid/charge?loan=L1'
     assert requests[0].get_method() == 'POST'
 
 
