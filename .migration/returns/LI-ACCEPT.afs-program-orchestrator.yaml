@@ -1,0 +1,25 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+pr: null
+phase: 6
+decisions:
+  - "martins-vds/ai-factory-synthetic-target#127: requested the human side-by-side check; no acceptance approval or passed verdict was set."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#127: compare the legacy About page with the target /about and /ui/about/ pages, including the reading-room layout and library details."
+next_step: await the approver's side-by-side sign-off
+acceptance:
+  slice: library-info
+  tickets:
+    total: 2
+    merged: 2
+    open: 0
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets: []
