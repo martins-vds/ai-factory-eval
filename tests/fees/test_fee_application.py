@@ -11,7 +11,7 @@ class Loan:
     returned_on: date | None = None
 
 
-class LoanRepository:
+class InMemoryLoanRepository:
     def __init__(self, loan):
         self.loan = loan
 
@@ -36,7 +36,7 @@ class PaymentGateway:
 
 def test_pay_requires_an_existing_loan_without_calling_the_gateway():
     gateway = PaymentGateway()
-    application = FeeApplication(LoanRepository(None), Clock(), gateway)
+    application = FeeApplication(InMemoryLoanRepository(None), Clock(), gateway)
 
     result = application.pay('missing')
 
@@ -47,7 +47,7 @@ def test_pay_requires_an_existing_loan_without_calling_the_gateway():
 def test_pay_uses_the_injected_gateway_for_an_existing_loan():
     gateway = PaymentGateway()
     loan = Loan('L1', date(2026, 1, 1))
-    application = FeeApplication(LoanRepository(loan), Clock(), gateway)
+    application = FeeApplication(InMemoryLoanRepository(loan), Clock(), gateway)
 
     result = application.pay('L1')
 
