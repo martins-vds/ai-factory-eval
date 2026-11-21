@@ -1,0 +1,27 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/109
+phase: 6
+decisions:
+  - "Accepted archived AFS acceptance run 42752283868, attempt 1, on 70fef8e7bc822092770b04b1bf9b5288e04d8bb6; no gates or mutation were rerun."
+  - "The re-audit returned complete with no ledger gaps; all three loan circulation ledger entries are migrated."
+dispatched: []
+awaiting_human:
+  - "Compare legacy and target POST /loans for missing and blank member/ISBN values, the 14-day due date and response format, and delimiter-containing exports; verify the approved blank-field and escaping divergences (#39, #43)."
+  - "Compare legacy and target first and repeated POST /loans/{id}/return outcomes, including the saved return date, repeat 409 behavior, and unknown-loan 404; verify the approved repeated-return divergence (#41)."
+  - "Exercise target /ui/loans/new/ and /ui/loans/{id}/return/ forms and compare validation, success/error states, and persistence with the corresponding legacy API behavior."
+next_step: "Wait for the human side-by-side check; record its result only after the human reports it, and do not close the slice epic before sign-off."
+acceptance:
+  slice: loan-circulation
+  tickets: {total: 5, merged: 5, open: 0, blocked: []}
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#43
