@@ -225,7 +225,7 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_return_not_found_for_unknown_cargo(client):
-    for path in ('route/', 'itineraries/'):
-        response = client.get(f'/admin/cargo/MISSING1/{path}')
+    for route_suffix in ('route/', 'itineraries/'):
+        response = client.get(f'/admin/cargo/MISSING1/{route_suffix}')
 
         assert response.status_code == 404
