@@ -1,0 +1,44 @@
+role: afs-verifier
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2020
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.907
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+findings:
+  - severity: major
+    where: templates/booking/dashboard/not_routed_table.html:32
+    what: htmx GET errors are not swapped into the dialog; the unknown/stale cargo 404 is not user-visible.
+    evidence: "run: idiom-ui-errors"
+  - severity: major
+    where: templates/booking/dialogs/destination.html:5
+    what: The destination form does not handle non-2xx htmx responses, so server errors are not shown in the dialog.
+    evidence: "run: idiom-ui-errors"
+  - severity: major
+    where: templates/booking/dialogs/deadline.html:5
+    what: The deadline form does not handle non-2xx htmx responses, so server errors are not shown in the dialog.
+    evidence: "run: idiom-ui-errors"
+tests_added:
+  - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_cargo_dialog_returns_cargo_not_found
+  - tests/booking/interfaces/test_dialogs.py::test_dialog_update_recalculates_route_state
+ledger_issues:
+  - booking.screen-not-routed-table remains in-progress and does not cite BK-05G's dialog-trigger evidence.
+  - booking.cargo-not-found does not list the dialog views or their unknown/stale-ID test as target evidence.
+quirk_tickets:
+  - martins-vds/ai-factory-pilot-target#232
+  - martins-vds/ai-factory-pilot-target#234
+  - martins-vds/ai-factory-pilot-target#235
+  - martins-vds/ai-factory-pilot-target#251
+rules: []
+no_rules:
+  booking.dialog-chain: The capability is modal open/close/refresh choreography and has no use-case business rule.
+  booking.dialog-deadline: "Date parsing and field feedback are interface validation under #234; the domain update and routing-state recalculation are covered by BK-05A."
+  booking.dialog-destination: "Filtering choices is UI behavior under #235; the domain update and routing-state recalculation are covered by BK-05A."
+inherited: []
