@@ -8,9 +8,12 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 0.85}
 boundary: "PORT selects the listening port (default 8080); startup creates the library persistence unit, wires four HTTP resources, binds Grizzly to 0.0.0.0, and shutdown closes the server and EntityManagerFactory."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [config.settings.DATABASES, src.loans.migrations]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json]
-notes: "Restart reset behavior is raised in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_migration_restart_does_not_replace_persisted_records]
+notes: "The fix ruling in martins-vds/ai-factory-synthetic-target#42 is implemented: persisted loans survive startup."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+no_rules: "Application startup has no business input rules; the persistence/reseed invariant is recorded under data.loan-storage and data.seed-records."

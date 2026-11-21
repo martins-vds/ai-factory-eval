@@ -9,7 +9,13 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans returns every loan ordered by id as one semicolon-separated text line per record, with a trailing newline."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.services.ListLoans, src.loans.views.api_loan_list]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md, tests/loans/test_services.py::test_list_loans_returns_records_in_id_order, tests/loans/test_catalog.py::test_api_lists_seeded_loans_as_legacy_text]
+rules:
+  - id: list-order
+    rule: "Loans are returned in ascending id order."
+    source: "legacy/src/main/java/lib/LoanResource.java:25-28"

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}{{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<a class="link link-hover text-[#783b2b]" href="{% url 'loan_catalog' %}">← Back to loans</a>
+<h1 class="mt-5 font-serif text-4xl font-medium tracking-tight">A loan in the ledger</h1>
+<div class="mt-8 max-w-xl">
+  {% include "loans/detail_fragment.html" %}
+</div>
+{% endblock %}

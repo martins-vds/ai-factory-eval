@@ -1,0 +1,31 @@
+{% load static %}
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="htmx-config" content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":false},{"code":"...","swap":false,"error":true}]}'>
+  <title>{% block title %}The Lending Library{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.24/dist/full.min.css" rel="stylesheet">
+  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.11/dist/htmx.min.js" defer></script>
+</head>
+<body class="min-h-screen bg-[#f5f0e5] text-[#2f3428]">
+  <header class="border-b border-[#d8cdbb]">
+    <div class="navbar mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <a class="text-xl font-serif font-bold tracking-tight text-[#2f3428] sm:text-2xl" href="{% url 'loan_catalog' %}">
+        The Lending Library
+      </a>
+      <nav aria-label="Library" class="ml-auto">
+        <a class="btn btn-ghost min-h-11 text-[#2f3428]" href="{% url 'loan_catalog' %}">Loans</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main-content" class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="mx-auto max-w-6xl px-4 pb-8 text-sm text-[#626658] sm:px-6 lg:px-8">
+    A neighborhood collection, kept with care.
+  </footer>
+</body>
+</html>
