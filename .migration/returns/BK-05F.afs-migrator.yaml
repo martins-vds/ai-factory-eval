@@ -1,6 +1,6 @@
 ticket: BK-05F
 issue: martins-vds/ai-factory-eval#1933
-pr: null
+pr: martins-vds/ai-factory-eval#1934
 role: afs-migrator
 specialty: ui
 gates:
@@ -22,6 +22,7 @@ ledger_updated:
 quirk_tickets: []
 new_tickets: []
 handoff: none
+rules: []
 no_rules:
   booking.routing-chain: "This capability is an interface chain, not a business eligibility or state-transition rule."
   booking.screen-route: "This capability presents route data and provides controls; it carries no independent eligibility rule."
