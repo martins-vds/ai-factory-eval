@@ -1,0 +1,18 @@
+role: afs-slice-coordinator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+pr: martins-vds/ai-factory-synthetic-target#128
+slice: library-info
+tickets:
+  total: 5
+  merged: 4
+  open: 1
+  blocked: []
+acceptance:
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: "n/a: coordinator did not rerun mutation; archived acceptance score is 0.976"
+  coverage_gaps: 0
+human_check: requested
+human_check_issues: []
+quirk_tickets: []
