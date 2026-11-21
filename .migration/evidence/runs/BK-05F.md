@@ -57,3 +57,21 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-07T23:33:57+00:00 | mutation-changed-security-fix | 1 | 61.57 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
 | 2026-11-07T23:35:56+00:00 | unknown-route-404-test | 0 | 1.41 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo` | `a558b8376cd28466` |  |  |
 | 2026-11-07T23:37:02+00:00 | mutation-changed-after-404-test | 1 | 61.99 | `python .migration/harness/tools/afs-mutation --changed-since origin/main` | `6587d75718117f99` | afs-mutation: FAILED score=0.790 threshold=0.8 killed=49 survived=13 skipped=0 files=1 jobs=1 base=origin/main | gate=mutation score=0.790 threshold=0.8 killed=49 survived=13 files=1 base=origin/main |
+| 2026-11-21T13:08:37+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:09:08+00:00 | mutation_changed | 0 | 0.18 | `python .migration/harness/tools/afs-mutation` | `74a3d0f0fbbbd8a1` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=689d41bc667cf18d7997044dc84be55904190162 |
+| 2026-11-21T13:11:54+00:00 | route-selection-focused | 2 | 2.17 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `2e48421eaad61c90` | ______ ERROR collecting tests/booking/interfaces/test_route_selection.py _______ |  |
+| 2026-11-21T13:12:04+00:00 | route-selection-focused | 0 | 1.98 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `7c24172bd3a4bec0` |  |  |
+| 2026-11-21T13:15:33+00:00 | mutation_changed | 0 | 206.58 | `python .migration/harness/tools/afs-mutation` | `9b48e4056f7307d7` |  | gate=mutation score=0.900 threshold=0.8 killed=54 survived=6 files=1 base=689d41bc667cf18d7997044dc84be55904190162 |
+| 2026-11-21T13:16:09+00:00 | route-salt-interface-test | 0 | 1.56 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_assignment_accepts_a_candidate_signed_with_the_route_salt` | `941ba30613647e4a` |  |  |
+| 2026-11-21T13:19:33+00:00 | mutation_changed | 0 | 197.11 | `python .migration/harness/tools/afs-mutation` | `6560e8e2b9379eca` |  | gate=mutation score=0.933 threshold=0.8 killed=56 survived=4 files=1 base=689d41bc667cf18d7997044dc84be55904190162 |
+| 2026-11-21T13:19:54+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:19:54+00:00 | build-django-check | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T13:19:54+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T13:19:55+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T13:19:55+00:00 | idiom-layers | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T13:19:56+00:00 | idiom-ui | 0 | 0.47 | `python .migration/harness/tools/check_ui.py` | `df254eaeaa87fc6d` |  | gate=ui scope="templates changed since 689d41bc667cf18d7997044dc84be55904190162" templates=0 findings=0 |
+| 2026-11-21T13:20:52+00:00 | tests | 0 | 52.23 | `pytest -q` | `944b8e80b5f108fc` |  |  |
+| 2026-11-21T13:21:36+00:00 | crap-coverage | 0 | 43.26 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f0bda4365952175f` |  |  |
+| 2026-11-21T13:21:36+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:21:36+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-21T13:24:08+00:00 | validate-rules-blocker | 1 | 4.93 | `python .migration/harness/tools/validate.py .migration` | `a3e4d383590c8f78` | 195 file(s) checked, 5 error(s) |  |

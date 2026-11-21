@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -128,12 +129,15 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert 'No routes found that satisfy the route specification.' in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
+    assert (
+        'No routes found that satisfy the route specification. '
+        'Try setting an arrival deadline further into the future.'
+    ) in route_content
     assert 'No routes found that satisfy the route specification.' in itinerary_content
     assert (
+        'No routes found that satisfy the route specification. '
         'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
-    )
+    ) in itinerary_content
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
 
@@ -196,6 +200,37 @@ def test_route_assignment_rejects_a_modified_candidate(client):
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_accepts_a_candidate_signed_with_the_route_salt(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    candidate = signing.dumps(
+        {
+            'tracking_id': tracking_id.value,
+            'legs': [
+                {
+                    'voyage_number': 'CM003',
+                    'load_location': {'unlocode': 'USNYC', 'name': 'New York'},
+                    'unload_location': {'unlocode': 'FIHEL', 'name': 'Helsinki'},
+                    'load_time': datetime(2030, 11, 1, tzinfo=UTC).isoformat(),
+                    'unload_time': datetime(2030, 11, 4, tzinfo=UTC).isoformat(),
+                }
+            ],
+        },
+        salt='booking.route_selection',
+    )
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/route/',
+        {'candidate': candidate},
+        follow=True,
+    )
+
+    assert response.status_code == 200
+    assert response.redirect_chain == [(f'/admin/cargo/{tracking_id.value}/', 302)]
+    assert 'CM003' in response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
     route_response = client.put(f'/admin/cargo/{tracking_id.value}/route/')
@@ -203,11 +238,14 @@ def test_route_screens_reject_unsupported_http_methods(client):
 
     assert route_response.status_code == 405
     assert itinerary_response.status_code == 405
+    assert route_response.headers['Allow'] == 'GET, POST'
+    assert itinerary_response.headers['Allow'] == 'GET'
 
 
 @pytest.mark.django_db
 def test_route_selection_raises_not_found_for_unknown_cargo():
     request = RequestFactory().get('/admin/cargo/MISSING1/route/')
 
-    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
+    with pytest.raises(Http404) as error:
         route_view(request, 'MISSING1')
+    assert str(error.value) == 'Cargo with tracking ID MISSING1 not found.'

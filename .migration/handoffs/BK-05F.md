@@ -25,3 +25,28 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-21T13:24:30Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-fix-changed-code-mutation-59109fd5-857e-454b-ada8-d9e907ca20a5` / https://github.com/martins-vds/ai-factory-eval/pull/2015 · **Last commit:** `843dc53d`
+
+### Done
+- Changed-code mutation passes at 0.933 (56 killed, 4 equivalent survivors), `.migration/runs/BK-05F/20261121T131616030942Z-mutation_changed.log`; all four survivors and their diffs are in `.migration/evidence/mutants/BK-05F.md`.
+- Build, idiom, behavior and CRAP profile gates pass; 469 tests pass and max CRAP is 26.0. The complete journal is `.migration/evidence/runs/BK-05F.md`.
+- Added an interface test that verifies a candidate signed with the established route salt remains assignable; strengthened the no-route guidance assertions.
+
+### Remaining
+- [ ] Resolve the business-rule layer blocker without expanding BK-05F's approved file scope.
+- [ ] Update the affected ledger entries and return with the use-case rules/tests once the scope is approved, then rerun migration validation.
+
+### Decisions made
+- The four mutation survivors are equivalent: #10, #13 and #44 change `Http404` messages hidden by the generic 404 response with `DEBUG=False`; #14 adds `X`, an unreserved character that `urllib.parse.quote` leaves unquoted regardless of `safe`.
+- Did not change application routing code because `src/cargotracker/booking/application/routing.py` and `tests/booking/application/test_routing.py` are not in BK-05F's planned files.
+
+### Blockers / questions
+- Migration validation requires `rules` or `no_rules` for all four BK-05F capabilities, with direct use-case tests for business rules. The route-specification check is currently in the route-selection view; `CargoRouting.assign_route` accepts an itinerary without checking the current specification. Moving that rule into the application use case requires changes outside BK-05F's approved scope. The orchestrator/operator must authorize a follow-up ticket or scope change before a fresh agent edits those files.
+
+### Failing commands
+- `python .migration/harness/tools/validate.py .migration` through `afs-run` → exit 1, see `.migration/runs/BK-05F/20261121T132403492619Z-validate-rules-blocker.log:2-6`.
+
+### Next step for the next session
+Ask the orchestrator to scope a follow-up for application-layer route-specification validation and its direct use-case test; once authorized, resolve that rule, add the capability ledger rules/no-rules declarations, update the return, and validate `.migration`.
