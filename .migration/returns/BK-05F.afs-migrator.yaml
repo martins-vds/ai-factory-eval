@@ -1,0 +1,30 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1941
+pr: null
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.857
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty: ui
+specialty_evidence:
+  - .migration/evidence/runs/BK-05F.md
+rules: []
+no_rules:
+  booking.routing-chain: Routing-chain is a structural composition boundary; eligibility is checked by the routing use case.
+  booking.screen-route: The route screen presents cargo and candidates and submits a selection; it does not make routing decisions.
+  booking.screen-select-itinerary: The itinerary screen delegates candidate availability and route eligibility to the routing use case.
+  booking.routing-assign: Assignment persists the selected itinerary and recalculates delivery; the route-screen index is a UI selection, not a domain eligibility rule.

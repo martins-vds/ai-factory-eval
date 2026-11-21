@@ -6,13 +6,18 @@ source:
   location: src/main/webapp/admin/selectItinerary.xhtml:9-23
   risk: {crap: 12, complexity: 3, coverage: 0.0}
 boundary: "The select-itinerary page reads trackingId and loads ItinerarySelection; when routeCandidates is empty it advises moving the arrival deadline further into the future."
+target:
+  components:
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
 slice: booking
 tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+status: migrated
 verification: characterized
 characterization_tier: A
 evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
+  - "tests/booking/interfaces/test_route_selection.py"
 notes: "This page contains only an empty-route state; the populated candidate table is in route.xhtml. With candidates present, its body is blank (.migration/quirks/booking-select-itinerary-blank-with-candidates.md). No named JUnit class exercises the page."
 quirks: [martins-vds/ai-factory-pilot-target#252]
+no_rules: "The itinerary screen delegates candidate availability and route eligibility to the routing use case."
