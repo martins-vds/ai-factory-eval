@@ -26,3 +26,4 @@ inherited: []
 rules: []
 no_rules:
   about.page: This static informational page has no business eligibility, state-transition, or persistence rules.
+handoff: .migration/handoffs/LL-04.md
