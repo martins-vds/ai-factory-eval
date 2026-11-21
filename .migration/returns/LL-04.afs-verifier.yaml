@@ -24,6 +24,7 @@ tests_added:
 ledger_issues:
   - "about.page: the ledger's migration evidence at tests/library_info/test_about_page.py is not fully green because the built-CSS verifier test fails."
 quirk_tickets: []
+handoff: .migration/handoffs/LL-04.md
 rules: []
 no_rules:
   about.page: "The capability serves static public information and routes only; it carries no eligibility, limit, state-transition, or use-case business rule."

@@ -30,9 +30,9 @@ def test_modern_about_template_utilities_are_in_built_css():
     template = (
         Path(__file__).resolve().parents[2] / 'templates/library_info/about.html'
     ).read_text(encoding='utf-8')
-    css = (
-        Path(__file__).resolve().parents[2] / 'static/css/tailwind.css'
-    ).read_text(encoding='utf-8')
+    css = (Path(__file__).resolve().parents[2] / 'static/css/tailwind.css').read_text(
+        encoding='utf-8'
+    )
 
     for utility in ('py-8', 'mt-8', 'leading-relaxed'):
         assert utility in template
