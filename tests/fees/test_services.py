@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, GatewayResponse, PaymentGatewayFailure
 
 
 @dataclass
@@ -30,6 +30,19 @@ class FixedClock:
         return self.current_date
 
 
+class RecordingGateway:
+    def __init__(self, response=None, failure=None):
+        self.response = response
+        self.failure = failure
+        self.calls = []
+
+    def charge(self, loan_id):
+        self.calls.append(loan_id)
+        if self.failure is not None:
+            raise self.failure
+        return self.response
+
+
 @pytest.mark.parametrize(
     ('due_on', 'returned_on', 'today', 'late_days', 'amount'),
     [
@@ -46,10 +59,63 @@ def test_fee_calculation_matches_characterized_days_grace_rate_and_cap(
     application = FeeApplication(
         LoanRepository(FeeLoan('L1', due_on, returned_on)),
         FixedClock(today),
-        gateway=None,
+        RecordingGateway(),
     )
 
     quote = application.fee_for('L1')
 
     assert quote.late_days == late_days
     assert quote.amount == amount
+
+
+def test_payment_does_not_call_gateway_when_loan_is_missing():
+    gateway = RecordingGateway()
+    application = FeeApplication(LoanRepository(), FixedClock(date(2026, 1, 1)), gateway)
+
+    result = application.pay('missing')
+
+    assert result is None
+    assert gateway.calls == []
+
+
+@pytest.mark.parametrize(
+    ('gateway_status', 'expected_status'),
+    [(200, 200), (503, 502)],
+)
+def test_payment_maps_only_gateway_success_to_success(gateway_status, expected_status):
+    gateway = RecordingGateway(GatewayResponse(gateway_status, 'gateway body\n'))
+    application = FeeApplication(
+        LoanRepository(FeeLoan('L1', date(2026, 1, 1))),
+        FixedClock(date(2026, 1, 1)),
+        gateway,
+    )
+
+    result = application.pay('L1')
+
+    assert result.status_code == expected_status
+    assert result.body == 'gateway body\n'
+    assert gateway.calls == ['L1']
+
+
+def test_payment_failure_keeps_the_interruption_as_its_cause():
+    def interrupted_gateway_call():
+        try:
+            raise InterruptedError('request interrupted')
+        except InterruptedError as error:
+            raise PaymentGatewayFailure('payment gateway unavailable') from error
+
+    with pytest.raises(PaymentGatewayFailure) as failure:
+        interrupted_gateway_call()
+
+    application = FeeApplication(
+        LoanRepository(FeeLoan('L1', date(2026, 1, 1))),
+        FixedClock(date(2026, 1, 1)),
+        RecordingGateway(failure=failure.value),
+    )
+
+    result = application.pay('L1')
+
+    assert result.status_code == 502
+    assert result.body == 'payment gateway unavailable\n'
+    assert result.failure is failure.value
+    assert isinstance(result.failure.__cause__, InterruptedError)
