@@ -15,3 +15,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T13:13:20+00:00 | idiom-targeted | 1 | 0.01 | `bash -c 'ruff check tests/data_migration/test_invariants.py && ruff format --check tests/data_migration/test_invariants.py'` | `db7757f211641d76` | 152 \|         assert all( |  |
 | 2026-11-21T13:13:33+00:00 | idiom-targeted | 0 | 0.02 | `bash -c 'ruff check tests/data_migration/test_invariants.py && ruff format --check tests/data_migration/test_invariants.py'` | `ce04ce92b1607300` |  |  |
 | 2026-11-21T13:13:35+00:00 | invariants-targeted | 0 | 1.55 | `pytest -q tests/data_migration/test_invariants.py` | `2ab521d85429af10` |  |  |
+| 2026-11-21T13:14:37+00:00 | idiom-targeted | 0 | 0.01 | `bash -c 'ruff check tests/data_migration/test_invariants.py && ruff format --check tests/data_migration/test_invariants.py'` | `ce04ce92b1607300` |  |  |
+| 2026-11-21T13:14:38+00:00 | invariants-targeted | 1 | 1.58 | `pytest -q tests/data_migration/test_invariants.py` | `9eff7d0d45037b32` | >           assert ( |  |
+| 2026-11-21T13:14:45+00:00 | idiom-targeted | 0 | 0.02 | `bash -c 'ruff check tests/data_migration/test_invariants.py && ruff format --check tests/data_migration/test_invariants.py'` | `ce04ce92b1607300` |  |  |
+| 2026-11-21T13:14:47+00:00 | invariants-targeted | 0 | 1.57 | `pytest -q tests/data_migration/test_invariants.py` | `ff8b70c9209cc2a9` |  |  |

@@ -32,15 +32,24 @@ def _write_table(snapshot, table, rows):
         writer.writerows(rows)
 
 
+def _read_table(snapshot, table):
+    with (snapshot / f'{table}.csv').open(encoding='utf-8', newline='') as stream:
+        return list(csv.DictReader(stream))
+
+
 def _load_invariant_snapshot(tmp_path):
     snapshot = tmp_path / 'snapshot'
     shutil.copytree(FIXTURE_SNAPSHOT, snapshot)
 
-    locations = list(csv.DictReader((snapshot / 'LOCATION.csv').open(encoding='utf-8')))
+    locations = _read_table(snapshot, 'LOCATION')
     locations.append({'ID': '103', 'UNLOCODE': 'USLAX', 'NAME': 'Los Angeles'})
     _write_table(snapshot, 'LOCATION', locations)
 
-    cargos = list(csv.DictReader((snapshot / 'CARGO.csv').open(encoding='utf-8')))
+    voyages = _read_table(snapshot, 'VOYAGE')
+    voyages[0]['VOYAGE_NUMBER'] = 'V001'
+    _write_table(snapshot, 'VOYAGE', voyages)
+
+    cargos = _read_table(snapshot, 'CARGO')
     cargos[0].update(
         TRANSPORT_STATUS='ONBOARD_CARRIER',
         LAST_KNOWN_LOCATION_ID='101',
@@ -53,7 +62,7 @@ def _load_invariant_snapshot(tmp_path):
     )
     _write_table(snapshot, 'CARGO', cargos)
 
-    events = list(csv.DictReader((snapshot / 'HANDLINGEVENT.csv').open(encoding='utf-8')))
+    events = _read_table(snapshot, 'HANDLINGEVENT')
     events[0].update(
         TYPE='LOAD',
         LOCATION_ID='101',
@@ -62,7 +71,7 @@ def _load_invariant_snapshot(tmp_path):
     )
     _write_table(snapshot, 'HANDLINGEVENT', events)
 
-    legs = list(csv.DictReader((snapshot / 'LEG.csv').open(encoding='utf-8')))
+    legs = _read_table(snapshot, 'LEG')
     legs[0].update(
         LOAD_TIME='2026-11-08T11:00:00+03:00',
         UNLOAD_TIME='2026-11-09T14:00:00Z',
@@ -80,7 +89,7 @@ def _load_invariant_snapshot(tmp_path):
     legs.append(second_leg)
     _write_table(snapshot, 'LEG', legs)
 
-    movements = list(csv.DictReader((snapshot / 'CARRIER_MOVEMENT.csv').open(encoding='utf-8')))
+    movements = _read_table(snapshot, 'CARRIER_MOVEMENT')
     movements[0].update(
         ARRIVAL_TIME='2026-11-09T13:00:00Z',
         DEPARTURE_TIME='2026-11-08T12:00:00Z',
@@ -100,10 +109,10 @@ def _load_invariant_snapshot(tmp_path):
 
     manifest_path = snapshot / 'manifest.json'
     manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
-    for table in ('LOCATION', 'CARGO', 'HANDLINGEVENT', 'LEG', 'CARRIER_MOVEMENT'):
+    for table in ('LOCATION', 'VOYAGE', 'CARGO', 'HANDLINGEVENT', 'LEG', 'CARRIER_MOVEMENT'):
         path = snapshot / f'{table}.csv'
         manifest['tables'][table].update(
-            rows=sum(1 for _ in csv.DictReader(path.open(encoding='utf-8'))),
+            rows=len(_read_table(snapshot, table)),
             sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
         )
     manifest_path.write_text(json.dumps(manifest), encoding='utf-8')
@@ -126,6 +135,31 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(tmp_path):
             calculated_at=cargo.delivery.calculated_at,
         )
 
+        assert (
+            derived.transport_status.value,
+            derived.last_known_location.unlocode.value,
+            derived.current_voyage.voyage_number.value,
+            derived.misdirected,
+            derived.eta.date().isoformat(),
+            derived.next_expected_activity.event_type,
+            derived.next_expected_activity.location.unlocode.value,
+            derived.next_expected_activity.voyage.voyage_number.value,
+            derived.unloaded_at_destination,
+            derived.routing_status.value,
+            history.most_recent_event_id,
+        ) == (
+            'ONBOARD_CARRIER',
+            'USNYC',
+            'V001',
+            False,
+            '2026-11-10',
+            'UNLOAD',
+            'USLAX',
+            'V001',
+            False,
+            'ROUTED',
+            71,
+        )
         assert cargo.delivery.transport_status == derived.transport_status
         assert cargo.delivery.last_known_location == derived.last_known_location
         assert cargo.delivery.current_voyage == derived.current_voyage
