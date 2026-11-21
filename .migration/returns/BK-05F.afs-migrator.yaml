@@ -1,0 +1,32 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#2081
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2086
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.906
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty: ui
+specialty_evidence:
+  - .migration/evidence/runs/BK-05F.md
+  - tests/booking/interfaces/test_route_selection.py::test_route_page_renders_cargo_details_and_candidate_properties
+  - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_cargo_details_and_shows_selected_itinerary
+rules: []
+no_rules:
+  booking.routing-chain: Route validity remains enforced by CargoRouting.route_candidates.
+  booking.screen-route: This screen renders cargo and route candidates without business-rule validation.
+  booking.screen-select-itinerary: This screen presents candidates; candidate validation stays in the routing application.
+  booking.routing-assign: The view verifies the signed candidate and delegates route assignment to CargoRouting.
