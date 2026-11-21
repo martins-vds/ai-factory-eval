@@ -1,0 +1,14 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1935
+phase: 0
+decisions:
+  - "Characterization tier A: ./legacy/run.sh completed Maven package and started Lending Library on port 8080."
+  - "Live evidence: /about returned 200 HTML; /loans returned 200 seed data; POST /loans with valid form data returned 201 and POST /loans/L4/return returned 200."
+  - "Observed 404 behavior: /loans/L404 and POST /payments/L404 returned 404; valid payment call returned 502; missing loan form POST /loans returned 500."
+  - "Target stacks recorded as Python 3.13, Django 5, Django templates, and PostgreSQL 17."
+dispatched: []
+awaiting_human:
+  - "Harness installation step 5 is pending dispatcher execution from the committed profile and capability checklist."
+  - "Every capability marked gap or new in capabilities.yaml requires operator resolution when bootstrap creates the issues."
+next_step: "Hand off to dispatcher to run bootstrap.py step 5; do not install or scaffold in this session."

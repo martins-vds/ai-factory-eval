@@ -1,0 +1,96 @@
+harness_version: 0.2.0
+checked_at: "2026-11-21T02:39:43Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  blockers: []
+  tier: A
+  reason: "Ran legacy/run.sh successfully, reached the HTTP server on port 8080, and exercised the live JAX-RS endpoints."
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh", version: "JDK 17/Maven" }
+    notes: "Maven package succeeded and java -cp target/classes:target/dependency/* lib.App started on port 8080."
+  - id: characterization-harness
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: tool, name: "legacy/run.sh live HTTP exercise" }
+    notes: "Live HTTP characterization used curl against /, /about, /loans, /fees/L1, and /payments/L1."
+  - id: unit-integration-tests
+    applies_to: source
+    status: gap
+    ticket: new
+  - id: coverage
+    applies_to: source
+    status: gap
+    ticket: new
+    best_effort: true
+  - id: complexity
+    applies_to: both
+    status: gap
+    ticket: new
+  - id: crap
+    applies_to: source
+    status: gap
+    ticket: new
+    best_effort: true
+  - id: mutation-testing
+    applies_to: source
+    status: gap
+    ticket: new
+  - id: lint-format
+    applies_to: source
+    status: gap
+    ticket: new
+  - id: stack-idioms
+    applies_to: source
+    status: met
+    provided_by:
+      - { kind: skill, name: java-docs }
+  - id: data-migration
+    applies_to: both
+    status: gap
+    ticket: new
+  - id: ui-end-to-end
+    applies_to: source
+    status: gap
+    ticket: new
+  - id: code-graph
+    applies_to: both
+    status: gap
+    ticket: new
+  - id: graph-data-links
+    applies_to: both
+    status: gap
+    ticket: new
+  - id: output-filtering
+    applies_to: both
+    status: gap
+    ticket: new
+  - id: unit-integration-tests
+    applies_to: target
+    status: gap
+    ticket: new
+  - id: crap
+    applies_to: target
+    status: gap
+    ticket: new
+  - id: mutation-testing
+    applies_to: target
+    status: gap
+    ticket: new
+  - id: lint-format
+    applies_to: target
+    status: gap
+    ticket: new
+  - id: stack-idioms
+    applies_to: target
+    status: gap
+    ticket: new
+  - id: ui-end-to-end
+    applies_to: target
+    status: gap
+    ticket: new
