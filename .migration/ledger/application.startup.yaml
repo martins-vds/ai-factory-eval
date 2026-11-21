@@ -1,0 +1,11 @@
+id: application.startup
+kind: structural
+title: Start the Lending Library application
+source:
+  graph_node: method:legacy/src/main/java/lib/App.java:App.main
+  location: legacy/src/main/java/lib/App.java:13-26
+  risk: {crap: 1.0, complexity: 1, coverage: 0.85}
+boundary: "Starting legacy/run.sh starts Grizzly/Jersey on PORT and initializes the JPA/H2 library."
+status: pending
+verification: pending
+notes: "Quirk draft: .migration/quirks/restart-data-loss.md"

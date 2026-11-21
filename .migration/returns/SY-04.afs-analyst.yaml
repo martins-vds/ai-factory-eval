@@ -1,0 +1,30 @@
+role: afs-analyst
+ticket: SY-04
+issue: martins-vds/ai-factory-eval#1978
+graphs:
+  knowledge: .migration/graphs/source/full/knowledge-graph.json
+  domain: .migration/graphs/source/full/domain-graph.json
+  nodes: 86
+  edges: 119
+  flows: 6
+ledger:
+  entries: 14
+  by_kind:
+    structural: 1
+    behavioral: 8
+    ui: 1
+    integration: 2
+    data: 2
+risk_map:
+  path: .migration/risk-map/SY-04.md
+  methods: 19
+  above_threshold: 0
+  hot_spots:
+  - "FinePayments::pay — CRAP 4.0"
+  - "LateFeeView::page — CRAP 4.0"
+  - "LoanResource::lend — CRAP 3.0"
+quirk_tickets:
+- .migration/quirks/restart-data-loss.md
+- .migration/quirks/repeated-loan-return.md
+- .migration/quirks/payment-interrupt.md
+graph_discrepancies: []

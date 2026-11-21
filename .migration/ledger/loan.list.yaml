@@ -1,0 +1,10 @@
+id: loan.list
+kind: behavioral
+title: List all loans
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:25-28
+boundary: "GET /loans returns HTTP 200 and semicolon-separated loan lines ordered by id."
+status: pending
+verification: pending

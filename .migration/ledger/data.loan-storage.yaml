@@ -1,0 +1,10 @@
+id: data.loan-storage
+kind: data
+title: Store loan records
+source:
+  graph_node: class:legacy/src/main/java/lib/LoanRepository.java:LoanRepository
+  location: legacy/src/main/java/lib/LoanRepository.java:12-69
+boundary: "Loan entities are read and written through JPA; data lifecycle is observable through the loan HTTP endpoints."
+status: pending
+verification: pending
+notes: "Quirk draft: .migration/quirks/restart-data-loss.md"
