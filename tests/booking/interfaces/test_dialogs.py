@@ -132,6 +132,23 @@ def test_unknown_cargo_dialog_returns_a_renderable_not_found_fragment(client):
 
     assert response.status_code == 404
     assert 'Cargo not found' in response.content.decode()
+    assert 'MISSING1' in response.content.decode()
+
+
+@pytest.mark.parametrize(
+    'path',
+    [
+        '/admin/cargo/DEF789/destination-dialog/',
+        '/admin/cargo/DEF789/deadline-dialog/',
+    ],
+)
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_reject_unsupported_methods_with_allowed_methods(client, path):
+    response = client.put(path)
+
+    assert response.status_code == 405
+    assert response.headers['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
@@ -153,8 +170,10 @@ def test_destination_dialog_shows_values_and_repeated_filtered_options():
     assert first.status_code == 200
     assert cargo.route_specification.origin.name in first_content
     assert cargo.route_specification.destination.name in first_content
+    assert 'destination-error' not in first_content
     assert first_options is not None
     assert second_options is not None
+    assert '<option' in first_options.group(1)
     assert first_options.group(1) == second_options.group(1)
     assert f'value="{cargo.route_specification.origin.unlocode.value}"' not in first_options.group(
         1
@@ -164,6 +183,28 @@ def test_destination_dialog_shows_values_and_repeated_filtered_options():
         not in first_options.group(1)
     )
     assert locations == original_locations
+
+
+@pytest.mark.django_db
+def test_destination_dialog_rejects_an_origin_as_the_new_destination():
+    call_command('seed_sample_data')
+    (destination_dialog, _), cargo_repository, _ = _dialog_views()
+    cargo_before = cargo_repository.find(TrackingId('DEF789'))
+    assert cargo_before is not None
+
+    response = destination_dialog(
+        RequestFactory().post(
+            '/admin/cargo/DEF789/destination-dialog/',
+            {'destination': cargo_before.route_specification.origin.unlocode.value},
+        ),
+        'DEF789',
+    )
+    cargo_after = cargo_repository.find(TrackingId('DEF789'))
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in response.content.decode()
+    assert cargo_after is not None
+    assert cargo_after.route_specification == cargo_before.route_specification
 
 
 @pytest.mark.django_db
@@ -181,14 +222,20 @@ def test_deadline_dialog_prefills_the_current_deadline():
     assert response.status_code == 200
     assert cargo.route_specification.origin.name in response.content.decode()
     assert cargo.route_specification.destination.name in response.content.decode()
+    assert 'deadline-error' not in response.content.decode()
     assert (
         f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"'
         in response.content.decode()
     )
 
 
+@pytest.mark.parametrize(
+    'form_data',
+    [{'deadline': 'not-a-date'}, {}],
+    ids=('malformed', 'missing'),
+)
 @pytest.mark.django_db
-def test_deadline_parse_error_is_shown_without_changing_the_cargo():
+def test_deadline_parse_error_is_shown_without_changing_the_cargo(form_data):
     call_command('seed_sample_data')
     (_, deadline_dialog), cargo_repository, _ = _dialog_views()
     cargo_before = cargo_repository.find(TrackingId('DEF789'))
@@ -197,7 +244,7 @@ def test_deadline_parse_error_is_shown_without_changing_the_cargo():
     response = deadline_dialog(
         RequestFactory().post(
             '/admin/cargo/DEF789/deadline-dialog/',
-            {'deadline': 'not-a-date'},
+            form_data,
         ),
         'DEF789',
     )
@@ -205,6 +252,8 @@ def test_deadline_parse_error_is_shown_without_changing_the_cargo():
 
     assert response.status_code == 200
     assert 'Enter a valid arrival deadline.' in response.content.decode()
+    if not form_data:
+        assert 'value=""' in response.content.decode()
     assert cargo_after is not None
     assert (
         cargo_after.route_specification.arrival_deadline

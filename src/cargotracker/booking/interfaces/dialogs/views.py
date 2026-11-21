@@ -11,8 +11,6 @@ from cargotracker.cargo.domain.cargo import Cargo
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.location.domain.location import Location
 
-DialogView = Callable[[HttpRequest, str], HttpResponse]
-
 
 def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo | None:
     try:
@@ -42,8 +40,7 @@ def _destination_form(
     request: HttpRequest,
     cargo: Cargo,
     locations: list[Location],
-    error: str = '',
-    selected_destination: str = '',
+    error: str,
 ) -> HttpResponse:
     return render(
         request,
@@ -52,7 +49,6 @@ def _destination_form(
             'cargo': cargo,
             'destinations': _destination_options(cargo, locations),
             'error': error,
-            'selected_destination': selected_destination,
         },
     )
 
@@ -60,8 +56,8 @@ def _destination_form(
 def _deadline_form(
     request: HttpRequest,
     cargo: Cargo,
-    deadline_value: str = '',
-    error: str = '',
+    deadline_value: str,
+    error: str,
 ) -> HttpResponse:
     return render(
         request,
@@ -78,7 +74,7 @@ def create_dialog_views(
     cargo_dashboard: CargoDashboard,
     cargo_specification: CargoSpecification,
     list_shipping_locations: Callable[[], list[Location]],
-) -> tuple[DialogView, DialogView]:
+) -> tuple[Callable[[HttpRequest, str], HttpResponse], Callable[[HttpRequest, str], HttpResponse]]:
     def destination_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         if request.method not in {'GET', 'POST'}:
             return HttpResponseNotAllowed(['GET', 'POST'])
@@ -89,9 +85,9 @@ def create_dialog_views(
 
         locations = list_shipping_locations()
         if request.method == 'GET':
-            return _destination_form(request, cargo, locations)
+            return _destination_form(request, cargo, locations, '')
 
-        selected_destination = request.POST.get('destination', '')
+        selected_destination = request.POST.get('destination')
         destination = next(
             (
                 location
@@ -106,7 +102,6 @@ def create_dialog_views(
                 cargo,
                 locations,
                 'Select a valid destination.',
-                selected_destination,
             )
 
         cargo_specification.change_destination(cargo.tracking_id, destination)
@@ -125,6 +120,7 @@ def create_dialog_views(
                 request,
                 cargo,
                 cargo.route_specification.arrival_deadline.date().isoformat(),
+                '',
             )
 
         deadline_value = request.POST.get('deadline', '')

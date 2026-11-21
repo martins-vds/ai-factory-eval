@@ -23,7 +23,7 @@
           autofocus
         >
           {% for location in destinations %}
-            <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == selected_destination %} selected{% endif %}>
+            <option value="{{ location.unlocode.value }}">
               {{ location.name }} ({{ location.unlocode.value }})
             </option>
           {% endfor %}
