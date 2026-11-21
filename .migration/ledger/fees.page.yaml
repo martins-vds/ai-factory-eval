@@ -27,6 +27,6 @@ evidence:
   - tests/fees/test_views.py::test_unknown_fee_page_renders_not_found
 rules:
   - id: loan-exists
-    rule: An unknown loan has no fee quote and the fee API returns HTTP 404 with the no-such-loan HTML fragment.
+    rule: An unknown loan has no fee quote.
     source: LateFeeView.java:29-30
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."

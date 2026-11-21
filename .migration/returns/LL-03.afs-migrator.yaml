@@ -1,0 +1,64 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#1917
+pr: martins-vds/ai-factory-eval#1922
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.940
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: Late days are max(0, days from due date to returnedOn or today).
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_uses_return_date_and_clamps_early_returns_to_zero
+    enforced: true
+    ledger_rule: late-days
+  - capability: fees.calculation
+    rule: Up to two days late is waived; otherwise the fee is 25 cents per late day capped at $10.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_for_loan_observes_grace_period_and_cap
+    enforced: true
+    ledger_rule: fee-waiver-cap
+  - capability: fees.page
+    rule: An unknown loan has no fee quote.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_for_unknown_loan_returns_no_quote
+    enforced: true
+    ledger_rule: loan-exists
+  - capability: integration.payment-gateway
+    rule: An unknown loan returns 404 and must not be sent to the payment gateway.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_for_unknown_loan_does_not_call_gateway
+    enforced: true
+    ledger_rule: loan-exists
+  - capability: integration.payment-gateway
+    rule: Gateway HTTP 200 remains 200; all other HTTP responses return 502.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_maps_gateway_status_and_preserves_response_body
+    enforced: true
+    ledger_rule: gateway-status
+  - capability: integration.payment-gateway
+    rule: Gateway I/O failures return HTTP 502 with the unavailable message.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_gateway_io_failure_becomes_a_502_payment_result
+    enforced: true
+    ledger_rule: gateway-io-failure
+  - capability: integration.payment-gateway
+    rule: An interrupted gateway call returns 502 while retaining the original InterruptedError.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_interrupted_payment_is_a_gateway_failure_and_retains_interruption
+    enforced: true
+    ledger_rule: retain-interruption
