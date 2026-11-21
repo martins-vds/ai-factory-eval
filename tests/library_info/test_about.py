@@ -4,18 +4,14 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import sync_playwright
 
-
 HTTP_GOLDEN_PATH = (
-    Path(__file__).resolve().parents[2]
-    / '.migration/characterization/source/goldens/http.json'
+    Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )
 
 
 @pytest.mark.django_db
 def test_about_endpoint_preserves_characterized_response(client):
-    expected = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))['GET /about'][
-        'response'
-    ]
+    expected = json.loads(HTTP_GOLDEN_PATH.read_text(encoding='utf-8'))['GET /about']['response']
 
     response = client.get('/about')
 
