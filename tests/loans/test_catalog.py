@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from src.loans.domain import Loan
 from src.loans.models import LoanRecord
 from src.loans.repository import DjangoLoanRepository
-from src.loans.services import GetLoan, LoanNotFound, SaveLoan
+from src.loans.services import GetLoan, ListLoans, LoanNotFound, SaveLoan
 
 
 @pytest.mark.django_db
@@ -48,6 +48,14 @@ def test_migration_restart_does_not_replace_persisted_records():
     call_command('migrate', verbosity=0, interactive=False)
 
     assert GetLoan(DjangoLoanRepository()).execute('L1').member == 'preserved'
+
+
+@pytest.mark.django_db
+def test_seeded_loans_are_available_through_list_use_case():
+    loans = ListLoans(DjangoLoanRepository()).execute()
+
+    assert [loan.id for loan in loans] == ['L1', 'L2', 'L3']
+    assert [loan.member for loan in loans] == ['ana', 'bo', 'cy']
 
 
 @pytest.mark.django_db
