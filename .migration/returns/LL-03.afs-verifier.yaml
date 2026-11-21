@@ -3,6 +3,7 @@ ticket: LL-03
 issue: martins-vds/ai-factory-synthetic-target#63
 pr: https://github.com/martins-vds/ai-factory-eval/pull/2037
 verdict: changes-required
+handoff: .migration/handoffs/LL-03.md
 gates:
   build: 0
   behavior: 1
