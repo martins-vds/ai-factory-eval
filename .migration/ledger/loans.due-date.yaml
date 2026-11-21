@@ -7,7 +7,9 @@ source:
   location: legacy/src/main/java/lib/Loan.java:14-15
 boundary: "A loan is due 14 calendar days after its lentOn date; the due date is included in loan lines and late-fee pages."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 rules:
   - { id: loan-period, rule: "The due date is lentOn plus 14 days.", source: "legacy/src/main/java/lib/Loan.java:14-15,44-46" }
 notes: "Lizard did not report Loan.dueOn as a method in the 19-method risk map, so no method-level risk score is assigned."

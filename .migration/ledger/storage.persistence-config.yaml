@@ -6,5 +6,7 @@ source:
   location: legacy/src/main/resources/META-INF/persistence.xml:3-11
 boundary: "The library unit uses RESOURCE_LOCAL transactions, in-memory H2, drop-and-create schema generation, and loads META-INF/seed.sql at startup."
 status: pending
-verification: pending
-notes: "The in-memory URL keeps the database alive for the process with DB_CLOSE_DELAY=-1."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "The in-memory URL keeps the database alive for the process with DB_CLOSE_DELAY=-1. Restart reset observed; see .migration/quirks/restart-data-loss.md."

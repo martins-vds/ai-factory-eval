@@ -26,6 +26,23 @@ CASES = (
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
 )
+EDGE_CASES = (
+    ('GET /loans/{missing}', 'GET', '/loans/missing', None),
+    ('GET /loans/{created}', 'GET', '/loans/L4', None),
+    ('POST /loans missing member', 'POST', '/loans', {'isbn': 'missing-member'}),
+    ('POST /loans missing isbn', 'POST', '/loans', {'member': 'missing-isbn'}),
+    ('POST /loans empty fields', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    ('GET /loans after empty fields', 'GET', '/loans', None),
+    ('POST /loans delimiter field', 'POST', '/loans', {'member': 'm;delim', 'isbn': '123'}),
+    ('GET /loans delimiter field', 'GET', '/loans/L6', None),
+    ('POST /loans/{missing}/return', 'POST', '/loans/missing/return', None),
+    ('GET /fees/{missing}', 'GET', '/fees/missing', None),
+    ('GET /fees/{capped}', 'GET', '/fees/L1', None),
+    ('GET /fees/{not-late}', 'GET', '/fees/L2', None),
+    ('POST /loans/{returned}/return', 'POST', '/loans/L2/return', None),
+    ('GET /fees/{after-repeat-return}', 'GET', '/fees/L2', None),
+    ('POST /payments/{missing}', 'POST', '/payments/missing', None),
+)
 
 
 def verify_graph_coverage():
@@ -73,15 +90,16 @@ def wait_until_ready(process, output):
 
 def exercise_http():
     observations = {}
-    for endpoint, method, path, form in CASES:
-        observations[endpoint] = {
-            'request': {
-                'method': method,
-                'path': path,
-                'form': form,
-            },
-            'response': get_response(method, path, form),
-        }
+    for cases in (CASES, EDGE_CASES):
+        for name, method, path, form in cases:
+            observations[name] = {
+                'request': {
+                    'method': method,
+                    'path': path,
+                    'form': form,
+                },
+                'response': get_response(method, path, form),
+            }
     return observations
 
 
@@ -107,12 +125,11 @@ def exercise_browser():
     return {'pages': pages}
 
 
-def normalize(observation, endpoint):
+def normalize(observation):
     response = observation['response']
     body = re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', response['body'])
-    if endpoint == 'GET /fees/{id}':
-        body = re.sub(r'\d+ day\(s\) late', '<days> day(s) late', body)
-        body = re.sub(r'Fee: \$\d+\.\d{2}', 'Fee: $<amount>', body)
+    body = re.sub(r'\d+ day\(s\) late', '<days> day(s) late', body)
+    body = re.sub(r'Fee: \$\d+\.\d{2}', 'Fee: $<amount>', body)
     return {
         'request': observation['request'],
         'response': {
@@ -132,8 +149,8 @@ def write_or_compare(name, observation, record):
         return
     expected = json.loads(path.read_text(encoding='utf-8'))
     if name == 'http':
-        actual = {key: normalize(value, key) for key, value in observation.items()}
-        baseline = {key: normalize(value, key) for key, value in expected.items()}
+        actual = {key: normalize(value) for key, value in observation.items()}
+        baseline = {key: normalize(value) for key, value in expected.items()}
     else:
         actual = observation
         baseline = expected
@@ -172,10 +189,31 @@ def main():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+    with tempfile.TemporaryFile() as output:
+        process = subprocess.Popen(
+            ['bash', str(RUN_SCRIPT)],
+            cwd=SOURCE,
+            env=os.environ.copy(),
+            stdout=output,
+            stderr=subprocess.STDOUT,
+        )
+        try:
+            wait_until_ready(process, output)
+            http['GET /loans after restart'] = {
+                'request': {'method': 'GET', 'path': '/loans', 'form': None},
+                'response': get_response('GET', '/loans', None),
+            }
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
     write_or_compare('http', http, args.record)
     write_or_compare('browser', browser, args.record)
     action = 'recorded' if args.record else 'verified'
-    print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
+    print(f'{action} {len(http)} source HTTP cases and {len(browser["pages"])} browser pages')
 
 
 if __name__ == '__main__':
