@@ -7,7 +7,9 @@ source:
 boundary: LOAN rows have an id, member, ISBN, lending date, and optional returned date; dueOn is 14 days after lentOn.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 rules:
   - id: required-loan-fields
     rule: Member, ISBN, and lentOn are required; returnedOn may be null.

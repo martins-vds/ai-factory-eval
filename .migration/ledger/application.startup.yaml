@@ -7,5 +7,8 @@ source:
 boundary: Startup creates the library persistence unit, registers all four REST resources, listens on 0.0.0.0 at PORT (default 8080), and closes the server and EntityManagerFactory on shutdown.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#42]
 notes: See .migration/quirks/restart-data-loss.md for the startup persistence-reset decision.

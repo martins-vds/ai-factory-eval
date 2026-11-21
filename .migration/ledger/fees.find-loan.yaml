@@ -9,5 +9,7 @@ source:
 boundary: GET /fees/{id} looks up the loan; a missing loan returns HTTP 404 with the HTML fragment "<p>No such loan.</p>".
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 no_rules: This entry captures lookup and missing-record handling for the fee page.

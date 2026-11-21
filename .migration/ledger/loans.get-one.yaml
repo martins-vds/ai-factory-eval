@@ -8,5 +8,8 @@ source:
 boundary: GET /loans/{id} returns the six-field loan line and newline with status 200, or status 404 and "no such loan" with a newline.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#43]
 no_rules: This is a read-by-id operation; its success and missing-record outcomes define the boundary.

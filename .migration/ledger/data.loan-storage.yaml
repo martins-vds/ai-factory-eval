@@ -7,5 +7,8 @@ source:
 boundary: The library persistence unit stores loans in in-memory H2, drops and recreates the schema on startup, and loads META-INF/seed.sql.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#42]
 notes: See .migration/quirks/restart-data-loss.md; restarts discard runtime loan changes.

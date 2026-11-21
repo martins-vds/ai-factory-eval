@@ -8,5 +8,8 @@ source:
 boundary: GET /loans is served as text/plain and delegates to the loan repository.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#43]
 no_rules: This entry records the HTTP route and delegation boundary; list behavior is captured separately.

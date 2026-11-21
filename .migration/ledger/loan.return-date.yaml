@@ -9,5 +9,8 @@ source:
 boundary: For an existing loan, the write transaction sets returnedOn to the requested date and merges the entity; a missing id yields no update.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#41]
 notes: A repeated return overwrites the original date; see .migration/quirks/repeated-loan-return.md.

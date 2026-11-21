@@ -9,6 +9,9 @@ source:
 boundary: A missing loan returns 404; gateway status 200 is returned as 200 with the gateway body, all other gateway statuses map to 502 with that body, and I/O or interruption errors return 502 with "payment gateway unavailable".
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#40]
 no_rules: This entry inventories the source's external-response and failure mapping.
 notes: The interrupted status is not restored; see .migration/quirks/payment-interrupt.md.

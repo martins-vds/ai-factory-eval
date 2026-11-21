@@ -9,6 +9,9 @@ source:
 boundary: POST /payments/{id} verifies the loan, then sends a bodyless HTTP POST to PAYMENT_GATEWAY_URL/charge?loan=<id>; the default base URL is https://payments.lending-library.invalid.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#40]
 no_rules: This capability is an external payment integration; request construction and endpoint configuration are the source contract.
 notes: See .migration/quirks/payment-interrupt.md for interrupted-call behavior.

@@ -9,7 +9,9 @@ source:
 boundary: Fee lateness ends on returnedOn for returned loans and today otherwise; negative lateness is clamped to zero, up to two late days are waived, and the fee is 25 cents per later day capped at 1000 cents.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 rules:
   - id: fee-waiver
     rule: No fee is charged for a loan at most two days late.
