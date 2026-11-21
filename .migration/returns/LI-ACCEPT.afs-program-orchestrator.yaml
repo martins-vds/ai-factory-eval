@@ -1,0 +1,24 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+phase: 6
+decisions:
+  - "martins-vds/ai-factory-synthetic-target#127: archive run 42938753426, attempt 1, accepted for evidence review without rerunning gates or setting a pass verdict."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#127: requested human side-by-side comparison of legacy About behavior against target /about and /ui/about/."
+next_step: "Wait for the human side-by-side check; do not set passed or approve until the approver records sign-off."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets: []
