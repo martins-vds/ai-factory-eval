@@ -1,0 +1,53 @@
+[
+  {
+    "at": "2026-11-21T20:25:14Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16901,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "SY-05",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/capabilities.yaml",
+      ".migration/characterization/source/characterize.py",
+      ".migration/characterization/source/goldens/http.json",
+      ".migration/evidence/characterization-SY-05.md",
+      ".migration/evidence/runs/SY-05.md",
+      ".migration/ledger/fees.view.yaml",
+      ".migration/ledger/library.about.yaml",
+      ".migration/ledger/loans.create.yaml",
+      ".migration/ledger/loans.due-date.yaml",
+      ".migration/ledger/loans.get.yaml",
+      ".migration/ledger/loans.list.yaml",
+      ".migration/ledger/loans.record-format.yaml",
+      ".migration/ledger/loans.return.yaml",
+      ".migration/ledger/loans.schema.yaml",
+      ".migration/ledger/loans.seed-data.yaml",
+      ".migration/ledger/payments.charge.yaml",
+      ".migration/ledger/reports.monthly.yaml",
+      ".migration/ledger/runtime.application.yaml",
+      ".migration/ledger/runtime.build-launch.yaml",
+      ".migration/ledger/storage.persistence-config.yaml",
+      ".migration/ledger/storage.repository-transactions.yaml",
+      ".migration/quirks/empty-loan-fields-accepted.md",
+      ".migration/quirks/loan-export-unescaped-delimiters.md",
+      ".migration/quirks/restart-data-loss.md",
+      ".migration/quirks/return-date-overwrite.md",
+      ".migration/returns/SY-05.afs-characterizer.yaml",
+      ".migration/risk-map/SY-05.md"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
