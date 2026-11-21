@@ -19,9 +19,9 @@ class Command(BaseCommand):
         for row in report:
             writer.writerow(
                 [
-                    row['member_id'],
-                    row['loans_started'],
-                    row['late_returns'],
-                    row['late_fees_cents'],
+                    row.member_id,
+                    row.loans_started,
+                    row.late_returns,
+                    row.late_fees_cents,
                 ]
             )

@@ -6,7 +6,7 @@ import pytest
 from django.core.management import call_command
 
 from src.loans.models import Loan as DjangoLoan
-from src.reports.services import MonthlyReportApplication
+from src.reports.services import MonthlyReportApplication, MonthlyReportRow
 
 
 @dataclass
@@ -45,31 +45,13 @@ def test_monthly_report_aggregates_prior_month_and_orders_members():
 
     assert repository.period == (date(2026, 2, 1), date(2026, 3, 1))
     assert report == [
-        {
-            'member_id': 'member-c',
-            'loans_started': 1,
-            'late_returns': 0,
-            'late_fees_cents': 300,
-        },
-        {
-            'member_id': 'member-b',
-            'loans_started': 2,
-            'late_returns': 2,
-            'late_fees_cents': 150,
-        },
-        {
-            'member_id': 'member-a',
-            'loans_started': 2,
-            'late_returns': 2,
-            'late_fees_cents': 0,
-        },
-        {
-            'member_id': 'member-d',
-            'loans_started': 1,
-            'late_returns': 0,
-            'late_fees_cents': 0,
-        },
+        MonthlyReportRow('member-c', 1, 0, 300),
+        MonthlyReportRow('member-b', 2, 2, 150),
+        MonthlyReportRow('member-a', 2, 2, 0),
+        MonthlyReportRow('member-d', 1, 0, 0),
     ]
+    assert report[-2].late_fees_cents == report[-1].late_fees_cents == 0
+    assert [row.member_id for row in report[-2:]] == ['member-a', 'member-d']
 
 
 @pytest.mark.django_db
