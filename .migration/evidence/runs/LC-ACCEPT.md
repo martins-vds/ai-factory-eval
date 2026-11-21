@@ -24,3 +24,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 Acceptance rows above were imported from the verified archive for [Actions run 42752283868, attempt 1](https://github.com/martins-vds/ai-factory-synthetic-target/actions/runs/42752283868). The unchanged result is archived at `.migration/evidence/acceptance-runs/42752283868-1.json`.
 | 2026-11-21T06:02:25+00:00 | validate | 1 | 1.37 | `python .migration/harness/tools/validate.py .migration` | `d6880ecfbfbd6fce` | 49 file(s) checked, 1 error(s) |  |
 | 2026-11-21T06:02:51+00:00 | validate | 1 | 1.0 | `python .migration/harness/tools/validate.py .migration` | `d6880ecfbfbd6fce` | 49 file(s) checked, 1 error(s) |  |
+| 2026-11-21T06:03:13+00:00 | validate | 0 | 1.01 | `python .migration/harness/tools/validate.py .migration` | `2f118c59d9d07eef` |  |  |
+| 2026-11-21T06:03:45+00:00 | finish-check | 0 | 28.01 | `python .migration/harness/tools/afs-finish-check --ticket LC-ACCEPT --role afs-slice-coordinator` | `da3a3a1a351baf0d` |  | gate=finish-check ticket=LC-ACCEPT role=afs-slice-coordinator findings=0 |
