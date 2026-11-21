@@ -8,5 +8,8 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "Starting the Java process starts a JAX-RS Grizzly server on PORT (default 8080), creates the JPA EntityManagerFactory, registers all resources, closes resources on shutdown, and blocks until the server is stopped."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
 notes: "The legacy run.sh first packages the Maven application and launches lib.App."

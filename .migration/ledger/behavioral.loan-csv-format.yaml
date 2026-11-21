@@ -8,4 +8,7 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "Each loan line contains id, member, isbn, lent_on, due_on and returned_on separated by semicolons; returned_on is empty if not returned."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

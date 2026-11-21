@@ -8,7 +8,10 @@ source:
   risk: { crap: 12, complexity: 3, coverage: 0 }
 boundary: "POST /loans requires member and isbn form fields. Missing either field returns 400; success creates a loan dated today and returns its line as 201."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
 rules:
   - { id: require-member-isbn, rule: "Member and ISBN are both required for lending.", source: "legacy/src/main/java/lib/LoanResource.java:38-43" }
   - { id: lent-date-today, rule: "A new loan uses LocalDate.now() as lentOn.", source: "legacy/src/main/java/lib/LoanResource.java:38-43" }

@@ -8,4 +8,7 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "LoanRepository counts existing loans and creates the next ID as L(n+1)."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

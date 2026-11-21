@@ -1,0 +1,35 @@
+role: afs-characterizer
+ticket: SY-05
+issue: martins-vds/ai-factory-eval#1980
+tier_used:
+  A: 16
+  B: 0
+  C: 1
+suite:
+  path: .migration/characterization/source/characterize.py
+  cases: 14
+  passing: 14
+  run_log: .migration/evidence/runs/SY-05.md
+predicted_vs_observed:
+  match: 14
+  differs: 0
+ledger_updated:
+  - behavioral.get-loan
+  - behavioral.lend-book
+  - behavioral.list-loans
+  - behavioral.loan-csv-format
+  - behavioral.loan-id-generation
+  - behavioral.monthly-lending-report
+  - behavioral.return-book
+  - data.loan-record-store
+  - data.loan-seed
+  - integration.fine-payment
+  - structural.app-bootstrap
+  - structural.loan-data-access
+  - structural.loan-domain-model
+  - structural.loan-persistence
+  - structural.maven-run
+  - ui.about-page
+  - ui.late-fee-view
+quirk_tickets: []
+review_only_requests: []

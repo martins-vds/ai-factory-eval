@@ -7,5 +7,8 @@ source:
   location: legacy/src/main/resources/static/about.html:1-10
 boundary: "GET /about returns the classpath static HTML with opening hours, 14-day lending period and contact address."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
 no_rules: "This capability is static public content, not a business-policy calculation."

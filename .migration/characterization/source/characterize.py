@@ -26,6 +26,13 @@ CASES = (
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
 )
+EDGE_CASES = (
+    ('GET /loans/{id} unknown', 'GET', '/loans/UNKNOWN', None),
+    ('POST /loans missing fields', 'POST', '/loans', {'member': 'dee'}),
+    ('POST /loans/{id}/return unknown', 'POST', '/loans/UNKNOWN/return', None),
+    ('GET /fees/{id} unknown', 'GET', '/fees/UNKNOWN', None),
+    ('POST /payments/{id} unknown', 'POST', '/payments/UNKNOWN', None),
+)
 
 
 def verify_graph_coverage():
@@ -74,6 +81,20 @@ def wait_until_ready(process, output):
 def exercise_http():
     observations = {}
     for endpoint, method, path, form in CASES:
+        observations[endpoint] = {
+            'request': {
+                'method': method,
+                'path': path,
+                'form': form,
+            },
+            'response': get_response(method, path, form),
+        }
+    return observations
+
+
+def exercise_http_edges():
+    observations = {}
+    for endpoint, method, path, form in EDGE_CASES:
         observations[endpoint] = {
             'request': {
                 'method': method,
@@ -164,6 +185,7 @@ def main():
         try:
             wait_until_ready(process, output)
             http = exercise_http()
+            http_edges = exercise_http_edges()
             browser = exercise_browser()
         finally:
             process.terminate()
@@ -173,6 +195,7 @@ def main():
                 process.kill()
                 process.wait()
     write_or_compare('http', http, args.record)
+    write_or_compare('http_edges', http_edges, args.record)
     write_or_compare('browser', browser, args.record)
     action = 'recorded' if args.record else 'verified'
     print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
