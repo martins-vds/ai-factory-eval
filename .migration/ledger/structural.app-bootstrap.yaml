@@ -1,0 +1,12 @@
+id: structural.app-bootstrap
+kind: structural
+title: Start the Lending Library server and wire application resources
+source:
+  graph_node: method:legacy/src/main/java/lib/App.java:App.main
+  flow: view-about-page
+  location: legacy/src/main/java/lib/App.java:13-26
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "Starting the Java process starts a JAX-RS Grizzly server on PORT (default 8080), creates the JPA EntityManagerFactory, registers all resources, closes resources on shutdown, and blocks until the server is stopped."
+status: pending
+verification: pending
+notes: "The legacy run.sh first packages the Maven application and launches lib.App."

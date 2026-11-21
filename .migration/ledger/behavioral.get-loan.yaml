@@ -1,0 +1,10 @@
+id: behavioral.get-loan
+kind: behavioral
+title: Get one loan or return 404
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:31-35
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /loans/{id} returns a single loan line plus newline as 200, or plain text no such loan and 404 for an unknown ID."
+status: pending
+verification: pending

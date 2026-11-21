@@ -1,0 +1,11 @@
+id: behavioral.loan-id-generation
+kind: behavioral
+title: Generate sequential loan IDs
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.lend
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanRepository.java:27-34
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "LoanRepository counts existing loans and creates the next ID as L(n+1)."
+status: pending
+verification: pending

@@ -1,0 +1,11 @@
+id: structural.loan-domain-model
+kind: structural
+title: Represent a loan and its 14-day due date
+source:
+  graph_node: class:legacy/src/main/java/lib/Loan.java:Loan
+  location: legacy/src/main/java/lib/Loan.java:12-47
+boundary: "A loan stores id, member, isbn, lent-on date and optional returned-on date; dueOn is lentOn plus 14 days and markReturned records a return date."
+status: pending
+verification: pending
+rules:
+  - { id: loan-period, rule: "A loan becomes due 14 days after lentOn.", source: "legacy/src/main/java/lib/Loan.java:9-10, 42-44" }

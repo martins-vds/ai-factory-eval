@@ -1,0 +1,9 @@
+id: data.loan-seed
+kind: data
+title: Seed three sample loans at startup
+source:
+  graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+boundary: "Startup loads L1 (ana, currently lent), L2 (bo, returned Jan 20), and L3 (cy, returned Jan 3) into the recreated LOAN table."
+status: pending
+verification: pending

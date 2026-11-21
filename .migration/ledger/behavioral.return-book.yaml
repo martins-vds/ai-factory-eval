@@ -1,0 +1,11 @@
+id: behavioral.return-book
+kind: behavioral
+title: Mark a loan returned
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans/{id}/return
+  flow: Return Book
+  location: legacy/src/main/java/lib/LoanRepository.java:36-45
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "POST /loans/{id}/return sets returnedOn to today and returns the updated loan; an unknown ID returns 404."
+status: pending
+verification: pending

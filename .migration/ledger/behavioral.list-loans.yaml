@@ -1,0 +1,11 @@
+id: behavioral.list-loans
+kind: behavioral
+title: List all loans in semicolon-separated text
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:26-28
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /loans returns all loans ordered by ID as semicolon-separated lines, one loan per line, with a trailing newline."
+status: pending
+verification: pending

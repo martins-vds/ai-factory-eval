@@ -1,0 +1,11 @@
+id: ui.about-page
+kind: ui
+title: Serve the static Library About page
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-10
+boundary: "GET /about returns the classpath static HTML with opening hours, 14-day lending period and contact address."
+status: pending
+verification: pending
+no_rules: "This capability is static public content, not a business-policy calculation."
