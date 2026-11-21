@@ -1,0 +1,130 @@
+harness_version: 0.2.0
+checked_at: "2026-11-21T13:41:22Z"
+characterization:
+  legacy_environment: available
+  source_builds: "yes"
+  blockers: []
+  tier: A
+  tier_b_attempt: "not applicable: tier A established by running legacy/run.sh successfully and exercising live HTTP endpoints"
+  reason: "legacy/run.sh built and started the Java application; HTTP endpoints were exercised and responses recorded in .migration/references/characterization.md."
+capabilities:
+  - id: build-run
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: "legacy/run.sh (Maven package and Java 17 runtime)"}
+  - id: build-run
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: "Python 3.13 and Django 5; profile build gate"}
+  - id: characterization-harness
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "Tier-A behavior was recorded through manual HTTP requests, but the source has no reusable automated characterization or differential harness."
+  - id: unit-integration-tests
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No Java test sources or test dependencies are present in legacy/."
+  - id: unit-integration-tests
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: pytest}
+  - id: coverage
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source tests or coverage configuration are present; source coverage is best-effort."
+  - id: coverage
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: pytest-coverage}
+      - {kind: tool, name: coverage.py}
+  - id: complexity
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard, version: "1.24.3"}
+  - id: complexity
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: lizard, version: "1.24.3"}
+  - id: crap
+    applies_to: source
+    status: gap
+    best_effort: true
+    ticket: new
+    notes: "No source coverage data is available; source CRAP is best-effort."
+  - id: crap
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: crap.py}
+      - {kind: tool, name: lizard, version: "1.24.3"}
+      - {kind: tool, name: coverage.py}
+  - id: mutation-testing
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "The source has no test suite or mutation-testing setup."
+  - id: mutation-testing
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: mutmut, version: "3.8.1"}
+  - id: lint-format
+    applies_to: source
+    status: gap
+    ticket: new
+    notes: "No Java lint or formatting gate is configured for the source."
+  - id: lint-format
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: tool, name: ruff}
+  - id: stack-idioms
+    applies_to: source
+    status: met
+    provided_by:
+      - {kind: skill, name: java-docs}
+      - {kind: skill, name: java-junit}
+  - id: stack-idioms
+    applies_to: target
+    status: met
+    provided_by:
+      - {kind: skill, name: django-patterns}
+      - {kind: skill, name: django-security}
+      - {kind: skill, name: django-tdd}
+      - {kind: skill, name: django-verification}
+  - id: data-migration
+    applies_to: both
+    status: waived
+    waiver:
+      reason: "The operator waived legacy-data migration because the source contains synthetic seed data only and no planted scenario requires migration (martins-vds/ai-factory-synthetic-target#20, operator comment and closure)."
+      approved_by: martins-vds
+  - id: ui-end-to-end
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: skill, name: agent-browser}
+  - id: code-graph
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: understand-anything, version: "4e6d3299017a7432da15957874992837a315c5b4"}
+  - id: graph-data-links
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: "enrich_graph.py (java-ee, django)"}
+  - id: output-filtering
+    applies_to: both
+    status: met
+    provided_by:
+      - {kind: tool, name: rtk-oss, version: "1.1.0"}
