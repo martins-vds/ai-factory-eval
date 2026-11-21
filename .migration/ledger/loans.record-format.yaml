@@ -8,5 +8,7 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "A loan record is id;member;isbn;lent date;due date;returned date, with an empty final field for an unreturned loan."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 notes: "Shared by list, get, create, and return responses; documented in legacy/docs/export-csv.md:1-4. Quirk draft: .migration/quirks/loan-export-unescaped-delimiters.md."

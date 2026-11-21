@@ -6,5 +6,7 @@ source:
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The document specifies a first-of-month report for the preceding month with one row per member, loan-start and late-return counts, total late fees in cents, descending fee order with member-id tie-break, and omission of members without loans."
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence: [.migration/evidence/characterization-SY-05.md]
 notes: "Document-only capability: it states the reporting product's code and runtime are unavailable. No executable behavior or domain flow exists in the pinned source. Decision draft: .migration/quirks/monthly-report-no-runtime.md."

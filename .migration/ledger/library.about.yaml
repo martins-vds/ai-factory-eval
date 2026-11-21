@@ -8,6 +8,8 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "GET /about serves the packaged static HTML describing opening hours, the 14-day loan period, and contact details as text/html."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 no_rules: "Static public information page; it defines no additional domain rule."
 notes: "The JAX-RS route reads /static/about.html from the classpath in legacy/src/main/java/lib/AboutPage.java:13-20."

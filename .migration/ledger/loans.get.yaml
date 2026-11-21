@@ -7,5 +7,7 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "GET /loans/{id} returns the six-field loan line and newline with 200 when found, or `no such loan` and newline with 404."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 notes: "Uses LoanRepository.find; line output is separately inventoried as loans.record-format. Lizard reports the route method as LoanResource::Path in this range."

@@ -8,5 +8,7 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "POST /loans/{id}/return records the current date and returns the updated loan line with 200, or `no such loan` and newline with 404."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 notes: "The repository mutates and merges an existing Loan. Quirk draft: .migration/quirks/return-date-overwrite.md."

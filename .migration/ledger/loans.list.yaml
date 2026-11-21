@@ -8,5 +8,7 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "GET /loans returns all loans ordered by ID as plain-text lines containing id, member, ISBN, lent date, due date, and returned date (empty when absent), with a trailing newline."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 notes: "Repository ordering is legacy/src/main/java/lib/LoanRepository.java:19-21; line formatting is separately inventoried as loans.record-format."
