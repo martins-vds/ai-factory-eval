@@ -91,8 +91,9 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert tuple(shipping_locations) == original_locations
 
 
-def test_unknown_cargo_dialog_returns_not_found(client):
-    response = client.get('/admin/cargo/MISSING1/destination/', HTTP_HX_REQUEST='true')
+@pytest.mark.parametrize('dialog', ('destination', 'deadline'))
+def test_unknown_cargo_dialog_returns_not_found(client, dialog):
+    response = client.get(f'/admin/cargo/MISSING1/{dialog}/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
 
@@ -120,7 +121,7 @@ def test_invalid_deadline_shows_field_error_and_keeps_dialog_open(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Enter a valid arrival deadline.' in content
+    assert '>Enter a valid arrival deadline.</p>' in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
 
@@ -151,7 +152,7 @@ def test_invalid_destination_shows_field_error_without_updating_cargo(client):
     content = response.content.decode()
 
     assert response.status_code == 200
-    assert 'Select a valid destination.' in content
+    assert '>Select a valid destination.</p>' in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true"' in content
     assert updated is not None
