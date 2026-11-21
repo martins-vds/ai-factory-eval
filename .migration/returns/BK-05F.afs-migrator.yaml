@@ -1,0 +1,29 @@
+ticket: BK-05F
+issue: martins-vds/ai-factory-eval#1933
+pr: null
+role: afs-migrator
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.839
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+no_rules:
+  booking.routing-chain: "This capability is an interface chain, not a business eligibility or state-transition rule."
+  booking.screen-route: "This capability presents route data and provides controls; it carries no independent eligibility rule."
+  booking.screen-select-itinerary: "This capability renders candidate or empty-route states and carries no independent eligibility rule."
+  booking.routing-assign: "This capability persists the selected itinerary; candidate validity is supplied by the routing use case."
