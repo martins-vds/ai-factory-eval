@@ -8,5 +8,7 @@ source:
   risk: { crap: 12, complexity: 3 }
 boundary: "POST /loans accepts member and ISBN form fields, returns 400 if either is absent, and otherwise creates a loan dated today and responds 201 with its semicolon-separated record."
 status: pending
-verification: pending
-notes: "Only null values are rejected by the source; blank values have not yet been characterized."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "Only null values are rejected by the source; the tier-A edge case confirmed blank member and ISBN values return 201 with both fields empty. Quirk draft: .migration/quirks/blank-loan-fields.md."

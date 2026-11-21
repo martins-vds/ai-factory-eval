@@ -7,5 +7,7 @@ source:
   risk: { crap: 6, complexity: 2 }
 boundary: "The LOAN table stores id, member, ISBN, lent date, and optional returned date; repository operations read and write these records."
 status: pending
-verification: pending
-notes: "The JPA unit uses in-memory H2, drops and recreates the schema on startup, and loads seed.sql. Quirk draft: .migration/quirks/restart-data-loss.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "The JPA unit uses in-memory H2, drops and recreates the schema on startup, and loads seed.sql. The tier-A restart scenario confirmed runtime loans are discarded; quirk draft: .migration/quirks/restart-data-loss.md."

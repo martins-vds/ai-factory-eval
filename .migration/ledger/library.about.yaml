@@ -7,6 +7,8 @@ source:
   location: legacy/src/main/java/lib/AboutPage.java:15-21
 boundary: "GET /about serves the static HTML page with the library name, opening hours, lending period, and contact."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
 no_rules: "This capability is a static public information page."
 notes: "Page content: legacy/src/main/resources/static/about.html:1-9."

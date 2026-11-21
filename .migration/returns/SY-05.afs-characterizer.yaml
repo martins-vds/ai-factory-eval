@@ -1,0 +1,40 @@
+role: afs-characterizer
+ticket: SY-05
+issue: martins-vds/ai-factory-eval#2154
+tier_used:
+  A: 14
+  B: 0
+  C: 1
+suite:
+  path: .migration/characterization/source/characterize.py
+  cases: 18
+  passing: 18
+  run_log: .migration/evidence/runs/SY-05.md
+predicted_vs_observed:
+  match: 18
+  differs: 0
+ledger_updated:
+  - application.build-run
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - fees.view
+  - integration.payment-gateway
+  - library.about
+  - loan.create
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.return-date
+  - loan.return
+  - payment.gateway-errors
+  - report.monthly-spec
+quirk_tickets:
+  - .migration/quirks/payment-interrupt.md
+  - .migration/quirks/repeated-loan-return.md
+  - .migration/quirks/restart-data-loss.md
+  - .migration/quirks/monthly-report-spec-only.md
+  - .migration/quirks/blank-loan-fields.md
+review_only_requests:
+  - "report.monthly-spec has no source code or runtime; the tier-C spec is recorded, and a human scope decision is needed."
+  - "Payment gateway success and deliberate interruption behavior remain unobserved; a real gateway was unavailable and no stand-in was used."

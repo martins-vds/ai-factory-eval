@@ -8,5 +8,7 @@ source:
   risk: { crap: 20, complexity: 4 }
 boundary: "POST /payments/{id} checks the loan and sends a bodyless POST to PAYMENT_GATEWAY_URL/charge?loan={id}; a gateway HTTP 200 is returned as 200 and other gateway statuses map to 502."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
 notes: "The default gateway URL is payments.lending-library.invalid. Error and interruption handling is separately inventoried as payment.gateway-errors."

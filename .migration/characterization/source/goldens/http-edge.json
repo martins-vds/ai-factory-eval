@@ -1,0 +1,127 @@
+{
+  "GET /fees/{id} capped": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/L1"
+    },
+    "response": {
+      "body": "<h1>Late fee for L1</h1><p>Due 2026-01-16, 309 day(s) late.</p><p class=\"fee\">Fee: $10.00</p>",
+      "content_type": "text/html",
+      "status": 200
+    }
+  },
+  "GET /fees/{id} returned before due": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/L2"
+    },
+    "response": {
+      "body": "<h1>Late fee for L2</h1><p>Due 2026-01-24, 0 day(s) late.</p><p class=\"fee\">Fee: $0.00</p>",
+      "content_type": "text/html",
+      "status": 200
+    }
+  },
+  "GET /fees/{id} unknown": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/unknown"
+    },
+    "response": {
+      "body": "<p>No such loan.</p>",
+      "content_type": "text/html",
+      "status": 404
+    }
+  },
+  "GET /loans/{id} after repeated return": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/loans/L2"
+    },
+    "response": {
+      "body": "L2;bo;9780596007126;2026-01-10;2026-01-24;2026-11-21\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "GET /loans/{id} unknown": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/loans/unknown"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  },
+  "POST /loans blank fields": {
+    "request": {
+      "form": {
+        "isbn": "",
+        "member": ""
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "L5;;;2026-11-21;2026-12-05;\n",
+      "content_type": "text/plain",
+      "status": 201
+    }
+  },
+  "POST /loans missing ISBN": {
+    "request": {
+      "form": {
+        "member": "dee"
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    }
+  },
+  "POST /loans/{id}/return already returned": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/loans/L2/return"
+    },
+    "response": {
+      "body": "L2;bo;9780596007126;2026-01-10;2026-01-24;2026-11-21\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "POST /loans/{id}/return unknown": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/loans/unknown/return"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  },
+  "POST /payments/{id} unknown": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/unknown"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  }
+}

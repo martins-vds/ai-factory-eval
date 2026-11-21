@@ -8,5 +8,7 @@ source:
   risk: { crap: 6, complexity: 2 }
 boundary: "POST /loans/{id}/return records today's date and returns the updated semicolon-separated loan record with HTTP 200, or `no such loan` with HTTP 404."
 status: pending
-verification: pending
-notes: "The source overwrites returnedOn on repeated returns; quirk draft: .migration/quirks/repeated-loan-return.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "The tier-A edge case confirmed POST /loans/L2/return overwrites its prior returnedOn date; quirk draft: .migration/quirks/repeated-loan-return.md."

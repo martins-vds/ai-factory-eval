@@ -7,4 +7,6 @@ source:
   risk: { crap: 2, complexity: 1 }
 boundary: "GET /loans/{id} returns the semicolon-separated loan record with HTTP 200, or `no such loan` with HTTP 404."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]

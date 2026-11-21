@@ -8,5 +8,7 @@ source:
   risk: { crap: 6, complexity: 2 }
 boundary: "A successful return writes the supplied return date to returnedOn, including when a return date is already present."
 status: pending
-verification: pending
-notes: "Repeated returns overwrite the earlier date; quirk draft: .migration/quirks/repeated-loan-return.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/runs/SY-05.md]
+notes: "The tier-A edge case returned already-returned L2 and observed its returnedOn date change from 2026-01-20 to 2026-11-21; quirk draft: .migration/quirks/repeated-loan-return.md."
