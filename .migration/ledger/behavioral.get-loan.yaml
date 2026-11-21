@@ -7,4 +7,7 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "GET /loans/{id} returns a single loan line plus newline as 200, or plain text no such loan and 404 for an unknown ID."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

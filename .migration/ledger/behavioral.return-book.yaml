@@ -8,4 +8,7 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "POST /loans/{id}/return sets returnedOn to today and returns the updated loan; an unknown ID returns 404."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

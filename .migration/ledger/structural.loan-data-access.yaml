@@ -8,4 +8,7 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "Each repository read opens and closes an EntityManager; each write begins a transaction, commits on success, and rolls back if an active transaction remains on exit."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

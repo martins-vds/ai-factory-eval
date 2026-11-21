@@ -6,4 +6,7 @@ source:
   location: legacy/run.sh:1-6
 boundary: "Invoking legacy/run.sh runs Maven package -DskipTests, then starts lib.App with target/classes and target/dependency on the Java classpath."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

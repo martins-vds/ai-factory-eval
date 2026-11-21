@@ -6,4 +6,7 @@ source:
   location: legacy/src/main/java/lib/Loan.java:12-47
 boundary: "The LOAN table stores each loan's ID, member, ISBN, lent-on date and nullable returned-on date."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md

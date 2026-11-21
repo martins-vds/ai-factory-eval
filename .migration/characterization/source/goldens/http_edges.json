@@ -1,0 +1,64 @@
+{
+  "GET /fees/{id} unknown": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/UNKNOWN"
+    },
+    "response": {
+      "body": "<p>No such loan.</p>",
+      "content_type": "text/html",
+      "status": 404
+    }
+  },
+  "GET /loans/{id} unknown": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/loans/UNKNOWN"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  },
+  "POST /loans missing fields": {
+    "request": {
+      "form": {
+        "member": "dee"
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    }
+  },
+  "POST /loans/{id}/return unknown": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/loans/UNKNOWN/return"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  },
+  "POST /payments/{id} unknown": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/UNKNOWN"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  }
+}
