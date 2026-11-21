@@ -5,3 +5,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | UTC | Gate | Exit | Seconds | Command | Log SHA-256 | First highlight | Result |
 |---|---|---|---|---|---|---|---|
 | 2026-11-21T22:34:43+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T22:36:54+00:00 | snapshot-check | 1 | 0.04 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `de25160433a451d6` | ::error::.migration/data/snapshot: no manifest.json |  |
+| 2026-11-21T22:37:58+00:00 | validate | 0 | 3.57 | `python .migration/harness/tools/validate.py .migration` | `a19ed5a217834789` |  |  |
+| 2026-11-21T22:38:17+00:00 | validate-final | 0 | 3.57 | `python .migration/harness/tools/validate.py .migration` | `a19ed5a217834789` |  |  |
