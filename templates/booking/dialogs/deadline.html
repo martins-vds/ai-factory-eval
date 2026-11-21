@@ -3,6 +3,7 @@
   hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
   hx-target="#booking-edit-dialog"
   hx-swap="innerHTML"
+  hx-on:htmx:before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
 >
   {% csrf_token %}
   <h2 id="deadline-dialog-heading" class="mb-4 text-lg font-semibold">Change arrival deadline</h2>

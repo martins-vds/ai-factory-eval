@@ -61,6 +61,8 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(
     assert first_response.status_code == 200
     assert not_routed_cargo.route_specification.origin.name in first_content
     assert not_routed_cargo.route_specification.destination.name in first_content
+    assert 'destination-error' not in first_content
+    assert 'aria-invalid="true"' not in first_content
     assert first_options is not None and second_options is not None
     assert first_options.group(1) == second_options.group(1)
     assert not_routed_cargo.route_specification.origin.unlocode.value not in first_options.group(1)
@@ -99,15 +101,13 @@ def test_not_routed_rows_open_dialogs_with_error_response_handling(client, not_r
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in content
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in content
     assert 'hx-target="#booking-edit-dialog"' in content
-    assert 'hx-on:htmx:beforeSwap=' in content
-    assert 'hx-on:htmx:afterSwap=' in content
+    assert 'hx-on:htmx:before-swap=' in content
+    assert 'hx-on:htmx:after-swap=' in content
 
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_unparseable_deadline_shows_inline_field_error_without_updating(
-    client, not_routed_cargo
-):
+def test_unparseable_deadline_shows_inline_field_error_without_updating(client, not_routed_cargo):
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
         {'deadline': 'not-a-date'},
@@ -122,6 +122,27 @@ def test_unparseable_deadline_shows_inline_field_error_without_updating(
     assert 'aria-invalid="true"' in content
     assert reloaded_cargo.route_specification.arrival_deadline == (
         not_routed_cargo.route_specification.arrival_deadline
+    )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_outside_filtered_options_shows_field_error_without_updating(
+    client, not_routed_cargo
+):
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': not_routed_cargo.route_specification.origin.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+    reloaded_cargo = cargo_repository.find(not_routed_cargo.tracking_id)
+    content = response.content.decode()
+
+    assert response.status_code == 200
+    assert 'Select a valid destination.' in content
+    assert 'aria-describedby="destination-error"' in content
+    assert reloaded_cargo.route_specification.destination == (
+        not_routed_cargo.route_specification.destination
     )
 
 
@@ -179,10 +200,12 @@ def test_deadline_update_preserves_other_specification_fields_and_refreshes_rows
     assert 'Widget for var' not in content
 
 
+@pytest.mark.parametrize('dialog', ('destination', 'deadline'))
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_missing_cargo_error_is_renderable_in_the_dialog(client, not_routed_cargo):
-    response = client.get('/admin/cargo/UNKNOWN/destination/')
+def test_missing_cargo_error_is_renderable_in_the_dialog(client, not_routed_cargo, dialog):
+    response = client.get(f'/admin/cargo/UNKNOWN/{dialog}/')
 
     assert response.status_code == 404
     assert 'Cargo not found' in response.content.decode()
+    assert 'UNKNOWN' in response.content.decode()

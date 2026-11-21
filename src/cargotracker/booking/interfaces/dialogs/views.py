@@ -12,14 +12,21 @@ from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.location.domain.location import Location
 
 
-def _not_routed_table(
-    request: HttpRequest, cargo_dashboard: CargoDashboard
-) -> HttpResponse:
+def _not_routed_table(request: HttpRequest, cargo_dashboard: CargoDashboard) -> HttpResponse:
     return render(
         request,
         'booking/dashboard/not_routed_table.html',
         {'not_routed_cargos': cargo_dashboard.get_dashboard().not_routed_cargos},
     )
+
+
+def _updated_not_routed_table(
+    request: HttpRequest, cargo_dashboard: CargoDashboard
+) -> HttpResponse:
+    response = _not_routed_table(request, cargo_dashboard)
+    response['HX-Retarget'] = '#not-routed-cargo'
+    response['HX-Reswap'] = 'outerHTML'
+    return response
 
 
 def _destination_context(
@@ -30,7 +37,8 @@ def _destination_context(
         'locations': [
             location
             for location in locations
-            if location not in (
+            if location
+            not in (
                 cargo.route_specification.origin,
                 cargo.route_specification.destination,
             )
@@ -55,12 +63,14 @@ def create_booking_dialog_views(
             )
 
         if request.method == 'POST':
-            destination_code = request.POST.get('destination', '')
+            destination_code = request.POST.get('destination')
             locations = find_locations()
             destinations = _destination_context(cargo, locations)['locations']
             destination = next(
                 (
-                    location for location in destinations if location.unlocode.value == destination_code
+                    location
+                    for location in destinations
+                    if location.unlocode.value == destination_code
                 ),
                 None,
             )
@@ -72,10 +82,7 @@ def create_booking_dialog_views(
                 )
 
             cargo_specification.change_destination(cargo.tracking_id, destination)
-            response = _not_routed_table(request, cargo_dashboard)
-            response['HX-Retarget'] = '#not-routed-cargo'
-            response['HX-Reswap'] = 'outerHTML'
-            return response
+            return _updated_not_routed_table(request, cargo_dashboard)
 
         return render(
             request,
@@ -113,10 +120,7 @@ def create_booking_dialog_views(
                 cargo.tracking_id,
                 timezone.make_aware(datetime.combine(deadline, time.min)),
             )
-            response = _not_routed_table(request, cargo_dashboard)
-            response['HX-Retarget'] = '#not-routed-cargo'
-            response['HX-Reswap'] = 'outerHTML'
-            return response
+            return _updated_not_routed_table(request, cargo_dashboard)
 
         return render(
             request,

@@ -37,6 +37,7 @@
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-target="#booking-edit-dialog"
                 hx-swap="innerHTML"
+                hx-on:htmx:before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
                 aria-haspopup="dialog"
                 class="mr-2 rounded border px-3 py-2"
               >
@@ -47,6 +48,7 @@
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-target="#booking-edit-dialog"
                 hx-swap="innerHTML"
+                hx-on:htmx:before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
                 aria-haspopup="dialog"
                 class="rounded border px-3 py-2"
               >
@@ -61,7 +63,7 @@
   <dialog
     id="booking-edit-dialog"
     aria-label="Cargo edit dialog"
-    hx-on:htmx:beforeSwap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
-    hx-on:htmx:afterSwap="if (!this.open) this.showModal()"
+    hx-on:htmx:before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+    hx-on:htmx:after-swap="if (!this.open) this.showModal()"
   ></dialog>
 </section>
