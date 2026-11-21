@@ -1,18 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a55398131911e`): score 0.830, threshold 0.8, killed 44, survived 9. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:48 Mutant #15`
-
-  ```diff
-  @@ -45,7 +45,7 @@
-   def _itinerary_from_token(token: str, tracking_id: TrackingId) -> Itinerary:
-       payload = signing.loads(token)
-  -    if payload['tracking_id'] != tracking_id.value or not payload['legs']:
-  +    if payload['tracking_id'] != tracking_id.value and not payload['legs']:
-           raise signing.BadSignature('Invalid itinerary selection')
-       return Itinerary(
-  ```
+Written by `afs-mutation` on its last run (base `36fae5a689c9209c673e36ecb81a55398131911e`): score 0.849, threshold 0.8, killed 45, survived 8. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:49 Mutant #16`
 

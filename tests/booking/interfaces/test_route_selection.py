@@ -2,6 +2,7 @@ import sys
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -186,6 +187,22 @@ def test_invalid_itinerary_token_does_not_assign_a_route(client, route_pages, po
 
 
 @pytest.mark.django_db
+def test_empty_signed_itinerary_does_not_assign_a_route(client, route_pages):
+    tracking_id = route_pages(_candidate_paths())
+    token = signing.dumps({'tracking_id': tracking_id.value, 'legs': []})
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/itineraries/',
+        {'itinerary_token': token},
+    )
+    cargo = DjangoCargoRepository().find(tracking_id)
+
+    assert response.status_code == 400
+    assert cargo is not None
+    assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
 def test_itinerary_token_cannot_assign_to_a_different_cargo(client, route_pages):
     tracking_id = route_pages(_candidate_paths())
     itinerary_response = client.get(f'/admin/cargo/{tracking_id.value}/itineraries/')
@@ -233,6 +250,7 @@ def test_route_selection_rejects_unsupported_methods(client, route_pages, method
     )
 
     assert response.status_code == 405
+    assert response.headers['Allow'] == ('GET' if method == 'post' else 'GET, POST')
 
 
 @pytest.mark.django_db

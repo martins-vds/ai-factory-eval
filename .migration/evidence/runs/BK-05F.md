@@ -35,3 +35,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:10:14+00:00 | behavior-security-edges | 0 | 1.96 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `004181ebcbfe5d9e` |  |  |
 | 2026-11-21T19:10:19+00:00 | lint-edge-guards | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T19:10:21+00:00 | format-edge-guards | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `3bc53bf3e981a98a` |  |  |
+| 2026-11-21T19:11:29+00:00 | mutation-changed-final | 0 | 56.22 | `python .migration/harness/tools/afs-mutation` | `543f58b416ca63f8` |  | gate=mutation score=0.849 threshold=0.8 killed=45 survived=8 files=1 base=36fae5a689c9209c673e36ecb81a55398131911e |
+| 2026-11-21T19:11:51+00:00 | behavior-empty-and-methods | 0 | 1.99 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `39292d5bd4c6e671` |  |  |
+| 2026-11-21T19:11:54+00:00 | lint-final-tests | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T19:11:56+00:00 | format-final-tests | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `3bc53bf3e981a98a` |  |  |
