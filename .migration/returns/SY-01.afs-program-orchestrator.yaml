@@ -1,0 +1,12 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#2133
+phase: 0
+decisions:
+  - "Characterization tier A: legacy/run.sh built and started; HTTP routes were exercised. Exact evidence is in .migration/handoffs/SY-01.md."
+  - "The H2-to-PostgreSQL data-migration capability is a gap: source data is in-process H2 memory and the export approach and snapshot owner need an operator decision."
+dispatched: []
+awaiting_human:
+  - "Dispatcher-created data-migration gap ticket (ticket: new): choose the source snapshot/export approach and designate its owner before Phase 2."
+next_step: "Dispatcher runs bootstrap.py from harness f195ae3d25110bdcf4bd78cadd0676c25c614a5c with this profile, checklist and stacks/java-to-django.json; scaffolding follows."
+handoff: .migration/handoffs/SY-01.md
