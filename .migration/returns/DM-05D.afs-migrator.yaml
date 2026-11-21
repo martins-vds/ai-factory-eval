@@ -1,0 +1,20 @@
+role: afs-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#2019
+pr: null
+specialty: data
+gates:
+  build: 0
+  behavior: 'n/a: full suite predates final test additions'
+  idiom: 'n/a: final gates not rerun after final test additions'
+  crap: 'n/a: final gates not rerun after final test additions'
+  mutation_changed: 'n/a: mutation worker selector failed twice after test additions'
+  regression: 'n/a: not run after stop rule fired'
+evidence_logs:
+  - .migration/evidence/runs/DM-05D.md
+  - .migration/evidence/mutants/DM-05D.md
+specialty_evidence: []
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/DM-05D.md
