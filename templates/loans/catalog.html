@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog · The Lending Library{% endblock %}
+
+{% block content %}
+<div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-14">
+  <section aria-labelledby="catalog-title">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#777865]">The collection · {{ loans|length }} loans</p>
+    <h1 id="catalog-title" class="mt-3 font-serif text-4xl font-medium leading-tight tracking-tight sm:text-6xl">
+      Books in good company.
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg leading-relaxed text-[#626658]">
+      A quiet ledger of what is out, who has it, and when it comes home.
+    </p>
+
+    <div class="mt-8 space-y-3">
+      {% for loan in loans %}
+      <article class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+        <div class="card-body gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div>
+            <p class="text-sm font-semibold uppercase tracking-wider text-[#a94e37]">{{ loan.id }}</p>
+            <h2 class="mt-1 font-serif text-2xl font-semibold">{{ loan.member }}</h2>
+            <p class="mt-1 text-sm text-[#626658]">ISBN {{ loan.isbn }}</p>
+          </div>
+          <div class="flex flex-col gap-3 sm:items-end">
+            <p class="text-sm text-[#626658]">
+              {% if loan.returned_on %}Returned{% else %}Due{% endif %}
+              <time datetime="{{ loan.due_on|date:'Y-m-d' }}">{{ loan.due_on|date:"M j, Y" }}</time>
+            </p>
+            <a class="btn btn-outline min-h-11 border-[#a94e37] text-[#783b2b] hover:bg-[#a94e37] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2"
+               href="{% url 'ui_loan_detail' loan.id %}"
+               hx-get="{% url 'ui_loan_detail' loan.id %}"
+               hx-target="#loan-detail"
+               hx-swap="innerHTML">
+              View loan
+            </a>
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <p class="rounded-box border border-[#d8cdbb] bg-[#fffdf7] p-6 text-[#626658]">No loans are in the catalog.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <aside id="loan-detail" aria-live="polite" aria-label="Selected loan" class="lg:pt-14">
+    {% include "loans/detail_placeholder.html" %}
+  </aside>
+</div>
+{% endblock %}

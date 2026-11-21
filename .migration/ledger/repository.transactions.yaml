@@ -8,7 +8,13 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.88}
 boundary: "Each repository read closes its EntityManager; each write begins and commits a transaction, rolls back if still active after failure, and closes the EntityManager."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.repository.DjangoLoanRepository, src.loans.services.SaveLoan]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_save_use_case_persists_a_loan, tests/loans/test_catalog.py::test_save_use_case_rolls_back_a_failed_transaction]
+rules:
+  - id: atomic-loan-save
+    rule: "A successful repository save commits, and a failed save leaves no loan row."
+    source: "legacy/src/main/java/lib/LoanRepository.java:47-69"

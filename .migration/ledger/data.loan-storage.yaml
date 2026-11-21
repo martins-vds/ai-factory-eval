@@ -7,9 +7,15 @@ source:
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.loans.models.LoanRecord, src.loans.repository.DjangoLoanRepository]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_migration_restart_does_not_replace_persisted_records]
+notes: "The fix ruling in martins-vds/ai-factory-synthetic-target#42 replaces the source's reset-on-startup storage."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+rules:
+  - id: keep-loans-across-startup
+    rule: "Persisted loans remain available after the application migrations are rerun."
+    source: "martins-vds/ai-factory-synthetic-target#42"
