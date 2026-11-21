@@ -1,0 +1,14 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#1936
+phase: 0
+decisions:
+  - "Pinned source: martins-vds/ai-factory-synthetic-target at 563c316ed51462b08fd6e58f3781a3c8b2890453, path legacy"
+  - "Characterization tier A: legacy/run.sh built and ran, and live HTTP endpoints were exercised"
+  - "Target: Python 3.13, Django 5, Django templates, PostgreSQL 17"
+  - "Harness: martins-vds/ai-factory-swarm at f195ae3d25110bdcf4bd78cadd0676c25c614a5c with stack pack stacks/java-to-django.json"
+dispatched: []
+awaiting_human:
+  - "Setup PR for profile and capability checklist must be reviewed and merged before dispatcher step 5"
+next_step: "Dispatcher runs tools/bootstrap.py from f195ae3d25110bdcf4bd78cadd0676c25c614a5c using this profile and checklist, then scaffolds the target"
+handoff: .migration/handoffs/SY-01.afs-program-orchestrator.md
