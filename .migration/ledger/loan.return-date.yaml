@@ -7,11 +7,20 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "A successful first return persists the supplied server-local date; a repeat return is rejected and leaves the original date unchanged."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2107]
+target:
+  components: [src.loans.services.return_loan, src.loans.repository.LoanRepository.mark_returned, src.loans.views.loan_return, src.loans.views.loan_return_ui]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_records_the_supplied_date, tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_original_date, tests/loans/test_circulation.py::test_return_api_records_first_return_date, tests/loans/test_circulation.py::test_return_api_rejects_repeat_without_overwriting_original_date, tests/loans/test_circulation.py::test_return_ui_shows_success_and_rejects_a_second_return, tests/loans/test_circulation.py::test_repository_return_is_atomic_and_ignores_missing_or_returned_loans]
+rules:
+  - id: first-return-date
+    rule: "The first return persists the supplied date."
+    source: legacy/src/main/java/lib/LoanRepository.java:36-44
+  - id: preserve-original-return-date
+    rule: "A repeat return is rejected without changing the original return date."
+    source: martins-vds/ai-factory-synthetic-target#41
+notes: "Quirk ruling #41 approves rejecting repeated returns without replacing the original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

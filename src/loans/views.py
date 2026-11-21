@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods, require_POST
 
 from .models import Loan
@@ -65,7 +66,7 @@ def loan_return(request, loan_id):
 @require_http_methods(['GET', 'POST'])
 def loan_new(request):
     if request.method == 'GET':
-        return render(request, 'loans/new.html', {'errors': {}})
+        return render(request, 'loans/new.html')
 
     try:
         loan = lend_loan(
@@ -74,10 +75,14 @@ def loan_new(request):
             request.POST.get('isbn'),
         )
     except LoanInputError as error:
-        template = 'loans/_loan_form.html' if request.headers.get('HX-Request') == 'true' else 'loans/new.html'
+        template = (
+            'loans/_loan_form.html'
+            if request.headers.get('HX-Request') == 'true'
+            else 'loans/new.html'
+        )
         return render(request, template, {'errors': error.errors}, status=422)
 
-    location = f'/ui/loans/{loan.id}/'
+    location = reverse('loan_catalog_detail', kwargs={'loan_id': loan.id})
     if request.headers.get('HX-Request') == 'true':
         return HttpResponse(status=201, headers={'HX-Redirect': location})
     return redirect(location)
@@ -107,5 +112,5 @@ def loan_return_ui(request, loan_id):
         )
 
     if request.headers.get('HX-Request') != 'true':
-        return redirect(f'/ui/loans/{loan.id}/')
+        return redirect('loan_catalog_detail', loan_id=loan.id)
     return render(request, 'loans/_return_status.html', {'loan': loan})

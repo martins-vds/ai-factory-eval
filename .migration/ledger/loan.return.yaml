@@ -7,11 +7,20 @@ source:
   flow: Return Book
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
-boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after its first return, HTTP 404 with `no such loan` when absent, and HTTP 409 for a repeated return."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2107]
+target:
+  components: [src.loans.services.return_loan, src.loans.repository.LoanRepository.mark_returned, src.loans.views.loan_return, src.loans.views.loan_return_ui]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_reports_unknown_loan, tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_changing_original_date, tests/loans/test_circulation.py::test_return_api_returns_not_found_for_unknown_loan, tests/loans/test_circulation.py::test_return_api_rejects_repeat_without_overwriting_original_date, tests/loans/test_circulation.py::test_return_ui_renders_unknown_loan_error, tests/loans/test_circulation.py::test_return_ui_shows_success_and_rejects_a_second_return, tests/loans/test_circulation.py::test_return_api_rejects_get_without_changing_the_loan, tests/loans/test_circulation.py::test_return_ui_rejects_get_without_changing_the_loan, tests/loans/test_circulation.py::test_non_htmx_return_redirects_to_updated_loan, tests/loans/test_circulation.py::test_repository_return_is_atomic_and_ignores_missing_or_returned_loans]
+rules:
+  - id: existing-loan
+    rule: "A return request for an unknown loan is rejected."
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
+  - id: return-once
+    rule: "An already-returned loan cannot be returned again."
+    source: martins-vds/ai-factory-synthetic-target#41
+notes: "Quirk ruling #41 approves rejecting repeated returns and preserving the original return date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

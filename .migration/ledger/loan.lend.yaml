@@ -7,11 +7,23 @@ source:
   flow: Lend Book
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
-boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "POST /loans rejects blank member or ISBN values with HTTP 400; valid values create a loan dated today with id L<count+1> and return HTTP 201 with a delimiter-escaped record."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2107]
+target:
+  components: [src.loans.services.lend_loan, src.loans.services.loan_line, src.loans.views.loan_list, src.loans.views.loan_new]
+rules:
+  - id: member-nonblank
+    rule: "A loan requires a member value containing a non-whitespace character."
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: isbn-nonblank
+    rule: "A loan requires an ISBN value containing a non-whitespace character."
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: export-escaped
+    rule: "Semicolons, quotes and line breaks in loan fields are escaped in text exports."
+    source: martins-vds/ai-factory-synthetic-target#43
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_required_fields, tests/loans/test_circulation.py::test_lend_api_creates_a_loan_due_fourteen_days_later, tests/loans/test_circulation.py::test_lend_api_rejects_blank_or_missing_fields_without_creating_a_loan, tests/loans/test_circulation.py::test_loan_line_escapes_delimiters_quotes_and_line_breaks, tests/loans/test_circulation.py::test_new_loan_page_renders_field_errors_for_blank_values, tests/loans/test_circulation.py::test_non_htmx_new_loan_page_renders_field_errors, tests/loans/test_circulation.py::test_loan_list_page_shows_collection_and_link_to_lend_form]
+notes: "Quirk rulings #39 and #43 approve rejecting blank inputs and escaping delimiters in loan exports."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
