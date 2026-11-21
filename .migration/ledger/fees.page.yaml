@@ -28,6 +28,7 @@ evidence:
   - .migration/evidence/runs/LL-03.md
   - tests/fees/test_endpoints.py::test_fee_api_matches_characterized_html
   - tests/fees/test_endpoints.py::test_fee_api_returns_characterized_not_found_response
+  - tests/fees/test_endpoints.py::test_fee_api_escapes_loan_identifier_in_html
   - tests/fees/test_endpoints.py::test_fee_page_uses_reading_room_layout_and_payment_action
   - tests/fees/test_endpoints.py::test_fee_page_renders_not_found_for_unknown_loan
   - tests/fees/test_browser.py::test_htmx_payment_failure_is_rendered_in_the_fee_page

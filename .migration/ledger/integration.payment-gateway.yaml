@@ -33,6 +33,7 @@ evidence:
   - tests/fees/test_services.py::test_payment_maps_io_failure_to_bad_gateway
   - tests/fees/test_services.py::test_payment_surfaces_interruption_without_losing_it
   - tests/fees/test_gateway.py::test_payment_gateway_uses_legacy_default_and_replaces_invalid_utf8
+  - tests/fees/test_gateway.py::test_payment_gateway_preserves_interruption
   - tests/fees/test_endpoints.py::test_payment_api_posts_expected_request_and_forwards_success
   - tests/fees/test_endpoints.py::test_payment_api_maps_gateway_failure_to_502_and_preserves_body
   - tests/fees/test_endpoints.py::test_payment_api_does_not_follow_gateway_redirects

@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils.html import format_html
 from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application
@@ -12,10 +13,12 @@ def fee_api(request, loan_id):
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
     amount = f'{fee.amount:.2f}'
-    body = (
-        f'<h1>Late fee for {fee.loan.id}</h1>'
-        f'<p>Due {fee.loan.due_on}, {fee.days_late} day(s) late.</p>'
-        f'<p class="fee">Fee: ${amount}</p>'
+    body = format_html(
+        '<h1>Late fee for {}</h1><p>Due {}, {} day(s) late.</p><p class="fee">Fee: ${}</p>',
+        fee.loan.id,
+        fee.loan.due_on,
+        fee.days_late,
+        amount,
     )
     return HttpResponse(body, content_type='text/html')
 

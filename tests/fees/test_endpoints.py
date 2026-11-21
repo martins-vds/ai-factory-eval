@@ -1,6 +1,7 @@
 import json
 from datetime import date
 from pathlib import Path
+from urllib.parse import quote
 
 import pytest
 
@@ -31,6 +32,24 @@ def test_fee_api_returns_characterized_not_found_response(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == '<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_fee_api_escapes_loan_identifier_in_html(client):
+    loan_id = '<img src=x onerror=alert(1)>'
+    Loan.objects.create(
+        id=loan_id,
+        member='reader',
+        isbn='123',
+        lent_on=date(2026, 1, 1),
+    )
+
+    response = client.get(f'/fees/{quote(loan_id, safe="")}')
+    body = response.content.decode()
+
+    assert response.status_code == 200
+    assert '<img' not in body
+    assert '&lt;img' in body
 
 
 @pytest.mark.django_db

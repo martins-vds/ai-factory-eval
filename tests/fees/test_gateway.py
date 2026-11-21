@@ -1,3 +1,7 @@
+from urllib.error import URLError
+
+import pytest
+
 from src.fees.gateway import HttpPaymentGateway
 
 
@@ -30,3 +34,21 @@ def test_payment_gateway_uses_legacy_default_and_replaces_invalid_utf8(monkeypat
     assert opener.request.full_url == ('https://payments.lending-library.invalid/charge?loan=L1')
     assert opener.request.get_method() == 'POST'
     assert (response.status, response.body) == (200, '\ufffd')
+
+
+def test_payment_gateway_preserves_interruption(monkeypatch):
+    interruption = InterruptedError('gateway call interrupted')
+
+    class InterruptedGatewayOpener:
+        def open(self, request):
+            raise URLError(interruption)
+
+    monkeypatch.setattr(
+        'src.fees.gateway.build_opener',
+        lambda handler: InterruptedGatewayOpener(),
+    )
+
+    with pytest.raises(InterruptedError) as raised:
+        HttpPaymentGateway().charge('L1')
+
+    assert raised.value is interruption
