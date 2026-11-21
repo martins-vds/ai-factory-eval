@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Loan not found · The Lending Library{% endblock %}
+
+{% block content %}
+<main class="catalog-shell py-10">
+  <section class="catalog-note card max-w-2xl rounded-box border border-library-line bg-library-surface p-8">
+    <p class="text-xs uppercase tracking-widest text-library-muted">No such loan</p>
+    <h1 class="mt-2 text-4xl font-bold">This record is not in the collection.</h1>
+    <a class="btn btn-sm mt-6 w-fit bg-library-rust text-white" href="/ui/loans/">Return to the catalog</a>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<main class="catalog-shell py-10">
+  <a class="text-sm text-library-rust underline underline-offset-4" href="/ui/loans/">
+    Back to the collection
+  </a>
+  <article class="catalog-note card mt-6 max-w-3xl rounded-box border border-library-line bg-library-surface p-8">
+    <p class="text-xs uppercase tracking-widest text-library-muted">Loan record</p>
+    <h1 class="mt-2 text-4xl font-bold">Loan {{ loan.id }}</h1>
+    <dl class="mt-7 grid gap-5 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm text-library-muted">Member</dt>
+        <dd class="mt-1 text-lg">{{ loan.member }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-library-muted">ISBN</dt>
+        <dd class="mt-1 text-lg">{{ loan.isbn }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-library-muted">Lent</dt>
+        <dd class="mt-1">{{ loan.lent_on|date:"M j, Y" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-library-muted">Due</dt>
+        <dd class="mt-1">{{ loan.due_on|date:"M j, Y" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-library-muted">Returned</dt>
+        <dd class="mt-1">
+          {% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}
+        </dd>
+      </div>
+    </dl>
+  </article>
+</main>
+{% endblock %}

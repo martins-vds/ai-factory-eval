@@ -8,10 +8,20 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:52-55
   risk: {crap: 2, complexity: 2, coverage: 1.0}
 boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. The docs state spreadsheet users rely on this format."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#2101, martins-vds/ai-factory-synthetic-target#35]
+target:
+  components: [src.loans.services.format_loan, src.loans.services.LoanCatalog.text_export]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_catalog_api_matches_characterized_source_responses
+  - tests/loans/test_catalog.py::test_text_export_escapes_semicolons_and_line_breaks
+notes: "Delimiter-containing fields are escaped per quirk ruling martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - id: delimited-escaping
+    rule: Semicolon-delimited export quotes delimiters and line breaks while preserving values and a trailing newline.
+    source: martins-vds/ai-factory-synthetic-target#43

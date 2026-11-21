@@ -7,8 +7,14 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:47-69
   risk: {crap: 2, complexity: 2, coverage: 0.88}
 boundary: "Each repository read closes its EntityManager; each write begins and commits a transaction, rolls back if still active after failure, and closes the EntityManager."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#2101, martins-vds/ai-factory-synthetic-target#35]
+target:
+  components: [src.loans.repositories.DjangoLoanRepository]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_catalog_queries_leave_no_transaction_open
+no_rules: Catalog queries use Django autocommit; this ticket adds no multi-step write operations.

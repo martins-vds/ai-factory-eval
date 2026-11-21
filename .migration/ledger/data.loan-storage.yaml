@@ -6,10 +6,16 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-eval#2101, martins-vds/ai-factory-synthetic-target#35]
+target:
+  components: [src.loans.models.LoanRecord, src.loans.repositories.DjangoLoanRepository]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_loan_records_survive_a_database_connection_restart
+notes: "PostgreSQL persistence replaces the source reset-on-restart behavior per quirk ruling martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+no_rules: Persistence and restart survival are storage guarantees, not input validation rules.
