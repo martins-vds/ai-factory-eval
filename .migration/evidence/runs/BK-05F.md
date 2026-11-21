@@ -29,3 +29,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T02:50:12+00:00 | mutation-changed | 0 | 65.03 | `python .migration/harness/tools/afs-mutation` | `933b187cd6c90042` |  | gate=mutation score=0.857 threshold=0.8 killed=24 survived=4 files=1 base=e2ecfc53f83d7ede9376c72b89117d8f03ac2f86 |
 | 2026-11-21T02:50:27+00:00 | crap-lizard | 0 | 0.09 | `sh -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T02:50:27+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-21T02:52:08+00:00 | route-selection-tests | 0 | 3.93 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `6952f4ed683bae13` |  |  |
+| 2026-11-21T02:53:19+00:00 | mutation-changed | 0 | 66.91 | `python .migration/harness/tools/afs-mutation` | `dd0a022d86a8a2b0` |  | gate=mutation score=0.867 threshold=0.8 killed=26 survived=4 files=1 base=e2ecfc53f83d7ede9376c72b89117d8f03ac2f86 |

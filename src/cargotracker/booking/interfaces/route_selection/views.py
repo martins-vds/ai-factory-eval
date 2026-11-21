@@ -57,8 +57,10 @@ def create_route_selection_views(
         )
 
     def assign_route(request: HttpRequest, tracking_id: str) -> HttpResponse:
+        cargo = _find_cargo(tracking_id)
+        canonical_tracking_id = cargo.tracking_id.value
         if request.method != 'POST':
-            return redirect(f'/admin/cargo/{tracking_id}/route/')
+            return redirect(f'/admin/cargo/{canonical_tracking_id}/route/')
         candidates = cargo_routing.route_candidates(TrackingId(tracking_id))
         try:
             candidate_index = int(request.POST.get('candidate', ''))
@@ -67,6 +69,6 @@ def create_route_selection_views(
         if candidate_index < 0 or candidate_index >= len(candidates):
             raise Http404('No route candidate was selected.')
         cargo_routing.assign_route(TrackingId(tracking_id), candidates[candidate_index])
-        return redirect(f'/admin/cargo/{tracking_id}/')
+        return redirect(f'/admin/cargo/{canonical_tracking_id}/')
 
     return route_selection, itinerary_selection, assign_route
