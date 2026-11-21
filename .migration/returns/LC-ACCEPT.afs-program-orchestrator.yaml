@@ -1,0 +1,25 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+phase: 6
+decisions: []
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#108: complete the requested side-by-side comparison in .migration/evidence/loan-circulation/acceptance.md: legacy versus target API lending and returning, and target lending/return forms against the corresponding legacy API behavior."
+next_step: "Await the human side-by-side check; leave the slice open until its approver records sign-off."
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#43
