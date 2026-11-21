@@ -1,0 +1,27 @@
+role: afs-program-orchestrator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+phase: 6
+decisions:
+  - "Use the archived acceptance run 42752283868, attempt 1, for commit 70fef8e7bc822092770b04b1bf9b5288e04d8bb6; do not rerun gates or mutation."
+  - "The re-audit is complete with no ledger gaps; disclose its target-graph POST /loans path inconsistency."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#108: compare legacy and target side by side for API lending (required member and ISBN fields, the 14-day due date, delimiter escaping), first and repeat returns (repeat returns 409 and preserves the saved date), and the /ui/loans/new/ and /ui/loans/{id}/return/ forms."
+next_step: "Wait for the operator's side-by-side check and record only the human-reported outcome; do not approve or close the epic."
+acceptance:
+  slice: loan-circulation
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: 0.920
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets:
+    - martins-vds/ai-factory-synthetic-target#39
+    - martins-vds/ai-factory-synthetic-target#41
+    - martins-vds/ai-factory-synthetic-target#43
