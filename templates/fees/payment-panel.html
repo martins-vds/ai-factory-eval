@@ -1,0 +1,21 @@
+<div id="payment-panel">
+  {% if not_found %}
+  <p class="alert mt-6 border border-[#d8cdbb] bg-[#fffdf7]" role="alert">No such loan.</p>
+  {% else %}
+  {% if payment %}
+    {% if payment.status_code == 200 %}
+  <p class="alert mt-6 border border-[#d8cdbb] bg-[#fffdf7]" role="status">{{ payment.body }}</p>
+    {% else %}
+  <p class="alert mt-6 border border-[#d8cdbb] bg-[#fffdf7]" role="alert">{{ payment.body }}</p>
+    {% endif %}
+  {% endif %}
+  {% if not payment or payment.status_code != 200 %}
+  <form method="post" action="/ui/payments/{{ loan_id }}/"
+        hx-post="/ui/payments/{{ loan_id }}/"
+        hx-target="#payment-panel" hx-swap="outerHTML">
+    {% csrf_token %}
+    <button class="btn btn-primary mt-6" type="submit">Pay fee</button>
+  </form>
+  {% endif %}
+  {% endif %}
+</div>

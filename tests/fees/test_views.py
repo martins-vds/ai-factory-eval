@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.loans.models import Loan
 
@@ -110,13 +111,15 @@ def test_htmx_payment_success_updates_the_payment_panel(client, payment_gateway)
 @pytest.mark.django_db
 def test_htmx_payment_failure_renders_an_error_panel(client, payment_gateway):
     payment_gateway.response_status = 503
-    payment_gateway.response_body = b'declined\n'
+    payment_gateway.response_body = b'declined <script>alert(1)</script>\n'
 
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 502
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+    assert b'&lt;script&gt;' in response.content
+    assert b'<script>' not in response.content
 
 
 @pytest.mark.django_db
@@ -127,3 +130,22 @@ def test_htmx_payment_for_unknown_loan_renders_an_error_panel(client, payment_ga
     assert b'role="alert"' in response.content
     assert b'No such loan.' in response.content
     assert payment_gateway.requests == []
+
+
+@pytest.mark.django_db
+def test_browser_can_view_fee_and_render_payment_failure(live_server, payment_gateway):
+    payment_gateway.response_status = 503
+    payment_gateway.response_body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            page.get_by_role('heading', name='Late fee for L1').wait_for()
+            page.get_by_role('button', name='Pay fee').click()
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+            assert 'declined' in alert.inner_text()
+        finally:
+            browser.close()

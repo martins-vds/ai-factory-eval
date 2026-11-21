@@ -68,6 +68,12 @@ def test_fee_calculation_matches_characterized_days_grace_rate_and_cap(
     assert quote.amount == amount
 
 
+def test_fee_for_unknown_loan_returns_no_quote():
+    application = FeeApplication(LoanRepository(), FixedClock(date(2026, 1, 1)), RecordingGateway())
+
+    assert application.fee_for('missing') is None
+
+
 def test_payment_does_not_call_gateway_when_loan_is_missing():
     gateway = RecordingGateway()
     application = FeeApplication(LoanRepository(), FixedClock(date(2026, 1, 1)), gateway)
@@ -97,15 +103,16 @@ def test_payment_maps_only_gateway_success_to_success(gateway_status, expected_s
     assert gateway.calls == ['L1']
 
 
-def test_payment_failure_keeps_the_interruption_as_its_cause():
-    def interrupted_gateway_call():
+@pytest.mark.parametrize('error_type', [InterruptedError, ConnectionError])
+def test_payment_failure_preserves_io_error_cause(error_type):
+    def failed_gateway_call():
         try:
-            raise InterruptedError('request interrupted')
-        except InterruptedError as error:
+            raise error_type('gateway request failed')
+        except error_type as error:
             raise PaymentGatewayFailure('payment gateway unavailable') from error
 
     with pytest.raises(PaymentGatewayFailure) as failure:
-        interrupted_gateway_call()
+        failed_gateway_call()
 
     application = FeeApplication(
         LoanRepository(FeeLoan('L1', date(2026, 1, 1))),
@@ -118,4 +125,4 @@ def test_payment_failure_keeps_the_interruption_as_its_cause():
     assert result.status_code == 502
     assert result.body == 'payment gateway unavailable\n'
     assert result.failure is failure.value
-    assert isinstance(result.failure.__cause__, InterruptedError)
+    assert isinstance(result.failure.__cause__, error_type)
