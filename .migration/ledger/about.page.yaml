@@ -9,4 +9,6 @@ source:
 boundary: "GET /about returns the classpath's static UTF-8 HTML page with the library hours, lending period, and contact details."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

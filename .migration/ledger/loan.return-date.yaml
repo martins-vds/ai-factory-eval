@@ -10,4 +10,6 @@ boundary: "A return request stores the supplied date on an existing loan; a repe
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 quirks: ["martins-vds/ai-factory-synthetic-target#41"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

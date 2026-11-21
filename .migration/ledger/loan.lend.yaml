@@ -10,4 +10,6 @@ boundary: "POST /loans requires non-null member and ISBN form fields (but accept
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 quirks: ["martins-vds/ai-factory-synthetic-target#39", "martins-vds/ai-factory-synthetic-target#43"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

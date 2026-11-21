@@ -8,4 +8,6 @@ source:
 boundary: "Reads create and close an EntityManager; writes begin and commit a transaction, roll back if still active on exit, and close the EntityManager."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

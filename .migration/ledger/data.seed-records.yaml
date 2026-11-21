@@ -8,4 +8,6 @@ boundary: "Persistence startup loads the three fixed seed loans L1, L2, and L3 i
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 quirks: ["martins-vds/ai-factory-synthetic-target#42"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

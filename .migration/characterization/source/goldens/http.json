@@ -11,6 +11,42 @@
       "status": 200
     }
   },
+  "GET /fees/L1 before return": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/L1"
+    },
+    "response": {
+      "body": "<h1>Late fee for L1</h1><p>Due 2026-01-16, 309 day(s) late.</p><p class=\"fee\">Fee: $10.00</p>",
+      "content_type": "text/html",
+      "status": 200
+    }
+  },
+  "GET /fees/L2 before return": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/L2"
+    },
+    "response": {
+      "body": "<h1>Late fee for L2</h1><p>Due 2026-01-24, 0 day(s) late.</p><p class=\"fee\">Fee: $0.00</p>",
+      "content_type": "text/html",
+      "status": 200
+    }
+  },
+  "GET /fees/not-found": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/not-found"
+    },
+    "response": {
+      "body": "<p>No such loan.</p>",
+      "content_type": "text/html",
+      "status": 404
+    }
+  },
   "GET /fees/{id}": {
     "request": {
       "form": null,
@@ -35,6 +71,42 @@
       "status": 200
     }
   },
+  "GET /loans after restart": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "L1;ana;9780134685991;2026-01-02;2026-01-16;\nL2;bo;9780596007126;2026-01-10;2026-01-24;2026-01-20\nL3;cy;9781617294945;2025-12-01;2025-12-15;2026-01-03\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "GET /loans/L2 after repeated return": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/loans/L2"
+    },
+    "response": {
+      "body": "L2;bo;9780596007126;2026-01-10;2026-01-24;2026-11-21\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "GET /loans/not-found": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/loans/not-found"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  },
   "GET /loans/{id}": {
     "request": {
       "form": null,
@@ -57,9 +129,103 @@
       "path": "/loans"
     },
     "response": {
-      "body": "L4;dee;123;2026-11-08;2026-11-22;\n",
+      "body": "L4;dee;123;2026-11-21;2026-12-05;\n",
       "content_type": "text/plain",
       "status": 201
+    }
+  },
+  "POST /loans delimiter fields": {
+    "request": {
+      "form": {
+        "isbn": "isbn;value",
+        "member": "member;line\nbreak"
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "L6;member;line\nbreak;isbn;value;2026-11-21;2026-12-05;\n",
+      "content_type": "text/plain",
+      "status": 201
+    }
+  },
+  "POST /loans empty fields": {
+    "request": {
+      "form": {
+        "isbn": "",
+        "member": ""
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "L5;;;2026-11-21;2026-12-05;\n",
+      "content_type": "text/plain",
+      "status": 201
+    }
+  },
+  "POST /loans missing ISBN": {
+    "request": {
+      "form": {
+        "member": "dee"
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    }
+  },
+  "POST /loans missing both fields": {
+    "request": {
+      "form": {},
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    }
+  },
+  "POST /loans missing member": {
+    "request": {
+      "form": {
+        "isbn": "123"
+      },
+      "method": "POST",
+      "path": "/loans"
+    },
+    "response": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    }
+  },
+  "POST /loans/L2/return repeated": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/loans/L2/return"
+    },
+    "response": {
+      "body": "L2;bo;9780596007126;2026-01-10;2026-01-24;2026-11-21\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "POST /loans/not-found/return": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/loans/not-found/return"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
     }
   },
   "POST /loans/{id}/return": {
@@ -69,9 +235,57 @@
       "path": "/loans/L1/return"
     },
     "response": {
-      "body": "L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-08\n",
+      "body": "L1;ana;9780134685991;2026-01-02;2026-01-16;2026-11-21\n",
       "content_type": "text/plain",
       "status": 200
+    }
+  },
+  "POST /payments/L1 gateway success": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/L1"
+    },
+    "response": {
+      "body": "payment accepted\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "POST /payments/L2 gateway rejection": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/L2"
+    },
+    "response": {
+      "body": "payment declined\n",
+      "content_type": "text/plain",
+      "status": 502
+    }
+  },
+  "POST /payments/L4 gateway unavailable": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/L4"
+    },
+    "response": {
+      "body": "payment gateway unavailable\n",
+      "content_type": "text/plain",
+      "status": 502
+    }
+  },
+  "POST /payments/not-found": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/not-found"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
     }
   },
   "POST /payments/{id}": {
