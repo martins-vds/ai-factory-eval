@@ -1,0 +1,49 @@
+role: afs-migrator
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#1920
+pr: martins-vds/ai-factory-eval#1925
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 11.0
+  mutation_changed: 0.909
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+ledger_updated:
+  - reports.monthly-spec
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: reports.monthly-spec
+    rule: Report the previous calendar month, using an inclusive start and exclusive end date.
+    use_case: MonthlyReportApplication.run_previous_month
+    test: tests/reports/test_monthly_report.py::test_monthly_report_uses_previous_calendar_month_across_year_boundary
+    enforced: true
+    ledger_rule: previous-calendar-month
+  - capability: reports.monthly-spec
+    rule: Emit one row per member with at least one loan started in the report month.
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_and_orders_members_with_monthly_loans
+    enforced: true
+    ledger_rule: member-row-inclusion
+  - capability: reports.monthly-spec
+    rule: Count loan starts and late returns only when their event dates fall within the report month.
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_and_orders_members_with_monthly_loans
+    enforced: true
+    ledger_rule: monthly-event-counts
+  - capability: reports.monthly-spec
+    rule: Sum calculated late-fee amounts in cents for loans returned during the report month.
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_counts_late_returns_and_totals_calculated_fees
+    enforced: true
+    ledger_rule: late-fee-total
+  - capability: reports.monthly-spec
+    rule: Sort rows by total late fees descending, then member id ascending.
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_and_orders_members_with_monthly_loans
+    enforced: true
+    ledger_rule: report-order

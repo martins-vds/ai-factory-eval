@@ -53,9 +53,7 @@ class MonthlyReportApplication:
         totals: dict[str, _MemberTotals] = {}
         for loan in self.loans.for_period(start, end):
             started_this_month = start <= loan.lent_on < end
-            returned_this_month = (
-                loan.returned_on is not None and start <= loan.returned_on < end
-            )
+            returned_this_month = loan.returned_on is not None and start <= loan.returned_on < end
             if not started_this_month and not returned_this_month:
                 continue
 

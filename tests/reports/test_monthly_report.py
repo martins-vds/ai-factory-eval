@@ -52,6 +52,7 @@ def report_application(loans, fees=None):
 def test_monthly_report_aggregates_and_orders_members_with_monthly_loans():
     application = report_application(
         [
+            Loan('L6', 'BEFORE', date(2026, 9, 30)),
             Loan('L1', 'B', date(2026, 10, 5), date(2026, 10, 22)),
             Loan('L2', 'B', date(2026, 10, 10), date(2026, 10, 30)),
             Loan('L3', 'A', date(2026, 10, 1), date(2026, 10, 18)),
@@ -59,7 +60,6 @@ def test_monthly_report_aggregates_and_orders_members_with_monthly_loans():
             Loan('L8', 'D', date(2026, 10, 4), date(2026, 10, 22)),
             Loan('L9', 'E', date(2026, 10, 4), date(2026, 10, 22)),
             Loan('L5', 'Z', date(2026, 9, 1), date(2026, 10, 25)),
-            Loan('L6', 'BEFORE', date(2026, 9, 30)),
             Loan('L7', 'END', date(2026, 11, 1)),
             Loan('L10', 'A', date(2026, 1, 1), date(2026, 9, 30)),
             Loan('L11', 'A', date(2026, 1, 1), date(2026, 11, 1)),
@@ -163,8 +163,5 @@ def test_monthly_report_command_outputs_previous_calendar_month(monkeypatch):
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,total_late_fees_cents\n'
-        'B,1,1,275\n'
-        'A,1,1,75\n'
-        'C,1,0,0\n'
+        'member_id,loans_started,late_returns,total_late_fees_cents\nB,1,1,275\nA,1,1,75\nC,1,0,0\n'
     )
