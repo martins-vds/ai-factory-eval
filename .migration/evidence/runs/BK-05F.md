@@ -32,3 +32,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T02:51:04+00:00 | idiom-ui-final | 0 | 0.47 | `python .migration/harness/tools/check_ui.py` | `16b6e629c72920bf` |  | gate=ui scope="templates changed since fc3bb05ed7ecde78b513097e7cd63a7ae0095ce3" templates=3 findings=0 |
 | 2026-11-21T02:51:27+00:00 | build-compile-final | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T02:51:27+00:00 | build-django-check-final | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T02:55:04+00:00 | crap-coverage | 0 | 45.45 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `766b9145c525d3ab` |  |  |
+| 2026-11-21T02:55:04+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-21T02:55:58+00:00 | behavior-full-suite | 0 | 48.82 | `pytest -q` | `efcf50ffb9bd7384` |  |  |
+| 2026-11-21T02:57:24+00:00 | mutation-changed | 0 | 134.41 | `python .migration/harness/tools/afs-mutation` | `307b5d03756dcf6f` |  | gate=mutation score=0.968 threshold=0.8 killed=30 survived=1 files=1 base=fc3bb05ed7ecde78b513097e7cd63a7ae0095ce3 |
