@@ -1,0 +1,80 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2185
+handoff: .migration/handoffs/LL-02.md
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: 1
+  mutation_changed: "n/a: verifier-added use-case test fails on baseline, so mutation could not be scored"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: lend_loan accepts empty and whitespace-only required fields when called directly; validation exists only in LoanForm.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - severity: major
+    where: src/loans/services.py:4,6
+    what: The use case imports Django's clock and concrete LoanRepository, violating the profile's ports-only layer contract.
+    evidence: "run: idiom"
+  - severity: major
+    where: templates/loans/detail.html:25; templates/loans/loan-form.html:3
+    what: Changed htmx templates do not handle 4xx/5xx responses; an unknown return's 404 is not swapped into the reading-room page.
+    evidence: "run: ui-check"
+  - severity: major
+    where: templates/loans/loan-form.html:2; templates/loans/new.html:6-8
+    what: The UI gate found 16 Tailwind utilities used by changed templates but absent from the committed stylesheet.
+    evidence: "run: ui-check"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: "The last successful run's survivors #1, #2 and #4 affect the pre-existing LL-01 catalog view/context/route; the full-suite UI smoke test covers /ui/loans/, but the narrowed tests/loans context omits it. The final mutation run could not test mutants because the new use-case test fails on baseline."
+    evidence: "run: mutation-after-review-tests (survivor file at commit b3ad492)"
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN values must not be empty or whitespace-only.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: false
+  - capability: loan.lend
+    rule: A new loan's due date is 14 calendar days after its lending date.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_sets_a_due_date_fourteen_days_after_lending
+    enforced: true
+  - capability: loan.return-date
+    rule: The first return records today's date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_sets_today_on_first_return
+    enforced: true
+  - capability: loan.return-date
+    rule: A repeated return is refused and preserves the original return date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+    enforced: true
+  - capability: loan.return
+    rule: An unknown loan is not updated and produces no loan result.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_does_not_update_an_unknown_loan
+    enforced: true
+tests_added:
+  - tests/loans/test_catalog.py::test_loan_form_requires_member_and_isbn
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+  - tests/loans/test_catalog.py::test_return_use_case_sets_today_on_first_return
+  - tests/loans/test_catalog.py::test_return_use_case_does_not_update_an_unknown_loan
+  - tests/loans/test_catalog.py::test_lend_use_case_sets_a_due_date_fourteen_days_after_lending
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues:
+  - loan.lend, loan.return-date, and loan.return omit both rules and no_rules in their migrated ledger entries.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
