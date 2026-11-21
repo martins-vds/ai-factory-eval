@@ -1,0 +1,52 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#2042
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2047
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.921
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: "A loan returned or evaluated no more than two calendar days after its due date has a zero fee"
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_waives_exactly_two_late_days
+    enforced: true
+    ledger_rule: grace-period
+  - capability: fees.calculation
+    rule: "Late fees are 25 cents per late day after the grace period, capped at $10"
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_calculation_charges_three_late_days_at_twenty_five_cents
+    enforced: true
+    ledger_rule: fee-rate-and-cap
+  - capability: fees.page
+    rule: "GET /fees/{id} returns HTTP 404 with <p>No such loan.</p> when the loan does not exist"
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_unknown_fee_is_rejected_by_use_case
+    enforced: true
+    ledger_rule: unknown-loan
+  - capability: integration.payment-gateway
+    rule: "Payment rejects an unknown loan with HTTP 404 and does not call the gateway"
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_unknown_payment_is_rejected_before_gateway_call
+    enforced: true
+    ledger_rule: existing-loan-required
+  - capability: integration.payment-gateway
+    rule: "Gateway HTTP 200 is returned as 200; every other gateway response or I/O failure is returned as 502"
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_maps_gateway_success_and_failure
+    enforced: true
+    ledger_rule: gateway-status

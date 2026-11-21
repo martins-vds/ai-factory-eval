@@ -9,9 +9,22 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.fees.services.PaymentApplication.pay, src.fees.gateway.HttpPaymentGateway.charge, src.fees.views.payment]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, tests/fees/test_fee_services.py::test_unknown_payment_is_rejected_before_gateway_call, tests/fees/test_fee_services.py::test_interrupted_payment_is_surface_as_gateway_failure, tests/fees/test_fee_catalog.py::test_payment_endpoint_forwards_gateway_success, tests/fees/test_fee_catalog.py::test_payment_endpoint_maps_gateway_failure_to_502]
 notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#40
+  reason: "Fix the interrupted-call quirk: surface as gateway failure without losing the interruption."
+rules:
+  - id: existing-loan-required
+    rule: "Payment rejects an unknown loan with HTTP 404 and does not call the gateway"
+    source: "legacy/src/main/java/lib/FinePayments.java:26-40"
+  - id: gateway-status
+    rule: "Gateway HTTP 200 is returned as 200; every other gateway response or I/O failure is returned as 502"
+    source: "legacy/src/main/java/lib/FinePayments.java:26-40"
