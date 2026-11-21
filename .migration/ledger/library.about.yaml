@@ -1,0 +1,12 @@
+id: library.about
+kind: ui
+title: Serve the public About page
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/AboutPage.java:GET /about
+  flow: View About Page
+  location: legacy/src/main/java/lib/AboutPage.java:15-21
+boundary: "GET /about serves the static HTML page with the library name, opening hours, lending period, and contact."
+status: pending
+verification: pending
+no_rules: "This capability is a static public information page."
+notes: "Page content: legacy/src/main/resources/static/about.html:1-9."

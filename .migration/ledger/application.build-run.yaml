@@ -1,0 +1,10 @@
+id: application.build-run
+kind: structural
+title: Build and launch the legacy application
+source:
+  graph_node: file:legacy/run.sh
+  location: legacy/run.sh:1-6
+boundary: "The legacy launcher builds the Maven package and starts lib.App."
+status: pending
+verification: pending
+notes: "The build uses Java 17 and Maven; dependencies and framework versions are declared in legacy/pom.xml."

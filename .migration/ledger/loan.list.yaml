@@ -1,0 +1,12 @@
+id: loan.list
+kind: behavioral
+title: List loans in the spreadsheet export format
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:25-28
+  risk: { crap: 2, complexity: 1 }
+boundary: "GET /loans returns loans ordered by id, one semicolon-separated line per loan, with a final newline."
+status: pending
+verification: pending
+notes: "Field order is id, member, ISBN, lent on, due on, returned on; documented at legacy/docs/export-csv.md:1-4."

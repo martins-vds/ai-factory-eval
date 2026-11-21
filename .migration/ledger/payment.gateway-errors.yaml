@@ -1,0 +1,12 @@
+id: payment.gateway-errors
+kind: behavioral
+title: Map payment gateway failures
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-40
+  risk: { crap: 20, complexity: 4 }
+boundary: "An unknown loan returns 404; non-200 gateway statuses and IO/interruption failures return HTTP 502."
+status: pending
+verification: pending
+notes: "InterruptedException is caught without restoring the interrupted status; quirk draft: .migration/quirks/payment-interrupt.md."
