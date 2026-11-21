@@ -19,5 +19,7 @@ class LoanRepository:
 
     @transaction.atomic
     def return_if_unreturned(self, loan_id, returned_on):
-        updated = Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(returned_on=returned_on)
+        updated = Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(
+            returned_on=returned_on
+        )
         return self.find(loan_id) if updated else None

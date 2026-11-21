@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan, tests/loans/test_circulation.py::test_return_api_persists_and_returns_the_formatted_loan, tests/loans/test_circulation.py::test_return_api_returns_the_characterized_not_found_response, tests/loans/test_circulation.py::test_repeat_return_ui_renders_error_and_preserves_saved_date, tests/loans/test_circulation.py::test_unknown_return_ui_renders_the_htmx_not_found_response]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan, tests/loans/test_circulation.py::test_return_api_persists_and_returns_the_formatted_loan, tests/loans/test_circulation.py::test_return_api_returns_the_characterized_not_found_response, tests/loans/test_circulation.py::test_repeat_return_ui_renders_error_and_preserves_saved_date, tests/loans/test_circulation.py::test_unknown_return_ui_renders_the_htmx_not_found_response, tests/loans/test_circulation.py::test_return_endpoints_only_accept_post]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
 rules:

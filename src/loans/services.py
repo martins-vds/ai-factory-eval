@@ -1,5 +1,5 @@
-from datetime import date
 import csv
+from datetime import date
 from io import StringIO
 from typing import Protocol
 

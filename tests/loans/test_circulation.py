@@ -1,7 +1,9 @@
 from datetime import date
+from types import SimpleNamespace
 
 import pytest
 
+from src.loans.repository import LoanRepository
 from src.loans.services import (
     LoanAlreadyReturned,
     LoanInputError,
@@ -9,7 +11,6 @@ from src.loans.services import (
     lend_loan,
     return_loan,
 )
-from src.loans.repository import LoanRepository
 
 
 @pytest.mark.parametrize(
@@ -93,6 +94,18 @@ def test_return_use_case_rejects_repeat_without_replacing_the_original_date():
     assert LoanRepository().find('L2').returned_on == original_date
 
 
+def test_return_use_case_handles_a_concurrent_return():
+    class ConcurrentReturnRepository:
+        def find(self, loan_id):
+            return SimpleNamespace(returned_on=None)
+
+        def return_if_unreturned(self, loan_id, returned_on):
+            return None
+
+    with pytest.raises(LoanAlreadyReturned):
+        return_loan(ConcurrentReturnRepository(), 'L1', date(2026, 11, 20))
+
+
 @pytest.mark.django_db
 def test_return_api_persists_and_returns_the_formatted_loan(client, monkeypatch):
     monkeypatch.setattr('django.utils.timezone.localdate', lambda: date(2026, 11, 20))
@@ -120,6 +133,7 @@ def test_repeat_return_api_answers_conflict_without_replacing_the_saved_date(cli
     response = client.post('/loans/L2/return')
 
     assert response.status_code == 409
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'loan already returned\n'
     assert LoanRepository().find('L2').returned_on == date(2026, 1, 20)
 
@@ -156,8 +170,15 @@ def test_lending_ui_renders_field_errors_and_preserves_invalid_values(client):
     assert response.status_code == 400
     assert b'Enter a member name.' in response.content
     assert b'Enter an ISBN.' in response.content
-    assert b'value="  "' in response.content
+    assert b'name="member" value="  "' in response.content
+    assert b'name="isbn" value=""' in response.content
     assert b'aria-invalid="true"' in response.content
+
+    response = client.post('/ui/loans/', {'member': '', 'isbn': ' \t'})
+
+    assert response.status_code == 400
+    assert b'name="member" value=""' in response.content
+    assert b'name="isbn" value=" \t"' in response.content
 
 
 @pytest.mark.django_db
@@ -178,6 +199,7 @@ def test_return_ui_updates_the_loan_with_the_return_date(client, monkeypatch):
     assert response.status_code == 200
     assert b'Returned Nov 20, 2026' in response.content
     assert b'hx-post=' not in response.content
+    assert b'role="alert"' not in response.content
 
 
 @pytest.mark.django_db
@@ -187,7 +209,10 @@ def test_repeat_return_ui_renders_error_and_preserves_saved_date(client, monkeyp
     response = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 409
-    assert b'already been returned' in response.content
+    assert (
+        b'<p class="text-sm text-[#a94e37]" role="alert">This loan has already been returned.</p>'
+        in response.content
+    )
     assert b'Jan 20, 2026' in response.content
     assert b'hx-on::before-swap=' in response.content
 
@@ -197,7 +222,7 @@ def test_unknown_return_ui_renders_the_htmx_not_found_response(client):
     response = client.post('/ui/loans/missing/return/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
-    assert b'No such loan.' in response.content
+    assert b'<p class="text-sm text-[#a94e37]" role="alert">No such loan.</p>' in response.content
     assert b'hx-on::before-swap=' in response.content
 
 
@@ -205,6 +230,32 @@ def test_unknown_return_ui_renders_the_htmx_not_found_response(client):
 def test_loan_collections_reject_unsupported_methods(client):
     api_response = client.put('/loans')
     browser_response = client.put('/ui/loans/')
+
+    assert api_response.status_code == 405
+    assert browser_response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_loan_catalog_shows_seeded_records_and_lending_link(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Loan L1' in response.content
+    assert b'ana' in response.content
+    assert b'href="/ui/loans/new/"' in response.content
+
+
+@pytest.mark.django_db
+def test_new_loan_form_only_accepts_get(client):
+    response = client.post('/ui/loans/new/')
+
+    assert response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_return_endpoints_only_accept_post(client):
+    api_response = client.get('/loans/L1/return')
+    browser_response = client.get('/ui/loans/L1/return/')
 
     assert api_response.status_code == 405
     assert browser_response.status_code == 405
