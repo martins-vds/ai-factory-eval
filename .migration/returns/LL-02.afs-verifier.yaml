@@ -1,0 +1,74 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: martins-vds/ai-factory-eval#1913
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: coverage suite stopped on behavior failures before CRAP analysis"
+  mutation_changed: "n/a: mutmut stopped on baseline test failures in four changed files"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: The use case imports Django timezone and the concrete LoanRepository, violating the ports-only layering contract.
+    evidence: "run: verifier-idiom-final2"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: Direct lend_loan calls persist empty or whitespace-only member and ISBN values instead of refusing them.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - severity: major
+    where: src/loans/views.py:80-81
+    what: An unknown-loan return responds with plain-text 404, which htmx does not swap; the reading-room user sees no error.
+    evidence: tests/loans/test_catalog.py::test_real_browser_shows_error_when_returned_loan_disappears
+  - severity: minor
+    where: templates/loans/detail.html:27
+    what: The UI gate reports 14 Tailwind utility selectors missing from built CSS across the changed lending and return templates.
+    evidence: "run: verifier-ui-errors-final2"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: The prior 17 survivors are behavior-changing (method guards, full-page errors, not-found responses, repeat-return context, atomic return, routes and form binding); added tests cover many, but body/media-type mutants remain untested and the fresh mutation run has no score.
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_sets_a_due_date_fourteen_days_after_lending
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_without_replacing_date
+  - tests/loans/test_catalog.py::test_return_use_case_records_today_on_first_return
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_unknown_loan
+  - tests/loans/test_catalog.py::test_real_browser_shows_error_when_returned_loan_disappears
+  - tests/loans/test_catalog.py::test_browser_return_for_unknown_loan_preserves_not_found_status
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN values must be nonempty and non-whitespace.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_required_fields
+    enforced: false
+  - capability: loan.lend
+    rule: A successful loan uses the next ID and has a due date 14 calendar days after lending.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_sets_a_due_date_fourteen_days_after_lending
+    enforced: true
+  - capability: loan.return-date
+    rule: The first return stores today's date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_records_today_on_first_return
+    enforced: true
+  - capability: loan.return
+    rule: A repeated return is refused without replacing the saved return date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeat_without_replacing_date
+    enforced: true
+  - capability: loan.return
+    rule: An unknown loan is refused without a persisted update.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_unknown_loan
+    enforced: true
+no_rules: {}
