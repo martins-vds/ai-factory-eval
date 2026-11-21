@@ -52,3 +52,16 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:16:23+00:00 | final-crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-21T19:17:14+00:00 | final-regression-suite | 0 | 47.26 | `pytest -q` | `067ac03a75e29767` |  |  |
 | 2026-11-21T19:18:08+00:00 | final-migration-validation | 0 | 4.51 | `python .migration/harness/tools/validate.py .migration` | `ef34805838431398` |  |  |
+| 2026-11-21T19:19:34+00:00 | finish-check | 1 | 46.25 | `.migration/harness/tools/afs-finish-check --ticket BK-05F --role afs-migrator` | `a3a6500f48a45611` | [mechanical] '.migration/returns/BK-05F.afs-migrator.yaml' reports failing gates and no handoff: 'crap: 26.0' (an exit g | gate=finish-check ticket=BK-05F role=afs-migrator findings=2 |
+| 2026-11-21T19:20:14+00:00 | build-compileall-final | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T19:20:17+00:00 | build-django-check-final | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T19:21:04+00:00 | behavior-suite-final | 0 | 44.69 | `pytest -q` | `2d0b30b0b778507f` |  |  |
+| 2026-11-21T19:21:07+00:00 | idiom-ruff-final | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T19:21:10+00:00 | idiom-format-final | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T19:21:13+00:00 | idiom-layers-final | 0 | 0.11 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T19:21:17+00:00 | idiom-ui-final | 0 | 0.45 | `python .migration/harness/tools/check_ui.py` | `6c483fb5a08ad33e` |  | gate=ui scope="templates changed since 36fae5a689c9209c673e36ecb81a55398131911e" templates=4 findings=0 |
+| 2026-11-21T19:22:05+00:00 | crap-coverage-final | 0 | 45.27 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `7d9dd4d553ef80a0` |  |  |
+| 2026-11-21T19:22:08+00:00 | crap-lizard-final | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T19:22:12+00:00 | crap-score-final | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-21T19:23:01+00:00 | regression-suite-final | 0 | 45.46 | `pytest -q` | `0e55212a99519a70` |  |  |
+| 2026-11-21T19:23:13+00:00 | migration-state-validation-final | 0 | 4.53 | `python .migration/harness/tools/validate.py .migration` | `ef34805838431398` |  |  |
