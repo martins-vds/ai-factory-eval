@@ -1,5 +1,6 @@
 from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from .composition import fee_application, payment_application
@@ -48,4 +49,6 @@ def fee_payment_page(request, loan_id):
         )
     if status != 200:
         return HttpResponse(body, status=status, content_type='text/plain')
-    return redirect(f'/ui/fees/{loan_id}/')
+    return HttpResponse(
+        status=302, headers={'Location': reverse('fee-page', kwargs={'loan_id': loan_id})}
+    )
