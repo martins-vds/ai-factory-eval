@@ -1,0 +1,23 @@
+role: afs-slice-coordinator
+ticket: LC-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#108
+pr: martins-vds/ai-factory-synthetic-target#109
+slice: loan-circulation
+tickets:
+  total: 6
+  merged: 5
+  open: 1
+  blocked:
+    - "martins-vds/ai-factory-synthetic-target#108: awaiting PR merge and human side-by-side sign-off"
+acceptance:
+  report: .migration/evidence/loan-circulation/acceptance.md
+  gates: all-green
+  mutation_score: "n/a: acceptance gates were run externally and are not rerun in this session"
+  coverage_gaps: 0
+human_check: requested
+human_check_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
