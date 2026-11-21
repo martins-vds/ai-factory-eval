@@ -35,9 +35,7 @@ class MonthlyReportApplication:
         for loan in self.loans.started_between(period_start, period_end):
             row = rows_by_member.setdefault(loan.member, MonthlyReportRow(loan.member))
             row.loans_started += 1
-            row.late_returns += int(
-                loan.returned_on is not None and loan.returned_on > loan.due_on
-            )
+            row.late_returns += int(loan.returned_on is not None and loan.returned_on > loan.due_on)
 
             fee_end = loan.returned_on if loan.returned_on is not None else as_of
             days_late = max(0, (fee_end - loan.due_on).days)
