@@ -2,6 +2,7 @@ import re
 from datetime import UTC, datetime
 
 import pytest
+from django.core import signing
 from django.http import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import path
@@ -189,6 +190,33 @@ def test_route_assignment_rejects_a_modified_candidate(client):
     ).group(1)
 
     response = client.post(route_url, {'candidate': f'{candidate_token}tampered'})
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_candidate_signed_in_default_context(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    candidate = {
+        'tracking_id': tracking_id.value,
+        'legs': [
+            {
+                'voyage_number': 'CM003',
+                'load_location': {'unlocode': 'USNYC', 'name': 'New York'},
+                'unload_location': {'unlocode': 'FIHEL', 'name': 'Helsinki'},
+                'load_time': datetime(2030, 11, 1, tzinfo=UTC).isoformat(),
+                'unload_time': datetime(2030, 11, 4, tzinfo=UTC).isoformat(),
+            }
+        ],
+    }
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/route/',
+        {'candidate': signing.dumps(candidate)},
+    )
 
     assert response.status_code == 404
     details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
