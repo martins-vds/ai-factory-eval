@@ -1,7 +1,7 @@
 role: afs-migrator
 ticket: BK-05F
 issue: martins-vds/ai-factory-eval#1941
-pr: null
+pr: https://github.com/martins-vds/ai-factory-eval/pull/1942
 gates:
   build: 0
   behavior: 0
