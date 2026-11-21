@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import date, timedelta
 
 
-@dataclass(frozen=True)
+@dataclass
 class Loan:
     id: str
     member: str

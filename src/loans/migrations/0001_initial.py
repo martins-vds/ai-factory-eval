@@ -39,13 +39,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='LoanRecord',
             fields=[
-                ('id', models.CharField(max_length=32, primary_key=True, serialize=False)),
+                ('id', models.TextField(primary_key=True, serialize=False)),
                 ('member', models.TextField()),
                 ('isbn', models.TextField()),
                 ('lent_on', models.DateField()),
-                ('returned_on', models.DateField(blank=True, null=True)),
+                ('returned_on', models.DateField(null=True)),
             ],
-            options={'ordering': ('id',)},
         ),
         migrations.RunPython(seed_loans, migrations.RunPython.noop),
     )
