@@ -1,0 +1,23 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+phase: 6
+decisions: []
+dispatched: []
+awaiting_human:
+  - "Compare the legacy /about page with target /about for About text, opening hours, lending policy/14-day term, contact, and preserved response; compare those same details on target /ui/about/ and its modernized layout against the approved reading-room plan and Tailwind/daisyUI/htmx direction."
+next_step: "Receive the human side-by-side findings and record them; do not mark sign-off complete or approve this PR."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: "n/a: this orchestrator did not rerun mutation; see verified acceptance archive"
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets: []
