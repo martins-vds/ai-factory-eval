@@ -8,7 +8,7 @@ gates:
   behavior: 0
   idiom: 0
   crap: 26.0
-  mutation_changed: 0.935
+  mutation_changed: 0.937
   regression: 0
 specialty_evidence:
   - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_candidate_details_and_target_route_properties
