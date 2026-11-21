@@ -61,3 +61,15 @@ The verified full run reports six survivors. Four are in loan views/routes/forms
 ## Human check
 
 Independent auditor review completed 2026-11-10. No missing, misplaced, broken-flow, integration, or untested capability gap was found; graph inconsistencies: none. Audit verdict: **complete**. Coordinator/operator flow sign-off remains the next step (ADR-0031); this report does not substitute for it.
+
+### Requested side-by-side comparison
+
+The human check is requested and has not been reported. Using the same loan data, date, and gateway outcome, compare legacy against target and record both observations for:
+
+1. Overdue loans at 3, 11, and 100 late days: compare the late-day count, fee in cents, two-decimal displayed amount, two-day grace boundary, and $10 cap.
+2. A loan that is not overdue: compare the calculated fee and its API/page presentation.
+3. An unknown loan: compare the exact HTTP status and body (including the characterized `404` and `<p>No such loan.</p>`), and whether either side calls the gateway.
+4. Paying through the API and UI: compare the API request to `/payments/{id}` and its response, and the UI fee/payment flow and resulting visible update.
+5. Gateway failures: compare a non-200 response and an I/O/interruption failure, including the resulting API status/body and UI state. Check the target's 502 handling against the approved interruption ruling (#40).
+
+Do not treat this request or the Auditor's verdict as human sign-off.
