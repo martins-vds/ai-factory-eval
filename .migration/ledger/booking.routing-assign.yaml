@@ -7,20 +7,24 @@ source:
   risk: {crap: 2, complexity: 1, coverage: 0.0}
 boundary: "The selected candidate is indexed from routeCandidates, converted back to domain locations/voyage, assigned and stored; cargo delivery routing status is recalculated, and the bean redirects to the cargo detail outcome."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#290]
+tickets: [martins-vds/ai-factory-pilot-target#290, martins-vds/ai-factory-pilot-target#293]
 target:
   components:
     - cargotracker.booking.application.routing.CargoRouting.assign_route
+    - cargotracker.booking.interfaces.route_selection.views.create_route_selection_views
+    - templates/booking/route_selection/_candidate_routes.html
 status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
-  - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testAssignRoute"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/domain/model/cargo/CargoTest.java::testRoutingStatus"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/application/test_routing.py::test_assign_route_persists_itinerary_and_recalculates_delivery"
+  - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_cargo_details_and_shows_selected_itinerary"
   - ".migration/evidence/runs/BK-05C.md"
-notes: "The bean returns a show.html outcome, while the running UI resolved the selected route to show.xhtml; preserve this observed result for quirk #236 review. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
+  - ".migration/evidence/runs/BK-05F.md"
+no_rules: "Assignment persists the selected candidate; route validation is enforced by CargoRouting.route_candidates and missing-cargo behavior belongs to booking.cargo-not-found."
+notes: "After selection the target redirects to cargo details per ruling #236. The signed candidate token preserves the chosen itinerary across requests. CargoLifecycleScenarioTest.testCargoFromHongkongToStockholm has no @Test and is not executed."
 quirks: [martins-vds/ai-factory-pilot-target#236, martins-vds/ai-factory-pilot-target#250]

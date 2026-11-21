@@ -159,6 +159,32 @@ def test_route_pages_show_no_route_guidance_when_candidates_are_empty(client, ro
 
 
 @pytest.mark.django_db
+def test_unknown_route_selection_returns_not_found(client, route_pages):
+    route_pages(())
+
+    route_response = client.get('/admin/cargo/UNKNOWN/route/')
+    itinerary_response = client.get('/admin/cargo/UNKNOWN/itineraries/')
+
+    assert route_response.status_code == 404
+    assert itinerary_response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_invalid_itinerary_token_does_not_assign_a_route(client, route_pages):
+    tracking_id = route_pages(_candidate_paths())
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/itineraries/',
+        {'itinerary_token': 'invalid'},
+    )
+    cargo = DjangoCargoRepository().find(tracking_id)
+
+    assert response.status_code == 400
+    assert cargo is not None
+    assert not cargo.itinerary.legs
+
+
+@pytest.mark.django_db
 def test_assigning_candidate_redirects_to_cargo_details_and_shows_selected_itinerary(
     client, route_pages
 ):
