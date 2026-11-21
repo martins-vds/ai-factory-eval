@@ -79,3 +79,22 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-08T00:26:31+00:00 | idiom-ruff-check-final | 0 | 0.03 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-08T00:26:31+00:00 | build-django-check-final | 0 | 0.41 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T13:08:28+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:10:36+00:00 | verifier-focused | 1 | 3.34 | `pytest -q tests/booking/application/test_routing.py::test_assign_route_rejects_itinerary_that_misses_the_arrival_deadline tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_cargo` | `e6afee62450802cd` | E       Failed: DID NOT RAISE Http404 |  |
+| 2026-11-21T13:11:17+00:00 | build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:11:19+00:00 | build-check | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T13:11:21+00:00 | idiom-ruff | 1 | 0.02 | `ruff check` | `a37ea05a4a7ab878` | Found 1 error. |  |
+| 2026-11-21T13:11:28+00:00 | idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T13:11:30+00:00 | idiom-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T13:11:32+00:00 | idiom-layers | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T13:11:36+00:00 | idiom-ui | 0 | 0.48 | `python .migration/harness/tools/check_ui.py` | `e23a8b34b4a53439` |  | gate=ui scope="templates changed since 9ddc319ad021898f7e7e920e535862207ef44acb" templates=0 findings=0 |
+| 2026-11-21T13:11:41+00:00 | behavior | 1 | 2.33 | `pytest -q tests/characterization/test_booking.py tests/booking/application/test_routing.py tests/booking/interfaces/test_route_selection.py` | `452860e1255095f6` | E       Failed: DID NOT RAISE Http404 |  |
+| 2026-11-21T13:12:30+00:00 | regression | 1 | 46.43 | `pytest -q` | `677da9cc334a79ec` | E       Failed: DID NOT RAISE Http404 |  |
+| 2026-11-21T13:13:24+00:00 | crap-coverage | 1 | 50.89 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `dbb88cd5779f3252` | E       Failed: DID NOT RAISE Http404 |  |
+| 2026-11-21T13:13:26+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:13:28+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `4877eadf5e45905d` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-21T13:13:32+00:00 | mutation-changed | 0 | 0.08 | `python .migration/harness/tools/afs-mutation` | `3e41e54213166d1e` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=9ddc319ad021898f7e7e920e535862207ef44acb |
+| 2026-11-21T13:15:29+00:00 | mutation-route-selection-path | 2 | 12.36 | `python .migration/harness/tools/afs-mutation --paths src/cargotracker/booking/interfaces/route_selection/views.py` | `0f3b6f0b9b757ca8` | afs-mutation: mutmut failed on src/cargotracker/booking/interfaces/route_selection/views.py; its mutants were not tested | gate=mutation score=n/a error=mutmut-failed failed_files=1 files=1 base=explicit |
+| 2026-11-21T13:15:34+00:00 | mutation-changed-final | 0 | 0.08 | `python .migration/harness/tools/afs-mutation` | `3e41e54213166d1e` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=9ddc319ad021898f7e7e920e535862207ef44acb |
+| 2026-11-21T13:18:52+00:00 | build-compile-handoff | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T13:18:55+00:00 | build-check-handoff | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |

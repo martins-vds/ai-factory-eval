@@ -220,3 +220,12 @@ def test_route_selection_raises_not_found_for_unknown_cargo():
 
     with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found\\.'):
         route_view(request, 'MISSING1')
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_screens_return_not_found_for_unknown_cargo(client):
+    for route_suffix in ('route/', 'itineraries/'):
+        response = client.get(f'/admin/cargo/MISSING1/{route_suffix}')
+
+        assert response.status_code == 404
