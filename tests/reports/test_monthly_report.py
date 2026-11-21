@@ -121,3 +121,27 @@ def test_monthly_report_uses_previous_calendar_year_for_january_run(monkeypatch)
         ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
         ['dee', '1', '0', '425'],
     ]
+
+
+@pytest.mark.django_db
+def test_monthly_report_includes_month_loans_with_zero_late_fees(monkeypatch):
+    Loan.objects.all().delete()
+    Loan.objects.create(
+        id='L-last-day',
+        member='zero',
+        isbn='1',
+        lent_on=date(2026, 2, 28),
+        returned_on=date(2026, 3, 1),
+    )
+    monkeypatch.setattr(
+        'src.reports.management.commands.monthly_report.timezone.localdate',
+        lambda: date(2026, 3, 1),
+    )
+    output = StringIO()
+
+    call_command('monthly_report', stdout=output)
+
+    assert list(csv.reader(StringIO(output.getvalue()))) == [
+        ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
+        ['zero', '1', '0', '0'],
+    ]
