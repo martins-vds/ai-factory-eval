@@ -1,0 +1,10 @@
+id: loans.schema
+kind: data
+title: Persist the LOAN entity
+source:
+  graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
+  location: legacy/src/main/java/lib/Loan.java:11-26
+boundary: "LOAN stores string ID, non-null MEMBER and ISBN, non-null LENT_ON, and nullable RETURNED_ON; the JPA entity also derives dueOn from lentOn."
+status: pending
+verification: pending
+notes: "Entity accessors and return-date mutation are in legacy/src/main/java/lib/Loan.java:38-50; due-date behavior is separately inventoried as loans.due-date."

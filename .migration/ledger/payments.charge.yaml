@@ -1,0 +1,12 @@
+id: payments.charge
+kind: integration
+title: Charge a loan's late fee through the payment gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:26-41
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "POST /payments/{id} returns 404 for an unknown loan; otherwise it POSTs to PAYMENT_GATEWAY_URL/charge?loan={id} (defaulting to the .invalid host), propagates a 200 gateway response and body, maps other statuses and IO/interruption failures to 502."
+status: pending
+verification: pending
+notes: "Gateway URL and response mapping are observable integration behavior. Quirk drafts: .migration/quirks/payment-gateway-id-encoding.md and .migration/quirks/payment-interrupt-swallowed.md."

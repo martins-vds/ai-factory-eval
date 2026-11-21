@@ -1,0 +1,14 @@
+id: fees.view
+kind: ui
+title: View a loan's late-fee page
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:23-38
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "GET /fees/{id} returns 404 HTML when the loan is missing; otherwise it renders due date, days late, and a fee of 25 cents per day, waived through two days late and capped at $10."
+status: pending
+verification: pending
+rules:
+  - { id: late-fee-rate, rule: "Charge 25 cents per day late after the two-day waiver, capped at $10.", source: "legacy/src/main/java/lib/LateFeeView.java:13-14,32-37" }
+notes: "For unreturned loans the calculation ends on LocalDate.now(); returned loans use returnedOn."

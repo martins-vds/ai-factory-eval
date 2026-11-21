@@ -1,0 +1,11 @@
+id: storage.repository-transactions
+kind: structural
+title: Read and write loan records through JPA
+source:
+  graph_node: class:legacy/src/main/java/lib/LoanRepository.java:LoanRepository
+  location: legacy/src/main/java/lib/LoanRepository.java:19-69
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "Reads use a fresh EntityManager and close it in finally; writes begin and commit a transaction, roll back if still active, and close the manager."
+status: pending
+verification: pending
+notes: "The risk value reflects the highest-ranked repository method (write/markReturned); all/find/lend are also inventoried with their owning flows."

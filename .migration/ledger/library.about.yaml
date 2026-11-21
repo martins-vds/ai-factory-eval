@@ -1,0 +1,13 @@
+id: library.about
+kind: ui
+title: Serve the public About page
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-9
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /about serves the packaged static HTML describing opening hours, the 14-day loan period, and contact details as text/html."
+status: pending
+verification: pending
+no_rules: "Static public information page; it defines no additional domain rule."
+notes: "The JAX-RS route reads /static/about.html from the classpath in legacy/src/main/java/lib/AboutPage.java:13-20."

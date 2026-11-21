@@ -1,0 +1,10 @@
+id: loans.seed-data
+kind: data
+title: Load three sample loans at startup
+source:
+  graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+boundary: "Startup seeds L1, L2, and L3 with member, ISBN, lent date, and nullable/recorded return dates."
+status: pending
+verification: pending
+notes: "Seed script is selected by storage.persistence-config and loaded into the in-memory database each process start."

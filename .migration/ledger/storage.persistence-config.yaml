@@ -1,0 +1,10 @@
+id: storage.persistence-config
+kind: structural
+title: Configure the library persistence unit
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:3-11
+boundary: "The library unit uses RESOURCE_LOCAL transactions, in-memory H2, drop-and-create schema generation, and loads META-INF/seed.sql at startup."
+status: pending
+verification: pending
+notes: "The in-memory URL keeps the database alive for the process with DB_CLOSE_DELAY=-1."

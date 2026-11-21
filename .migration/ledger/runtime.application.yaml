@@ -1,0 +1,11 @@
+id: runtime.application
+kind: structural
+title: Start and stop the HTTP application
+source:
+  graph_node: method:legacy/src/main/java/lib/App.java:App.main
+  location: legacy/src/main/java/lib/App.java:13-25
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "The process reads PORT (default 8080), creates the library persistence unit, registers four JAX-RS resources, binds Grizzly to 0.0.0.0, and closes the server and entity manager factory at shutdown."
+status: pending
+verification: pending
+notes: "Registers LoanResource, LateFeeView, FinePayments, and AboutPage. The main thread joins after startup."
