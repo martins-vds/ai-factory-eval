@@ -1,0 +1,70 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#2190
+pr: martins-vds/ai-factory-eval#2195
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.000
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: Days late is the nonnegative difference between due date and return date or today.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_services.py::test_fee_for_loan_uses_return_date_and_never_charges_for_early_returns
+    enforced: true
+    ledger_rule: late-days
+  - capability: fees.calculation
+    rule: No fee is charged through two days late; otherwise charge 25 cents per late day.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_services.py::test_fee_for_loan_applies_grace_period_daily_rate_and_cap
+    enforced: true
+    ledger_rule: grace-and-rate
+  - capability: fees.calculation
+    rule: The late fee is capped at $10.00.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_services.py::test_fee_for_loan_applies_grace_period_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-cap
+  - capability: fees.page
+    rule: An unknown loan has no late-fee quote.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_services.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+    ledger_rule: loan-exists
+  - capability: integration.payment-gateway
+    rule: Reject an unknown loan before making a payment-gateway request.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_services.py::test_payment_requires_an_existing_loan_before_calling_gateway
+    enforced: true
+    ledger_rule: loan-exists-before-charge
+  - capability: integration.payment-gateway
+    rule: Return HTTP 200 only for gateway HTTP 200; map other statuses to 502 and preserve their body.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_services.py::test_payment_maps_non_success_gateway_status_to_bad_gateway
+    enforced: true
+    ledger_rule: gateway-status
+  - capability: integration.payment-gateway
+    rule: Map gateway I/O failures to HTTP 502 with the unavailable message.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_services.py::test_payment_maps_io_failure_to_bad_gateway
+    enforced: true
+    ledger_rule: gateway-io-failure
+  - capability: integration.payment-gateway
+    rule: An interrupted gateway call returns HTTP 502 while retaining the interruption.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_services.py::test_payment_surfaces_interruption_without_losing_it
+    enforced: true
+    ledger_rule: preserve-interruption

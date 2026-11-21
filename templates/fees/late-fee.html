@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Late fees · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+  <div>
+    <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+    <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+    <h1 class="mb-4 mt-3 text-5xl">Late fees</h1>
+    <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan {{ fee.loan.id }}</p>
+        <h2 class="card-title mt-2 text-2xl">{{ fee.loan.member }}</h2>
+        <p>ISBN {{ fee.loan.isbn }}</p>
+        <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+          <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ fee.loan.due_on|date:"Y-m-d" }}</dd></div>
+          <div><dt class="text-sm text-[#66705b]">Late days</dt><dd>{{ fee.days_late }} day(s) late</dd></div>
+        </dl>
+        <p class="mt-6 text-5xl font-bold text-[#a94e37]">Fee: ${{ fee.amount|floatformat:2 }}</p>
+        <p class="mt-2 text-sm text-[#66705b]">No fee is charged for the first two late days. After that, each late day is 25¢, up to $10.00.</p>
+        <div id="payment-result" class="mt-6">
+          {% if payment_result %}
+          {% if payment_result.status == 200 %}
+          <p role="status">Payment complete: {{ payment_result.body }}</p>
+          {% else %}
+          <p role="alert">Payment failed: {{ payment_result.body }}</p>
+          {% endif %}
+          {% else %}
+          <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
+                hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-result" hx-swap="outerHTML">
+            {% csrf_token %}
+            <button class="btn btn-outline text-[#a94e37]" type="submit">Pay late fee</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+  </div>
+  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-widest text-[#66705b]">The fee ledger</p>
+      <h2 class="card-title text-2xl">Choose a loan</h2>
+      <div class="divide-y divide-[#d8cdbb]">
+        {% for loan_fee in fees %}
+        <a class="block py-5 text-[#2f3428]" href="/ui/fees/{{ loan_fee.loan.id }}/">
+          <span class="font-semibold">{{ loan_fee.loan.id }} · {{ loan_fee.loan.member }}</span>
+          <span class="block text-sm text-[#66705b]">${{ loan_fee.amount|floatformat:2 }}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+  </aside>
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    if (event.detail.target.id === 'payment-result' && event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
+{% endblock %}
