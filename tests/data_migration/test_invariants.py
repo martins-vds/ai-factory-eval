@@ -82,6 +82,6 @@ def test_loaded_carrier_movement_schedules_are_in_order(loaded_snapshot):
         )
         for previous, following in pairwise(movements):
             assert previous.arrival_time <= following.departure_time, voyage.voyage_number
-            assert (
-                previous.arrival_location_id == following.departure_location_id
-            ), voyage.voyage_number
+            assert previous.arrival_location_id == following.departure_location_id, (
+                voyage.voyage_number
+            )
