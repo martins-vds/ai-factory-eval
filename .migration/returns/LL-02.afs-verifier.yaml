@@ -1,0 +1,72 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2103
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: coverage run stops on failing verifier tests"
+  mutation_changed: "n/a: mutation runner cannot score with a failing test baseline"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+  - .migration/evidence/mutants/LL-02.md
+handoff: .migration/handoffs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:4-6
+    what: "Loan use cases import Django time and LoanRepository, violating the ports-only service boundary."
+    evidence: "run: final-layers"
+  - severity: major
+    where: src/loans/services.py:9-16
+    what: "Direct lend_loan calls accept blank or whitespace member/ISBN values instead of refusing them."
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - severity: major
+    where: src/loans/views.py:80-83
+    what: "Unknown UI returns produce plain-text 404 without an alert; the return form's HTMX request does not show the error."
+    evidence: tests/loans/test_catalog.py::test_browser_unknown_loan_return_shows_an_error
+  - severity: major
+    where: templates/loans/detail.html:25
+    what: "Changed HTMX templates lack 4xx/5xx response handling, and changed reading-room utilities are missing from the built CSS."
+    evidence: "run: final-ui"
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md
+    what: "The fresh 0.923 run left behavior-changing LL-02 survivors #44, #68-#70, #79 and #9; added assertions cover these paths, but the final mutation run could not score with failing tests."
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_loan_form_declares_required_member_and_isbn_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - tests/loans/test_catalog.py::test_return_use_case_preserves_the_original_date_on_repeat
+  - tests/loans/test_catalog.py::test_return_use_case_does_not_update_an_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+  - tests/loans/test_catalog.py::test_browser_unknown_loan_return_shows_an_error
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+inherited:
+  - where: src/loans/views.py:17; src/loans/urls.py:9
+    what: "Catalog template/context mutants #1/#2 and catalog-route mutant #4 remain from LL-01; the LL-01 verifier already recorded route survivors."
+    origin: LL-01
+    evidence: "run: verify-mutation-changed"
+rules:
+  - capability: loan.lend
+    rule: Member and ISBN values must be present and nonblank.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+    enforced: false
+  - capability: loan.return-date
+    rule: A first return records today's date; a repeat is refused without replacing the saved date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_preserves_the_original_date_on_repeat
+    enforced: true
+  - capability: loan.return
+    rule: An unknown loan ID is not updated and is reported as absent by the use case.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_does_not_update_an_unknown_loan
+    enforced: true
+no_rules: {}
