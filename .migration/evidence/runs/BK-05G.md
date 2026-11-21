@@ -44,3 +44,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T20:53:45+00:00 | crap-lizard-final | 0 | 0.37 | `bash -lc 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T20:53:45+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-21T20:55:40+00:00 | mutation-changed-final | 0 | 110.95 | `python .migration/harness/tools/afs-mutation` | `3238ea3623251e3b` |  | gate=mutation score=1.000 threshold=0.8 killed=39 survived=0 files=1 base=b491ff4233bc289cdda3c2c7fa6163c4a55acd78 |
+| 2026-11-21T20:59:41+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T21:01:01+00:00 | crap-coverage-return-fix | 0 | 63.29 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `41b42f5ebb33a23d` |  |  |
+| 2026-11-21T21:01:01+00:00 | crap-lizard-return-fix | 0 | 0.36 | `bash -lc 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T21:01:02+00:00 | crap-score-return-fix | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
