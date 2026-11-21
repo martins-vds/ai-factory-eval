@@ -1,0 +1,67 @@
+role: afs-verifier
+ticket: LL-02
+issue: martins-vds/ai-factory-synthetic-target#61
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2039
+handoff: .migration/handoffs/LL-02.md
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: test suite fails before CRAP calculation"
+  mutation_changed: "n/a: mutation run stopped because the behavior test fails at baseline"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+findings:
+  - severity: major
+    where: src/loans/services.py:9
+    what: lend_loan accepts and persists blank or whitespace member/ISBN values instead of refusing them at the use-case boundary.
+    evidence: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - severity: major
+    where: src/loans/services.py:4
+    what: The use case imports Django's clock and concrete LoanRepository, violating the profile's port-only dependency contract.
+    evidence: "run: verifier-final-idiom"
+  - severity: major
+    where: templates/loans/detail.html:25
+    what: The return form has no htmx 4xx/5xx response handling; an unknown-loan 404 is not swapped into the page.
+    evidence: "run: verifier-final-ui"
+  - severity: minor
+    where: templates/loans/new.html:6
+    what: The changed reading-room templates use Tailwind utilities absent from static/css/tailwind.css, degrading the selected UI layout (14 CSS findings).
+    evidence: "run: verifier-final-ui"
+  - severity: minor
+    where: src/loans/services.py:12
+    what: Loan IDs use count()+1 before a separate insert, so concurrent lending requests can select the same ID and one can fail.
+  - severity: minor
+    where: .migration/evidence/mutants/LL-02.md:5
+    what: "The last successful mutation run left 9 behavior-changing survivors: views #1/#2 (catalog template/context), #44 (HTMX/full-page selection), #68-#70 (unknown-return response), #79 (repeat-return context), URL #4 (catalog route), and form #9 (model). The final mutation rerun could not assess whether new tests kill some of them."
+    evidence: "run: verifier-mutation-changed-baseline"
+tests_added:
+  - tests/loans/test_catalog.py::test_lend_endpoint_rejects_missing_or_blank_fields
+  - tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+  - tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+  - tests/loans/test_catalog.py::test_browser_lending_page_shows_errors_for_blank_fields
+  - tests/loans/test_catalog.py::test_browser_return_page_returns_not_found_for_unknown_loan
+  - tests/loans/test_catalog.py::test_browser_regular_repeat_return_shows_an_error
+ledger_issues:
+  - loan.lend.yaml, loan.return-date.yaml, and loan.return.yaml omit both rules and no_rules despite encoding behavioral rules in their boundaries.
+  - loan.return-date.yaml does not cite the new direct use-case test for repeated-return preservation.
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+rules:
+  - capability: loan.lend
+    rule: Reject blank member and ISBN values before creating a loan.
+    use_case: src.loans.services.lend_loan
+    test: tests/loans/test_catalog.py::test_lend_use_case_rejects_blank_member_and_isbn
+    enforced: false
+  - capability: loan.return-date
+    rule: Reject a repeated return and preserve the original returned_on date.
+    use_case: src.loans.services.return_loan
+    test: tests/loans/test_catalog.py::test_return_use_case_rejects_repeated_return_without_replacing_date
+    enforced: true
+no_rules:
+  loan.return: The capability specifies HTTP status/body mapping; its state-transition rule is recorded under loan.return-date.
