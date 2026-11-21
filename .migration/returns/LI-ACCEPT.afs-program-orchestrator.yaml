@@ -1,0 +1,24 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+pr: https://github.com/martins-vds/ai-factory-synthetic-target/pull/128
+phase: 6
+decisions:
+  - "Acceptance run 42938753426 attempt 1 passed on commit 7d4b249e342a94e7176ebf3e1d370f81d7156b16; LI-AUDIT returned complete."
+dispatched: []
+awaiting_human:
+  - "Perform and report the side-by-side comparison specified in .migration/evidence/library-info/acceptance.md; do not treat this request as sign-off."
+next_step: "Wait for the operator's side-by-side result; only then update the acceptance return according to that human decision."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 4
+    open: 1
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  quirk_tickets: []
