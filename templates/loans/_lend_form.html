@@ -1,0 +1,14 @@
+<form id="loan-form" method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="#loan-form" hx-swap="outerHTML" class="mt-6 grid gap-4">
+  {% csrf_token %}
+  <div class="form-control">
+    <label class="label" for="{{ form.member.id_for_label }}"><span class="label-text">Member</span></label>
+    {{ form.member }}
+    {% if form.member.errors %}<p role="alert" class="mt-2 text-sm text-[#a94e37]">{{ form.member.errors|join:", " }}</p>{% endif %}
+  </div>
+  <div class="form-control">
+    <label class="label" for="{{ form.isbn.id_for_label }}"><span class="label-text">ISBN</span></label>
+    {{ form.isbn }}
+    {% if form.isbn.errors %}<p role="alert" class="mt-2 text-sm text-[#a94e37]">{{ form.isbn.errors|join:", " }}</p>{% endif %}
+  </div>
+  <button class="btn btn-primary" type="submit">Lend book</button>
+</form>

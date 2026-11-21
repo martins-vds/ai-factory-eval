@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Lend a book · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">At the desk</p>
+      <h1 class="card-title mt-2 text-4xl">Lend a book.</h1>
+      <p class="mt-2">Add a reader and the book’s ISBN to the library ledger.</p>
+      {% include "loans/_lend_form.html" %}
+    </div>
+  </article>
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    if (event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
+{% endblock %}

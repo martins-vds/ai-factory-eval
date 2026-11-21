@@ -15,7 +15,16 @@
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Returned</dt><dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd></div>
       </dl>
+      {% include "loans/_return_action.html" with loan=loan %}
     </div>
   </article>
 </section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    if (event.detail.xhr.status >= 400) {
+      event.detail.shouldSwap = true;
+      event.detail.isError = false;
+    }
+  });
+</script>
 {% endblock %}
