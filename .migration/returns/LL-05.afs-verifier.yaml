@@ -1,0 +1,25 @@
+role: afs-verifier
+ticket: LL-05
+issue: martins-vds/ai-factory-synthetic-target#67
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2126
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.894
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+findings:
+  - severity: minor
+    where: .migration/ledger/reports.monthly-spec.yaml
+    what: "The migrated entry has no explicit rules/no_rules declaration; the boundary and tests still capture and verify the specification's output behavior."
+tests_added: []
+ledger_issues:
+  - "reports.monthly-spec omits an explicit rules/no_rules declaration."
+quirk_tickets: []
+rules: []
+no_rules:
+  reports.monthly-spec: "This read-only report has no eligibility, rejection, or state-transition rule; its specified output invariants are verified by the command tests."
