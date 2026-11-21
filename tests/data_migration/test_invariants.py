@@ -1,17 +1,21 @@
 import csv
 import hashlib
+import itertools
 import json
-from pathlib import Path
 import shutil
+from pathlib import Path
 
 import pytest
 from django.core.management import call_command
 
 from cargotracker.cargo.domain.delivery import Delivery
 from cargotracker.cargo.domain.tracking_id import TrackingId
-from cargotracker.cargo.infrastructure.models import CargoRecord
+from cargotracker.cargo.infrastructure.models import CargoRecord, LegRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
+from cargotracker.handling.infrastructure.models import HandlingEventRecord
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
+from cargotracker.location.infrastructure.models import LocationRecord
+from cargotracker.voyage.infrastructure.models import CarrierMovementRecord, VoyageRecord
 
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
 MAPPING = Path(__file__).resolve().parents[2] / '.migration' / 'data' / 'mapping.yaml'
@@ -132,3 +136,53 @@ def test_loaded_cargo_delivery_state_matches_its_handling_history(tmp_path):
         assert cargo.delivery.routing_status == derived.routing_status
         assert cargo.delivery.calculated_at == derived.calculated_at
         assert cargo.delivery.last_event_id == history.most_recent_event_id
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_itinerary_legs_connect(tmp_path):
+    _load_invariant_snapshot(tmp_path)
+
+    for cargo in CargoRecord.objects.all():
+        legs = list(
+            LegRecord.objects.filter(cargo=cargo)
+            .select_related('load_location', 'unload_location')
+            .order_by('load_time', 'pk')
+        )
+
+        assert len(legs) >= 2
+        assert all(
+            previous.unload_location_id == following.load_location_id
+            for previous, following in itertools.pairwise(legs)
+        )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_handling_event_references_exist(tmp_path):
+    _load_invariant_snapshot(tmp_path)
+
+    location_ids = set(LocationRecord.objects.values_list('pk', flat=True))
+    voyage_ids = set(VoyageRecord.objects.values_list('pk', flat=True))
+    for event in HandlingEventRecord.objects.all():
+        assert event.location_id in location_ids
+        if event.voyage_id is not None:
+            assert event.voyage_id in voyage_ids
+        if event.event_type in {'LOAD', 'UNLOAD'}:
+            assert event.voyage_id in voyage_ids
+
+
+@pytest.mark.django_db(transaction=True)
+def test_loaded_voyage_carrier_movement_schedules_are_ordered(tmp_path):
+    _load_invariant_snapshot(tmp_path)
+
+    for voyage in VoyageRecord.objects.all():
+        movements = list(
+            CarrierMovementRecord.objects.filter(voyage=voyage).order_by('departure_time', 'pk')
+        )
+
+        assert movements
+        assert all(movement.departure_time < movement.arrival_time for movement in movements)
+        assert all(
+            previous.arrival_time <= following.departure_time
+            and previous.arrival_location_id == following.departure_location_id
+            for previous, following in itertools.pairwise(movements)
+        )
