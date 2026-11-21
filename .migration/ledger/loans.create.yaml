@@ -1,0 +1,12 @@
+id: loans.create
+kind: behavioral
+title: Create a loan from member and ISBN form fields
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43
+  risk: { crap: 12, complexity: 3, coverage: 0 }
+boundary: "POST /loans accepts member and isbn form fields; if either is null it returns 400 with `member and isbn are required`, otherwise it lends on the current date and returns the created loan line with 201."
+status: pending
+verification: pending
+notes: "Repository generates ID from row count plus one (LoanRepository.java:27-34). Quirk drafts: .migration/quirks/loan-id-counter-race.md and .migration/quirks/loan-export-unescaped-delimiters.md."

@@ -1,0 +1,12 @@
+id: loans.list
+kind: behavioral
+title: List loans as semicolon-separated lines
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:25-28
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /loans returns all loans ordered by ID as plain-text lines containing id, member, ISBN, lent date, due date, and returned date (empty when absent), with a trailing newline."
+status: pending
+verification: pending
+notes: "Repository ordering is legacy/src/main/java/lib/LoanRepository.java:19-21; line formatting is separately inventoried as loans.record-format."

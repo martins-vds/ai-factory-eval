@@ -1,0 +1,12 @@
+id: loans.record-format
+kind: behavioral
+title: Format loan records as six semicolon-separated fields
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:52-55
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "A loan record is id;member;isbn;lent date;due date;returned date, with an empty final field for an unreturned loan."
+status: pending
+verification: pending
+notes: "Shared by list, get, create, and return responses; documented in legacy/docs/export-csv.md:1-4. Quirk draft: .migration/quirks/loan-export-unescaped-delimiters.md."

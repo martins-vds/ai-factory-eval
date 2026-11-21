@@ -1,0 +1,11 @@
+id: loans.get
+kind: behavioral
+title: Retrieve one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /loans/{id} returns the six-field loan line and newline with 200 when found, or `no such loan` and newline with 404."
+status: pending
+verification: pending
+notes: "Uses LoanRepository.find; line output is separately inventoried as loans.record-format. Lizard reports the route method as LoanResource::Path in this range."
