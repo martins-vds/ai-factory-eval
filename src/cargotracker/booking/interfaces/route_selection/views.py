@@ -4,6 +4,7 @@ from datetime import datetime
 from django.core import signing
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.routing import CargoRouting
@@ -63,7 +64,7 @@ def create_route_selection_views(
             if itinerary is None:
                 return HttpResponseBadRequest('Invalid route selection.')
             cargo_routing.assign_route(cargo_tracking_id, itinerary)
-            return redirect(f'/admin/cargo/{tracking_id}/')
+            return redirect(reverse('cargo_details', kwargs={'tracking_id': tracking_id}))
 
         candidates = cargo_routing.route_candidates(cargo_tracking_id)
         routes = [

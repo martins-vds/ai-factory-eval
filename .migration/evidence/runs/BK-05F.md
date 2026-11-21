@@ -40,3 +40,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T13:28:18+00:00 | crap-lizard | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T13:28:18+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `dc8a2783869f1a5a` |  | gate=crap max=26.0 threshold=30 over=0 methods=207 |
 | 2026-11-21T13:29:10+00:00 | regression | 0 | 42.05 | `pytest -q` | `3d82cedd43a89d47` |  |  |
+| 2026-11-21T13:31:10+00:00 | route-selection-reverse | 0 | 1.92 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `4dbaada96f23db42` |  |  |
+| 2026-11-21T13:31:10+00:00 | route-selection-reverse-ruff | 0 | 0.01 | `ruff check src/cargotracker/booking/interfaces/route_selection/views.py tests/booking/interfaces/test_route_selection.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T13:31:10+00:00 | route-selection-reverse-format | 0 | 0.01 | `ruff format --check src/cargotracker/booking/interfaces/route_selection/views.py tests/booking/interfaces/test_route_selection.py` | `3bc53bf3e981a98a` |  |  |

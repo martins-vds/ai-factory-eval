@@ -67,7 +67,7 @@ _, cargo_details_view = create_booking_views(dashboard)
 urlpatterns = [
     path('admin/cargo/<str:tracking_id>/route/', route_selection_view),
     path('admin/cargo/<str:tracking_id>/itineraries/', select_itinerary_view),
-    path('admin/cargo/<str:tracking_id>/', cargo_details_view),
+    path('admin/cargo/<str:tracking_id>/', cargo_details_view, name='cargo_details'),
 ]
 
 
