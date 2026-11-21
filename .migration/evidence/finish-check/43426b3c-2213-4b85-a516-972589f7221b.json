@@ -1,0 +1,32 @@
+[
+  {
+    "at": "2026-11-21T20:43:41Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17070,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "BK-05F",
+    "role": "afs-verifier",
+    "changed": [
+      ".migration/evidence/runs/BK-05F.md",
+      ".migration/returns/BK-05F.afs-verifier.yaml",
+      "tests/booking/interfaces/test_route_selection.py"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/BK-05F.afs-verifier.yaml` reports failing gates and no handoff: `crap: 26.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop.",
+      "[mechanical] You changed `tests/booking/interfaces/test_route_selection.py` after your last run of `build`, `behavior`, `idiom`, `crap`, `regression`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
