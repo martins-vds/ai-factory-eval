@@ -74,8 +74,7 @@ def test_monthly_report_groups_prior_month_and_orders_by_fees_then_member():
 
     assert repository.period == (date(2025, 12, 1), date(2026, 1, 1))
     assert [
-        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents)
-        for row in rows
+        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents) for row in rows
     ] == [
         ('amy', 1, 1, 175),
         ('zoe', 2, 1, 175),
@@ -104,6 +103,5 @@ def test_monthly_report_command_prints_the_prior_month_report_from_postgres():
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id;loans_started;late_returns;late_fees_cents\n'
-        'report-reader;1;1;75\n'
+        'member_id;loans_started;late_returns;late_fees_cents\nreport-reader;1;1;75\n'
     )
