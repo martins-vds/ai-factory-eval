@@ -7,4 +7,6 @@ source:
 boundary: "The surviving spec describes a report run on each month's first day for the prior month, one row per member with loan starts, late returns, and late fees in cents, sorted by fees descending then member ID, omitting members with no loans; report code/runtime are absent."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence: [.migration/evidence/SY-05.md]

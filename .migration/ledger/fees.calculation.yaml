@@ -9,4 +9,6 @@ source:
 boundary: "Use returnedOn or today's date, clamp days late at zero, waive the first two late days, then charge 25 cents per day up to $10."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

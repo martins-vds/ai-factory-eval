@@ -9,4 +9,6 @@ source:
 boundary: "GET /loans returns all loans ordered by ID as one semicolon-separated record per line, with a final newline."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

@@ -7,4 +7,6 @@ source:
 boundary: "GET /loans/{id} returns the semicolon-separated loan line followed by a newline, or 404 with `no such loan` and a trailing newline."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

@@ -10,4 +10,6 @@ boundary: "POST /loans/{id}/return records today's date and returns 200 with the
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 quirks: ["martins-vds/ai-factory-synthetic-target#41"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

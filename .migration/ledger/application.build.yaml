@@ -7,4 +7,6 @@ source:
 boundary: "Maven packages the Java 17 application and copies runtime dependencies; legacy/run.sh packages with tests skipped and launches lib.App."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

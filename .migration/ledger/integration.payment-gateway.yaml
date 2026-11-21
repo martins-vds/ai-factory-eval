@@ -10,4 +10,6 @@ boundary: "For an existing loan, POST /payments/{id} sends a bodyless request to
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 quirks: ["martins-vds/ai-factory-synthetic-target#40"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]

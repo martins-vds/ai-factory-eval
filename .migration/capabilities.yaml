@@ -5,7 +5,7 @@ characterization:
   legacy_environment: available
   source_builds: 'yes'
   tier: A
-  reason: The pinned legacy source builds and runs; HTTP endpoint probes returned the expected responses (see references/characterization.md).
+  reason: The pinned legacy source builds and runs; per-capability evidence is in evidence/SY-05.md. Sixteen runtime capabilities use tier A; the code-less monthly report specification uses tier C.
 capabilities:
 - id: build-run
   applies_to: source
@@ -28,8 +28,8 @@ capabilities:
   provided_by:
   - kind: tool
     name: .migration/characterization/source/characterize.py and HTTP/browser golden files
-  notes: 'All 7 source graph endpoints are captured as request/response goldens. Evidence: .migration/evidence/runs/SY-03.md
-    (source-characterization, source-characterization-verify).'
+  notes: 'SY-05 captures 24 HTTP cases, two browser pages, gateway responses and restart behavior. Evidence:
+    .migration/evidence/runs/SY-05.md and .migration/evidence/SY-05.md.'
 - id: unit-integration-tests
   applies_to: target
   status: met
@@ -47,7 +47,8 @@ capabilities:
     name: JaCoCo agent and Maven report
     version: 0.8.13
   notes: 'No legacy test sources were found; characterization covered 89/98 lines and 460/513 instructions. Evidence:
-    .migration/evidence/runs/SY-03.md (source-coverage-characterization, source-jacoco-report, source-coverage-summary).'
+    .migration/evidence/runs/SY-03.md (source-coverage-characterization, source-jacoco-report, source-coverage-summary);
+    the test-source inventory is in .migration/evidence/SY-05.md.'
 - id: coverage
   applies_to: target
   status: met

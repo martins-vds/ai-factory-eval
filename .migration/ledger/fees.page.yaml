@@ -9,4 +9,6 @@ source:
 boundary: "GET /fees/{id} returns HTML with the loan ID, due date, days late, and formatted fee; an unknown loan returns 404 with an HTML message."
 tickets: ["martins-vds/ai-factory-synthetic-target#35"]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/SY-05.md]
