@@ -68,7 +68,9 @@ def create_route_selection_views(
     cargo_routing: CargoRouting,
     cargo_dashboard: CargoDashboard,
 ) -> tuple[Callable[[HttpRequest, str], HttpResponse], Callable[[HttpRequest, str], HttpResponse]]:
-    def route_selection(request: HttpRequest, tracking_id: str) -> HttpResponse:
+    def route_selection_page(
+        request: HttpRequest, tracking_id: str, page_title: str
+    ) -> HttpResponse:
         cargo_id = TrackingId(tracking_id)
         cargo = cargo_dashboard.get_cargo_details(cargo_id)
         if cargo is None:
@@ -98,7 +100,14 @@ def create_route_selection_views(
             'cargo': cargo,
             'candidates': candidates,
             'no_route_guidance': NO_ROUTE_GUIDANCE,
+            'page_title': page_title,
         }
         return render(request, 'booking/route_selection/route.html', context)
 
-    return route_selection, route_selection
+    def route_selection(request: HttpRequest, tracking_id: str) -> HttpResponse:
+        return route_selection_page(request, tracking_id, 'Route Cargo')
+
+    def select_itinerary(request: HttpRequest, tracking_id: str) -> HttpResponse:
+        return route_selection_page(request, tracking_id, 'Select Itinerary')
+
+    return route_selection, select_itinerary

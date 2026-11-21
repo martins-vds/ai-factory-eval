@@ -115,6 +115,7 @@ def test_route_page_renders_cargo_and_numbered_candidate_legs(client, booking_pa
     deadline = cargo.route_specification.arrival_deadline
 
     assert response.status_code == 200
+    assert 'Route Cargo DEF789' in content
     assert 'Hong Kong' in content
     assert 'CNHKG' in content
     assert 'Melbourne' in content
@@ -133,6 +134,16 @@ def test_route_page_renders_cargo_and_numbered_candidate_legs(client, booking_pa
     assert 'Itinerary 2' in content
     assert '0400S' in content
     assert content.count('name="candidate_token"') == 2
+    itinerary_one = content.split('Itinerary 1', 1)[1].split('Itinerary 2', 1)[0]
+    assert (
+        itinerary_one.index('CNHKG') < itinerary_one.index('NLRTM') < itinerary_one.index('AUMEL')
+    )
+    expected_dates = [
+        (deadline - timedelta(days=offset)).strftime('%m/%d/%Y') for offset in (5, 4, 3, 2)
+    ]
+    assert [itinerary_one.index(date) for date in expected_dates] == sorted(
+        itinerary_one.index(date) for date in expected_dates
+    )
 
 
 @pytest.mark.django_db
@@ -142,6 +153,7 @@ def test_select_itinerary_renders_candidates_when_routes_exist(client, booking_p
 
     assert response.status_code == 200
     assert 'Potential routes: 2' in content
+    assert 'Select Itinerary DEF789' in content
     assert 'Itinerary 1' in content
     assert '0200T' in content
     assert 'Itinerary 2' in content
@@ -208,4 +220,12 @@ def test_invalid_candidate_token_displays_error_without_requesting_new_candidate
     assert response.status_code == 400
     assert 'role="alert"' in content
     assert 'Reload the route page and choose an itinerary.' in content
+    assert 'href="/admin/cargo/DEF789/route/"' in content
     assert booking_pages.request_count == 0
+
+
+@pytest.mark.django_db
+def test_unknown_cargo_route_selection_returns_not_found(client, booking_pages):
+    response = client.get('/admin/cargo/UNKNOWN/route/')
+
+    assert response.status_code == 404
