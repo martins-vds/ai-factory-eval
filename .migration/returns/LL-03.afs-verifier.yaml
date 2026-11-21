@@ -1,0 +1,66 @@
+role: afs-verifier
+ticket: LL-03
+issue: martins-vds/ai-factory-synthetic-target#63
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2192
+verdict: changes-required
+handoff: .migration/handoffs/LL-03.md
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 7.0
+  mutation_changed: 0.981
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+findings:
+  - severity: major
+    where: templates/fees/payment-form.html:3
+    what: "The htmx payment action has no 4xx/5xx response handling, so the 502 error fragment and 404 response are not swapped into the UI."
+    evidence: "run: idiom-ui-verified"
+  - severity: minor
+    where: templates/fees/payment-form.html:5
+    what: "The configured built CSS is missing bg-[#a94e37], text-white, and hover:bg-[#873b2a], so the button's intended styling is ignored."
+    evidence: "run: idiom-ui-verified"
+  - severity: minor
+    where: src/fees/views.py:26
+    what: "The API and UI view pairs duplicate fee lookup/not-found and payment response handling."
+  - severity: minor
+    where: .migration/evidence/mutants/LL-03.md:5
+    what: "Two surviving mutants only remove frozen=True from Fee and GatewayResponse; immutability is not specified by LL-03."
+    evidence: "run: mutation-changed-verified"
+tests_added:
+  - tests/fees/test_fee_calculation.py::test_pay_for_existing_loan_delegates_to_gateway
+  - tests/fees/test_fee_calculation.py::test_pay_for_unknown_loan_does_not_call_gateway
+  - tests/fees/test_endpoints.py::test_fee_routes_reject_unsupported_methods
+  - tests/fees/test_endpoints.py::test_fee_page_formats_capped_fee_as_ten_dollars
+  - tests/fees/test_endpoints.py::test_fee_page_returns_characterized_not_found_response
+  - tests/fees/test_endpoints.py::test_non_htmx_payment_returns_complete_fee_page
+  - tests/fees/test_endpoints.py::test_ui_payment_endpoint_rejects_unknown_loan_without_calling_gateway
+  - tests/fees/test_endpoints.py::test_payment_gateway_uses_the_configured_default_url
+ledger_issues: []
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+rules:
+  - capability: fees.calculation
+    rule: "Late days are clamped at zero; the first two late days are waived, then the fee is 25 cents per day capped at $10."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap
+    enforced: true
+  - capability: fees.calculation
+    rule: "A returned loan's fee uses returned_on rather than today's date."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_returned_loan_uses_return_date_instead_of_today
+    enforced: true
+  - capability: fees.calculation
+    rule: "An unknown loan has no fee."
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_calculation.py::test_fee_for_unknown_loan_returns_none
+    enforced: true
+  - capability: integration.payment-gateway
+    rule: "A payment is not sent to the gateway for an unknown loan."
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_calculation.py::test_pay_for_unknown_loan_does_not_call_gateway
+    enforced: true
+no_rules:
+  fees.page: "Presentation capability; it has no separate domain rule."
