@@ -27,5 +27,6 @@ evidence:
   - .migration/characterization/source/goldens/browser.json
   - .migration/evidence/runs/LL-04.md
   - tests/library_info/test_about.py::test_about_endpoint_matches_characterized_response
+  - tests/library_info/test_about.py::test_about_pages_reject_non_get_requests
   - tests/library_info/test_about.py::test_real_browser_renders_library_information
 no_rules: Static informational content has no business validation or state transition.
