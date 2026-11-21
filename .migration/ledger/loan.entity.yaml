@@ -7,4 +7,8 @@ source:
 boundary: A loan has id, member, ISBN, lent date, optional returned date, a 14-day due date, and can be marked returned.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md

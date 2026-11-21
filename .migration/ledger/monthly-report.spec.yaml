@@ -7,7 +7,10 @@ source:
 boundary: A monthly report runs on the first day for the previous month and produces one member row with started loans, late returns, and late fees.
 slice: lending-library
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/evidence/SY-05-characterization.md
 rules:
   - {id: report-period, rule: "Run on the first day of each month for the previous month", source: "legacy/docs/reports-spec.md:4"}
   - {id: report-row-shape, rule: "Each row contains member id, loans started, loans returned late, and total late fees in cents", source: "legacy/docs/reports-spec.md:5"}

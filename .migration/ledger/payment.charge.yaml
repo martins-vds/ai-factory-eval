@@ -9,4 +9,8 @@ source:
 boundary: POST /payments/{id} verifies the loan then sends a gateway POST; gateway 200 maps to 200, other statuses map to 502.
 slice: lending-library
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/SY-05-characterization.md
