@@ -6,3 +6,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 |---|---|---|---|---|---|---|---|
 | 2026-11-21T23:45:20+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T23:46:09+00:00 | snapshot-check | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-21T23:47:30+00:00 | export-red | 1 | 2.25 | `pytest -q tests/data_migration/test_export.py` | `91ef70aa4a01af63` | E               KeyError: 'export_data_snapshot' |  |
