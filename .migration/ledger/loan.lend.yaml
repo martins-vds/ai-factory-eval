@@ -1,0 +1,13 @@
+id: loan.lend
+kind: behavioral
+title: Create a loan
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans"
+  flow: Lend Book
+  location: "legacy/src/main/java/lib/LoanResource.java:37-43"
+  risk: { crap: 12, complexity: 3, coverage: 0 }
+boundary: "POST /loans requires non-null member and ISBN form fields (but accepts empty strings), assigns today's date and ID L{current row count + 1}, then returns 201 with the loan line and newline."
+tickets: ["martins-vds/ai-factory-synthetic-target#35"]
+quirks: ["martins-vds/ai-factory-synthetic-target#39", "martins-vds/ai-factory-synthetic-target#43"]
+status: pending
+verification: pending

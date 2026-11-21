@@ -1,0 +1,12 @@
+id: about.page
+kind: ui
+title: Public About page
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/AboutPage.java:GET /about"
+  flow: View About Page
+  location: "legacy/src/main/java/lib/AboutPage.java:13-21"
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /about returns the classpath's static UTF-8 HTML page with the library hours, lending period, and contact details."
+tickets: ["martins-vds/ai-factory-synthetic-target#35"]
+status: pending
+verification: pending

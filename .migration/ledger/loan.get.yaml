@@ -1,0 +1,10 @@
+id: loan.get
+kind: behavioral
+title: Retrieve one loan
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}"
+  location: "legacy/src/main/java/lib/LoanResource.java:30-35"
+boundary: "GET /loans/{id} returns the semicolon-separated loan line followed by a newline, or 404 with `no such loan` and a trailing newline."
+tickets: ["martins-vds/ai-factory-synthetic-target#35"]
+status: pending
+verification: pending
