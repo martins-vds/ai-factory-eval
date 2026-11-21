@@ -1,0 +1,35 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+specialty: ui
+pr: null
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.869
+  regression: 0
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_candidate_signed_in_default_context
+  - .migration/evidence/runs/BK-05F.md
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+mutation_review: |
+  Resolved:
+  - #16 and #21 changed the route and itinerary no-route guidance. The interface assertions now require the exact guidance rendered in each page.
+  - #44 changed the caught BadSignature cause text. The message was removed; the caught error still maps to the same generic 404.
+  Remaining equivalent survivors (diff → reason):
+  - #1: _CANDIDATE_SALT='XXbooking.route_selectionXX' → signing and verification use the same salt; the hidden candidate token remains usable and its opaque bytes are not a screen behavior.
+  - #2: _CANDIDATE_SALT=None → signing and verification remain paired; no other application signing call uses this token context, and default-context tokens are rejected by the interface test.
+  - #10: Http404 cargo-not-found message gains XX → the client receives the same generic 404 page; exception detail is not rendered.
+  - #13: Http404 stale-route message gains XX → the client receives the same generic 404 page; exception detail is not rendered.
+  - #14: quote(..., safe='') changes to safe='XXXX' → X is unreserved and quote leaves it unescaped either way, so the redirect is unchanged.
+  - #27: Http404 context cargo-not-found message gains XX → the client receives the same generic 404 page; exception detail is not rendered.
+  - #40: missing-candidate default changes from '' to 'XXXX' → both values fail signature loading and map to the same generic 404.
+  - #45: invalid-route Http404 message gains XX → the client receives the same generic 404 page; exception detail is not rendered.
