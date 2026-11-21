@@ -19,3 +19,5 @@ Acceptance gate rows below are copied unchanged from `.migration/evidence/runs/L
 | 2026-11-10T03:57:18+00:00 | crap-1 | 0 | 0.05 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-10T03:57:18+00:00 | crap-2 | 0 | 0.04 | `bash -c 'python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `1a44279a39c11bc6` |  | gate=crap max=7.0 threshold=30 over=0 methods=23 |
 | 2026-11-10T03:59:00+00:00 | mutation_full-0 | 0 | 102.52 | `bash -c 'python .migration/harness/tools/afs-mutation --all'` | `4510bb8211bb915d` |  | gate=mutation score=0.920 threshold=0.8 killed=126 survived=11 files=9 base=all |
+| 2026-11-21T17:44:32+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T17:45:02+00:00 | finish-check | 0 | 26.97 | `python .migration/harness/tools/afs-finish-check --ticket LC-ACCEPT --role afs-program-orchestrator` | `cba677bb03b44d19` |  | gate=finish-check ticket=LC-ACCEPT role=afs-program-orchestrator findings=0 |
