@@ -1,0 +1,81 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Route Cargo | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-6 text-2xl font-semibold text-gray-900">
+    Route Cargo {{ cargo.tracking_id.value }}
+  </h1>
+  <dl class="mb-6 grid gap-4 sm:grid-cols-[max-content_1fr]">
+    <dt class="font-semibold text-blue-700">Origin:</dt>
+    <dd>{{ cargo.route_specification.origin.name }} ({{ cargo.route_specification.origin.unlocode.value }})</dd>
+    <dt class="font-semibold text-blue-700">Destination:</dt>
+    <dd>
+      {{ cargo.route_specification.destination.name }}
+      ({{ cargo.route_specification.destination.unlocode.value }})
+    </dd>
+    <dt class="font-semibold text-blue-700">Arrival deadline:</dt>
+    <dd>{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</dd>
+  </dl>
+
+  <p id="potential-routes" class="mb-4 font-semibold">
+    Potential routes: {{ candidates|length }}
+  </p>
+
+  {% if assignment_error %}
+    <p id="route-assignment-error" class="mb-4 text-red-700" role="alert">{{ assignment_error }}</p>
+  {% endif %}
+
+  {% if candidates %}
+    <ol class="space-y-6" aria-label="Candidate itineraries">
+      {% for candidate in candidates %}
+        <li class="rounded border border-gray-300 p-4">
+          <h2 class="mb-4 text-xl font-semibold text-gray-900">Itinerary {{ forloop.counter }}</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+              <thead>
+                <tr class="border-b border-gray-300">
+                  <th scope="col" class="p-3">Leg</th>
+                  <th scope="col" class="p-3">Voyage</th>
+                  <th scope="col" class="p-3">Load</th>
+                  <th scope="col" class="p-3">Date</th>
+                  <th scope="col" class="p-3">Unload</th>
+                  <th scope="col" class="p-3">Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for leg in candidate.itinerary.legs %}
+                  <tr class="border-b border-gray-200">
+                    <th scope="row" class="p-3">Leg {{ forloop.counter }}</th>
+                    <td class="p-3">{{ leg.voyage.voyage_number.value }}</td>
+                    <td class="p-3">
+                      {{ leg.load_location.name }}<br>
+                      <span class="text-sm text-gray-600">{{ leg.load_location.unlocode.value }}</span>
+                    </td>
+                    <td class="p-3">{{ leg.load_time|date:"m/d/Y" }}</td>
+                    <td class="p-3">
+                      {{ leg.unload_location.name }}<br>
+                      <span class="text-sm text-gray-600">{{ leg.unload_location.unlocode.value }}</span>
+                    </td>
+                    <td class="p-3">{{ leg.unload_time|date:"m/d/Y" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <form method="post" class="mt-4">
+            {% csrf_token %}
+            <button
+              class="rounded bg-blue-700 px-4 py-2 text-white hover:bg-blue-800"
+              type="submit"
+              name="candidate_token"
+              value="{{ candidate.token }}"
+            >Assign itinerary {{ forloop.counter }}</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p id="no-routes" role="status">{{ no_route_guidance }}</p>
+  {% endif %}
+{% endblock %}

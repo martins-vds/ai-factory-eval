@@ -1,3 +1,4 @@
+import re
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -13,7 +14,6 @@ from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.cargo.management.commands import seed_sample_data
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
-from cargotracker.location.domain.un_locode import UnLocode
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 from cargotracker.pathfinder.domain.transit_edge import TransitEdge
 from cargotracker.pathfinder.domain.transit_path import TransitPath
@@ -25,9 +25,13 @@ urlpatterns = []
 class CandidateRoutingService:
     def __init__(self, candidates):
         self.candidates = candidates
+        self.request_count = 0
 
     def find_shortest_paths(self, origin, destination):
-        return self.candidates
+        self.request_count += 1
+        if self.request_count == 1:
+            return self.candidates
+        return tuple(reversed(self.candidates))
 
 
 @pytest.fixture
@@ -88,9 +92,7 @@ def booking_pages(monkeypatch):
         routing_service,
     )
     cargo_dashboard = CargoDashboard(cargo_repository)
-    route_view, select_itinerary_view = create_route_selection_views(
-        cargo_routing, cargo_dashboard
-    )
+    route_view, select_itinerary_view = create_route_selection_views(cargo_routing, cargo_dashboard)
     _, cargo_details_view = create_booking_views(cargo_dashboard)
     urlpatterns = [
         path('admin/cargo/<str:tracking_id>/route/', route_view),
@@ -108,6 +110,9 @@ def booking_pages(monkeypatch):
 def test_route_page_renders_cargo_and_numbered_candidate_legs(client, booking_pages):
     response = client.get('/admin/cargo/DEF789/route/')
     content = response.content.decode()
+    cargo = DjangoCargoRepository().find(TrackingId('DEF789'))
+    assert cargo is not None
+    deadline = cargo.route_specification.arrival_deadline
 
     assert response.status_code == 200
     assert 'Hong Kong' in content
@@ -121,11 +126,13 @@ def test_route_page_renders_cargo_and_numbered_candidate_legs(client, booking_pa
     assert 'Hong Kong' in content
     assert 'Rotterdam' in content
     assert 'NLRTM' in content
+    assert (deadline - timedelta(days=5)).strftime('%m/%d/%Y') in content
     assert 'Leg 2' in content
     assert '0300A' in content
+    assert (deadline - timedelta(days=2)).strftime('%m/%d/%Y') in content
     assert 'Itinerary 2' in content
     assert '0400S' in content
-    assert content.count('name="candidate_index"') == 2
+    assert content.count('name="candidate_token"') == 2
 
 
 @pytest.mark.django_db
@@ -161,13 +168,21 @@ def test_route_page_shows_no_route_guidance_when_candidates_are_empty(client, bo
 def test_candidate_assignment_redirects_to_cargo_details_and_renders_assigned_itinerary(
     client, booking_pages
 ):
+    selection_page = client.get('/admin/cargo/DEF789/route/')
+    candidate_tokens = re.findall(
+        r'name="candidate_token"\s+value="([^"]+)"',
+        selection_page.content.decode(),
+    )
+    assert len(candidate_tokens) == 2
+
     response = client.post(
         '/admin/cargo/DEF789/route/',
-        {'candidate_index': '1'},
+        {'candidate_token': candidate_tokens[1]},
     )
 
     assert response.status_code == 302
     assert response['Location'] == '/admin/cargo/DEF789/'
+    assert booking_pages.request_count == 1
 
     details = client.get(response['Location'])
     content = details.content.decode()
@@ -178,3 +193,19 @@ def test_candidate_assignment_redirects_to_cargo_details_and_renders_assigned_it
     assert 'Melbourne' in content
     assert '0400S' in content
     assert '0200T' not in content
+
+
+@pytest.mark.django_db
+def test_invalid_candidate_token_displays_error_without_requesting_new_candidates(
+    client, booking_pages
+):
+    response = client.post(
+        '/admin/cargo/DEF789/route/',
+        {'candidate_token': 'invalid'},
+    )
+    content = response.content.decode()
+
+    assert response.status_code == 400
+    assert 'role="alert"' in content
+    assert 'Reload the route page and choose an itinerary.' in content
+    assert booking_pages.request_count == 0
