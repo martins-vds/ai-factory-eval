@@ -16,3 +16,25 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-21T23:22:55Z
+**State:** blocked  ·  **Branch / PR:** copilot/fix-41807230-1458293352-091e3639-ae33-4127-aeb0-20be82e49a16  ·  **Last commit:** b9adf47a
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] You changed `tests/booking/interfaces/test_dialogs.py` after your last run of `build`, `behavior`, `crap`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
+
+## Handoff — afs-migrator · 2026-11-21T23:23:58Z
+**State:** blocked  ·  **Branch / PR:** copilot/fix-41807230-1458293352-091e3639-ae33-4127-aeb0-20be82e49a16  ·  **Last commit:** b9adf47a
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] You changed `tests/booking/interfaces/test_dialogs.py` after your last run of `build`, `behavior`, `crap`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
