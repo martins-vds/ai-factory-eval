@@ -28,11 +28,38 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline mt-2 focus:ring-2 focus:ring-blue-500"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination-dialog/"
+                hx-target="#cargo-dialog"
+                hx-swap="innerHTML"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+              >
+                Change destination
+              </button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+              <button
+                type="button"
+                class="btn btn-sm btn-outline mt-2 focus:ring-2 focus:ring-blue-500"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline-dialog/"
+                hx-target="#cargo-dialog"
+                hx-swap="innerHTML"
+                aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+              >
+                Change deadline
+              </button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <div
+    id="cargo-dialog"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+    hx-on::after-swap="const dialog = this.querySelector('dialog'); if (dialog && !dialog.open) { dialog.showModal(); const control = dialog.querySelector('[autofocus]'); if (control) control.focus(); }"
+  ></div>
 </section>

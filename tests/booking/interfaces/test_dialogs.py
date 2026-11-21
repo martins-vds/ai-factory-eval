@@ -4,16 +4,34 @@ from datetime import date, datetime, time
 import pytest
 from django.core.management import call_command
 from django.template.loader import render_to_string
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
+from django.urls import path
 from django.utils import timezone
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
+from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
+
+
+web_cargo_repository = DjangoCargoRepository()
+web_cargo_dashboard = CargoDashboard(web_cargo_repository)
+web_destination_dialog, web_deadline_dialog = create_dialog_views(
+    web_cargo_dashboard,
+    CargoSpecification(web_cargo_repository, DjangoHandlingEventRepository()),
+    DjangoLocationRepository().find_all,
+)
+web_dashboard, web_cargo_details = create_booking_views(web_cargo_dashboard)
+urlpatterns = [
+    path('admin/dashboard/', web_dashboard),
+    path('admin/cargo/<str:tracking_id>/', web_cargo_details),
+    path('admin/cargo/<str:tracking_id>/destination-dialog/', web_destination_dialog),
+    path('admin/cargo/<str:tracking_id>/deadline-dialog/', web_deadline_dialog),
+]
 
 
 def _dialog_views():
@@ -40,18 +58,81 @@ def _not_routed_table(cargo_repository):
 
 
 @pytest.mark.django_db
-def test_not_routed_table_opens_destination_and_deadline_editors():
+@override_settings(ROOT_URLCONF=__name__)
+def test_not_routed_table_opens_destination_and_deadline_editors(client):
     call_command('seed_sample_data')
-    (destination_dialog, _), cargo_repository, _ = _dialog_views()
 
-    content = _not_routed_table(cargo_repository)
+    response = client.get('/admin/dashboard/')
+    content = response.content.decode()
 
+    assert response.status_code == 200
     assert 'href="/admin/cargo/DEF789/route/"' in content
     assert 'hx-get="/admin/cargo/DEF789/destination-dialog/"' in content
     assert 'hx-get="/admin/cargo/DEF789/deadline-dialog/"' in content
     assert 'id="cargo-dialog"' in content
     assert 'hx-on::before-swap' in content
-    assert destination_dialog is not None
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_open_update_and_refresh_the_not_routed_table(client):
+    call_command('seed_sample_data')
+    cargo_before = web_cargo_repository.find(TrackingId('DEF789'))
+    assert cargo_before is not None
+    locations = DjangoLocationRepository().find_all()
+    destination = next(
+        location
+        for location in locations
+        if location
+        not in (
+            cargo_before.route_specification.origin,
+            cargo_before.route_specification.destination,
+        )
+    )
+    client.get('/admin/dashboard/')
+    destination_response = client.get(
+        '/admin/cargo/DEF789/destination-dialog/',
+        HTTP_HX_REQUEST='true',
+    )
+    destination_update = client.post(
+        '/admin/cargo/DEF789/destination-dialog/',
+        {'destination': destination.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+    destination_table = client.get('/admin/dashboard/').content.decode()
+    deadline_response = client.get(
+        '/admin/cargo/DEF789/deadline-dialog/',
+        HTTP_HX_REQUEST='true',
+    )
+    deadline_update = client.post(
+        '/admin/cargo/DEF789/deadline-dialog/',
+        {'deadline': '2027-01-15'},
+        HTTP_HX_REQUEST='true',
+    )
+    refreshed_table = client.get('/admin/dashboard/').content.decode(    )
+
+    assert destination_response.status_code == 200
+    assert 'id="destination-dialog"' in destination_response.content.decode()
+    assert destination_update.status_code == 204
+    assert destination_update.headers['HX-Redirect'] == '/admin/dashboard/'
+    assert destination.name in destination_table
+    assert deadline_response.status_code == 200
+    assert 'id="deadline-dialog"' in deadline_response.content.decode()
+    assert deadline_update.status_code == 204
+    assert deadline_update.headers['HX-Redirect'] == '/admin/dashboard/'
+    assert '01/15/2027' in refreshed_table
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_unknown_cargo_dialog_returns_a_renderable_not_found_fragment(client):
+    response = client.get(
+        '/admin/cargo/MISSING1/destination-dialog/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+    assert 'Cargo not found' in response.content.decode()
 
 
 @pytest.mark.django_db
