@@ -40,5 +40,48 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-21T13:46:25Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17999,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/0132b795-ec70-4c2f-8b4b-8a2c2ea0c601.json",
+      ".migration/evidence/mutants/LL-02.md",
+      ".migration/evidence/runs/LL-02.md",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/returns/LL-02.afs-migrator.yaml",
+      "src/loans/repository.py",
+      "src/loans/services.py",
+      "src/loans/urls.py",
+      "src/loans/views.py",
+      "templates/base.html",
+      "templates/loans/detail.html",
+      "templates/loans/list.html",
+      "templates/loans/new.html",
+      "tests/loans/test_catalog.py"
+    ],
+    "findings": [
+      "[mechanical] You changed `templates/loans/list.html` after your last run of `behavior`, `regression`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.",
+      "[scope] These files are outside ticket LL-02's planned files: `templates/base.html`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides."
+    ],
+    "blocks_before": 1,
+    "decision": "block",
+    "why": "block 2 of 2"
   }
 ]

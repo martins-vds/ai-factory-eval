@@ -42,6 +42,7 @@
       "hook.end": [
         "hookInvocationId",
         "hookType",
+        "output",
         "success"
       ],
       "hook.start": [
@@ -148,38 +149,43 @@
       ]
     },
     "event_types": {
-      "assistant.message": 76,
-      "assistant.turn_end": 76,
-      "assistant.turn_start": 76,
-      "external_tool.completed": 1,
-      "external_tool.requested": 1,
-      "hook.end": 228,
-      "hook.start": 229,
-      "permission.completed": 132,
-      "permission.requested": 132,
+      "assistant.message": 90,
+      "assistant.turn_end": 90,
+      "assistant.turn_start": 90,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 262,
+      "hook.start": 263,
+      "permission.completed": 147,
+      "permission.requested": 147,
       "session.start": 1,
-      "session.usage_record": 76,
+      "session.usage_record": 90,
       "skill.context_delivered_ref": 4,
       "skill.invoked": 4,
       "subagent.selected": 1,
       "system.message": 1,
-      "tool.execution_complete": 134,
-      "tool.execution_start": 134,
-      "user.message": 1
+      "tool.execution_complete": 149,
+      "tool.execution_start": 149,
+      "user.message": 2
     },
-    "events": 1307,
+    "events": 1494,
     "usage_fields": []
   },
-  "ended_at": "2026-11-21T13:42:52.350Z",
+  "ended_at": "2026-11-21T13:46:24.979Z",
   "event": "agentStop",
   "harness_tools": [
+    {
+      "count": 2,
+      "exit": 0,
+      "tool": "afs-mutation"
+    },
     {
       "count": 2,
       "exit": 1,
       "tool": "afs-mutation"
     },
     {
-      "count": 14,
+      "count": 20,
       "exit": 0,
       "tool": "afs-run"
     },
@@ -199,12 +205,12 @@
       "tool": "check_inputs.py"
     },
     {
-      "count": 4,
+      "count": 6,
       "exit": 0,
       "tool": "check_layers.py"
     },
     {
-      "count": 5,
+      "count": 6,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -214,22 +220,22 @@
       "tool": "check_runtime.py"
     },
     {
-      "count": 2,
+      "count": 3,
       "exit": 0,
       "tool": "check_ui.py"
     },
     {
-      "count": 2,
+      "count": 3,
       "exit": 1,
       "tool": "check_ui.py"
     },
     {
-      "count": 1,
+      "count": 2,
       "exit": 0,
       "tool": "crap.py"
     },
     {
-      "count": 4,
+      "count": 5,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -248,11 +254,11 @@
   "models": {
     "mai-code-2-flash": {
       "output": 0,
-      "requests": 76
+      "requests": 90
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-21T13:43:18+00:00",
+  "recorded_at": "2026-11-21T13:46:51+00:00",
   "schema": "afs-cost/1",
   "session_id": "0132b795-ec70-4c2f-8b4b-8a2c2ea0c601",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
