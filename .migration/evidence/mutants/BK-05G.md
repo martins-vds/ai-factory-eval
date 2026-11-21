@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05G
 
-Written by `afs-mutation` on its last run (base `origin/main`): score 0.889, threshold 0.8, killed 48, survived 6. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `d8b24bd27103ae43c0073a635c9170452e3de789`): score 0.889, threshold 0.8, killed 48, survived 6. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/dialogs/views.py:18 Mutant #3`
 
