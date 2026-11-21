@@ -55,6 +55,7 @@ def test_return_endpoint_records_the_date(client):
     response = client.post('/loans/L1/return')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == (
         f'L1;ana;9780134685991;2026-01-02;2026-01-16;{today.isoformat()}\n'
     )
@@ -68,6 +69,8 @@ def test_return_endpoint_rejects_a_repeat_and_keeps_the_original_date(client):
     response = client.post('/loans/L2/return')
 
     assert response.status_code == 409
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'loan already returned\n'
     assert Loan.objects.get(pk='L2').returned_on == original_date
 
 
@@ -76,6 +79,7 @@ def test_return_endpoint_reports_an_unknown_loan(client):
     response = client.post('/loans/missing/return')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
 
 
