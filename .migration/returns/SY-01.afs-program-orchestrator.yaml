@@ -1,0 +1,14 @@
+role: afs-program-orchestrator
+ticket: SY-01
+issue: martins-vds/ai-factory-eval#2055
+phase: 0
+decisions:
+  - "martins-vds/ai-factory-synthetic-target@563c316ed51462b08fd6e58f3781a3c8b2890453: pinned legacy/ source, characterized at tier A"
+  - "Characterization tier A is proven by a successful legacy/run.sh Maven build and live HTTP endpoint responses recorded in .migration/references/characterization.md"
+  - "martins-vds/ai-factory-synthetic-target#20: data migration waived by martins-vds because only synthetic seed data is present"
+dispatched: []
+awaiting_human:
+  - "Dispatcher: run ai-factory-swarm@f195ae3d25110bdcf4bd78cadd0676c25c614a5c bootstrap.py with stack pack stacks/java-to-django.json, profile .migration/profile.yaml, and checklist .migration/capabilities.yaml"
+  - "Operator: review each capability gap issue created by bootstrap and resolve it before Phase 2"
+next_step: "Dispatcher runs step 5 bootstrap and hands the setup PR to the human approver; this session stops after steps 1-4"
+handoff: .migration/handoffs/SY-01.md
