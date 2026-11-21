@@ -1,0 +1,32 @@
+<form
+  id="deadline-form"
+  hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+  hx-target="#booking-edit-dialog"
+  hx-swap="innerHTML"
+  hx-on:htmx:before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+>
+  {% csrf_token %}
+  <h2 id="deadline-dialog-heading" class="mb-4 text-lg font-semibold">Change arrival deadline</h2>
+  <p class="mb-4">
+    {{ cargo.route_specification.origin.name }} to {{ cargo.route_specification.destination.name }}
+  </p>
+  <label for="deadline" class="mb-1 block font-medium">Arrival deadline</label>
+  <input
+    id="deadline"
+    name="deadline"
+    type="date"
+    value="{{ deadline|date:'Y-m-d' }}"
+    required
+    {% if deadline_error %}aria-describedby="deadline-error" aria-invalid="true"{% endif %}
+    class="mb-2 block h-10 w-full rounded border border-gray-300 px-3"
+  >
+  {% if deadline_error %}
+    <p id="deadline-error" role="alert" class="mb-3 text-red-700">{{ deadline_error }}</p>
+  {% endif %}
+  <div class="mt-4 flex gap-2">
+    <button type="submit" class="rounded bg-blue-700 px-4 py-2 text-white">Update</button>
+    <button type="button" onclick="this.closest('dialog').close()" class="rounded border px-4 py-2">
+      Cancel
+    </button>
+  </div>
+</form>
