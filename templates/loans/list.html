@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Loans · The Lending Library{% endblock %}
+{% block content %}
+<main class="prototype-shell pt-2">
+  <section>
+    <p class="uppercase tracking-[.2em] text-xs prototype-muted">The collection · {{ loans|length }} loans in view</p>
+    <h1 class="text-5xl md:text-6xl mt-3 mb-4">Books in good company.</h1>
+    <p class="prototype-muted mb-8">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    {% for loan in loans %}
+      <article class="loan-row grid sm:grid-cols-[1fr_auto] gap-4">
+        <div>
+          <p class="text-xl font-semibold">{{ loan.member }}</p>
+          <p class="prototype-muted"><span>{{ loan.id }}</span> · ISBN {{ loan.isbn }}</p>
+        </div>
+        <div class="sm:text-right">
+          <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+          {% if loan.returned_on %}
+            <p class="text-sm prototype-muted">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+          {% endif %}
+          <a class="link" href="/ui/loans/{{ loan.id }}/">View {{ loan.id }}</a>
+        </div>
+      </article>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}

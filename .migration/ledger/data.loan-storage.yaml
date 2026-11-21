@@ -7,9 +7,12 @@ source:
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [loans.Loan, loans.LoanRepository]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json, tests/loans/test_catalog.py::test_seed_records_are_available_in_id_order, tests/loans/test_catalog.py::test_seeding_does_not_replace_persisted_records]
+no_rules: "Storage preservation is an infrastructure capability; it has no input-refusal rule."
 notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
