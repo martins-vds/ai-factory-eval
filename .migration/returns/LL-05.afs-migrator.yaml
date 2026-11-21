@@ -1,0 +1,43 @@
+role: afs-migrator
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#2054
+pr: martins-vds/ai-factory-eval#2058
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.821
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+ledger_updated:
+  - reports.monthly-spec
+quirk_tickets: []
+new_tickets: []
+handoff: null
+rules:
+  - capability: reports.monthly-spec
+    rule: "The report covers the half-open prior-calendar-month range"
+    use_case: MonthlyReportApplication.report
+    test: "tests/reports/test_monthly_report.py::test_monthly_report_groups_and_sorts_member_rows"
+    enforced: true
+    ledger_rule: prior-calendar-month
+  - capability: reports.monthly-spec
+    rule: "Only members with at least one loan started in the report month are included"
+    use_case: MonthlyReportApplication.report
+    test: "tests/reports/test_monthly_report.py::test_monthly_report_groups_and_sorts_member_rows"
+    enforced: true
+    ledger_rule: qualifying-member
+  - capability: reports.monthly-spec
+    rule: "Rows are sorted by total late fees descending, then by member id ascending"
+    use_case: MonthlyReportApplication.report
+    test: "tests/reports/test_monthly_report.py::test_monthly_report_groups_and_sorts_member_rows"
+    enforced: true
+    ledger_rule: report-order
+  - capability: reports.monthly-spec
+    rule: "The report sums late fees in cents using the lending fee formula"
+    use_case: MonthlyReportApplication.report
+    test: "tests/reports/test_monthly_report.py::test_monthly_report_handles_month_end_due_date_and_late_fee_boundaries"
+    enforced: true
+    ledger_rule: late-fee-cents
