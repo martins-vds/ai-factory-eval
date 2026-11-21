@@ -1,7 +1,9 @@
 from datetime import UTC, datetime
 
 import pytest
-from django.test import override_settings
+from django.core import signing
+from django.http import Http404
+from django.test import RequestFactory, override_settings
 from django.urls import path
 
 from cargotracker.booking.application.dashboard import CargoDashboard
@@ -220,3 +222,48 @@ def test_route_selection_rejects_an_invalid_candidate_token(client):
     )
 
     assert response.status_code == 400
+    assert response.content == b'Invalid route selection.'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_a_candidate_for_another_cargo(client):
+    first_tracking_id = _register_cargo_and_candidates()
+    second_tracking_id = CargoRegistration(repository).register(ORIGIN, DESTINATION, DEADLINE)
+    candidate = client.get(f'/admin/cargo/{first_tracking_id.value}/route/').context['routes'][0][
+        'selection'
+    ]
+
+    response = client.post(
+        f'/admin/cargo/{second_tracking_id.value}/route/',
+        {'candidate': candidate},
+    )
+
+    assert response.status_code == 400
+    assert response.content == b'Invalid route selection.'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_selection_rejects_a_signed_non_mapping_candidate(client):
+    tracking_id = _register_cargo_and_candidates()
+    candidate = signing.dumps(
+        'not a mapping',
+        salt='cargotracker.booking.route_selection',
+    )
+
+    response = client.post(
+        f'/admin/cargo/{tracking_id.value}/route/',
+        {'candidate': candidate},
+    )
+
+    assert response.status_code == 400
+
+
+@pytest.mark.django_db
+def test_unknown_route_selection_raises_the_existing_not_found_error():
+    with pytest.raises(Http404, match=r'^Cargo with tracking ID UNKNOWN not found\.$'):
+        route_selection_view(
+            RequestFactory().get('/admin/cargo/UNKNOWN/route/'),
+            'UNKNOWN',
+        )
