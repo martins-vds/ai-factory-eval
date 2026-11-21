@@ -201,35 +201,40 @@
       ]
     },
     "event_types": {
-      "assistant.message": 146,
-      "assistant.turn_end": 63,
-      "assistant.turn_start": 64,
+      "assistant.message": 162,
+      "assistant.turn_end": 74,
+      "assistant.turn_start": 74,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 242,
-      "hook.start": 243,
-      "permission.completed": 127,
-      "permission.requested": 127,
+      "hook.end": 269,
+      "hook.start": 270,
+      "permission.completed": 137,
+      "permission.requested": 137,
       "session.start": 1,
-      "session.usage_record": 64,
+      "session.usage_record": 74,
       "skill.context_delivered_ref": 9,
       "skill.invoked": 7,
       "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 148,
-      "tool.execution_start": 149,
+      "tool.execution_complete": 161,
+      "tool.execution_start": 161,
       "user.message": 3
     },
-    "events": 1408,
+    "events": 1555,
     "usage_fields": []
   },
-  "ended_at": "2026-11-21T19:12:51.513Z",
+  "ended_at": "2026-11-21T19:15:22.489Z",
   "event": "agentStop",
   "harness_tools": [
+    {
+      "count": 1,
+      "exit": 0,
+      "tool": "afs-finish-check"
+    },
     {
       "count": 1,
       "exit": 0,
@@ -300,11 +305,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 146
+      "requests": 162
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-21T19:13:24+00:00",
+  "recorded_at": "2026-11-21T19:16:09+00:00",
   "schema": "afs-cost/1",
   "session_id": "6aafdbc1-4adc-498d-b271-c2c5be5e36c0",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -340,6 +345,5 @@
   ],
   "started_at": "2026-11-21T18:59:20.670Z",
   "surface": "coding-agent",
-  "trigger_id": "ec91992f-98f8-44ee-bf7e-bb5a77429ab8",
   "usage_source": "assistant.message (output only, partial)"
 }
