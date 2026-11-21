@@ -1,0 +1,24 @@
+role: afs-program-orchestrator
+ticket: LI-ACCEPT
+issue: martins-vds/ai-factory-synthetic-target#127
+phase: 6
+decisions:
+  - "The archived acceptance run passed, the LI-AUDIT verdict is complete, and the about.page ledger entry remains migrated with differential verification."
+dispatched: []
+awaiting_human:
+  - "martins-vds/ai-factory-synthetic-target#127: perform the requested side-by-side comparison; do not record a pass until the operator reports the result."
+next_step: "Have the operator compare legacy /about with target /about and /ui/about/, then compare the modernized layout with the approved reading-room plan decisions."
+acceptance:
+  slice: library-info
+  tickets:
+    total: 5
+    merged: 5
+    open: 0
+    blocked: []
+  report: .migration/evidence/library-info/acceptance.md
+  gates: all-green
+  mutation_score: 0.976
+  coverage_gaps: 0
+  human_check: requested
+  human_check_issues: []
+  quirk_tickets: []
