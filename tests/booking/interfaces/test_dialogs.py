@@ -74,9 +74,7 @@ def test_destination_dialog_shows_initial_values_and_stable_filtered_options(cli
     assert 'Hong Kong' in first and 'Melbourne' in first
     assert 'CNHKG' not in option_values
     assert 'AUMEL' not in option_values
-    assert option_values == re.findall(
-        r'<option\b[^>]*value="([^"]+)"', second_options.group(1)
-    )
+    assert option_values == re.findall(r'<option\b[^>]*value="([^"]+)"', second_options.group(1))
     assert location_repository.find_all() == locations_before
 
 
@@ -146,6 +144,37 @@ def test_destination_update_preserves_other_specification_fields_and_refreshes_r
         original.route_specification.arrival_deadline
     )
     assert 'New York' in refreshed_dashboard
+
+
+@pytest.mark.django_db
+def test_change_destination_use_case_rejects_the_cargos_origin():
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    with pytest.raises(ValueError, match="Origin and destination can't be the same"):
+        CargoSpecification(cargo_repository, DjangoHandlingEventRepository()).change_destination(
+            TrackingId('DEF789'),
+            original.route_specification.origin,
+        )
+
+    assert cargo_repository.find(TrackingId('DEF789')) == original
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_destination_dialog_reports_when_the_origin_is_submitted(client):
+    original = cargo_repository.find(TrackingId('DEF789'))
+    assert original is not None
+
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': original.route_specification.origin.unlocode.value},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 200
+    assert 'Destination must differ from origin.' in response.content.decode()
+    assert cargo_repository.find(TrackingId('DEF789')) == original
 
 
 @pytest.mark.django_db

@@ -1,0 +1,49 @@
+<dialog aria-labelledby="destination-dialog-title" class="max-h-[90vh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border border-slate-300 bg-white p-6 shadow-xl">
+  <section class="space-y-5">
+    <header>
+      <h2 id="destination-dialog-title" class="text-xl font-semibold text-slate-900">Change destination</h2>
+      <p class="mt-2 text-slate-700">
+        Cargo {{ cargo.tracking_id.value }} from {{ cargo.route_specification.origin.name }}
+        ({{ cargo.route_specification.origin.unlocode.value }}) to
+        {{ cargo.route_specification.destination.name }}
+        ({{ cargo.route_specification.destination.unlocode.value }})
+      </p>
+    </header>
+    <form
+      id="destination-form"
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+      hx-target="#booking-dialog"
+      hx-swap="innerHTML"
+      class="space-y-5"
+    >
+      {% csrf_token %}
+      <div>
+        <label class="mb-1 block font-medium text-slate-800" for="destination">Destination</label>
+        <select
+          class="select select-bordered min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+          id="destination"
+          name="destination"
+          {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+          autofocus
+        >
+          {% for location in locations %}
+            <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == destination_value %} selected{% endif %}>
+              {{ location.name }} ({{ location.unlocode.value }})
+            </option>
+          {% endfor %}
+        </select>
+        {% if destination_error %}
+          <p class="mt-2 text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+        {% endif %}
+      </div>
+    </form>
+    <div class="flex justify-end gap-3">
+      <form method="dialog">
+        <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="submit">Cancel</button>
+      </form>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit" form="destination-form">Update</button>
+    </div>
+  </section>
+</dialog>
