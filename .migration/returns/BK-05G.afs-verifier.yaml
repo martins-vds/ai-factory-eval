@@ -25,6 +25,9 @@ findings:
     where: templates/booking/dialogs/deadline.html:5
     what: The deadline form does not handle non-2xx htmx responses, so server errors are not shown in the dialog.
     evidence: "run: idiom-ui-errors"
+  - severity: minor
+    where: src/cargotracker/urls.py:23
+    what: Project URLconf omits both dialog routes; test-only routing masks this until planned BK-05H registration.
 tests_added:
   - tests/booking/interfaces/test_dialogs.py::test_unknown_or_stale_cargo_dialog_returns_cargo_not_found
   - tests/booking/interfaces/test_dialogs.py::test_dialog_update_recalculates_route_state
