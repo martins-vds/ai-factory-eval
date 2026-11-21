@@ -31,6 +31,17 @@
         "parentToolCallId",
         "turnId"
       ],
+      "external_tool.completed": [
+        "requestId"
+      ],
+      "external_tool.requested": [
+        "arguments",
+        "requestId",
+        "sessionId",
+        "toolCallId",
+        "toolName",
+        "workingDirectory"
+      ],
       "hook.end": [
         "hookInvocationId",
         "hookType",
@@ -107,6 +118,17 @@
         "source",
         "trigger"
       ],
+      "subagent.completed": [
+        "agentDisplayName",
+        "agentName",
+        "durationMs",
+        "firstDispatchedModel",
+        "model",
+        "modelSelectionSource",
+        "toolCallId",
+        "totalTokens",
+        "totalToolCalls"
+      ],
       "subagent.configured": [
         "model",
         "multiTurn",
@@ -178,30 +200,33 @@
       ]
     },
     "event_types": {
-      "assistant.message": 64,
-      "assistant.turn_end": 63,
-      "assistant.turn_start": 64,
-      "hook.end": 220,
-      "hook.start": 221,
-      "permission.completed": 118,
-      "permission.requested": 118,
+      "assistant.message": 69,
+      "assistant.turn_end": 69,
+      "assistant.turn_start": 69,
+      "external_tool.completed": 1,
+      "external_tool.requested": 1,
+      "hook.end": 232,
+      "hook.start": 233,
+      "permission.completed": 120,
+      "permission.requested": 120,
       "session.start": 1,
-      "session.usage_record": 64,
+      "session.usage_record": 69,
       "skill.context_delivered_ref": 8,
       "skill.invoked": 7,
       "skill.invoked_ref": 1,
+      "subagent.completed": 1,
       "subagent.configured": 1,
       "subagent.selected": 2,
       "subagent.started": 1,
       "system.message": 2,
-      "tool.execution_complete": 135,
-      "tool.execution_start": 136,
+      "tool.execution_complete": 140,
+      "tool.execution_start": 140,
       "user.message": 2
     },
-    "events": 1228,
+    "events": 1289,
     "usage_fields": []
   },
-  "ended_at": "2026-11-21T13:53:11.133Z",
+  "ended_at": "2026-11-21T13:54:57.437Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -245,7 +270,7 @@
       "tool": "check_layers.py"
     },
     {
-      "count": 3,
+      "count": 4,
       "exit": 0,
       "tool": "check_plan.py"
     },
@@ -260,7 +285,7 @@
       "tool": "check_ui.py"
     },
     {
-      "count": 2,
+      "count": 3,
       "exit": 0,
       "tool": "validate.py"
     },
@@ -279,11 +304,11 @@
   "models": {
     "mai-code-2-flash": {
       "output": 0,
-      "requests": 64
+      "requests": 69
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-21T13:53:40+00:00",
+  "recorded_at": "2026-11-21T13:55:27+00:00",
   "schema": "afs-cost/1",
   "session_id": "dedfc14b-a6d6-4b2d-8be0-eebed6729d2d",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -319,6 +344,5 @@
   ],
   "started_at": "2026-11-21T13:42:46.281Z",
   "surface": "coding-agent",
-  "trigger_id": "ffa44a0c-c8bc-4f92-a825-b08368212df3",
   "usage_source": "assistant.message (output only, partial)"
 }
