@@ -1,0 +1,43 @@
+[
+  {
+    "at": "2026-11-21T19:36:42Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20815,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-05",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-05.md",
+      ".migration/ledger/reports.monthly-spec.yaml",
+      ".migration/returns/LL-05.afs-migrator.yaml",
+      "config/settings.py",
+      "src/reports/__init__.py",
+      "src/reports/management/__init__.py",
+      "src/reports/management/commands/__init__.py",
+      "src/reports/management/commands/monthly_report.py",
+      "src/reports/repository.py",
+      "src/reports/services.py",
+      "tests/reports/test_monthly_report.py"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/LL-05.afs-migrator.yaml` reports failing gates and no handoff: `crap: 7.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop.",
+      "[mechanical] You changed `src/reports/services.py` after your last run of `build`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
