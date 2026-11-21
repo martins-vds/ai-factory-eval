@@ -20,3 +20,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:51:17+00:00 | crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T23:51:17+00:00 | crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `cd986f492a47b1ae` |  | gate=crap max=26.0 threshold=30 over=0 methods=177 |
 | 2026-11-21T23:51:20+00:00 | mutation-changed | 0 | 0.08 | `python .migration/harness/tools/afs-mutation` | `ff38ed57dad3cb71` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=3342ac09c288306f1460ce4451f549197327b9cb |
+| 2026-11-21T23:56:03+00:00 | final-invariants | 0 | 1.9 | `pytest -q tests/data_migration/test_invariants.py` | `fed06df9dc542900` |  |  |
+| 2026-11-21T23:57:07+00:00 | build-compile-final | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T23:57:08+00:00 | build-check-final | 0 | 0.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T23:57:57+00:00 | finish-check | 0 | 41.99 | `python .migration/harness/tools/afs-finish-check --ticket DM-05F --role afs-migrator` | `a1b60371041f6195` |  | gate=finish-check ticket=DM-05F role=afs-migrator findings=0 |
