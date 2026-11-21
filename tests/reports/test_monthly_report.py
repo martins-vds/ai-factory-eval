@@ -24,9 +24,7 @@ class LoanRepository:
 
     def started_between(self, start, end):
         self.period = (start, end)
-        return [
-            loan for loan in self.loans if start <= loan.lent_on < end
-        ]
+        return [loan for loan in self.loans if start <= loan.lent_on < end]
 
 
 def test_monthly_report_aggregates_prior_month_and_orders_members():
@@ -101,7 +99,5 @@ def test_monthly_report_command_prints_the_prior_month_from_persisted_loans(monk
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,late_fees_cents\n'
-        'member-c,1,0,300\n'
-        'member-b,1,1,75\n'
+        'member_id,loans_started,late_returns,late_fees_cents\nmember-c,1,0,300\nmember-b,1,1,75\n'
     )

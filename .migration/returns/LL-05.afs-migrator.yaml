@@ -1,0 +1,37 @@
+role: afs-migrator
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#2124
+pr: martins-vds/ai-factory-eval#2128
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 0.912
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+ledger_updated:
+  - .migration/ledger/reports.monthly-spec.yaml
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: reports.monthly-spec
+    rule: "Include loans started in the previous calendar month, using a half-open date interval."
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+    enforced: true
+    ledger_rule: report-window
+  - capability: reports.monthly-spec
+    rule: "Emit one row per member with loans started in the month, reporting starts, late returns, and late fees in cents; omit members without starts."
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+    enforced: true
+    ledger_rule: member-totals
+  - capability: reports.monthly-spec
+    rule: "Sort rows by total late fees descending, then member id ascending."
+    use_case: MonthlyReportApplication.run
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+    enforced: true
+    ledger_rule: sort-order

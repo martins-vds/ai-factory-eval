@@ -40,9 +40,7 @@ class MonthlyReportApplication:
 
             fee_end = loan.returned_on if loan.returned_on is not None else as_of
             days_late = max(0, (fee_end - loan.due_on).days)
-            member['late_fees_cents'] += (
-                0 if days_late <= 2 else min(1000, days_late * 25)
-            )
+            member['late_fees_cents'] += 0 if days_late <= 2 else min(1000, days_late * 25)
 
         return sorted(
             members.values(),
