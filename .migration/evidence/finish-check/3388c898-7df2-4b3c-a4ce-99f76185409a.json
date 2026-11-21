@@ -1,0 +1,48 @@
+[
+  {
+    "at": "2026-11-21T06:48:02Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17040,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "SY-05",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/characterization/source/characterize.py",
+      ".migration/characterization/source/goldens/http.json",
+      ".migration/characterization/source/goldens/http_edges.json",
+      ".migration/evidence/SY-05-characterization.md",
+      ".migration/evidence/runs/SY-05.md",
+      ".migration/ledger/behavioral.get-loan.yaml",
+      ".migration/ledger/behavioral.lend-book.yaml",
+      ".migration/ledger/behavioral.list-loans.yaml",
+      ".migration/ledger/behavioral.loan-csv-format.yaml",
+      ".migration/ledger/behavioral.loan-id-generation.yaml",
+      ".migration/ledger/behavioral.return-book.yaml",
+      ".migration/ledger/data.loan-record-store.yaml",
+      ".migration/ledger/data.loan-seed.yaml",
+      ".migration/ledger/integration.fine-payment.yaml",
+      ".migration/ledger/structural.app-bootstrap.yaml",
+      ".migration/ledger/structural.loan-data-access.yaml",
+      ".migration/ledger/structural.loan-domain-model.yaml",
+      ".migration/ledger/structural.loan-persistence.yaml",
+      ".migration/ledger/structural.maven-run.yaml",
+      ".migration/ledger/ui.about-page.yaml",
+      ".migration/ledger/ui.late-fee-view.yaml",
+      ".migration/returns/SY-05.afs-characterizer.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
