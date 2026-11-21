@@ -106,6 +106,8 @@ def test_catalog_page_lists_seeded_loans_and_detail_links(client):
     assert b'Books in good company.' in response.content
     assert b'ana' in response.content
     assert b'hx-get="/ui/loans/L1/"' in response.content
+    assert b'Returned' in response.content
+    assert b'datetime="2026-01-20"' in response.content
 
 
 @pytest.mark.django_db
