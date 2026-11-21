@@ -80,6 +80,13 @@ def test_return_endpoint_reports_an_unknown_loan(client):
 
 
 @pytest.mark.django_db
+def test_loan_endpoints_reject_unsupported_methods(client):
+    assert client.put('/loans').status_code == 405
+    assert client.post('/loans/L1').status_code == 405
+    assert client.get('/loans/L1/return').status_code == 405
+
+
+@pytest.mark.django_db
 def test_lend_endpoint_escapes_field_and_record_delimiters(client):
     today = server_today()
 

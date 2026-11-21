@@ -10,6 +10,7 @@
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan record · {{ loan.id }}</p>
       <h1 class="card-title mt-2 text-4xl">A book in good company.</h1>
       <p class="mt-2">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+      {% if return_error %}<p role="alert" class="mt-2 text-[#a94e37]">Loan already returned. The original return date is kept.</p>{% endif %}
       <dl class="mt-6 grid gap-4 sm:grid-cols-2">
         <div><dt class="text-sm text-[#66705b]">Lent</dt><dd>{{ loan.lent_on|date:"M j, Y" }}</dd></div>
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ loan.due_on|date:"M j, Y" }}</dd></div>

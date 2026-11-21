@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_services.py::test_return_rejects_an_unknown_loan, tests/loans/test_circulation.py::test_return_endpoint_reports_an_unknown_loan, tests/loans/test_circulation_ui.py::test_htmx_return_renders_an_unknown_loan_error, tests/loans/test_circulation_ui.py::test_htmx_return_renders_a_repeat_error_and_keeps_the_date]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-02.md, tests/loans/test_services.py::test_return_rejects_an_unknown_loan, tests/loans/test_circulation.py::test_return_endpoint_reports_an_unknown_loan, tests/loans/test_circulation_ui.py::test_htmx_return_renders_an_unknown_loan_error, tests/loans/test_circulation_ui.py::test_regular_unknown_return_returns_a_plain_text_not_found, tests/loans/test_circulation_ui.py::test_regular_repeat_return_renders_the_loan_and_original_date, tests/loans/test_circulation_ui.py::test_htmx_return_renders_a_repeat_error_and_keeps_the_date]
 rules:
   - id: unknown-loan
     rule: Reject attempts to return an id that does not identify a stored loan.

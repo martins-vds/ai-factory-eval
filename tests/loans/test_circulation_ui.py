@@ -39,6 +39,7 @@ def test_browser_lending_renders_field_errors(client):
     response = client.post('/ui/loans/new/', {'member': ' \t ', 'isbn': ''})
 
     assert response.status_code == 400
+    assert b'<!doctype html>' in response.content
     assert b'This field is required.' in response.content
     assert Loan.objects.count() == 3
 
@@ -84,6 +85,37 @@ def test_loan_detail_offers_htmx_return_and_updates_the_page(client):
 
 
 @pytest.mark.django_db
+def test_regular_return_redirects_to_updated_loan(client):
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+    assert Loan.objects.get(pk='L1').returned_on == server_today()
+
+
+@pytest.mark.django_db
+def test_regular_repeat_return_renders_the_loan_and_original_date(client):
+    original_date = Loan.objects.get(pk='L2').returned_on
+
+    response = client.post('/ui/loans/L2/return/')
+
+    assert response.status_code == 409
+    assert b'Loan record \xc2\xb7 L2' in response.content
+    assert b'Jan 20, 2026' in response.content
+    assert b'Loan already returned' in response.content
+    assert Loan.objects.get(pk='L2').returned_on == original_date
+
+
+@pytest.mark.django_db
+def test_regular_unknown_return_returns_a_plain_text_not_found(client):
+    response = client.post('/ui/loans/missing/return/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
+    assert response.content == b'no such loan\n'
+
+
+@pytest.mark.django_db
 def test_htmx_return_renders_a_repeat_error_and_keeps_the_date(client):
     original_date = Loan.objects.get(pk='L2').returned_on
 
@@ -91,6 +123,7 @@ def test_htmx_return_renders_a_repeat_error_and_keeps_the_date(client):
 
     assert response.status_code == 409
     assert b'already returned' in response.content
+    assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == original_date
 
 
