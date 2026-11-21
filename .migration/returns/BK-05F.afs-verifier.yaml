@@ -1,0 +1,58 @@
+role: afs-verifier
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2166
+verdict: pass
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 'n/a: no mutable code changed'
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+findings: []
+tests_added:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_return_not_found_for_unknown_or_stale_cargo
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: src/cargotracker/booking/application/routing.py:1,66
+    what: CargoRouting imports and raises Django Http404 in the application layer, a known ADR-0001 layering debt.
+    origin: BK-05C
+    evidence: 'run: verify-idiom-layers'
+rules:
+  - capability: booking.routing-assign
+    rule: A submitted candidate must be signed and associated with the requested tracking ID.
+    use_case: create_route_selection_views.route_selection
+    test: tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
+    enforced: true
+    ledger_rule: route-candidate-valid
+  - capability: booking.routing-assign
+    rule: A selected candidate must satisfy the cargo's current route specification.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+    ledger_rule: route-specification-satisfied
+no_rules:
+  booking.routing-chain: This is flow orchestration; candidate eligibility and assignment rules are recorded separately.
+  booking.screen-route: This is a presentation capability; it introduces no additional business rule.
+  booking.screen-select-itinerary: This is a presentation capability; it introduces no additional business rule.
+mutation_survivors:
+  - ids: [1, 2]
+    matters: false
+    assessment: >-
+      Mutants change only the salt used symmetrically for signing and verification. Tokens are opaque,
+      and this is the application's only signing consumer; no current cross-purpose acceptance changes.
+  - ids: [10, 13, 27, 44, 46]
+    matters: false
+    assessment: >-
+      These mutate Http404 or BadSignature diagnostic text. The same 404 boundary remains; the cargo
+      not-found response stays a 404 and the diagnostic is not part of the normal UI contract.
+  - ids: [14]
+    matters: false
+    assessment: X is unreserved in URLs, so changing quote's safe set does not change the redirect URL.
+  - ids: [40]
+    matters: false
+    assessment: Both missing-token defaults fail signature validation and produce the same 404.
