@@ -1,0 +1,10 @@
+id: loan.persistence
+kind: structural
+title: Configure in-memory JPA persistence
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:3-12
+boundary: Persistence unit library uses H2 in memory, drops and recreates the schema on startup, and loads seed.sql.
+slice: lending-library
+status: pending
+verification: pending

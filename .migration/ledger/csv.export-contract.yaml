@@ -1,0 +1,12 @@
+id: csv.export-contract
+kind: data
+title: Define the loan CSV export contract
+source:
+  graph_node: document:legacy/docs/export-csv.md
+  location: legacy/docs/export-csv.md:1-4
+boundary: Spreadsheet users depend on GET /loans using semicolon-separated fields and one loan per newline.
+slice: lending-library
+status: pending
+verification: pending
+rules:
+  - {id: export-fields, rule: "Loan export fields are id, member, ISBN, lent date, due date, and returned date", source: "legacy/docs/export-csv.md:3"}

@@ -1,0 +1,10 @@
+id: loan.get
+kind: behavioral
+title: Read one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+boundary: GET /loans/{id} returns the loan line with a trailing newline, or 404 with no such loan.
+slice: lending-library
+status: pending
+verification: pending

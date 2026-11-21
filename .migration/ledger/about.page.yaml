@@ -1,0 +1,13 @@
+id: about.page
+kind: ui
+title: View the About page
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/java/lib/AboutPage.java:16-21
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: GET /about serves the UTF-8 classpath HTML containing hours, lending period, and contact address.
+slice: lending-library
+status: pending
+verification: pending
+no_rules: "This capability is static public information and carries no enforced business rule in the page handler."

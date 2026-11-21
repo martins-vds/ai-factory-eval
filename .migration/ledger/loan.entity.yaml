@@ -1,0 +1,10 @@
+id: loan.entity
+kind: structural
+title: Persist the Loan domain entity
+source:
+  graph_node: class:legacy/src/main/java/lib/Loan.java:Loan
+  location: legacy/src/main/java/lib/Loan.java:10-49
+boundary: A loan has id, member, ISBN, lent date, optional returned date, a 14-day due date, and can be marked returned.
+slice: lending-library
+status: pending
+verification: pending
