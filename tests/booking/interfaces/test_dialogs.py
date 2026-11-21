@@ -17,7 +17,6 @@ from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
 
-
 web_cargo_repository = DjangoCargoRepository()
 web_cargo_dashboard = CargoDashboard(web_cargo_repository)
 web_destination_dialog, web_deadline_dialog = create_dialog_views(
@@ -109,7 +108,7 @@ def test_dialogs_open_update_and_refresh_the_not_routed_table(client):
         {'deadline': '2027-01-15'},
         HTTP_HX_REQUEST='true',
     )
-    refreshed_table = client.get('/admin/dashboard/').content.decode(    )
+    refreshed_table = client.get('/admin/dashboard/').content.decode()
 
     assert destination_response.status_code == 200
     assert 'id="destination-dialog"' in destination_response.content.decode()
@@ -271,7 +270,9 @@ def test_deadline_update_preserves_route_fields_and_refreshes_the_table():
     assert response.headers['HX-Redirect'] == '/admin/dashboard/'
     assert cargo_after is not None
     assert cargo_after.route_specification.origin == cargo_before.route_specification.origin
-    assert cargo_after.route_specification.destination == cargo_before.route_specification.destination
+    assert (
+        cargo_after.route_specification.destination == cargo_before.route_specification.destination
+    )
     assert cargo_after.route_specification.arrival_deadline == timezone.make_aware(
         datetime.combine(new_deadline, time.min)
     )
