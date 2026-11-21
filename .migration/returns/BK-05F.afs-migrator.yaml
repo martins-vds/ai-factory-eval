@@ -1,0 +1,62 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2170
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.869
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty: ui
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - .migration/evidence/runs/BK-05F.md
+rules: []
+survivor_classifications:
+  - mutant: "#1: _CANDIDATE_SALT='booking.route_selection' → 'XXbooking.route_selectionXX'"
+    classification: equivalent
+    reason: Signing and verification use the same salt; changing it only changes transient token signatures, not page or redirect behavior.
+  - mutant: "#2: _CANDIDATE_SALT='booking.route_selection' → None"
+    classification: equivalent
+    reason: Signing and verification still use the same salt value; no external or persisted token contract depends on this internal salt.
+  - mutant: "#5: remove @require_http_methods(['GET', 'POST'])"
+    classification: missing_test
+    resolution: Existing test_route_screens_reject_unsupported_http_methods asserts HTTP 405 and kills this mutant.
+  - mutant: "#10: change missing-cargo Http404 detail"
+    classification: equivalent
+    reason: The detail is not rendered in the normal 404 page; the observable response remains HTTP 404.
+  - mutant: "#13: change route-specification Http404 detail"
+    classification: equivalent
+    reason: The detail is not rendered in the normal 404 page; the observable response remains HTTP 404.
+  - mutant: "#14: quote(..., safe='') → quote(..., safe='XXXX')"
+    classification: equivalent
+    reason: X is unreserved and urllib.parse.quote never escapes unreserved characters, so both calls produce the same redirect path.
+  - mutant: "#16: alter route-screen no-route guidance text"
+    classification: missing_test
+    resolution: The interface assertion now checks the complete rendered no-route sentence; it fails on the XX-wrapped mutant.
+  - mutant: "#20: remove @require_http_methods(['GET'])"
+    classification: missing_test
+    resolution: Existing test_route_screens_reject_unsupported_http_methods asserts HTTP 405 for POST to the itinerary page.
+  - mutant: "#21: alter itinerary-screen no-route guidance text"
+    classification: missing_test
+    resolution: The interface assertion now checks the complete rendered itinerary guidance sentence; it fails on the XX-wrapped mutant.
+  - mutant: "#27: change missing-cargo Http404 detail"
+    classification: equivalent
+    reason: The detail is not rendered in the normal 404 page; the observable response remains HTTP 404.
+  - mutant: "#40: missing-candidate default '' → 'XXXX'"
+    classification: equivalent
+    resolution: Removed the redundant empty-string default; missing tokens still produce the same caught invalid-candidate 404.
+  - mutant: "#44/#43: change BadSignature detail"
+    classification: equivalent
+    reason: The BadSignature is caught and mapped to the same invalid-route HTTP 404; the cause detail is not rendered.
+  - mutant: "#46/#45: change invalid-route Http404 detail"
+    classification: equivalent
+    reason: The detail is not rendered in the normal 404 page; the observable response remains HTTP 404.
