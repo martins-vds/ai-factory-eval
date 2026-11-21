@@ -9,7 +9,12 @@ source:
 boundary: POST /loans reads form parameters member and isbn; if either is null it returns 400 with "member and isbn are required", otherwise it delegates a loan dated today.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#43
 rules:
   - id: required-form-fields
     rule: A missing member or ISBN form parameter returns HTTP 400; empty strings are not rejected by this check.

@@ -26,6 +26,21 @@ CASES = (
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
 )
+SCENARIOS = (
+    ('fees.active-loan-cap', 'GET /fees/{id}', 'GET', '/fees/L1', None),
+    ('fees.returned-before-due', 'GET /fees/{id}', 'GET', '/fees/L2', None),
+    ('loans.get-one.missing', 'GET /loans/{id}', 'GET', '/loans/missing', None),
+    ('loans.return.missing', 'POST /loans/{id}/return', 'POST', '/loans/missing/return', None),
+    ('fees.find-loan.missing', 'GET /fees/{id}', 'GET', '/fees/missing', None),
+    ('payments.missing-loan', 'POST /payments/{id}', 'POST', '/payments/missing', None),
+    ('loans.create.missing-member', 'POST /loans', 'POST', '/loans', {'isbn': '123'}),
+    ('loans.create.missing-isbn', 'POST /loans', 'POST', '/loans', {'member': 'dee'}),
+    ('loans.create.blank-fields', 'POST /loans', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    ('loans.create.delimiter-field', 'POST /loans', 'POST', '/loans', {'member': 'ana;bo', 'isbn': 'X'}),
+    ('loans.get-one.delimiter-field', 'GET /loans/{id}', 'GET', '/loans/L6', None),
+    ('loans.return.already-returned', 'POST /loans/{id}/return', 'POST', '/loans/L2/return', None),
+    ('loans.list.after-mutations', 'GET /loans', 'GET', '/loans', None),
+)
 
 
 def verify_graph_coverage():
@@ -82,6 +97,16 @@ def exercise_http():
             },
             'response': get_response(method, path, form),
         }
+    observations['_scenarios'] = {}
+    for name, endpoint, method, path, form in SCENARIOS:
+        observations['_scenarios'][name] = {
+            'request': {
+                'method': method,
+                'path': path,
+                'form': form,
+            },
+            'response': get_response(method, path, form),
+        }
     return observations
 
 
@@ -112,7 +137,6 @@ def normalize(observation, endpoint):
     body = re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', response['body'])
     if endpoint == 'GET /fees/{id}':
         body = re.sub(r'\d+ day\(s\) late', '<days> day(s) late', body)
-        body = re.sub(r'Fee: \$\d+\.\d{2}', 'Fee: $<amount>', body)
     return {
         'request': observation['request'],
         'response': {
@@ -132,8 +156,22 @@ def write_or_compare(name, observation, record):
         return
     expected = json.loads(path.read_text(encoding='utf-8'))
     if name == 'http':
-        actual = {key: normalize(value, key) for key, value in observation.items()}
-        baseline = {key: normalize(value, key) for key, value in expected.items()}
+        scenario_endpoints = {scenario[0]: scenario[1] for scenario in SCENARIOS}
+        actual = {}
+        baseline = {}
+        for key, value in observation.items():
+            if key == '_scenarios':
+                actual[key] = {
+                    scenario: normalize(case, scenario_endpoints[scenario])
+                    for scenario, case in value.items()
+                }
+                baseline[key] = {
+                    scenario: normalize(case, scenario_endpoints[scenario])
+                    for scenario, case in expected[key].items()
+                }
+            else:
+                actual[key] = normalize(value, key)
+                baseline[key] = normalize(expected[key], key)
     else:
         actual = observation
         baseline = expected
@@ -172,10 +210,39 @@ def main():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+    initial_loans = http['GET /loans']['response']
+    with tempfile.TemporaryFile() as output:
+        process = subprocess.Popen(
+            ['bash', str(RUN_SCRIPT)],
+            cwd=SOURCE,
+            env=os.environ.copy(),
+            stdout=output,
+            stderr=subprocess.STDOUT,
+        )
+        try:
+            wait_until_ready(process, output)
+            restarted_loans = get_response('GET', '/loans', None)
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+    if restarted_loans != initial_loans:
+        raise AssertionError('restart did not restore the seeded loan list')
+    http['_restart'] = {
+        'request': {'method': 'GET', 'path': '/loans', 'form': None},
+        'response': restarted_loans,
+    }
     write_or_compare('http', http, args.record)
     write_or_compare('browser', browser, args.record)
     action = 'recorded' if args.record else 'verified'
-    print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
+    checks = len(CASES) + len(SCENARIOS) + len(browser['pages']) + 1
+    print(
+        f'{action} {len(CASES)} source endpoints, {len(SCENARIOS)} HTTP scenarios, '
+        f'restart reset, and {len(browser["pages"])} browser pages ({checks} checks)'
+    )
 
 
 if __name__ == '__main__':

@@ -7,5 +7,7 @@ source:
 boundary: Maven packaging of the Java 17 Lending Library with Jersey/Grizzly, Hibernate, H2, and copied runtime dependencies.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 no_rules: Build configuration is structural; its observable effect is producing the launchable application and dependency set.

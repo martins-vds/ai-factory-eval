@@ -1,0 +1,48 @@
+role: afs-characterizer
+ticket: SY-05
+issue: martins-vds/ai-factory-eval#2214
+tier_used:
+  A: 22
+  B: 0
+  C: 1
+suite:
+  path: .migration/characterization/source/characterize.py
+  cases: 23
+  passing: 23
+  run_log: .migration/evidence/runs/SY-05.md
+predicted_vs_observed:
+  match: 23
+  differs: 0
+ledger_updated:
+  - about.page
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - fees.calculate
+  - fees.find-loan
+  - fees.render
+  - integration.payment-gateway
+  - loan.entity
+  - loan.return-date
+  - loan.return
+  - loans.create-input
+  - loans.create-persist
+  - loans.create-response
+  - loans.csv-contract
+  - loans.get-one
+  - loans.list-query
+  - loans.list-route
+  - loans.return-input
+  - monthly-report.spec
+  - payment.gateway-errors
+  - runtime.build
+  - runtime.launch
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#40
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+  - .migration/quirks/empty-loan-list-newline.md
+  - .migration/quirks/loan-id-collision.md
+review_only_requests: []

@@ -9,5 +9,8 @@ source:
 boundary: A found loan returns HTTP 200 with its updated line and newline; an unknown id returns HTTP 404 with "no such loan" and a newline.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#41]
 notes: See .migration/quirks/repeated-loan-return.md.

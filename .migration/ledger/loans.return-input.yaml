@@ -9,5 +9,8 @@ source:
 boundary: POST /loans/{id}/return uses the path id and the current local date to request a return update.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#41]
 no_rules: This entry records the request boundary; returned-date persistence and response outcomes are separate.

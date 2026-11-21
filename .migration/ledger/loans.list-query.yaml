@@ -9,6 +9,9 @@ source:
 boundary: GET /loans reads every Loan entity in ascending id order using a read EntityManager.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#43]
 no_rules: The repository query exposes the complete ordered loan set without additional filtering.
 notes: The HTTP formatter still returns a newline for an empty result; see .migration/quirks/empty-loan-list-newline.md.

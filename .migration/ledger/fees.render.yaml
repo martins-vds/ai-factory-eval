@@ -9,5 +9,7 @@ source:
 boundary: GET /fees/{id} returns an HTML fragment with loan id, due date, days late, and a dollar fee formatted to two decimal places.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 no_rules: This entry records the HTML representation; calculation rules are inventoried separately.

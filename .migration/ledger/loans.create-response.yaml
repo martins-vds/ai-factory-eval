@@ -9,6 +9,11 @@ source:
 boundary: A successfully persisted loan is returned with HTTP 201 and its semicolon-separated loan line followed by a newline.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#43
 no_rules: The response carries the persisted representation and create status.
 notes: See .migration/quirks/loan-id-collision.md and .migration/quirks/unescaped-loan-export-fields.md.

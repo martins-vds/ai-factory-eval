@@ -9,5 +9,8 @@ source:
 boundary: GET /loans returns id, member, ISBN, lent date, due date, and returned date separated by semicolons, one loan per line; a null returned date is an empty field and the response ends in a newline.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#43]
 notes: Member and ISBN values are inserted unescaped; see .migration/quirks/unescaped-loan-export-fields.md. Empty results still produce one newline; see .migration/quirks/empty-loan-list-newline.md.

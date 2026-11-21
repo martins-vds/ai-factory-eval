@@ -7,5 +7,8 @@ source:
 boundary: Startup seeds L1 for ana, L2 for bo, and L3 for cy with their ISBN, lentOn, and returnedOn values.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+quirks: [martins-vds/ai-factory-synthetic-target#42]
 notes: The seed is reloaded when the persistence unit recreates its schema; see .migration/quirks/restart-data-loss.md.

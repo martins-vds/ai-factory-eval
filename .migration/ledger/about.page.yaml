@@ -8,5 +8,7 @@ source:
 boundary: GET /about serves the classpath HTML page with the library name, Monday-to-Saturday 09:00-18:00 opening hours, 14-day loan period, and contact address.
 tickets: [martins-vds/ai-factory-eval#2152]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
 no_rules: The page is static public information without interactive behavior.
