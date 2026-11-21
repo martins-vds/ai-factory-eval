@@ -40,3 +40,14 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:11:54+00:00 | lint-final-tests | 0 | 0.01 | `ruff check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T19:11:56+00:00 | format-final-tests | 0 | 0.01 | `ruff format --check tests/booking/interfaces/test_route_selection.py src/cargotracker/booking/interfaces/route_selection/views.py` | `3bc53bf3e981a98a` |  |  |
 | 2026-11-21T19:13:10+00:00 | mutation-changed-final-2 | 0 | 56.34 | `python .migration/harness/tools/afs-mutation` | `8307dc2cf301bcb3` |  | gate=mutation score=0.906 threshold=0.8 killed=48 survived=5 files=1 base=36fae5a689c9209c673e36ecb81a55398131911e |
+| 2026-11-21T19:14:18+00:00 | final-build-compileall | 0 | 0.03 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T19:14:21+00:00 | final-build-django-check | 0 | 0.29 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T19:15:17+00:00 | final-behavior-suite | 0 | 53.74 | `pytest -q` | `23514f8a576d623c` |  |  |
+| 2026-11-21T19:15:20+00:00 | final-idiom-ruff | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T19:15:22+00:00 | final-idiom-format | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T19:15:25+00:00 | final-idiom-layers | 0 | 0.11 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T19:15:28+00:00 | final-idiom-ui | 0 | 0.44 | `python .migration/harness/tools/check_ui.py` | `6c483fb5a08ad33e` |  | gate=ui scope="templates changed since 36fae5a689c9209c673e36ecb81a55398131911e" templates=4 findings=0 |
+| 2026-11-21T19:16:17+00:00 | final-crap-coverage | 0 | 45.43 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `ec80485fe0e0e4bb` |  |  |
+| 2026-11-21T19:16:20+00:00 | final-crap-lizard | 0 | 0.11 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-21T19:16:23+00:00 | final-crap-score | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0cea1cdfeb73461b` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
+| 2026-11-21T19:17:14+00:00 | final-regression-suite | 0 | 47.26 | `pytest -q` | `067ac03a75e29767` |  |  |
