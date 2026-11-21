@@ -1,0 +1,30 @@
+role: afs-verifier
+ticket: LL-04
+issue: martins-vds/ai-factory-synthetic-target#65
+pr: martins-vds/ai-factory-eval#2043
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 1
+  idiom: 1
+  crap: "n/a: pytest coverage suite fails on the CSS finding"
+  mutation_changed: "n/a: mutmut could not complete while the verifier baseline test is failing"
+  regression: 1
+evidence_logs:
+  - .migration/evidence/runs/LL-04.md
+findings:
+  - severity: major
+    where: templates/library_info/about.html:6
+    what: "The reading-room template uses Tailwind utilities absent from the committed built CSS (`py-8`, `mt-8`, `leading-relaxed`)."
+    evidence: "tests/library_info/test_about_page.py::test_modern_about_template_utilities_are_in_built_css"
+tests_added:
+  - tests/library_info/test_about_page.py::test_about_routes_reject_post[/about]
+  - tests/library_info/test_about_page.py::test_about_routes_reject_post[/ui/about/]
+  - tests/library_info/test_about_page.py::test_modern_about_template_utilities_are_in_built_css
+ledger_issues:
+  - "about.page: the ledger's migration evidence at tests/library_info/test_about_page.py is not fully green because the built-CSS verifier test fails."
+quirk_tickets: []
+handoff: .migration/handoffs/LL-04.md
+rules: []
+no_rules:
+  about.page: "The capability serves static public information and routes only; it carries no eligibility, limit, state-transition, or use-case business rule."
