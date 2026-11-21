@@ -66,3 +66,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T19:06:35+00:00 | route-selection-tests-final | 0 | 1.84 | `pytest -q tests/booking/interfaces/test_route_selection.py` | `8ee8f83d7f7b3cd7` |  |  |
 | 2026-11-21T19:06:56+00:00 | build-compile | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-21T19:06:56+00:00 | build-django-check | 0 | 0.31 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-21T19:07:25+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-21T19:07:26+00:00 | idiom-ruff-format | 0 | 0.02 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-21T19:07:26+00:00 | idiom-layers | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-21T19:07:26+00:00 | idiom-ui | 0 | 0.49 | `python .migration/harness/tools/check_ui.py` | `f68b53a74a9d38ad` |  | gate=ui scope="templates changed since 6841d295c763202849db8ff9ba328b66673af1dc" templates=0 findings=0 |
+| 2026-11-21T19:08:15+00:00 | regression | 0 | 45.53 | `pytest -q` | `49e0c454b85b1405` |  |  |
