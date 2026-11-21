@@ -1,0 +1,11 @@
+id: library.about
+kind: ui
+title: View library information
+source:
+  graph_node: flow:view-about-page
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-20
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "GET /about serves the static library about HTML."
+status: pending
+verification: pending

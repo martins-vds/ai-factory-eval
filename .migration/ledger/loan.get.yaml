@@ -1,0 +1,10 @@
+id: loan.get
+kind: behavioral
+title: Get one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "GET /loans/{id} returns the semicolon-separated loan or 404 with no such loan."
+status: pending
+verification: pending

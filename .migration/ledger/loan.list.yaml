@@ -1,0 +1,11 @@
+id: loan.list
+kind: behavioral
+title: List and export loans
+source:
+  graph_node: flow:list-loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:25-28
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "GET /loans returns 200 text with one semicolon-separated loan line per row."
+status: pending
+verification: pending

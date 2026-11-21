@@ -1,0 +1,10 @@
+id: application.startup
+kind: structural
+title: Application startup
+source:
+  graph_node: method:legacy/src/main/java/lib/App.java:App.main
+  location: legacy/src/main/java/lib/App.java:13-26
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "run.sh packages and starts lib.App on the configured PORT with JPA, JAX-RS resources, and Grizzly."
+status: pending
+verification: pending

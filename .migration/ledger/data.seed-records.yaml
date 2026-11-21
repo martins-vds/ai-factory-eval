@@ -1,0 +1,10 @@
+id: data.seed-records
+kind: data
+title: Seed loan records
+source:
+  graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "Startup loads three LOAN seed rows: L1, L2, and L3."
+status: pending
+verification: pending
