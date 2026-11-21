@@ -16,7 +16,7 @@ def _to_loan(record: LoanRecord) -> Loan:
 
 class DjangoLoanRepository:
     def list_all(self) -> list[Loan]:
-        return [_to_loan(record) for record in LoanRecord.objects.order_by('id')]
+        return [_to_loan(record) for record in LoanRecord.objects.all()]
 
     def get(self, loan_id: str) -> Loan | None:
         record = LoanRecord.objects.filter(pk=loan_id).first()
