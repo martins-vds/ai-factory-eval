@@ -1,0 +1,14 @@
+id: late-fee.view
+kind: behavioral
+title: View a loan's late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: {crap: 4.0, complexity: 4, coverage: 0.90}
+boundary: "GET /fees/{id} renders the due date and fee HTML or HTTP 404 for an unknown loan."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

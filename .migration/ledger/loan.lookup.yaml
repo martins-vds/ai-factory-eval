@@ -1,0 +1,13 @@
+id: loan.lookup
+kind: behavioral
+title: Look up one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+boundary: "GET /loans/{id} returns the matching loan line or HTTP 404 for an unknown id."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

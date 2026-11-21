@@ -1,0 +1,13 @@
+id: library.about
+kind: ui
+title: Show the library about page
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-10
+boundary: "GET /about returns the classpath HTML page with title and Lending Library opening/lending information."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md

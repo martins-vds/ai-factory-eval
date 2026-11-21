@@ -1,0 +1,13 @@
+id: report.monthly
+kind: behavioral
+title: Produce the monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-8
+boundary: "The remaining specification defines a first-of-month previous-month report grouped and sorted by member."
+status: pending
+verification: pending
+characterization_tier: C
+verification: spec-derived
+evidence:
+- .migration/references/characterization.md

@@ -1,0 +1,15 @@
+id: integration.payment-gateway
+kind: integration
+title: Charge a loan through the payment gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: {crap: 4.0, complexity: 4, coverage: 0.75}
+boundary: "POST /payments/{id} posts to PAYMENT_GATEWAY_URL/charge?loan=<id>; unknown loans return 404."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/evidence/runs/SY-05.md
+notes: "Quirk draft: .migration/quirks/payment-interrupt.md"
