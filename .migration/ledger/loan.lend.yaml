@@ -1,0 +1,11 @@
+id: loan.lend
+kind: behavioral
+title: Lend a book
+source:
+  graph_node: flow:lend-book
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43
+  risk: {crap: 12, complexity: 3, coverage: 0}
+boundary: "POST /loans requires member and isbn form fields, creates a loan dated today, and returns 201."
+status: pending
+verification: pending

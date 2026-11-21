@@ -1,0 +1,9 @@
+id: loan.csv-export
+kind: structural
+title: Export loans as semicolon-separated CSV
+source:
+  graph_node: document:legacy/docs/export-csv.md
+  location: legacy/docs/export-csv.md:1-3
+boundary: "GET /loans exports one line per loan with semicolon-separated fields in the documented order."
+status: pending
+verification: pending

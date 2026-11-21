@@ -1,0 +1,11 @@
+id: payment.pay
+kind: integration
+title: Pay a loan late fee
+source:
+  graph_node: flow:pay-late-fee
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: {crap: 20, complexity: 4, coverage: 0}
+boundary: "POST /payments/{id} looks up the loan and calls the configured payment gateway."
+status: pending
+verification: pending

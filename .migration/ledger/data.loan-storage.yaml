@@ -1,0 +1,10 @@
+id: data.loan-storage
+kind: data
+title: Loan persistence
+source:
+  graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
+  location: legacy/src/main/resources/META-INF/persistence.xml:4-10
+  risk: {crap: 2, complexity: 1, coverage: 0}
+boundary: "Loan records are stored in JPA-managed LOAN data for the life of the running in-memory H2 database."
+status: pending
+verification: pending

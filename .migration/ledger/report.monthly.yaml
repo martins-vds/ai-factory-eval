@@ -1,0 +1,9 @@
+id: report.monthly
+kind: behavioral
+title: Generate monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-9
+boundary: "The retired reporting module's specification defines one row per member for the prior calendar month, sorted by total late fees descending and member id for ties."
+status: pending
+verification: pending
