@@ -7,7 +7,7 @@ gates:
   build: 0
   behavior: 1
   idiom: 0
-  crap: 26.0
+  crap: 1
   mutation_changed: "n/a: no mutable code changed"
   regression: 1
 evidence_logs:
@@ -46,6 +46,7 @@ inherited:
     origin: BK-05C
     evidence: "run: idiom-layers-final (reported as known, not failing)"
 mutation_context: "The profile mutation command returned n/a because this verifier checkout has no mutable code diff; the original BK-05F journal records 0.855 for changed-code mutation."
+handoff: .migration/handoffs/BK-05F.md
 survivors:
   - "#1: no; changing the signing salt changes only opaque tokens produced and verified by the same code."
   - "#2: no; both signing operations use Django's matching default salt."

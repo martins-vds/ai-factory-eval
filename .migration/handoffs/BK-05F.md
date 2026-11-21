@@ -25,3 +25,30 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-verifier · 2026-11-21T19:05:42Z
+**State:** blocked · **Branch / PR:** `copilot/martins-vdsai-factory-pilot-target293-verify-route-another-one` / https://github.com/martins-vds/ai-factory-eval/pull/2089 · **Last commit:** a9c7bb6d
+
+### Done
+- Independently reviewed BK-05F's route-selection code, four ledger entries, plan, characterization, rulings and all nine mutation survivors.
+- Added an unknown-cargo 404 test for both route screens and a direct application test for assigning an itinerary beyond the cargo's arrival deadline; no production code was changed.
+- Build and idiom gates passed; CRAP score was 26.0 (threshold 30). The profile mutation command returned `n/a: no mutable code changed`; the original BK-05F journal records 0.855.
+- The verifier return is at `.migration/returns/BK-05F.afs-verifier.yaml`; migration validation passed before the handoff update.
+
+### Remaining
+- [ ] A Migrator should enforce the route-specification rule in `CargoRouting.assign_route` (or obtain an explicit ruling on its intended application boundary), then rerun behavior, CRAP and regression gates.
+- [ ] A fresh verifier should resume BK-05F after that correction and complete the return.
+
+### Decisions made
+- The verifier finding and failing test are preserved; the verifier does not modify production code or weaken the assertion.
+
+### Blockers / questions
+- The Verifier role cannot fix the production use case. `CargoRouting.assign_route` accepts and persists a late itinerary although the BK-05F view checks the route specification. The added test demonstrates this gap.
+
+### Failing commands
+- `pytest -q` → exit 1, see `.migration/runs/BK-05F/20261121T185856262325Z-behavior-final.log:28-37`.
+- `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` → exit 1, see `.migration/runs/BK-05F/20261121T185955063521Z-crap-coverage-final.log:28-37`.
+- `pytest -q` → exit 1, see `.migration/runs/BK-05F/20261121T190053499227Z-regression-final.log:28-37`.
+
+### Next step for the next session
+Ask a Migrator to enforce application-level route-specification validation while preserving the UI's 404 behavior, then rerun the gates and resume verification.
