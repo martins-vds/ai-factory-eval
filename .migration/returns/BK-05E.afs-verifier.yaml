@@ -1,0 +1,45 @@
+role: afs-verifier
+ticket: BK-05E
+issue: martins-vds/ai-factory-pilot-target#292
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2161
+verdict: changes-required
+gates:
+  build: 0
+  behavior: 0
+  idiom: 1
+  crap: 26.0
+  mutation_changed: 0.919
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05E.md
+findings:
+  - severity: major
+    where: src/cargotracker/booking/interfaces/dashboard/views.py:7
+    what: The dashboard web adapter depends on and calls CargoRepository directly instead of a use case, violating ADR-0001.
+    evidence: "run: final-idiom-layers"
+tests_added:
+  - tests/booking/interfaces/test_cargo_details.py::test_unrouted_cargo_details_link_to_route_selection
+  - tests/booking/interfaces/test_cargo_details.py::test_misdirected_cargo_details_link_to_reroute
+ledger_issues: []
+quirk_tickets: []
+inherited:
+  - where: templates/booking/wizard/_deadline_form.html:5
+    what: The htmx form does not handle 4xx/5xx responses; this is outside BK-05E.
+    origin: BK-05D
+    evidence: "run: final-idiom-ui"
+rules:
+  - capability: booking.cargo-not-found
+    rule: Unknown or stale tracking IDs are rejected as not found.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
+    enforced: true
+no_rules:
+  booking.dashboard-chain: Structural composition only; no business rule.
+  booking.dashboard-filters: Presentation partitioning only; no business-policy refusal.
+  booking.screen-dashboard: UI composition only; no business rule.
+  booking.screen-routed-table: UI rendering only; no business rule.
+  booking.screen-not-routed-table: UI rendering only; dialog actions belong to BK-05G.
+  booking.screen-claimed-table: UI rendering only; no business rule.
+  booking.screen-cargo-details: UI rendering and action links only; not-found behavior is covered by booking.cargo-not-found.
+crap_method: "_prepare_tables(mapping, models), src/cargotracker/data_migration/loader.py:172-226; CRAP 26 < 30, no split needed."
+mutation_survivors: "The only BK-05E survivor is views.py:38 mutant #12, which adds XX around the Http404 detail; the response remains 404 and the exact message is not specified, so it is not behaviorally material. The other 21 survivors are outside BK-05E (19 BK-05D wizard mutants and 2 data-migration exporter mutants)."
