@@ -1,0 +1,13 @@
+<div id="return-status">
+  {% if error %}
+  <p class="mt-5 text-sm text-[#a94e37]" role="alert">{{ error }}</p>
+  {% elif loan.returned_on %}
+  <p class="mt-5 text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+  {% else %}
+  <form class="mt-6" method="post" action="/ui/loans/{{ loan.id }}/return/"
+        hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-status" hx-swap="outerHTML">
+    {% csrf_token %}
+    <button class="btn btn-primary" type="submit">Return this book</button>
+  </form>
+  {% endif %}
+</div>
