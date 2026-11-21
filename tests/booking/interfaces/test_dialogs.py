@@ -57,6 +57,7 @@ def test_destination_dialog_shows_initial_values_and_stable_filtered_options(cli
     assert 'value="USNYC"' in options.group(1)
     assert len(re.findall(r'<option\b', options.group(1))) == 11
     assert locations == initial_locations
+    assert 'id="destination-error"' not in content
     assert re.findall(r'<option\b[^>]*value="([^"]+)"', options.group(1)) == re.findall(
         r'<option\b[^>]*value="([^"]+)"',
         re.search(
@@ -81,6 +82,7 @@ def test_deadline_dialog_shows_cargo_route_fields_and_current_deadline(client):
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
     assert f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"' in content
+    assert 'id="deadline-error"' not in content
 
 
 @pytest.mark.parametrize('dialog', ('destination', 'deadline'))
@@ -94,9 +96,13 @@ def test_unknown_cargo_dialog_returns_not_found(client, dialog):
     assert response.status_code == 404
 
 
+@pytest.mark.parametrize(
+    ('payload', 'expected_value'),
+    [({'deadline': 'not-a-date'}, 'not-a-date'), ({}, '')],
+)
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
-def test_unparseable_deadline_is_reported_at_the_deadline_field(client):
+def test_unparseable_deadline_is_reported_at_the_deadline_field(client, payload, expected_value):
     call_command('seed_sample_data')
     tracking_id = TrackingId('DEF789')
     original = cargo_repository.find(tracking_id)
@@ -104,7 +110,7 @@ def test_unparseable_deadline_is_reported_at_the_deadline_field(client):
 
     response = client.post(
         '/admin/cargo/DEF789/deadline/',
-        {'deadline': 'not-a-date'},
+        payload,
         HTTP_HX_REQUEST='true',
     )
     content = response.content.decode()
@@ -115,6 +121,8 @@ def test_unparseable_deadline_is_reported_at_the_deadline_field(client):
     assert 'id="deadline-error"' in content
     assert 'aria-invalid="true"' in content
     assert 'aria-describedby="deadline-error"' in content
+    assert response.context['deadline_error'] == 'Enter a valid arrival deadline.'
+    assert response.context['deadline_value'] == expected_value
     assert updated is not None
     assert (
         updated.route_specification.arrival_deadline
@@ -142,6 +150,7 @@ def test_destination_update_rejects_origin_as_a_new_destination(client):
     assert response.status_code == 200
     assert 'Select a valid destination.' in content
     assert 'aria-invalid="true"' in content
+    assert response.context['destination_error'] == 'Select a valid destination.'
     assert updated is not None
     assert updated.route_specification == original.route_specification
 
@@ -166,7 +175,7 @@ def test_destination_update_completes_dialog_and_refreshes_the_not_routed_row(cl
 
     assert response.status_code == 200
     assert response.content == b''
-    assert 'bookingDialogCompleted' in response.headers['HX-Trigger']
+    assert response.headers['HX-Trigger'] == 'bookingDialogCompleted'
     assert b'Widget' not in response.content
     assert updated is not None
     assert updated.route_specification.origin == original.route_specification.origin
@@ -199,7 +208,7 @@ def test_deadline_update_completes_dialog_and_refreshes_the_not_routed_row(clien
 
     assert response.status_code == 200
     assert response.content == b''
-    assert 'bookingDialogCompleted' in response.headers['HX-Trigger']
+    assert response.headers['HX-Trigger'] == 'bookingDialogCompleted'
     assert b'Widget' not in response.content
     assert updated is not None
     assert updated.route_specification.origin == original.route_specification.origin
