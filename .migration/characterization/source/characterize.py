@@ -9,6 +9,7 @@ import subprocess
 import tempfile
 import threading
 import time
+from datetime import date, timedelta
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from urllib import error, parse, request
@@ -187,10 +188,49 @@ def exercise_gateway(source_copy):
     return observations
 
 
-def normalize(observation, endpoint):
+def exercise_fee_boundaries(source_copy):
+    today = date.today()
+    due = today - timedelta(days=10)
+    lent_on = due - timedelta(days=14)
+    seed = source_copy / 'target/classes/META-INF/seed.sql'
+    seed.chmod(seed.stat().st_mode | 0o200)
+    with seed.open('a', encoding='utf-8') as output:
+        for loan_id, days_late in (('L4', 2), ('L5', 3)):
+            returned_on = due + timedelta(days=days_late)
+            output.write(
+                f"\nINSERT INTO LOAN (ID, MEMBER, ISBN, LENT_ON, RETURNED_ON) "
+                f"VALUES ('{loan_id}', 'boundary', 'test', DATE '{lent_on}', "
+                f"DATE '{returned_on}');\n"
+            )
+    port = available_port()
+    base_url = f'http://127.0.0.1:{port}'
+    env = os.environ.copy()
+    env['PORT'] = str(port)
+    with tempfile.TemporaryFile() as output:
+        process = subprocess.Popen(
+            ['java', '-cp', 'target/classes:target/dependency/*', 'lib.App'],
+            cwd=source_copy,
+            env=env,
+            stdout=output,
+            stderr=subprocess.STDOUT,
+        )
+        try:
+            wait_until_ready(process, output, base_url)
+            return {
+                f'{days_late}-days-late': {
+                    'request': {'method': 'GET', 'path': f'/fees/{loan_id}', 'form': None},
+                    'response': get_response(base_url, 'GET', f'/fees/{loan_id}', None),
+                }
+                for loan_id, days_late in (('L4', 2), ('L5', 3))
+            }
+        finally:
+            stop_process(process)
+
+
+def normalize(observation, endpoint, include_fee_details=True):
     response = observation['response']
     body = re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', response['body'])
-    if endpoint == 'GET /fees/{id}':
+    if endpoint == 'GET /fees/{id}' and include_fee_details:
         body = re.sub(r'\d+ day\(s\) late', '<days> day(s) late', body)
         body = re.sub(r'Fee: \$\d+\.\d{2}', 'Fee: $<amount>', body)
     return {
@@ -214,6 +254,15 @@ def write_or_compare(name, observation, record):
     if name == 'http':
         actual = {key: normalize(value, CASE_ENDPOINTS[key]) for key, value in observation.items()}
         baseline = {key: normalize(value, CASE_ENDPOINTS[key]) for key, value in expected.items()}
+    elif name == 'fee-boundaries':
+        actual = {
+            key: normalize(value, 'GET /fees/{id}', include_fee_details=False)
+            for key, value in observation.items()
+        }
+        baseline = {
+            key: normalize(value, 'GET /fees/{id}', include_fee_details=False)
+            for key, value in expected.items()
+        }
     else:
         actual = observation
         baseline = expected
@@ -256,13 +305,16 @@ def main():
             finally:
                 stop_process(process)
         gateway = exercise_gateway(source_copy)
+        fee_boundaries = exercise_fee_boundaries(source_copy)
     write_or_compare('http', http, args.record)
     write_or_compare('browser', browser, args.record)
     write_or_compare('gateway', gateway, args.record)
+    write_or_compare('fee-boundaries', fee_boundaries, args.record)
     action = 'recorded' if args.record else 'verified'
     print(
         f'{action} {len(http)} HTTP cases across 7 endpoints, '
-        f'{len(browser["pages"])} browser pages, and {len(gateway) - 1} gateway cases'
+        f'{len(browser["pages"])} browser pages, {len(gateway) - 1} gateway cases, '
+        f'and {len(fee_boundaries)} fee-boundary cases'
     )
 
 
