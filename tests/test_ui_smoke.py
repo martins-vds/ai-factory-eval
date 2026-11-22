@@ -12,7 +12,9 @@ def test_loan_catalog_page_renders_in_browser(live_server):
             assert response is not None
             assert response.status == 200
             assert page.get_by_role('heading', name='Books in good company.').is_visible()
-            assert page.get_by_text('L1', exact=True).is_visible()
-            assert page.get_by_text('ana', exact=True).is_visible()
+            assert page.get_by_role('link', name='Loan L1').is_visible()
+            assert page.get_by_text('ana · ISBN 9780134685991').is_visible()
+            page.get_by_role('link', name='Loan L1').click()
+            assert page.get_by_role('heading', name='A book in good company.').is_visible()
         finally:
             browser.close()

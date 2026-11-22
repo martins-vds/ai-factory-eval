@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+  <div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+    <section aria-label="Loan catalog">
+      <p class="text-xs uppercase tracking-[.2em] prototype-muted">
+        The collection · {{ loans|length }} loans in view
+      </p>
+      <h1 class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+      <p class="mb-8 prototype-muted">
+        A quiet ledger of what is out, who has it, and when it comes home.
+      </p>
+      {% for loan in loans %}
+        <article class="loan-row grid gap-4 sm:grid-cols-[1fr_auto]">
+          <div>
+            <a class="text-xl font-semibold prototype-ink" href="/ui/loans/{{ loan.id }}/">
+              Loan {{ loan.id }}
+            </a>
+            <p class="prototype-muted">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+          </div>
+          <div class="sm:text-right">
+            <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+            {% if loan.returned_on %}
+              <p class="text-sm prototype-muted">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+            {% else %}
+              <p class="text-sm prototype-muted">On loan</p>
+            {% endif %}
+          </div>
+        </article>
+      {% empty %}
+        <p class="prototype-muted" role="status">There are no loans in the catalog.</p>
+      {% endfor %}
+    </section>
+    <aside class="prototype-surface h-fit p-6">
+      <p class="text-xs uppercase tracking-widest prototype-muted">At the desk</p>
+      <h2 class="mb-5 mt-2 text-2xl">A shared collection</h2>
+      <p class="prototype-muted">
+        Books are lent for 14 days. The catalog keeps its records safely between visits.
+      </p>
+    </aside>
+  </div>
+{% endblock %}

@@ -6,7 +6,18 @@ from django.db import connection
 
 from src.loans.domain import Loan
 from src.loans.repository import DjangoLoanRepository
-from src.loans.services import LoanCatalog, format_loan
+from src.loans.services import LoanCatalog
+
+
+class InMemoryLoanRepository:
+    def __init__(self, loans):
+        self.loans = loans
+
+    def list_all(self):
+        return self.loans
+
+    def find_by_id(self, loan_id):
+        return next((loan for loan in self.loans if loan.id == loan_id), None)
 
 
 def test_due_date_is_fourteen_calendar_days_after_lending():
@@ -19,12 +30,34 @@ def test_due_date_is_fourteen_calendar_days_after_lending():
     )
 
     assert loan.due_on == date(2026, 11, 22)
+    assert LoanCatalog.due_date(loan.lent_on) == date(2026, 11, 22)
+
+
+def test_catalog_orders_loan_records_by_id():
+    loans = [
+        Loan('L2', 'bo', '2', date(2026, 1, 10), None),
+        Loan('L1', 'ana', '1', date(2026, 1, 2), None),
+    ]
+    catalog = LoanCatalog(InMemoryLoanRepository(loans))
+
+    assert [loan.id for loan in catalog.list_loans()] == ['L1', 'L2']
 
 
 def test_unknown_loan_is_not_found_at_use_case_boundary(db):
     catalog = LoanCatalog(DjangoLoanRepository())
 
     assert catalog.get_loan('missing') is None
+
+
+@pytest.mark.django_db(transaction=True)
+def test_repository_commits_catalog_records_to_postgresql():
+    loan = Loan('L4', 'dee', '123', date(2026, 11, 8), None)
+    repository = DjangoLoanRepository()
+
+    repository.save(loan)
+    connection.close()
+
+    assert repository.find_by_id('L4') == loan
 
 
 def test_text_export_escapes_field_and_record_delimiters():
@@ -36,7 +69,7 @@ def test_text_export_escapes_field_and_record_delimiters():
         returned_on=None,
     )
 
-    assert format_loan(loan) == (
+    assert LoanCatalog.format_loan(loan) == (
         'L4;"member;with\nnewline";"123;""456";2026-11-08;2026-11-22;\n'
     )
 
@@ -67,6 +100,16 @@ def test_api_gets_one_loan_or_returns_the_legacy_not_found_response(client):
     assert missing.status_code == 404
     assert missing['Content-Type'] == 'text/plain'
     assert missing.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_ui_detail_and_admin_route(client):
+    detail = client.get('/ui/loans/L1/')
+
+    assert detail.status_code == 200
+    assert b'9780134685991' in detail.content
+    assert client.get('/ui/loans/missing/').status_code == 404
+    assert client.get('/admin/login/').status_code == 404
 
 
 @pytest.mark.django_db(transaction=True)
