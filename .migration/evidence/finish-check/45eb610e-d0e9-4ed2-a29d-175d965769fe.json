@@ -1,0 +1,35 @@
+[
+  {
+    "at": "2026-11-22T00:16:58Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 23211,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05D",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/45eb610e-d0e9-4ed2-a29d-175d965769fe.json",
+      ".migration/evidence/mutants/DM-05D.md",
+      ".migration/evidence/runs/DM-05D.md",
+      ".migration/returns/DM-05D.afs-migrator.yaml",
+      "src/cargotracker/data_migration/exporter.py",
+      "src/cargotracker/data_migration/management/commands/export_data_snapshot.py",
+      "tests/data_migration/test_export.py"
+    ],
+    "findings": [
+      "[mechanical] You changed `tests/data_migration/test_export.py` after your last run of `build`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return."
+    ],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "self_heal.enabled is off; would have blocked"
+  }
+]
