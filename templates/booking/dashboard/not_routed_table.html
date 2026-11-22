@@ -1,4 +1,13 @@
-<section id="not-routed-cargo" aria-labelledby="not-routed-cargo-heading">
+<section
+  id="not-routed-cargo"
+  aria-labelledby="not-routed-cargo-heading"
+  hx-get="/admin/dashboard/"
+  hx-trigger="cargoUpdated from:body"
+  hx-select="#not-routed-cargo"
+  hx-target="this"
+  hx-swap="outerHTML"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true"
+>
   <h2 id="not-routed-cargo-heading" class="mb-3 text-xl font-semibold text-gray-900">Not Routed Cargo</h2>
   <div class="overflow-x-auto">
     <table class="w-full border-collapse text-left">
@@ -28,11 +37,35 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <button
+                type="button"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+                class="btn btn-ghost min-h-11 rounded-md px-3 py-2"
+              >Change destination</button>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}
+              <button
+                type="button"
+                aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#cargo-edit-dialog"
+                hx-swap="innerHTML"
+                class="btn btn-ghost min-h-11 rounded-md px-3 py-2"
+              >Change deadline</button>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog
+    id="cargo-edit-dialog"
+    aria-label="Edit cargo"
+    class="modal"
+    hx-on::after-swap="if (!this.open) this.showModal()"
+  ></dialog>
 </section>

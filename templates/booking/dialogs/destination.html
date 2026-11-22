@@ -1,0 +1,47 @@
+<header>
+  <h2 id="cargo-edit-dialog-heading" class="mb-4 text-xl font-semibold text-slate-900">
+    Change destination
+  </h2>
+  <p class="mb-4">
+    {{ cargo.route_specification.origin.name }} to
+    {{ cargo.route_specification.destination.name }}
+  </p>
+</header>
+<form
+  method="post"
+  action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+  hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+  hx-target="#cargo-edit-dialog"
+  hx-swap="innerHTML"
+  hx-on::after-request="if (event.detail.successful) this.closest('dialog').close()"
+  class="flex flex-col gap-4"
+>
+  {% csrf_token %}
+  <label for="destination" class="font-medium">New destination</label>
+  <select
+    id="destination"
+    name="destination"
+    required
+    {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    class="select select-bordered w-full"
+  >
+    <option value="">Choose a destination</option>
+    {% for location in destinations %}
+      <option
+        value="{{ location.unlocode.value }}"
+        {% if location.unlocode.value == selected_destination %}selected{% endif %}
+      >{{ location.name }} ({{ location.unlocode.value }})</option>
+    {% endfor %}
+  </select>
+  {% if destination_error %}
+    <p id="destination-error" role="alert" class="text-red-700">{{ destination_error }}</p>
+  {% endif %}
+  <div class="flex justify-end gap-3">
+    <button
+      type="button"
+      onclick="this.closest('dialog').close()"
+      class="btn btn-ghost min-h-11 rounded-md px-5 py-2"
+    >Cancel</button>
+    <button type="submit" class="btn btn-primary min-h-11 rounded-md px-5 py-2">Update</button>
+  </div>
+</form>
