@@ -66,11 +66,7 @@ def _destination_context(
         'tracking_id': cargo.tracking_id.value,
         'origin': origin,
         'current_destination': destination,
-        'destinations': [
-            location
-            for location in locations
-            if location != origin and location != destination
-        ],
+        'destinations': [location for location in locations if location != origin and location != destination],
         'selected_destination': selected_destination,
         'destination_error': error,
     }

@@ -110,7 +110,9 @@ def test_destination_dialog_update_preserves_other_specification_fields_and_refr
     assert updated is not None
     assert updated.route_specification.origin == before.route_specification.origin
     assert updated.route_specification.destination.unlocode.value == 'USNYC'
-    assert updated.route_specification.arrival_deadline == before.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline == before.route_specification.arrival_deadline
+    )
 
 
 @pytest.mark.django_db
