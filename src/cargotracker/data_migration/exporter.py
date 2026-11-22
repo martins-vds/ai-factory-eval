@@ -1,29 +1,15 @@
 import csv
-import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import yaml
-from django.apps import apps
 
-
-class DataExportError(Exception):
-    pass
-
-
-def _model_index():
-    return {
-        model._meta.db_table: model
-        for model in apps.get_models()
-        if not model._meta.proxy and not model._meta.auto_created
-    }
-
-
-def _field_for_column(model, column):
-    for field in model._meta.concrete_fields:
-        if column in (field.column, field.name, field.attname):
-            return field
-    raise DataExportError(f'{model._meta.db_table}: no target column {column!r}')
+from cargotracker.data_migration.schema import (
+    DataExportError,
+    field_for_column,
+    format_value,
+    model_index,
+    timestamp_timezone,
+)
 
 
 def _prepare_tables(mapping, models):
@@ -43,7 +29,7 @@ def _prepare_tables(mapping, models):
         columns = spec.get('columns')
         if not isinstance(columns, dict) or not columns:
             raise DataExportError(f'{target}: mapping has no columns')
-        fields = {column: _field_for_column(model, column) for column in columns}
+        fields = {column: field_for_column(model, column) for column in columns}
         key = spec.get('key')
         if not isinstance(key, list) or not key or any(column not in fields for column in key):
             raise DataExportError(f'{target}: mapping key must name mapped target columns')
@@ -62,28 +48,6 @@ def _prepare_tables(mapping, models):
     return prepared
 
 
-def _timestamp_timezone(mapping):
-    zone = (mapping.get('defaults') or {}).get('timestamp_tz', 'UTC')
-    try:
-        return ZoneInfo(zone)
-    except (TypeError, ZoneInfoNotFoundError) as error:
-        raise DataExportError(f'unknown timestamp timezone {zone!r}') from error
-
-
-def _format_value(value, timezone):
-    if value is None:
-        return r'\N'
-    if isinstance(value, datetime.datetime):
-        if value.tzinfo is None or value.utcoffset() is None:
-            value = value.replace(tzinfo=timezone)
-        return value.astimezone(datetime.UTC).isoformat()
-    if isinstance(value, datetime.date):
-        return value.isoformat()
-    if isinstance(value, bool):
-        return 'true' if value else 'false'
-    return str(value)
-
-
 def _write_table(output, table, timezone):
     path = output / f'{table["target"]}.csv'
     model = table['model']
@@ -95,7 +59,7 @@ def _write_table(output, table, timezone):
             rows = model._base_manager.order_by(*ordering).iterator(chunk_size=1000)
             writer.writerows(
                 [
-                    _format_value(getattr(row, table['fields'][column].attname), timezone)
+                    format_value(getattr(row, table['fields'][column].attname), timezone)
                     for column in table['columns']
                 ]
                 for row in rows
@@ -115,8 +79,8 @@ def export_snapshot(mapping_path, output_path):
     if not isinstance(mapping, dict):
         raise DataExportError(f'{mapping_file}: mapping must be an object')
 
-    timezone = _timestamp_timezone(mapping)
-    tables = _prepare_tables(mapping, _model_index())
+    timezone = timestamp_timezone(mapping)
+    tables = _prepare_tables(mapping, model_index())
     output = Path(output_path)
     try:
         output.mkdir(parents=True, exist_ok=True)
