@@ -14,6 +14,10 @@ def list_loans(reader: LoanReader) -> list[Loan]:
     return sorted(reader.list(), key=lambda loan: loan.id)
 
 
+def get_loan(reader: LoanReader, loan_id: str) -> Loan | None:
+    return reader.get(loan_id)
+
+
 def format_loan(loan: Loan) -> str:
     output = StringIO()
     writer = csv.writer(output, delimiter=';', lineterminator='\n')

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<article class="mx-auto max-w-3xl">
+  <a class="link link-hover text-rose-800" href="{% url 'loan-catalog-page' %}">← Back to the collection</a>
+  <p class="mt-10 text-xs uppercase tracking-[.2em] text-stone-600">Loan record</p>
+  <h1 class="mb-8 mt-3 text-5xl font-normal">A book in good company.</h1>
+  <div class="card border border-stone-300 bg-white shadow-sm">
+    <div class="card-body">
+      <p><span class="font-semibold">Loan:</span> {{ loan.id }}</p>
+      <p><span class="font-semibold">Member:</span> {{ loan.member }}</p>
+      <p><span class="font-semibold">ISBN:</span> {{ loan.isbn }}</p>
+      <p><span class="font-semibold">Lent:</span> {{ loan.lent_on|date:"M j, Y" }}</p>
+      <p><span class="font-semibold">Due:</span> {{ due_on|date:"M j, Y" }}</p>
+      <p>
+        <span class="font-semibold">Returned:</span>
+        {% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet{% endif %}
+      </p>
+    </div>
+  </div>
+</article>
+{% endblock %}
