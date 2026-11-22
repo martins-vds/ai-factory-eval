@@ -1,6 +1,6 @@
 import csv
-from io import StringIO
 from datetime import date
+from io import StringIO
 from typing import Protocol
 
 
@@ -19,7 +19,6 @@ class LoanRepositoryPort(Protocol):
 class InvalidLoanInput(ValueError):
     def __init__(self, errors):
         self.errors = errors
-        super().__init__('Loan fields are required.')
 
 
 class AlreadyReturned(ValueError):

@@ -2,14 +2,14 @@
   {% csrf_token %}
   <div class="form-control">
     <label class="label" for="member"><span class="label-text">Member</span></label>
-    <input class="input input-bordered" id="member" name="member" value="{{ member }}" required aria-describedby="member-error">
+    <input class="input input-bordered" id="member" name="member" value="{{ member }}" required{% if errors.member %} aria-describedby="member-error" aria-invalid="true"{% endif %}>
     {% if errors.member %}
     <p class="mt-1 text-sm text-[#a94e37]" id="member-error" role="alert">{{ errors.member }}</p>
     {% endif %}
   </div>
   <div class="form-control mt-3">
     <label class="label" for="isbn"><span class="label-text">ISBN</span></label>
-    <input class="input input-bordered" id="isbn" name="isbn" value="{{ isbn }}" required aria-describedby="isbn-error">
+    <input class="input input-bordered" id="isbn" name="isbn" value="{{ isbn }}" required{% if errors.isbn %} aria-describedby="isbn-error" aria-invalid="true"{% endif %}>
     {% if errors.isbn %}
     <p class="mt-1 text-sm text-[#a94e37]" id="isbn-error" role="alert">{{ errors.isbn }}</p>
     {% endif %}

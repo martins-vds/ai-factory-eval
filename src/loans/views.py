@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods, require_POST
 
 from .repository import LoanRepository
@@ -32,22 +33,12 @@ def loan_list(request):
     return HttpResponse(list_loans_text(LoanRepository()), content_type='text/plain')
 
 
+@csrf_exempt
 @require_http_methods(['GET', 'POST'])
 def loan_collection(request):
-    if request.method == 'POST':
-        return loan_create(request)
-    return loan_list(request)
+    if request.method == 'GET':
+        return loan_list(request)
 
-
-def loan_detail(request, loan_id):
-    body = get_loan_text(loan_id, LoanRepository())
-    if body is None:
-        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-    return HttpResponse(body, content_type='text/plain')
-
-
-@require_POST
-def loan_create(request):
     try:
         loan = lend_loan(
             request.POST.get('member'),
@@ -60,6 +51,14 @@ def loan_create(request):
     return HttpResponse(loan_line(loan), status=201, content_type='text/plain')
 
 
+def loan_detail(request, loan_id):
+    body = get_loan_text(loan_id, LoanRepository())
+    if body is None:
+        return HttpResponse('no such loan\n', status=404, content_type='text/plain')
+    return HttpResponse(body, content_type='text/plain')
+
+
+@csrf_exempt
 @require_POST
 def loan_return(request, loan_id):
     try:
@@ -74,11 +73,7 @@ def loan_return(request, loan_id):
 @require_http_methods(['GET', 'POST'])
 def loan_lend(request):
     if request.method == 'GET':
-        return render(
-            request,
-            'loans/new.html',
-            {'member': '', 'isbn': '', 'errors': {}},
-        )
+        return render(request, 'loans/new.html')
 
     member = request.POST.get('member')
     isbn = request.POST.get('isbn')
@@ -86,11 +81,15 @@ def loan_lend(request):
         loan = lend_loan(member, isbn, LoanRepository(), timezone.localdate())
     except InvalidLoanInput as error:
         context = {
-            'member': member or '',
-            'isbn': isbn or '',
+            'member': member,
+            'isbn': isbn,
             'errors': error.errors,
         }
-        template = 'loans/_lend_form.html' if request.headers.get('HX-Request') == 'true' else 'loans/new.html'
+        template = (
+            'loans/_lend_form.html'
+            if request.headers.get('HX-Request') == 'true'
+            else 'loans/new.html'
+        )
         return render(request, template, context, status=422)
 
     if request.headers.get('HX-Request') == 'true':
@@ -107,9 +106,14 @@ def loan_return_ui(request, loan_id):
         return render(
             request,
             'loans/_loan_row.html',
-            {'loan': get_loan(loan_id, repository), 'error': 'This loan has already been returned.'},
+            {
+                'loan': get_loan(loan_id, repository),
+                'error': 'This loan has already been returned.',
+            },
             status=409,
         )
     if loan is None:
-        return render(request, 'loans/_return_feedback.html', {'error': 'No such loan.'}, status=404)
+        return render(
+            request, 'loans/_return_feedback.html', {'error': 'No such loan.'}, status=404
+        )
     return render(request, 'loans/_loan_row.html', {'loan': loan})
