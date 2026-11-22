@@ -8,4 +8,8 @@ source:
   risk: { crap: 20, complexity: 4, coverage: 0 }
 boundary: POST /payments/{id} returns 404 without calling the gateway for an unknown loan; gateway status 200 remains 200 with its body, every other status becomes 502 with its body, and I/O or interruption becomes 502 with "payment gateway unavailable\n".
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

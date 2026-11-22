@@ -8,4 +8,8 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: POST /loans/{id}/return sets returnedOn to today and returns the formatted loan line, or HTTP 404 with "no such loan\n" when the id is unknown; repeating the request replaces the prior return date.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

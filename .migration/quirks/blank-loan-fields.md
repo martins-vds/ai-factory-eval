@@ -5,7 +5,7 @@
 
 ## Evidence
 - Source: `endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans` / `legacy/src/main/java/lib/LoanResource.java:37-42`
-- Characterization: Predicted from source (not yet exercised): a request with both form fields present but empty passes the null check and proceeds to create a loan.
+- Characterization: tier A observed `POST /loans` with both fields present but empty returning HTTP 201 and creating `L5;;;2026-11-22;2026-12-06;`. `GET /loans/L5` returned the same empty member/ISBN fields. See `.migration/characterization/source/goldens/edges.json`.
 - Why it looks wrong: The error response says both fields are required, but the implementation enforces presence only, not non-blank values.
 
 ## Impact

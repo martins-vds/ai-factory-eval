@@ -8,4 +8,8 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: Loan records contain id, member, isbn, lentOn, dueOn, and returnedOn in that order, separated by semicolons; an unreturned loan has an empty final field.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

@@ -8,4 +8,8 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: GET /about serves the packaged static HTML page as UTF-8 text/html, including opening hours, the 14-day lending period, and contact details.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

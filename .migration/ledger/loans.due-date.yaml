@@ -6,4 +6,8 @@ source:
   location: legacy/src/main/java/lib/Loan.java:14-46
 boundary: Each loan is due 14 days after lentOn; dueOn is exposed in the formatted loan record and used to calculate late fees.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

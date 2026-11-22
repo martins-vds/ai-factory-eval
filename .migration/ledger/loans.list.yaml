@@ -8,4 +8,8 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: GET /loans returns all loans ordered by id as one semicolon-separated record per line, with a trailing newline; an empty result is a single newline.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

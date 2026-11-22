@@ -7,4 +7,8 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: GET /loans/{id} returns the formatted loan line followed by a newline, or HTTP 404 with "no such loan\n" when the id is unknown.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

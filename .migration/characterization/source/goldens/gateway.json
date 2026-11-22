@@ -1,0 +1,62 @@
+{
+  "gateway_io_error": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/L3"
+    },
+    "response": {
+      "body": "payment gateway unavailable\n",
+      "content_type": "text/plain",
+      "status": 502
+    }
+  },
+  "gateway_non_200": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/L3"
+    },
+    "response": {
+      "body": "gateway unavailable\n",
+      "content_type": "text/plain",
+      "status": 502
+    }
+  },
+  "gateway_requests": [
+    {
+      "body": "",
+      "method": "POST",
+      "path": "/charge?loan=L3"
+    },
+    {
+      "body": "",
+      "method": "POST",
+      "path": "/charge?loan=L3"
+    }
+  ],
+  "gateway_success": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/L3"
+    },
+    "response": {
+      "body": "approved\n",
+      "content_type": "text/plain",
+      "status": 200
+    }
+  },
+  "unknown_loan": {
+    "request": {
+      "form": null,
+      "method": "POST",
+      "path": "/payments/missing"
+    },
+    "response": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  }
+}
