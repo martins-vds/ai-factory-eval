@@ -9,9 +9,31 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.loans.services.return_book
+    - src.loans.views.loan_return
+    - src.loans.views.loan_catalog_return
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_api_records_first_return_date_and_legacy_response
+  - tests/loans/test_circulation.py::test_return_api_preserves_not_found_response_for_unknown_loan
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_unknown_loan
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_original_date
+  - tests/loans/test_circulation.py::test_browser_return_records_date_and_updates_return_status
+rules:
+  - id: reject-unknown-loan
+    rule: Returning a loan identifier that does not exist is rejected.
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
+  - id: reject-repeat-return
+    rule: A loan that has already been returned cannot be returned again.
+    source: martins-vds/ai-factory-synthetic-target#41
+notes: "The approved fix in #41 rejects repeated returns without replacing the original date."
 quirks: [martins-vds/ai-factory-synthetic-target#41]

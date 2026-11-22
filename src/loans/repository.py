@@ -13,3 +13,20 @@ class LoanRepository:
     @transaction.atomic
     def create(self, **fields):
         return Loan.objects.create(**fields)
+
+    @transaction.atomic
+    def lend(self, member, isbn, lent_on):
+        loan_id = f'L{Loan.objects.count() + 1}'
+        return Loan.objects.create(
+            id=loan_id,
+            member=member,
+            isbn=isbn,
+            lent_on=lent_on,
+        )
+
+    @transaction.atomic
+    def mark_returned(self, loan_id, returned_on):
+        updated = Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(
+            returned_on=returned_on
+        )
+        return updated == 1
