@@ -45,3 +45,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T18:07:36+00:00 | return-validate-final | 1 | 6.49 | `python .migration/harness/tools/validate.py .migration` | `5ec8a47e8b570c65` | 195 file(s) checked, 3 error(s) |  |
 | 2026-11-22T18:07:47+00:00 | return-validate-final | 1 | 6.6 | `python .migration/harness/tools/validate.py .migration` | `4bf2175061f90b26` | 195 file(s) checked, 1 error(s) |  |
 | 2026-11-22T18:07:58+00:00 | return-validate-final | 0 | 6.65 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-22T18:10:36+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
