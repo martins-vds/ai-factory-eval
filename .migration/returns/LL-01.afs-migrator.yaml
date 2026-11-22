@@ -3,12 +3,12 @@ ticket: LL-01
 issue: martins-vds/ai-factory-eval#2318
 pr: martins-vds/ai-factory-eval#2321
 gates:
-  build: pending
-  behavior: pending
-  idiom: pending
-  crap: pending
-  mutation_changed: pending
-  regression: pending
+  build: null
+  behavior: null
+  idiom: null
+  crap: null
+  mutation_changed: null
+  regression: null
 evidence_logs:
   - .migration/evidence/runs/LL-01.md
 ledger_updated:
