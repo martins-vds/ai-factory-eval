@@ -54,3 +54,8 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T18:11:55+00:00 | layers-correction | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
 | 2026-11-22T18:11:57+00:00 | ui-correction | 0 | 0.55 | `python .migration/harness/tools/check_ui.py` | `155001eb467e1b84` |  | gate=ui scope="templates changed since a5a2fdf4f0431a1e6fbf29dcbda1a9df126efa17" templates=4 findings=0 |
 | 2026-11-22T18:12:09+00:00 | return-validate-correction | 0 | 6.28 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
+| 2026-11-22T18:13:47+00:00 | lint-finish-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T18:13:49+00:00 | format-finish-check | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-22T18:13:52+00:00 | layers-finish-check | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-22T18:13:54+00:00 | ui-finish-check | 0 | 0.56 | `python .migration/harness/tools/check_ui.py` | `155001eb467e1b84` |  | gate=ui scope="templates changed since a5a2fdf4f0431a1e6fbf29dcbda1a9df126efa17" templates=4 findings=0 |
+| 2026-11-22T18:14:07+00:00 | return-validate-finish-check | 0 | 6.38 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
