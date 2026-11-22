@@ -1,0 +1,59 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+specialty: ui
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2400
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.857
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_assignment_quotes_tracking_id_as_one_redirect_path_segment
+  - tests/booking/interfaces/test_route_selection_views_reject_unsupported_methods_before_lookup
+survivor_classifications:
+  - mutant: "views.py:22 #1"
+    diff: "_CANDIDATE_SALT: 'booking.route_selection' → 'XXbooking.route_selectionXX'"
+    classification: equivalent
+    why: "Candidate signing and verification use the same salt, so changing both preserves the rendered-and-submitted candidate flow."
+  - mutant: "views.py:22 #2"
+    diff: "_CANDIDATE_SALT: 'booking.route_selection' → None"
+    classification: equivalent
+    why: "Django signing uses the same default salt for both dumps and loads; the candidate flow remains valid."
+  - mutant: "views.py:34 #10"
+    diff: "Unknown-cargo Http404 detail is wrapped in XX"
+    classification: equivalent
+    why: "The view still returns the same generic 404 response; the exception detail is not rendered."
+  - mutant: "views.py:37 #13"
+    diff: "Stale-route Http404 detail is wrapped in XX"
+    classification: equivalent
+    why: "The view still returns the same generic 404 response; the exception detail is not rendered."
+  - mutant: "views.py:39 #14"
+    diff: "quote(..., safe='') → quote(..., safe='XXXX')"
+    classification: equivalent
+    why: "X is already an unreserved character, so the safe-set change produces the same quoted path segment."
+  - mutant: "views.py:71 #28"
+    diff: "Unknown-cargo Http404 detail in _selection_context is wrapped in XX"
+    classification: equivalent
+    why: "The exception detail is not rendered; status and generic 404 page are unchanged."
+  - mutant: "views.py:96 #41"
+    diff: "Missing candidate default '' → 'XXXX'"
+    classification: equivalent
+    why: "Both defaults are invalid signed values; signing.loads raises BadSignature and the view returns the same 404."
+  - mutant: "views.py:98 #45"
+    diff: "BadSignature detail is wrapped in XX"
+    classification: equivalent
+    why: "The error is caught and translated to the same generic 404 response."
+  - mutant: "views.py:101 #47"
+    diff: "Invalid-route Http404 detail is wrapped in XX"
+    classification: equivalent
+    why: "The exception detail is not rendered; status and generic 404 page are unchanged."
