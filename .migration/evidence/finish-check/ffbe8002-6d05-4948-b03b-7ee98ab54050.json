@@ -1,0 +1,50 @@
+[
+  {
+    "at": "2026-11-22T00:29:34Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16977,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "SY-04",
+    "role": "afs-analyst",
+    "changed": [
+      ".migration/evidence/runs/SY-04.md",
+      ".migration/ledger/about.page.yaml",
+      ".migration/ledger/application.build-run.yaml",
+      ".migration/ledger/application.startup.yaml",
+      ".migration/ledger/data.loan-entity.yaml",
+      ".migration/ledger/data.loan-storage.yaml",
+      ".migration/ledger/data.seed-records.yaml",
+      ".migration/ledger/fees.view.yaml",
+      ".migration/ledger/loan.create.yaml",
+      ".migration/ledger/loan.get.yaml",
+      ".migration/ledger/loan.list.yaml",
+      ".migration/ledger/loan.record-format.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/ledger/payment.gateway-errors.yaml",
+      ".migration/ledger/payments.charge.yaml",
+      ".migration/ledger/reporting.monthly-spec.yaml",
+      ".migration/quirks/csv-record-escaping.md",
+      ".migration/quirks/loan-empty-inputs.md",
+      ".migration/quirks/loan-id-allocation.md",
+      ".migration/quirks/monthly-report-no-runtime.md",
+      ".migration/quirks/payment-repeat-charge.md",
+      ".migration/returns/SY-04.afs-analyst.yaml",
+      ".migration/risk-map/SY-04.md"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
