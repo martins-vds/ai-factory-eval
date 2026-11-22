@@ -1,4 +1,3 @@
-# Backfilled from the plan and its published tickets (harness #98).
 slice: data-migration
 tickets:
 - id: DM-05A
@@ -54,3 +53,11 @@ tickets:
   - tests/data_migration/test_invariants.py
   blocked_by:
   - DM-05C
+- id: REF-01
+  title: Restructure the data exporter, preserving behaviour
+  role: afs-migrator
+  specialty: null
+  files:
+  - src/cargotracker/data_migration/
+  - tests/data_migration/
+  blocked_by: []
