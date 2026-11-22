@@ -1,0 +1,37 @@
+[
+  {
+    "at": "2026-11-22T04:38:18Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 28425,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "REF-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/255dce75-96a4-4933-9da8-0851bd4f1cd8.json",
+      ".migration/evidence/mutants/REF-02.md",
+      ".migration/evidence/runs/REF-02.md",
+      ".migration/returns/REF-02.afs-migrator.yaml",
+      "src/fees/presentation.py",
+      "src/fees/views.py"
+    ],
+    "findings": [
+      "[mechanical] `.migration/returns/REF-02.afs-migrator.yaml` reports failing gates and no handoff: `crap: 7.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
