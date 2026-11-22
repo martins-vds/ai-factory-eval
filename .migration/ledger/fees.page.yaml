@@ -14,4 +14,7 @@ status: migrated
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/browser.json, .migration/evidence/runs/LL-03.md, tests/fees/test_endpoints.py::test_fee_endpoint_matches_characterized_html, tests/fees/test_endpoints.py::test_fee_endpoint_returns_characterized_not_found_response, tests/fees/test_endpoints.py::test_fee_page_shows_late_fee_and_posts_payment_to_ui_route, tests/fees/test_endpoints.py::test_real_browser_can_pay_a_late_fee, tests/fees/test_seed_restoration.py::test_seed_loans_remain_available_after_fee_browser_test]
+rules:
+  - {id: known-loan-fee-details, rule: "A known loan's fee page shows its identifier, due date, late days and fee in dollars and cents.", source: "legacy/src/main/java/lib/LateFeeView.java:31-37"}
+  - {id: unknown-loan-fee-page-not-found, rule: "A fee page for an unknown loan returns HTTP 404 with `<p>No such loan.</p>`.", source: "legacy/src/main/java/lib/LateFeeView.java:23-30"}
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
