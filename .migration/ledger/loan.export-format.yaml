@@ -11,4 +11,7 @@ notes: "Semicolons in field values are not escaped; see .migration/quirks/csv-fi
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md

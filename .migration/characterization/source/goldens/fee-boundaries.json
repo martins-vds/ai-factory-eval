@@ -1,0 +1,26 @@
+{
+  "2-days-late": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/L4"
+    },
+    "response": {
+      "body": "<h1>Late fee for L4</h1><p>Due 2026-11-12, 2 day(s) late.</p><p class=\"fee\">Fee: $0.00</p>",
+      "content_type": "text/html",
+      "status": 200
+    }
+  },
+  "3-days-late": {
+    "request": {
+      "form": null,
+      "method": "GET",
+      "path": "/fees/L5"
+    },
+    "response": {
+      "body": "<h1>Late fee for L5</h1><p>Due 2026-11-12, 3 day(s) late.</p><p class=\"fee\">Fee: $0.75</p>",
+      "content_type": "text/html",
+      "status": 200
+    }
+  }
+}

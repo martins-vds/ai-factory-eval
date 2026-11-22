@@ -5,7 +5,7 @@ When `POST /loans` supplies empty `member` or `isbn` values, the source accepts 
 
 ## Evidence
 - Source: `endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans`, `legacy/src/main/java/lib/LoanResource.java:38-43`
-- Characterization: tier A is established in `.migration/references/characterization.md`; empty form values were not separately exercised.
+- Characterization: tier A observed `member=` and `isbn=` returning HTTP 201 and `L5;;;2026-11-22;2026-12-06;`; see `.migration/characterization/source/goldens/http.json` (`lend-empty-fields`) and `.migration/evidence/SY-05/characterization.md`.
 - Why it looks wrong: the endpoint reports that both fields are required but treats an empty string as present.
 
 ## Impact

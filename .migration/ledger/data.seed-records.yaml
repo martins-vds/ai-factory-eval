@@ -8,4 +8,7 @@ boundary: "Application startup inserts loans L1, L2, and L3 with their member, I
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md

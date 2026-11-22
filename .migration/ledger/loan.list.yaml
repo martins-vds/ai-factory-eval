@@ -10,4 +10,7 @@ boundary: "GET /loans returns all loans ordered by ID as one newline-terminated 
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md

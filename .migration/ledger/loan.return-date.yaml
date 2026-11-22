@@ -11,4 +11,7 @@ notes: "Repeated returns overwriting the original date is raised in .migration/q
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md

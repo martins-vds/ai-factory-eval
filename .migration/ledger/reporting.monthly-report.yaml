@@ -9,4 +9,7 @@ notes: "The specification says the separate reporting module's code and runtime 
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/evidence/SY-05/characterization.md

@@ -11,4 +11,7 @@ notes: "The source swallows InterruptedException without restoring interrupt sta
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md
