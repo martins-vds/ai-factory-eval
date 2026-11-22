@@ -25,3 +25,27 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-22T17:53:03Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05f-classify-survivors-one-more-time  ·  **Last commit:** f2079ae84
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05F.afs-migrator.yaml` reports failing gates and no handoff: `crap: 26.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop.
+- [ ] You changed `tests/booking/interfaces/test_route_selection.py` after your last run of `build`, `idiom`, `crap`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 2 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
+
+## Handoff — afs-migrator · 2026-11-22T17:54:25Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05f-classify-survivors-one-more-time  ·  **Last commit:** f2079ae84
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05F.afs-migrator.yaml` reports failing gates and no handoff: `crap: 26.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop.
+- [ ] You changed `tests/booking/interfaces/test_route_selection.py` after your last run of `build`, `idiom`, `crap`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 2 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.

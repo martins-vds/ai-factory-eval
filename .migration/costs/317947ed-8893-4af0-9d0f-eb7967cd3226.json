@@ -42,6 +42,7 @@
       "hook.end": [
         "hookInvocationId",
         "hookType",
+        "output",
         "success"
       ],
       "hook.start": [
@@ -109,6 +110,11 @@
         "interactionId",
         "role"
       ],
+      "system.notification": [
+        "content",
+        "kind",
+        "responsesReasoning"
+      ],
       "tool.execution_complete": [
         "error",
         "fileEdits",
@@ -149,29 +155,30 @@
       ]
     },
     "event_types": {
-      "assistant.message": 230,
-      "assistant.turn_end": 119,
-      "assistant.turn_start": 119,
+      "assistant.message": 236,
+      "assistant.turn_end": 124,
+      "assistant.turn_start": 124,
       "external_tool.completed": 1,
       "external_tool.requested": 1,
-      "hook.end": 303,
-      "hook.start": 304,
-      "permission.completed": 147,
-      "permission.requested": 147,
+      "hook.end": 317,
+      "hook.start": 318,
+      "permission.completed": 151,
+      "permission.requested": 151,
       "session.start": 1,
-      "session.usage_record": 119,
+      "session.usage_record": 124,
       "skill.context_delivered_ref": 9,
       "skill.invoked": 9,
       "subagent.selected": 1,
       "system.message": 1,
-      "tool.execution_complete": 170,
-      "tool.execution_start": 170,
-      "user.message": 2
+      "system.notification": 1,
+      "tool.execution_complete": 175,
+      "tool.execution_start": 175,
+      "user.message": 5
     },
-    "events": 1853,
+    "events": 1924,
     "usage_fields": []
   },
-  "ended_at": "2026-11-22T17:50:53.297Z",
+  "ended_at": "2026-11-22T17:53:26.094Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -234,11 +241,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 230
+      "requests": 236
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-22T17:51:52+00:00",
+  "recorded_at": "2026-11-22T17:54:25+00:00",
   "schema": "afs-cost/1",
   "session_id": "317947ed-8893-4af0-9d0f-eb7967cd3226",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
