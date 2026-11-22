@@ -4,6 +4,7 @@ from typing import Protocol
 
 
 class LoanRecord(Protocol):
+    id: str
     due_on: date
     returned_on: date | None
 
