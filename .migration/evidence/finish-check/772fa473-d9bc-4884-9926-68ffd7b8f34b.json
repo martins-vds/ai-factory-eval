@@ -1,0 +1,52 @@
+[
+  {
+    "at": "2026-11-22T17:13:35Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21137,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-02.md",
+      ".migration/handoffs/LL-02.md",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/returns/LL-02.afs-migrator.yaml",
+      "src/loans/clock.py",
+      "src/loans/composition.py",
+      "src/loans/forms.py",
+      "src/loans/ports.py",
+      "src/loans/repository.py",
+      "src/loans/services.py",
+      "src/loans/urls.py",
+      "src/loans/views.py",
+      "templates/loans/list.html",
+      "templates/loans/new.html",
+      "templates/loans/partials/loan_errors.html",
+      "templates/loans/partials/loan_feedback.html",
+      "templates/loans/partials/loan_rows.html",
+      "templates/loans/partials/return_error.html",
+      "templates/loans/return_error.html",
+      "tests/loans/test_circulation.py"
+    ],
+    "test_health": {
+      "block": true,
+      "findings": []
+    },
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
