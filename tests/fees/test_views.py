@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 HTTP_GOLDENS = json.loads(
     (
@@ -191,3 +192,23 @@ def test_regular_payment_success_renders_a_complete_page(
     assert b'<!doctype html>' in response.content
     assert b'role="status"' in response.content
     assert b'Payment received for loan L1.' in response.content
+
+
+@pytest.mark.django_db
+def test_real_browser_displays_gateway_failure(live_server, local_payment_gateway):
+    local_payment_gateway.response_status = 503
+    local_payment_gateway.response_body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            page.get_by_role('button', name='Pay late fee').click()
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+
+            assert 'Payment could not be completed for loan L1.' in alert.inner_text()
+            assert 'declined' in page.locator('#payment-result').inner_text()
+        finally:
+            browser.close()
