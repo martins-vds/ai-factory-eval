@@ -1,0 +1,25 @@
+role: afs-migrator
+ticket: REF-01
+issue: martins-vds/ai-factory-eval#2286
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2288
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.978
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/REF-01.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
+notes: >-
+  Changed `test_model_index_excludes_proxy_and_auto_created_models` and
+  `test_export_interprets_naive_and_offsetless_datetimes_in_mapping_timezone`
+  only to use the new public `schema.model_index` and `schema.format_value`
+  APIs (and patch `schema.apps`); the removed private exporter helpers no
+  longer exist. Assertions and other tests were unchanged.
