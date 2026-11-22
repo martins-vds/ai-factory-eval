@@ -60,3 +60,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T17:20:09+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-22T17:20:35+00:00 | mutation-changed | 0 | 0.31 | `python .migration/harness/tools/afs-mutation` | `99e6e94442cec2c3` |  | gate=mutation score=n/a reason=no-mutable-code-changed base=0538d7114e513297511adaedb63d333378af38f7 |
 | 2026-11-22T17:26:41+00:00 | mutation-changed-pr-base | 0 | 246.74 | `python .migration/harness/tools/afs-mutation` | `e55df3abcd5cfa19` |  | gate=mutation score=0.823 threshold=0.8 killed=51 survived=11 files=1 base=3d1fcec13586c2d89b7a079bfd14ca011e2522c0 |
+| 2026-11-22T17:28:34+00:00 | no-route-guidance-tests | 0 | 1.61 | `pytest -q tests/booking/interfaces/test_route_selection.py::test_route_selection_explains_when_no_candidates_satisfy_the_deadline tests/booking/interfaces/test_route_selection.py::test_itinerary_selection_explains_when_no_candidates_satisfy_the_deadline` | `8467712def929e7a` |  |  |
+| 2026-11-22T17:32:43+00:00 | mutation-changed-final | 0 | 246.26 | `python .migration/harness/tools/afs-mutation` | `e55df3abcd5cfa19` |  | gate=mutation score=0.823 threshold=0.8 killed=51 survived=11 files=1 base=3d1fcec13586c2d89b7a079bfd14ca011e2522c0 |
+| 2026-11-22T17:33:16+00:00 | build-compile-final | 0 | 0.05 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T17:33:17+00:00 | build-check-final | 0 | 0.32 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-22T17:33:17+00:00 | idiom-ruff-final | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T17:33:17+00:00 | idiom-format-final | 1 | 0.02 | `ruff format --check` | `a759b8299830b48e` | 142 \|     assert ( |  |
