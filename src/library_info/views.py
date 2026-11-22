@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 
 
 ABOUT_PAGE = """<!doctype html>
@@ -15,3 +16,7 @@ ABOUT_PAGE = """<!doctype html>
 
 def about_page(request):
     return HttpResponse(ABOUT_PAGE, content_type='text/html')
+
+
+def about_ui(request):
+    return render(request, 'library_info/about.html')
