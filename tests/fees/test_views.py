@@ -82,7 +82,7 @@ def test_payment_endpoint_maps_a_redirected_gateway_response_to_bad_gateway(
 ):
     payment_gateway_server['status'] = 302
     payment_gateway_server['body'] = b'redirected\n'
-    payment_gateway_server['redirect_to'] = f'{payment_gateway_server["base_url"]}/completed'
+    payment_gateway_server['redirect_to'] = True
 
     response = client.post('/payments/L1')
 

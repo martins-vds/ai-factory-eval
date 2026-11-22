@@ -14,7 +14,7 @@ def payment_gateway_server(monkeypatch):
             state['requests'].append((self.command, self.path, body))
             self.send_response(state['status'])
             if state['redirect_to']:
-                self.send_header('Location', state['redirect_to'])
+                self.send_header('Location', '/completed')
             self.end_headers()
             self.wfile.write(state['body'])
 
