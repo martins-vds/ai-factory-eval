@@ -1,0 +1,45 @@
+<section aria-labelledby="destination-dialog-title" class="flex flex-col gap-5">
+  <h2 id="destination-dialog-title" class="text-xl font-semibold">
+    Change destination for cargo {{ tracking_id }}
+  </h2>
+  <p>
+    Origin: {{ origin.name }} ({{ origin.unlocode.value }})<br>
+    Current destination: {{ current_destination.name }} ({{ current_destination.unlocode.value }})
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ tracking_id }}/destination/"
+    hx-post="/admin/cargo/{{ tracking_id }}/destination/"
+    hx-target="#booking-edit-dialog-content"
+    hx-swap="innerHTML"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = true; event.detail.isError = false; }"
+    class="flex flex-col gap-4"
+  >
+    {% csrf_token %}
+    <label class="label mb-1 block font-medium text-slate-800" for="destination">Destination</label>
+    {% if destination_error %}
+      <p class="text-red-700" id="destination-error" role="alert">{{ destination_error }}</p>
+    {% endif %}
+    <select
+      class="select select-bordered w-full rounded-md border border-slate-300 bg-white px-3 py-2 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-600"
+      id="destination"
+      name="destination"
+      required
+      {% if destination_error %}aria-invalid="true" aria-describedby="destination-error"{% endif %}
+    >
+      {% for location in destinations %}
+        <option value="{{ location.unlocode.value }}"{% if location.unlocode.value == selected_destination %} selected{% endif %}>
+          {{ location.name }} ({{ location.unlocode.value }})
+        </option>
+      {% endfor %}
+    </select>
+    <nav aria-label="Destination dialog actions" class="flex justify-end gap-3">
+      <a
+        class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100"
+        href="/admin/dashboard/"
+        onclick="if (this.closest('dialog')) { event.preventDefault(); this.closest('dialog').close(); }"
+      >Cancel</a>
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update</button>
+    </nav>
+  </form>
+</section>

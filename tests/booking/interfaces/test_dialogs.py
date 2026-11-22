@@ -10,7 +10,6 @@ from cargotracker.booking.application.specification import CargoSpecification
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.dialogs.views import create_booking_dialog_views
 from cargotracker.cargo.domain.tracking_id import TrackingId
-from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.infrastructure.repository import DjangoLocationRepository
@@ -70,6 +69,11 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     second_response = client.get(url, HTTP_HX_REQUEST='true')
     content = first_response.content.decode()
     options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
+    second_options = re.search(
+        r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>',
+        second_response.content.decode(),
+        re.DOTALL,
+    )
 
     assert first_response.status_code == 200
     assert second_response.status_code == 200
@@ -80,7 +84,8 @@ def test_destination_dialog_shows_current_values_and_stable_filtered_options(cli
     assert 'value="AUMEL"' not in options.group(1)
     assert options.group(1).count('<option') == len(original_locations) - 2
     assert tuple(shipping_locations) == original_locations
-    assert second_response.content == first_response.content
+    assert second_options is not None
+    assert second_options.group(1) == options.group(1)
 
 
 @pytest.mark.django_db
