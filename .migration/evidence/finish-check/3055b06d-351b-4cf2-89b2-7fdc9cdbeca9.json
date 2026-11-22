@@ -42,5 +42,47 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-22T16:29:09Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 25023,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-05",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/3055b06d-351b-4cf2-89b2-7fdc9cdbeca9.json",
+      ".migration/evidence/runs/LL-05.md",
+      ".migration/ledger/reports.monthly-spec.yaml",
+      ".migration/returns/LL-05.afs-migrator.yaml",
+      "config/settings.py",
+      "src/reports/__init__.py",
+      "src/reports/apps.py",
+      "src/reports/management/__init__.py",
+      "src/reports/management/commands/__init__.py",
+      "src/reports/management/commands/monthly_report.py",
+      "src/reports/repository.py",
+      "src/reports/services.py",
+      "tests/reports/test_command.py",
+      "tests/reports/test_monthly_report.py"
+    ],
+    "test_health": {
+      "block": false,
+      "findings": []
+    },
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
   }
 ]
