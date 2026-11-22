@@ -1,6 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `explicit`): score 0.823, threshold 0.8, killed 51, survived 11. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `efc825d24a5c7a60f0623774c8ec2f224357668f`): score 0.836, threshold 0.8, killed 51, survived 10. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:22 Mutant #1`
 
@@ -115,29 +115,15 @@ Written by `afs-mutation` on its last run (base `explicit`): score 0.823, thresh
   -        candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
   +        candidate = signing.loads(request.POST.get('candidate', 'XXXX'), salt=_CANDIDATE_SALT)
            if candidate['tracking_id'] != tracking_id:
-               raise BadSignature('Candidate belongs to another cargo.')
+               raise BadSignature
            return _deserialize_itinerary(candidate['legs'])
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:97 Mutant #44`
-
-  ```diff
-  @@ -94,7 +94,7 @@
-       try:
-           candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
-           if candidate['tracking_id'] != tracking_id:
-  -            raise BadSignature('Candidate belongs to another cargo.')
-  +            raise BadSignature('XXCandidate belongs to another cargo.XX')
-           return _deserialize_itinerary(candidate['legs'])
-       except (BadSignature, KeyError, TypeError, ValueError) as error:
-           raise Http404('The selected route is invalid.') from error
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:100 Mutant #46`
+- `src/cargotracker/booking/interfaces/route_selection/views.py:100 Mutant #45`
 
   ```diff
   @@ -97,7 +97,7 @@
-               raise BadSignature('Candidate belongs to another cargo.')
+               raise BadSignature
            return _deserialize_itinerary(candidate['legs'])
        except (BadSignature, KeyError, TypeError, ValueError) as error:
   -        raise Http404('The selected route is invalid.') from error
