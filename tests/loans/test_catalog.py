@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+from django.urls import reverse
 
 from src.loans.models import LoanRecord
 
@@ -23,12 +24,19 @@ def test_get_returns_one_loan_and_missing_loan_is_not_found(client):
     response = client.get('/loans/L1')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
 
     missing = client.get('/loans/unknown')
 
     assert missing.status_code == 404
+    assert missing['Content-Type'] == 'text/plain'
     assert missing.content.decode() == 'no such loan\n'
+
+
+def test_api_route_names_resolve_to_the_characterized_paths():
+    assert reverse('loan_list') == '/loans'
+    assert reverse('loan_detail', args=['L1']) == '/loans/L1'
 
 
 @pytest.mark.django_db
@@ -67,9 +75,22 @@ def test_browser_detail_page_renders_loan_fields(client):
     response = client.get('/ui/loans/L1/')
 
     assert response.status_code == 200
+    assert b'href="/ui/loans/"' in response.content
     assert b'Loan L1' in response.content
     assert b'9780134685991' in response.content
     assert b'Not yet returned' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_catalog_page_renders_seeded_loans_and_export_link(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'Loan L1' in response.content
+    assert b'Loan L2' in response.content
+    assert b'Loan L3' in response.content
+    assert b'href="/loans"' in response.content
+    assert b'Export the catalog' in response.content
 
 
 @pytest.mark.django_db

@@ -10,7 +10,7 @@ def _catalog() -> LoanCatalog:
 
 
 def loan_list(request: HttpRequest) -> HttpResponse:
-    response = HttpResponse(_catalog().text_export(), content_type='text/plain')
+    response = HttpResponse(_catalog().text_export())
     response['Content-Type'] = 'text/plain'
     return response
 
@@ -18,9 +18,9 @@ def loan_list(request: HttpRequest) -> HttpResponse:
 def loan_detail(request: HttpRequest, loan_id: str) -> HttpResponse:
     loan = _catalog().get(loan_id)
     if loan is None:
-        response = HttpResponse('no such loan\n', status=404, content_type='text/plain')
+        response = HttpResponse('no such loan\n', status=404)
     else:
-        response = HttpResponse(f'{LoanCatalog.text_line(loan)}\n', content_type='text/plain')
+        response = HttpResponse(f'{LoanCatalog.text_line(loan)}\n')
     response['Content-Type'] = 'text/plain'
     return response
 
