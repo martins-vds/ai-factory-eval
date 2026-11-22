@@ -1,0 +1,20 @@
+role: afs-migrator
+ticket: REF-02
+issue: martins-vds/ai-factory-eval#2312
+pr: martins-vds/ai-factory-eval#2315
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 7.0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/REF-02.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
+notes: Tests were unchanged; no test changes were needed for the helper extraction.
