@@ -1,0 +1,10 @@
+id: loan.return-date
+kind: behavioral
+title: Record the return date
+source:
+  graph_node: method:legacy/src/main/java/lib/Loan.java:Loan.markReturned
+  location: legacy/src/main/java/lib/Loan.java:48-50
+boundary: "The returnedOn field is stored on the loan and is the end date used by late-fee calculation; each return request currently replaces it with today's date."
+status: pending
+verification: pending
+notes: "See .migration/quirks/repeated-loan-return.md; the human must decide whether repeated return is preserved or changed."

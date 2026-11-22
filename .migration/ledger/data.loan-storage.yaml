@@ -1,0 +1,10 @@
+id: data.loan-storage
+kind: data
+title: Store loans in the H2 database
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:3-11
+boundary: "Loan operations read and write the LOAN table in an in-memory H2 database; startup drops and recreates the schema."
+status: pending
+verification: pending
+notes: "The repository wraps reads and writes in EntityManager transactions (legacy/src/main/java/lib/LoanRepository.java:47-69). Restart behavior is linked by .migration/quirks/restart-data-loss.md."

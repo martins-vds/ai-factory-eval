@@ -1,0 +1,12 @@
+id: fees.view
+kind: ui
+title: View a loan's late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:23-38
+  risk: { crap: 20, complexity: 4 }
+boundary: "GET /fees/{id} renders an HTML fee page; the fee is 25 cents per late day, waived through two days late, capped at $10, and an unknown id returns HTTP 404."
+status: pending
+verification: pending
+notes: "The fee uses returnedOn when present, so the repeat-return decision affects this output."
