@@ -1,0 +1,10 @@
+id: loans.repository
+kind: data
+title: Access and update persisted loans
+source:
+  graph_node: class:legacy/src/main/java/lib/LoanRepository.java:LoanRepository
+  location: legacy/src/main/java/lib/LoanRepository.java:19-69
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: Repository reads list loans ordered by id and finds loans by primary key; create and return operations run in write transactions, rolling back an active transaction on exit before closing the entity manager.
+status: pending
+verification: pending

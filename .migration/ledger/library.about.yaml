@@ -1,0 +1,11 @@
+id: library.about
+kind: ui
+title: Serve the public About page
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/AboutPage.java:GET /about
+  flow: View About Page
+  location: legacy/src/main/java/lib/AboutPage.java:13-20
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: GET /about serves the packaged static HTML page as UTF-8 text/html, including opening hours, the 14-day lending period, and contact details.
+status: pending
+verification: pending

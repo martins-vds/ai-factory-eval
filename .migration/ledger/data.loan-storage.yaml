@@ -1,0 +1,9 @@
+id: data.loan-storage
+kind: data
+title: Configure loan storage
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:3-10
+boundary: The library persistence unit maps Loan to the LOAN table, uses an in-memory H2 database, and drops and recreates its schema at startup.
+status: pending
+verification: pending

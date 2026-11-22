@@ -1,0 +1,9 @@
+id: app.launch
+kind: structural
+title: Launch the Lending Library
+source:
+  graph_node: file:legacy/run.sh
+  location: legacy/run.sh:1-6
+boundary: Running run.sh packages without tests, then starts lib.App with target/classes and copied dependencies on the Java classpath.
+status: pending
+verification: pending

@@ -1,0 +1,11 @@
+id: integration.payment-gateway
+kind: integration
+title: Send payment requests to the external gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:33-37
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: For an existing loan, the application sends a bodyless HTTP POST to PAYMENT_GATEWAY_URL (default https://payments.lending-library.invalid) at /charge?loan={id} and relays the gateway response body.
+status: pending
+verification: pending

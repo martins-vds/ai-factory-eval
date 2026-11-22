@@ -1,0 +1,35 @@
+role: afs-analyst
+ticket: SY-04
+issue: martins-vds/ai-factory-eval#2256
+graphs:
+  knowledge: .migration/graphs/source/full/knowledge-graph.json
+  domain: .migration/graphs/source/full/domain-graph.json
+  nodes: 86
+  edges: 119
+  flows: 6
+ledger:
+  entries: 20
+  by_kind:
+    structural: 4
+    behavioral: 10
+    ui: 1
+    integration: 1
+    data: 4
+risk_map:
+  path: .migration/risk-map/SY-04.md
+  methods: 19
+  above_threshold: 0
+  hot_spots:
+    - legacy/src/main/java/lib/LateFeeView.java:26-38 (LateFeeView.page, CRAP 20, CCN 4)
+    - legacy/src/main/java/lib/FinePayments.java:29-41 (FinePayments.pay, CRAP 20, CCN 4)
+    - legacy/src/main/java/lib/LoanResource.java:38-43 (LoanResource.lend, CRAP 12, CCN 3)
+    - legacy/src/main/java/lib/LoanResource.java:52-55 (LoanResource.line, CRAP 6, CCN 2)
+    - legacy/src/main/java/lib/LoanRepository.java:36-45 (LoanRepository.markReturned, CRAP 6, CCN 2)
+quirk_tickets:
+  - .migration/quirks/monthly-report-spec-only.md
+  - .migration/quirks/concurrent-loan-identifiers.md
+  - .migration/quirks/repeated-loan-return.md
+  - .migration/quirks/payment-interrupt.md
+  - .migration/quirks/restart-data-loss.md
+  - .migration/quirks/blank-loan-fields.md
+graph_discrepancies: []

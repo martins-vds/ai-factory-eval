@@ -1,0 +1,11 @@
+id: loans.create
+kind: behavioral
+title: Lend a book
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43
+  risk: { crap: 12, complexity: 3, coverage: 0 }
+boundary: POST /loans reads form fields member and isbn, returns HTTP 400 only when either is null, otherwise creates a loan dated today and responds HTTP 201 with its formatted line and newline.
+status: pending
+verification: pending

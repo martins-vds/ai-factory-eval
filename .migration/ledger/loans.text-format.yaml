@@ -1,0 +1,11 @@
+id: loans.text-format
+kind: behavioral
+title: Format loan records
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:52-55
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: Loan records contain id, member, isbn, lentOn, dueOn, and returnedOn in that order, separated by semicolons; an unreturned loan has an empty final field.
+status: pending
+verification: pending
