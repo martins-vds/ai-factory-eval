@@ -16,4 +16,3 @@ When `POST /loans` supplies empty `member` or `isbn` values, the source accepts 
 1. Preserve exactly (empty fields are accepted; a test pins this behavior)
 2. Fix (reject blank fields; record the approved divergence in the ledger)
 3. Other
-

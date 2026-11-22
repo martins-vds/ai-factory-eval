@@ -16,4 +16,3 @@ When a loan field contains a semicolon, the source emits it unescaped in the sem
 1. Preserve exactly (fields are not escaped; a test pins this behavior)
 2. Fix (escape or reject delimiter-containing values; record the approved divergence in the ledger)
 3. Other
-
