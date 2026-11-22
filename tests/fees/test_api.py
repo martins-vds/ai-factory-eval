@@ -100,11 +100,36 @@ def test_fee_page_shows_the_reading_room_layout_and_htmx_payment_action(client):
     response = client.get('/ui/fees/L3/')
 
     assert response.status_code == 200
+    assert b'Due 2025-12-15' in response.content
     assert b'Late fee for L3' in response.content
     assert b'19 day(s) late' in response.content
     assert b'Fee: $4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'hx-on::response-error=' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_the_reading_room_not_found_page(client):
+    response = client.get('/ui/fees/L9/')
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/ui/fees/L3/', 'post'),
+        ('/payments/L3', 'get'),
+        ('/ui/payments/L3/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
 
 
 @pytest.mark.django_db
@@ -128,10 +153,32 @@ def test_ui_payment_returns_success_to_htmx(client, payment_gateway):
 
 
 @pytest.mark.django_db
+def test_ui_payment_returns_a_full_page_without_an_htmx_request(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 200
+    assert b'<title>Payment' in response.content
+    assert b'role="status"' in response.content
+    assert b'charged' in response.content
+    assert b'/ui/fees/L1/' in response.content
+    assert payment_gateway == [('POST', '/charge?loan=L1', b'')]
+
+
+@pytest.mark.django_db
 def test_ui_payment_returns_unknown_loan_as_htmx_error(client):
     response = client.post('/ui/payments/L9/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_ui_payment_returns_unknown_loan_as_a_full_page(client):
+    response = client.post('/ui/payments/L9/')
+
+    assert response.status_code == 404
+    assert b'<title>Payment' in response.content
     assert b'role="alert"' in response.content
     assert b'No such loan.' in response.content
 
