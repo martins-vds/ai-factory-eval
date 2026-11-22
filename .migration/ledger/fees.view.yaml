@@ -1,0 +1,19 @@
+id: fees.view
+kind: ui
+title: View a loan's late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: { crap: 4.2, complexity: 4, coverage: 0.90 }
+boundary: "GET /fees/{id}: HTML status and rendered loan id, due date, lateness, and fee"
+tickets: [martins-vds/ai-factory-eval#2266]
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edges.json
+  - .migration/characterization/source/goldens/browser.json
+  - .migration/evidence/runs/SY-05.md

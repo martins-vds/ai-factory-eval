@@ -1,0 +1,18 @@
+id: payment.gateway-errors
+kind: integration
+title: Map payment gateway failures
+source:
+  graph_node: method:legacy/src/main/java/lib/FinePayments.java:FinePayments.pay
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:34-40
+  risk: { crap: 4.2, complexity: 4, coverage: 0.75 }
+boundary: "Gateway non-200 responses and I/O or interruption failures mapped to the source HTTP response"
+tickets: [martins-vds/ai-factory-eval#2266]
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edges.json
+  - .migration/evidence/runs/SY-05.md

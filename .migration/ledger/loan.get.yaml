@@ -1,0 +1,18 @@
+id: loan.get
+kind: behavioral
+title: Retrieve one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  flow: Get Loan
+  location: legacy/src/main/java/lib/LoanResource.java:32-35
+  risk: { crap: 1.0, complexity: 1, coverage: 1.0 }
+boundary: "GET /loans/{id}: formatted loan response or the exact 404 status and body for an unknown id"
+tickets: [martins-vds/ai-factory-eval#2266]
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edges.json
+  - .migration/evidence/runs/SY-05.md
