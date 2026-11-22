@@ -265,3 +265,20 @@ def test_regular_payment_success_redirects_to_fee_page(client, monkeypatch, paym
 
     assert response.status_code == 302
     assert response['Location'] == '/ui/fees/L-ui/'
+
+
+@pytest.mark.django_db
+def test_regular_payment_redirect_escapes_loan_id(client, monkeypatch, payment_gateway):
+    loan_id = r'L\example.test'
+    Loan.objects.create(
+        id=loan_id,
+        member='dee',
+        isbn='123',
+        lent_on=date(2026, 11, 1),
+    )
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', payment_gateway.url)
+
+    response = client.post('/ui/payments/L%5Cexample.test/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L%5Cexample.test/'

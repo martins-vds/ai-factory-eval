@@ -90,7 +90,7 @@ def payment_page(request, loan_id):
             'fees/payment-status.html',
             {'error': False, 'message': 'Payment complete.'},
         )
-    return redirect(f'/ui/fees/{loan_id}/')
+    return redirect('fee-page', loan_id=loan_id)
 
 
 def _payment_failure(request, loan_id, message, htmx_request):
