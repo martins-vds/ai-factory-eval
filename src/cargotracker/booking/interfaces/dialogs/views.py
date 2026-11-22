@@ -15,7 +15,7 @@ from cargotracker.location.domain.location import Location
 def _find_cargo(cargo_dashboard: CargoDashboard, tracking_id: str) -> Cargo:
     cargo = cargo_dashboard.get_cargo_details(TrackingId(tracking_id))
     if cargo is None:
-        raise Http404(f'Cargo with tracking ID {tracking_id} not found.')
+        raise Http404
     return cargo
 
 
@@ -31,7 +31,6 @@ def _not_found(request: HttpRequest, tracking_id: str) -> HttpResponse:
 def _destination_context(
     cargo: Cargo,
     locations: list[Location],
-    selected_destination: str = '',
     error: str = '',
 ) -> dict[str, object]:
     return {
@@ -42,14 +41,15 @@ def _destination_context(
             if location
             not in (cargo.route_specification.origin, cargo.route_specification.destination)
         ],
-        'selected_destination': selected_destination,
         'destination_error': error,
     }
 
 
-def _deadline_context(cargo: Cargo, value: str = '', error: str = '') -> dict[str, object]:
+def _deadline_context(cargo: Cargo, value: str | None = None, error: str = '') -> dict[str, object]:
     deadline_value = (
-        value or timezone.localtime(cargo.route_specification.arrival_deadline).date().isoformat()
+        timezone.localtime(cargo.route_specification.arrival_deadline).date().isoformat()
+        if value is None
+        else value
     )
     return {
         'cargo': cargo,
@@ -79,7 +79,7 @@ def create_dialog_views(
 
         locations = list_shipping_locations()
         if request.method == 'POST':
-            destination_code = request.POST.get('destination', '')
+            destination_code = request.POST.get('destination')
             destinations = {
                 location.unlocode.value: location
                 for location in locations
@@ -91,7 +91,6 @@ def create_dialog_views(
                 context = _destination_context(
                     cargo,
                     locations,
-                    destination_code,
                     'Select a valid destination.',
                 )
                 return render(

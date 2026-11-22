@@ -60,11 +60,16 @@ def test_dialogs_render_the_cargo_destination_and_deadline(client):
     assert destination_response.status_code == 200
     assert 'Hong Kong' in destination_response.content.decode()
     assert 'Melbourne' in destination_response.content.decode()
+    assert 'role="alert"' not in destination_response.content.decode()
     assert deadline_response.status_code == 200
+    deadline_content = deadline_response.content.decode()
     assert (
         f'value="{cargo.route_specification.arrival_deadline.date().isoformat()}"'
-        in deadline_response.content.decode()
+        in deadline_content
     )
+    assert 'Hong Kong' in deadline_content
+    assert 'Melbourne' in deadline_content
+    assert 'role="alert"' not in deadline_content
 
 
 @pytest.mark.django_db
@@ -95,8 +100,10 @@ def test_destination_dialog_filters_options_without_mutating_backing_locations()
     option_values = re.findall(r'<option\b[^>]*value="([^"]+)"', options.group(1))
 
     assert response.status_code == 200
+    assert option_values
     assert cargo.route_specification.origin.unlocode.value not in option_values
     assert cargo.route_specification.destination.unlocode.value not in option_values
+    assert 'selected' not in options.group(1)
     assert options.group(1) == repeated_options.group(1)
     assert locations == original_locations
 
@@ -123,14 +130,39 @@ def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client):
         HTTP_HX_REQUEST='true',
     )
     updated = cargo_repository.find(TrackingId('DEF789'))
+    error = re.search(
+        r'<p\b[^>]*id="deadline-error"[^>]*>([^<]*)</p>',
+        response.content.decode(),
+    )
 
     assert response.status_code == 400
-    assert 'Enter a valid arrival deadline.' in response.content.decode()
+    assert error is not None
+    assert error.group(1) == 'Enter a valid arrival deadline.'
     assert updated is not None
     assert (
         updated.route_specification.arrival_deadline
         == original.route_specification.arrival_deadline
     )
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_deadline_dialog_keeps_a_missing_value_empty_after_validation(client):
+    call_command('seed_sample_data')
+
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+    content = response.content.decode()
+    error = re.search(r'<p\b[^>]*id="deadline-error"[^>]*>([^<]*)</p>', content)
+
+    assert response.status_code == 400
+    assert error is not None
+    assert error.group(1) == 'Enter a valid arrival deadline.'
+    assert 'name="deadline"' in content
+    assert 'value=""' in content
 
 
 @pytest.mark.django_db
@@ -146,11 +178,30 @@ def test_destination_dialog_shows_an_error_for_an_unavailable_destination(client
         HTTP_HX_REQUEST='true',
     )
     updated = cargo_repository.find(TrackingId('DEF789'))
+    error = re.search(
+        r'<p\b[^>]*id="destination-error"[^>]*>([^<]*)</p>',
+        response.content.decode(),
+    )
 
     assert response.status_code == 400
-    assert 'Select a valid destination.' in response.content.decode()
+    assert error is not None
+    assert error.group(1) == 'Select a valid destination.'
     assert updated is not None
     assert updated.route_specification.destination == original.route_specification.destination
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialogs_reject_unsupported_http_methods(client):
+    call_command('seed_sample_data')
+
+    destination_response = client.put('/admin/cargo/DEF789/destination/')
+    deadline_response = client.put('/admin/cargo/DEF789/deadline/')
+
+    assert destination_response.status_code == 405
+    assert destination_response.headers['Allow'] == 'GET, POST'
+    assert deadline_response.status_code == 405
+    assert deadline_response.headers['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db
