@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Loans · The Lending Library{% endblock %}
+
+{% block content %}
+<div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+  <section>
+    <p class="text-xs uppercase tracking-[.2em] text-stone-600">The collection · {{ loans|length }} loans</p>
+    <h1 class="mb-4 mt-3 text-5xl font-normal md:text-6xl">Books in good company.</h1>
+    <p class="mb-8 max-w-2xl text-lg leading-relaxed text-stone-700">
+      A quiet ledger of what is out, who has it, and when it comes home.
+    </p>
+    <div class="divide-y divide-stone-300">
+      {% for item in loans %}
+      <article class="grid gap-4 py-6 sm:grid-cols-[1fr_auto]">
+        <div>
+          <p class="text-xl font-semibold">{{ item.loan.member }}</p>
+          <p class="mt-1 text-stone-600">ISBN {{ item.loan.isbn }}</p>
+        </div>
+        <div class="sm:text-right">
+          <a class="link link-hover text-lg font-semibold text-rose-800"
+             href="{% url 'loan-detail-page' item.loan.id %}">{{ item.loan.id }}</a>
+          <p class="mt-1 text-sm text-stone-600">Due {{ item.due_on|date:"M j, Y" }}</p>
+          {% if item.loan.returned_on %}
+          <p class="badge badge-ghost mt-2">Returned {{ item.loan.returned_on|date:"M j, Y" }}</p>
+          {% else %}
+          <p class="badge badge-outline mt-2">On loan</p>
+          {% endif %}
+        </div>
+      </article>
+      {% empty %}
+      <p class="py-8 text-stone-600">No loans are in the catalog yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+  <aside class="card h-fit border border-stone-300 bg-amber-100/70 shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.18em] text-stone-600">A note from the desk</p>
+      <h2 class="card-title font-serif text-2xl">A good book finds its way home.</h2>
+      <p class="leading-relaxed text-stone-700">Every loan is kept here with its lending and due dates.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

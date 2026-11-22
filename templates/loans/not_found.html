@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan not found · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <h1 class="mb-4 text-4xl font-normal">That loan is not in the ledger.</h1>
+  <p class="mb-6 text-stone-700">The record may have been removed or the number may be mistaken.</p>
+  <a class="link link-hover text-rose-800" href="{% url 'loan-catalog-page' %}">Return to the collection</a>
+</section>
+{% endblock %}

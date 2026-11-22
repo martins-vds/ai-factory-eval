@@ -9,9 +9,20 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 1.0}
 boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. The docs state spreadsheet users rely on this format."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.loans.services.format_loan
+    - src.loans.views.loan_list_api
+    - src.loans.views.loan_detail_api
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+evidence:
+  - .migration/evidence/runs/LL-01.md
+  - tests/loans/test_catalog.py::test_format_loan_escapes_delimiters_and_keeps_trailing_newline
+notes: "The approved fix in martins-vds/ai-factory-synthetic-target#43 quotes field delimiters."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - id: semicolon-export
+    rule: "Export fields in ID, member, ISBN, lent-on, due-on, returned-on order, end each record with a newline, and quote delimiter-containing fields."
+    source: "legacy/src/main/java/lib/LoanResource.java:52-55; martins-vds/ai-factory-synthetic-target#43"

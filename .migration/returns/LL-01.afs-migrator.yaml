@@ -1,0 +1,64 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#2378
+pr: martins-vds/ai-factory-eval#2381
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: data.seed-records
+    rule: Seed records are inserted only when their IDs are absent; existing records are never overwritten.
+    use_case: src.loans.migrations.0001_initial.seed_loans
+    test: tests/loans/test_repository.py::test_seed_migration_preserves_existing_record_values
+    enforced: true
+    ledger_rule: preserve-existing-seed-records
+  - capability: loan.due-date
+    rule: The loan due date is exactly 14 calendar days after its lent-on date.
+    use_case: src.loans.services.loan_due_date
+    test: tests/loans/test_domain.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: fourteen-calendar-days
+  - capability: loan.get
+    rule: An unknown loan ID returns no loan, and the HTTP adapter responds with 404 and `no such loan` plus a newline.
+    use_case: src.loans.services.get_loan
+    test: tests/loans/test_catalog.py::test_get_loan_returns_none_when_id_is_unknown
+    enforced: true
+    ledger_rule: absent-loan
+  - capability: loan.list
+    rule: The catalog lists every loan in ascending ID order.
+    use_case: src.loans.services.list_loans
+    test: tests/loans/test_catalog.py::test_list_loans_orders_records_by_id
+    enforced: true
+    ledger_rule: ordered-list
+  - capability: loan.text-export
+    rule: Export fields in ID, member, ISBN, lent-on, due-on, returned-on order, end each record with a newline, and quote semicolon-containing fields.
+    use_case: src.loans.services.format_loan
+    test: tests/loans/test_catalog.py::test_format_loan_escapes_delimiters_and_keeps_trailing_newline
+    enforced: true
+    ledger_rule: semicolon-export
+no_rules:
+  application.build: Application build and route wiring are structural and introduce no business input rules.
+  application.startup: Startup and migration registration are structural; seed preservation is tracked under data.seed-records.
+  data.loan-storage: The storage adapter persists loan fields without applying circulation input validation.
+  repository.transactions: Transaction boundaries are repository mechanics; this capability rejects no business input.
