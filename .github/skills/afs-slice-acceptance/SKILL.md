@@ -14,7 +14,10 @@ and `afs-quirk-ticket` for quirks acceptance finds.
 ## 1. Acceptance
 **Slice acceptance** (all tickets merged): end-to-end characterization, differential checks (tier A)
 or checks against specs, full mutation run, capability coverage (dispatch `afs-auditor` for gate 7),
-ledger reconciled, evidence report written. Then request the human side-by-side check
+ledger reconciled, evidence report written. A slice with a customer spec also gets its spec mutation
+report (`afs-mutation --all --spec` through `afs-run`, ADR-0063): record its score as
+`spec_mutation_score` in the report, link `.migration/evidence/mutants/<ticket>.spec.md`, and list each
+survivor as a behaviour the customer's cases don't pin down. It is a report, not a gate. Then request the human side-by-side check
 (`human_check: requested`).
 **The sign-off is the approver's review, never your line (ADR-0031).** When the human reports the
 check passed, commit your acceptance return with `human_check: passed` on a PR that you (or the Copilot coding
@@ -61,7 +64,8 @@ re-walk. The checker never closes work issues. A retained-open descendant remain
 to block epic closure under ADR-0024.
 ## 3. The acceptance return
 Commit it as `.migration/returns/<acceptance-ticket>.afs-program-orchestrator.yaml`, with your usual
-orchestrator return plus an `acceptance` block. `check_signoff.py` and `check_slice_returns.py` read the
+orchestrator return plus an `acceptance` block. Every acceptance field goes **inside** the block, none at
+the top level: the sign-off checks read only the block, and `validate.py` refuses anything else (ADR-0059). `check_signoff.py` and `check_slice_returns.py` read the
 block, as they read a retired Slice Coordinator's return:
 ```yaml
 acceptance:
