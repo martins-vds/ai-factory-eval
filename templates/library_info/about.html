@@ -3,33 +3,19 @@
 {% block title %}About the Library · The Lending Library{% endblock %}
 
 {% block content %}
-<section class="grid gap-12 lg:grid-cols-[1fr_19rem]">
-  <div>
-    <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A neighborhood collection</p>
-    <h1 class="mb-4 mt-3 text-5xl md:text-6xl">A library for the neighborhood.</h1>
-    <p class="mb-8 text-[#66705b]">A shared collection, here for curious readers and neighbors.</p>
-    <div class="divide-y divide-[#d8cdbb]">
-      <article class="py-5">
-        <h2 class="text-xl font-semibold">Opening hours</h2>
-        <p class="mt-1 text-[#66705b]">{{ opening_hours }}</p>
-      </article>
-      <article class="py-5">
-        <h2 class="text-xl font-semibold">Lending period</h2>
-        <p class="mt-1 text-[#66705b]">{{ lending_period }}</p>
-      </article>
-      <article class="py-5">
-        <h2 class="text-xl font-semibold">Get in touch</h2>
-        <p class="mt-1 text-[#66705b]">Contact: {{ contact_address }}</p>
-      </article>
+<section class="mx-auto max-w-3xl">
+  <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">A place for curious readers</p>
+  <h1 class="mb-8 mt-3 text-5xl md:text-6xl">About the Lending Library</h1>
+  <p class="text-2xl">A neighborhood collection, kept in motion by the people who read it.</p>
+  <div class="card mt-3 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p>{{ opening_hours }}</p>
+      <p>{{ lending_period }}</p>
+      <p>
+        Contact:
+        <a class="link link-hover text-[#a94e37]" href="mailto:{{ contact_address }}">{{ contact_address }}</a>
+      </p>
     </div>
   </div>
-  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
-    <div class="card-body">
-      <p class="text-xs uppercase tracking-widest text-[#66705b]">From the shelves</p>
-      <h2 class="card-title text-2xl">Good books, shared.</h2>
-      <p>Find your next read in the neighborhood collection.</p>
-      <a class="btn btn-ghost mt-3 text-[#a94e37]" href="/ui/loans/">Visit the collection</a>
-    </div>
-  </aside>
 </section>
 {% endblock %}

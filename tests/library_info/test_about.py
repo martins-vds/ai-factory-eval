@@ -30,10 +30,13 @@ def test_modern_about_page_shows_library_information_in_browser(live_server):
 
             assert response is not None
             assert response.status == 200
-            assert page.get_by_role('heading', name='A library for the neighborhood.').is_visible()
+            assert page.get_by_role('heading', name='About the Lending Library').is_visible()
+            assert page.get_by_text(
+                'A neighborhood collection, kept in motion by the people who read it.'
+            ).is_visible()
             assert page.get_by_text('Open Monday to Saturday, 9:00 to 18:00.').is_visible()
             assert page.get_by_text('Books are lent for 14 days.').is_visible()
-            assert page.get_by_text('desk@lending-library.invalid').is_visible()
-            assert page.get_by_role('link', name='Visit the collection').is_visible()
+            contact_link = page.get_by_role('link', name='desk@lending-library.invalid')
+            assert contact_link.get_attribute('href') == 'mailto:desk@lending-library.invalid'
         finally:
             browser.close()
