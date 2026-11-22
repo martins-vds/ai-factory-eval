@@ -16,7 +16,6 @@ ledger_updated:
   - booking.dialog-chain
   - booking.dialog-deadline
   - booking.dialog-destination
-  - booking.screen-not-routed-table
 quirk_tickets:
   - martins-vds/ai-factory-pilot-target#234
   - martins-vds/ai-factory-pilot-target#235
