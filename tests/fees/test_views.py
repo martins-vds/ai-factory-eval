@@ -4,7 +4,7 @@ from threading import Thread
 import pytest
 
 import src.fees.gateway as gateway_module
-from src.fees.gateway import PaymentGateway, PaymentGatewayFailure
+from src.fees.gateway import HttpPaymentGateway, PaymentGatewayFailure
 
 
 @pytest.fixture
@@ -13,11 +13,14 @@ def local_gateway(monkeypatch):
         calls = []
         status_code = 200
         response_body = b'charged\n'
+        redirect_location = None
 
         def do_POST(self):
             self.calls.append((self.command, self.path))
             self.send_response(self.status_code)
             self.send_header('Content-Type', 'text/plain')
+            if self.redirect_location is not None:
+                self.send_header('Location', self.redirect_location)
             self.end_headers()
             self.wfile.write(self.response_body)
 
@@ -34,6 +37,7 @@ def local_gateway(monkeypatch):
     GatewayHandler.calls = []
     GatewayHandler.status_code = 200
     GatewayHandler.response_body = b'charged\n'
+    GatewayHandler.redirect_location = None
     try:
         yield GatewayHandler
     finally:
@@ -98,6 +102,19 @@ def test_payment_api_maps_gateway_failure_to_bad_gateway(client, local_gateway):
 
 
 @pytest.mark.django_db
+def test_payment_api_does_not_follow_gateway_redirects(client, local_gateway):
+    local_gateway.status_code = 302
+    local_gateway.response_body = b'redirected\n'
+    local_gateway.redirect_location = '/settled'
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content.decode() == 'redirected\n'
+    assert local_gateway.calls == [('POST', '/charge?loan=L1')]
+
+
+@pytest.mark.django_db
 def test_payment_for_unknown_loan_does_not_call_gateway(client, local_gateway):
     response = client.post('/payments/missing')
 
@@ -118,6 +135,20 @@ def test_payment_ui_renders_gateway_failure_for_htmx(client, local_gateway):
     assert 'declined' in response.content.decode()
 
 
+@pytest.mark.django_db
+def test_interrupted_payment_is_a_gateway_failure(client, monkeypatch):
+    class InterruptingOpener:
+        def open(self, _request):
+            raise InterruptedError('request interrupted')
+
+    monkeypatch.setattr(gateway_module, 'build_opener', lambda *_handlers: InterruptingOpener())
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content.decode() == 'payment gateway unavailable\n'
+
+
 def test_interrupted_gateway_call_is_wrapped_without_losing_interrupt(monkeypatch):
     interrupted = InterruptedError('request interrupted')
 
@@ -128,6 +159,6 @@ def test_interrupted_gateway_call_is_wrapped_without_losing_interrupt(monkeypatc
     monkeypatch.setattr(gateway_module, 'build_opener', lambda *_handlers: InterruptingOpener())
 
     with pytest.raises(PaymentGatewayFailure) as error:
-        PaymentGateway('https://payments.example').charge('L1')
+        HttpPaymentGateway('https://payments.example').charge('L1')
 
     assert error.value.__cause__ is interrupted

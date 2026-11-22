@@ -1,0 +1,5 @@
+{% if payment_success %}
+<p role="status">Payment complete{% if payment_message %}: {{ payment_message }}{% endif %}</p>
+{% else %}
+<p role="alert">Payment failed: {{ payment_message }}</p>
+{% endif %}
