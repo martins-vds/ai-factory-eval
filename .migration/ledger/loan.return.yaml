@@ -15,3 +15,19 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components: [src.loans.services.return_book, src.loans.views.loan_return, src.loans.views.loan_catalog_return]
+status: migrated
+rules:
+  - id: unknown-loan-refused
+    rule: A return for an unknown loan is refused and does not create a record.
+    source: LoanResource.java:45-50
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_unknown_loan_without_creating_it
+  - tests/loans/test_circulation.py::test_return_endpoint_returns_not_found_for_unknown_loan
+  - tests/loans/test_circulation.py::test_ui_return_for_unknown_loan_renders_error

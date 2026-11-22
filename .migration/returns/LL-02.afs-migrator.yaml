@@ -1,0 +1,48 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#2319
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2323
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.8
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - loan.lend
+  - loan.return-date
+  - loan.return
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: .migration/handoffs/LL-02.md
+rules:
+  - capability: loan.lend
+    rule: Lending refuses missing or whitespace-only member and ISBN values.
+    use_case: lend_book
+    test: tests/loans/test_circulation.py::test_lend_use_case_rejects_blank_fields
+    enforced: true
+    ledger_rule: nonblank-member-isbn
+  - capability: loan.lend
+    rule: A valid loan receives id L<count+1> and the supplied current date.
+    use_case: lend_book
+    test: tests/loans/test_circulation.py::test_lend_use_case_assigns_the_next_id_and_lending_date
+    enforced: true
+    ledger_rule: next-id-and-lent-date
+  - capability: loan.return-date
+    rule: The first return records the supplied date; repeated returns are refused without replacing it.
+    use_case: return_book
+    test: tests/loans/test_circulation.py::test_return_use_case_sets_date_once_and_rejects_a_repeat
+    enforced: true
+    ledger_rule: return-date-recorded-once
+  - capability: loan.return
+    rule: A return for an unknown loan is refused and does not create a record.
+    use_case: return_book
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_unknown_loan_without_creating_it
+    enforced: true
+    ledger_rule: unknown-loan-refused
