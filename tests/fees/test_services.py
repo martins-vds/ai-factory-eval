@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, GatewayResponse, PaymentApplication
 
 
 @dataclass
@@ -27,6 +27,19 @@ class FixedClock:
 
     def today(self):
         return self.current_date
+
+
+class PaymentGateway:
+    def __init__(self, response=None, error=None):
+        self.response = response
+        self.error = error
+        self.loan_ids = []
+
+    def charge(self, loan_id):
+        self.loan_ids.append(loan_id)
+        if self.error is not None:
+            raise self.error
+        return self.response
 
 
 @pytest.mark.parametrize(
@@ -73,3 +86,50 @@ def test_fee_for_unknown_loan_is_absent():
     application = FeeApplication(LoanRepository(), FixedClock(date(2026, 11, 22)))
 
     assert application.calculate('L9') is None
+
+
+def test_payment_for_unknown_loan_does_not_call_gateway():
+    gateway = PaymentGateway(GatewayResponse(200, b'charged\n'))
+    application = PaymentApplication(LoanRepository(), gateway)
+
+    result = application.pay('L9')
+
+    assert (result.status, result.body) == (404, b'no such loan\n')
+    assert gateway.loan_ids == []
+
+
+@pytest.mark.parametrize(
+    ('gateway_response', 'expected_status', 'expected_body'),
+    [
+        (GatewayResponse(200, b'charged\n'), 200, b'charged\n'),
+        (GatewayResponse(503, b'declined\n'), 502, b'declined\n'),
+    ],
+)
+def test_payment_maps_gateway_response(gateway_response, expected_status, expected_body):
+    gateway = PaymentGateway(gateway_response)
+    application = PaymentApplication(LoanRepository(Loan('L1', date(2026, 1, 16))), gateway)
+
+    result = application.pay('L1')
+
+    assert (result.status, result.body) == (expected_status, expected_body)
+    assert gateway.loan_ids == ['L1']
+
+
+def test_payment_failure_keeps_interruption_context():
+    interruption = InterruptedError('gateway request interrupted')
+    gateway = PaymentGateway(error=interruption)
+    application = PaymentApplication(LoanRepository(Loan('L1', date(2026, 1, 16))), gateway)
+
+    result = application.pay('L1')
+
+    assert (result.status, result.body) == (502, b'payment gateway unavailable\n')
+    assert result.interruption is interruption
+
+
+def test_payment_io_failure_maps_to_gateway_unavailable():
+    gateway = PaymentGateway(error=OSError('connection refused'))
+    application = PaymentApplication(LoanRepository(Loan('L1', date(2026, 1, 16))), gateway)
+
+    result = application.pay('L1')
+
+    assert (result.status, result.body) == (502, b'payment gateway unavailable\n')
