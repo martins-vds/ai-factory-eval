@@ -6,6 +6,11 @@ from .services import GatewayResponse, InterruptedPayment, PaymentGatewayFailure
 DEFAULT_GATEWAY_URL = 'https://payments.lending-library.invalid'
 
 
+class _NoRedirectHandler(request.HTTPRedirectHandler):
+    def redirect_request(self, _request, _file, _code, _message, _headers, _url):
+        return None
+
+
 class HttpPaymentGateway:
     def charge(self, loan_id: str) -> GatewayResponse:
         gateway_url = os.environ.get('PAYMENT_GATEWAY_URL', DEFAULT_GATEWAY_URL)
@@ -16,12 +21,13 @@ class HttpPaymentGateway:
         )
 
         try:
-            with request.urlopen(payment_request) as response:
+            opener = request.build_opener(_NoRedirectHandler)
+            with opener.open(payment_request) as response:
                 status = response.status
-                body = response.read().decode('utf-8')
+                body = response.read().decode('utf-8', errors='replace')
         except error.HTTPError as response:
             status = response.code
-            body = response.read().decode('utf-8')
+            body = response.read().decode('utf-8', errors='replace')
         except InterruptedError as exc:
             raise InterruptedPayment('payment request interrupted') from exc
         except error.URLError as exc:
@@ -31,4 +37,4 @@ class HttpPaymentGateway:
         except OSError as exc:
             raise PaymentGatewayFailure('payment gateway unavailable') from exc
 
-        return GatewayResponse(200 if status == 200 else 502, body)
+        return GatewayResponse(status, body)

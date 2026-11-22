@@ -47,10 +47,12 @@ class PaymentGateway:
 
 
 @pytest.mark.parametrize(
-    ('late_days', 'expected_cents'),
-    [(0, 0), (2, 0), (3, 75), (19, 475), (296, 1000)],
+    ('late_days', 'expected_days_late', 'expected_cents'),
+    [(-1, 0, 0), (0, 0, 0), (2, 2, 0), (3, 3, 75), (19, 19, 475), (296, 296, 1000)],
 )
-def test_fee_calculation_applies_waiver_threshold_and_cap(late_days, expected_cents):
+def test_fee_calculation_applies_waiver_threshold_and_cap(
+    late_days, expected_days_late, expected_cents
+):
     due_on = date(2026, 1, 1)
     loan = Loan('L1', due_on, returned_on=due_on + timedelta(days=late_days))
     application = FeeApplication(
@@ -61,7 +63,7 @@ def test_fee_calculation_applies_waiver_threshold_and_cap(late_days, expected_ce
 
     quote = application.calculate_fee('L1')
 
-    assert quote.days_late == late_days
+    assert quote.days_late == expected_days_late
     assert quote.amount_cents == expected_cents
 
 
@@ -105,6 +107,19 @@ def test_payment_delegates_to_gateway_for_an_existing_loan():
 
     assert result == GatewayResponse(200, 'charged\n')
     assert gateway.charges == ['L1']
+
+
+def test_payment_maps_non_success_gateway_responses_to_bad_gateway():
+    gateway = PaymentGateway(GatewayResponse(503, 'declined\n'))
+    application = FeeApplication(
+        LoanRepository(Loan('L1', date(2026, 1, 1))),
+        FixedClock(date(2026, 1, 1)),
+        gateway,
+    )
+
+    result = application.pay('L1')
+
+    assert result == GatewayResponse(502, 'declined\n')
 
 
 def test_payment_does_not_swallow_interruption():

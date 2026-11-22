@@ -9,9 +9,32 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.fees.services.FeeApplication.pay, src.fees.gateway.HttpPaymentGateway]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-03.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - tests/fees/test_services.py::test_payment_requires_an_existing_loan_before_calling_gateway
+  - tests/fees/test_services.py::test_payment_maps_non_success_gateway_responses_to_bad_gateway
+  - tests/fees/test_services.py::test_payment_does_not_swallow_interruption
+  - tests/fees/test_endpoints.py::test_payment_api_forwards_gateway_request_and_maps_responses
+  - tests/fees/test_endpoints.py::test_payment_api_maps_redirects_to_bad_gateway_without_following_them
+  - tests/fees/test_endpoints.py::test_interrupted_payment_is_a_gateway_failure_without_losing_interrupt
+  - tests/fees/test_endpoints.py::test_payment_page_swaps_gateway_error_fragment
+rules:
+  - id: existing-loan
+    rule: "A payment is not sent to the gateway unless the loan exists."
+    source: "legacy/src/main/java/lib/FinePayments.java:29-31"
+  - id: gateway-status
+    rule: "Only gateway HTTP 200 remains 200; every other response maps to 502 with its body preserved."
+    source: "legacy/src/main/java/lib/FinePayments.java:34-37"
+  - id: interruption
+    rule: "An interrupted gateway call remains an interruption with its original cause and surfaces as HTTP 502."
+    source: "legacy/src/main/java/lib/FinePayments.java:34-40; quirk ruling #40"
+notes: "The source swallowed InterruptedException; ruling martins-vds/ai-factory-synthetic-target#40 requires preserving it while returning 502."
 quirks: [martins-vds/ai-factory-synthetic-target#40]

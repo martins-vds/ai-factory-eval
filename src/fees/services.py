@@ -66,4 +66,5 @@ class FeeApplication:
     def pay(self, loan_id: str) -> GatewayResponse | None:
         if self.repository.find(loan_id) is None:
             return None
-        return self.gateway.charge(loan_id)
+        response = self.gateway.charge(loan_id)
+        return GatewayResponse(200 if response.status == 200 else 502, response.body)

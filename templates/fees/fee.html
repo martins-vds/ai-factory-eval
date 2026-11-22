@@ -3,7 +3,6 @@
 {% block title %}Late fee · The Lending Library{% endblock %}
 
 {% block content %}
-<meta name="htmx-config" content='{"responseHandling":[{"code":"[23]..","swap":true,"error":false},{"code":"[45]..","swap":true,"error":true},{"code":"...","swap":false}]}' />
 <section class="mx-auto max-w-3xl">
   <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
   {% if quote %}
@@ -18,9 +17,10 @@
         <p role="alert">Payment could not be completed: {{ payment_error }}</p>
         {% endif %}
         <form method="post" action="/ui/payments/{{ quote.loan.id }}/"
-              hx-post="/ui/payments/{{ quote.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+              hx-post="/ui/payments/{{ quote.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML"
+              hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = true; event.detail.isError = false; }">
           {% csrf_token %}
-          <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+          <button class="btn btn-ghost text-[#a94e37]" type="submit">Pay late fee</button>
         </form>
       </div>
     </div>
