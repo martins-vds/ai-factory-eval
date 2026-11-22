@@ -1,9 +1,17 @@
 import os
+from http.client import HTTPException
 from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
 
 from .services import GatewayResponse
+
+
+def _read_body(response):
+    try:
+        return response.read()
+    except HTTPException as error:
+        raise OSError('incomplete payment gateway response') from error
 
 
 class HttpPaymentGateway:
@@ -18,6 +26,6 @@ class HttpPaymentGateway:
         request = Request(url, data=b'', method='POST')
         try:
             with urlopen(request, timeout=5) as response:
-                return GatewayResponse(response.status, response.read())
+                return GatewayResponse(response.status, _read_body(response))
         except HTTPError as response:
-            return GatewayResponse(response.code, response.read())
+            return GatewayResponse(response.code, _read_body(response))

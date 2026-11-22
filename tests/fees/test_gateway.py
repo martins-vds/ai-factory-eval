@@ -16,7 +16,10 @@ def payment_gateway_server():
             body = self.rfile.read(int(self.headers.get('Content-Length', 0)))
             requests.append((self.command, self.path, body))
             self.send_response(response['status'])
-            self.send_header('Content-Length', str(len(response['body'])))
+            self.send_header(
+                'Content-Length',
+                str(response.get('content_length', len(response['body']))),
+            )
             self.end_headers()
             self.wfile.write(response['body'])
 
@@ -54,6 +57,14 @@ def test_gateway_reads_configured_url(monkeypatch):
     monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'https://payments.example.test/custom')
 
     assert HttpPaymentGateway().base_url == 'https://payments.example.test/custom'
+
+
+def test_gateway_translates_incomplete_response_to_io_error(payment_gateway_server):
+    base_url, response, _ = payment_gateway_server
+    response.update(status=200, body=b'partial\n', content_length=20)
+
+    with pytest.raises(OSError):
+        HttpPaymentGateway(base_url).charge('L1')
 
 
 def test_gateway_uses_characterized_default_url(monkeypatch):
