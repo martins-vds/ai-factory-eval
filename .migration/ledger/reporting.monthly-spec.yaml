@@ -6,7 +6,11 @@ source:
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The remaining report specification describes a first-of-month report for the preceding month, grouped by member, ordered by fees then member ID, and omitting members with no loans."
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: reporting-window
     rule: The report is run on the first day of each month for the previous month.
@@ -17,4 +21,4 @@ rules:
   - id: report-order
     rule: Rows sort by total late fees descending, then by member ID.
     source: legacy/docs/reports-spec.md:8
-notes: The document says the reporting module was a separate product and its code/runtime are no longer available; see .migration/quirks/monthly-report-no-runtime.md.
+notes: 'Tier C: the document says the reporting module was a separate product and its code/runtime are no longer available; see .migration/quirks/monthly-report-no-runtime.md.'

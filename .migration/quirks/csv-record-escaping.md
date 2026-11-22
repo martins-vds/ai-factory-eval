@@ -5,7 +5,7 @@ The source joins loan fields with semicolons but does not quote or escape field 
 
 ## Evidence
 - Source: `method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line`, `legacy/src/main/java/lib/LoanResource.java:52-55`; `legacy/docs/export-csv.md:1-4`
-- Characterization: the tier-A list probe observed semicolon-separated records; embedded semicolons, quotes, and newlines were not separately exercised.
+- Characterization: `POST /loans` with `member=gray;lee` and `isbn=semicolon` returned `L7;gray;lee;semicolon;<today>;<today+14>;`; `GET /loans/L7` returned the same unquoted field content.
 - Why it looks wrong: a member value containing a semicolon or newline makes the documented row format ambiguous to spreadsheet consumers.
 
 ## Impact

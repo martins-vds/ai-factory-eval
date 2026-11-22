@@ -8,7 +8,11 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "POST /loans/{id}/return marks a known loan returned today and returns its formatted record, or returns HTTP 404 for an unknown ID."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: unknown-loan
     rule: An unknown loan ID returns HTTP 404 with `no such loan` followed by a newline.

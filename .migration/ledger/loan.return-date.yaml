@@ -8,7 +8,11 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "A successful return writes the supplied return date to the persisted Loan.returnedOn field."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: overwrite-return-date
     rule: The return operation sets returnedOn to the supplied date even when the loan already has a return date.

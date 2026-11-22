@@ -5,7 +5,7 @@ When `POST /loans` receives an empty `member` or `isbn` value, the source accept
 
 ## Evidence
 - Source: `endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans`, `legacy/src/main/java/lib/LoanResource.java:38-42`
-- Characterization: the tier-A HTTP suite exercised valid form values; empty values were not separately exercised.
+- Characterization: `POST /loans` with `member=` and `isbn=empty-member` returned HTTP 201 and `L5;;empty-member;<today>;<today+14>;`; `member=empty-isbn` and `isbn=` returned HTTP 201 and `L6;empty-isbn;;<today>;<today+14>;`.
 - Why it looks wrong: a loan with an empty member or ISBN can be persisted even though the fields identify its borrower and book.
 
 ## Impact

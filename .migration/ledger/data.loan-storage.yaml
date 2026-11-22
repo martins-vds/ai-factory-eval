@@ -7,7 +7,11 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "The library persistence unit uses an in-memory H2 database, creates the schema from the Loan entity, loads seed.sql, and wraps writes in JPA transactions."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: schema-lifecycle
     rule: Startup uses drop-and-create schema generation and loads META-INF/seed.sql.

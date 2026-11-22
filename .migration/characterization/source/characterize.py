@@ -39,7 +39,12 @@ EDGE_CASES = (
     ('POST /loans (missing isbn)', 'POST', '/loans', {'member': 'missing-isbn'}),
     ('POST /loans (empty member)', 'POST', '/loans', {'member': '', 'isbn': 'empty-member'}),
     ('POST /loans (empty isbn)', 'POST', '/loans', {'member': 'empty-isbn', 'isbn': ''}),
-    ('POST /loans (semicolon member)', 'POST', '/loans', {'member': 'gray;lee', 'isbn': 'semicolon'}),
+    (
+        'POST /loans (semicolon member)',
+        'POST',
+        '/loans',
+        {'member': 'gray;lee', 'isbn': 'semicolon'},
+    ),
     ('POST /loans/L2/return', 'POST', '/loans/L2/return', None),
     ('POST /loans/L2/return (repeat)', 'POST', '/loans/L2/return', None),
     ('POST /loans/unknown/return', 'POST', '/loans/unknown/return', None),
@@ -65,7 +70,9 @@ class GatewayHandler(BaseHTTPRequestHandler):
                 pass
             self.connection.close()
             return
-        status, response_body = (503, 'gateway failure\n') if loan_id == 'L2' else (200, 'charged\n')
+        status, response_body = (
+            (503, 'gateway failure\n') if loan_id == 'L2' else (200, 'charged\n')
+        )
         encoded = response_body.encode('utf-8')
         self.send_response(status)
         self.send_header('Content-Length', str(len(encoded)))

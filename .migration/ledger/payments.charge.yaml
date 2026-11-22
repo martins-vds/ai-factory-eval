@@ -8,7 +8,11 @@ source:
   risk: { crap: 20, complexity: 4, coverage: 0 }
 boundary: "POST /payments/{id} checks that the loan exists, sends a no-body POST to the configured gateway, and returns the mapped gateway response."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: existing-loan
     rule: An unknown loan ID returns HTTP 404 without calling the gateway.

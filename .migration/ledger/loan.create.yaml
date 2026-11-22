@@ -8,7 +8,11 @@ source:
   risk: { crap: 12, complexity: 3, coverage: 0 }
 boundary: "POST /loans accepts member and isbn form fields, creates a loan dated today, and returns HTTP 201 with its formatted record."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: required-fields
     rule: If member or isbn is absent (null), creation is rejected with HTTP 400 and `member and isbn are required`.

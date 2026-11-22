@@ -8,7 +8,11 @@ source:
   risk: { crap: 20, complexity: 4, coverage: 0 }
 boundary: "Gateway I/O failures and interrupted calls return HTTP 502 with `payment gateway unavailable`."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: gateway-exception
     rule: IOException or InterruptedException is mapped to HTTP 502 with a plain-text `payment gateway unavailable` body.
