@@ -18,7 +18,29 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
+@dataclass(frozen=True)
+class GatewayResponse:
+    status: int
+    body: str
+
+
+class PaymentGateway(Protocol):
+    def charge(self, loan_id: str) -> GatewayResponse: ...
+
+
 class LoanNotFound(LookupError):
+    pass
+
+
+class PaymentGatewayError(Exception):
+    pass
+
+
+class PaymentGatewayInterrupted(PaymentGatewayError):
+    pass
+
+
+class PaymentGatewayUnavailable(PaymentGatewayError):
     pass
 
 
@@ -48,3 +70,14 @@ class LateFeeApplication:
             else min(Decimal(days_late) * Decimal('0.25'), Decimal('10.00'))
         )
         return FeeQuote(loan.id, loan.due_on, days_late, amount)
+
+
+class PaymentApplication:
+    def __init__(self, repository: LoanRepository, gateway: PaymentGateway):
+        self.repository = repository
+        self.gateway = gateway
+
+    def pay(self, loan_id: str) -> GatewayResponse:
+        if self.repository.find(loan_id) is None:
+            raise LoanNotFound(loan_id)
+        return self.gateway.charge(loan_id)
