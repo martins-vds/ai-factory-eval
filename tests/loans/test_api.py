@@ -30,3 +30,8 @@ def test_get_unknown_loan_returns_characterized_not_found(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_admin_route_is_not_installed(client):
+    assert client.get('/admin/').status_code == 404
