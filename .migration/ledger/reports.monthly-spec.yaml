@@ -6,9 +6,34 @@ source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets:
+  - martins-vds/ai-factory-synthetic-target#35
+  - martins-vds/ai-factory-synthetic-target#67
+target:
+  components:
+    - src/reports/services.py::MonthlyReportApplication
+    - src/reports/repository.py::DjangoReportLoanRepository
+    - src/reports/management/commands/monthly_report.py::Command
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+evidence:
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+  - tests/reports/test_monthly_report.py::test_monthly_report_uses_previous_december_at_year_boundary
+  - tests/reports/test_monthly_report.py::test_monthly_report_calculates_late_fees_in_cents
+  - tests/reports/test_monthly_report.py::test_monthly_report_command_reads_postgres_and_writes_csv
+  - .migration/evidence/runs/LL-05.md
+rules:
+  - id: previous-month-window
+    rule: "The report covers the half-open prior-calendar-month window and counts loan starts and late returns in that window."
+    source: "legacy/docs/reports-spec.md:3-6"
+  - id: member-inclusion
+    rule: "Include only members with loans started during the report month."
+    source: ".migration/plan/monthly-report.md:5"
+  - id: late-fee-total
+    rule: "Count late returns and total their late fees in cents using the established grace period and cap."
+    source: "legacy/docs/reports-spec.md:5; legacy/src/main/java/lib/LateFeeView.java:31-37"
+  - id: report-order
+    rule: "Sort rows by total late fees descending, then member id ascending."
+    source: "legacy/docs/reports-spec.md:7"
+notes: "Only the specification remains; the separate reporting runtime is unavailable. Scheduling stays external to this management command."
