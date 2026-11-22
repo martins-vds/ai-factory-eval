@@ -11,7 +11,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from cargotracker.cargo.infrastructure.models import CargoRecord
-from cargotracker.data_migration import exporter
+from cargotracker.data_migration import exporter, schema
 from cargotracker.location.infrastructure.models import LocationRecord
 
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
@@ -25,9 +25,9 @@ def test_model_index_excludes_proxy_and_auto_created_models(monkeypatch):
         SimpleNamespace(_meta=SimpleNamespace(db_table='location', proxy=True, auto_created=False)),
         SimpleNamespace(_meta=SimpleNamespace(db_table='location', proxy=False, auto_created=True)),
     ]
-    monkeypatch.setattr(exporter.apps, 'get_models', lambda: models)
+    monkeypatch.setattr(schema.apps, 'get_models', lambda: models)
 
-    assert exporter._model_index() == {'location': models[0]}
+    assert schema.model_index() == {'location': models[0]}
 
 
 @pytest.mark.django_db(transaction=True)
@@ -211,9 +211,9 @@ def test_export_interprets_naive_and_offsetless_datetimes_in_mapping_timezone():
 
     mapping_timezone = timezone(timedelta(hours=-5))
     expected = '2026-02-01T17:00:00+00:00'
-    assert exporter._format_value(datetime(2026, 2, 1, 12), mapping_timezone) == expected
+    assert schema.format_value(datetime(2026, 2, 1, 12), mapping_timezone) == expected
     assert (
-        exporter._format_value(
+        schema.format_value(
             datetime(2026, 2, 1, 12, tzinfo=OffsetlessTimezone()),
             mapping_timezone,
         )
