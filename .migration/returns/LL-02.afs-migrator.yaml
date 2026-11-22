@@ -1,0 +1,66 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#2379
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2383
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 5
+  mutation_changed: 0.951
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Missing, empty or whitespace-only member values are refused with a member field error.
+    use_case: LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_lending_rejects_blank_fields_through_the_use_case
+    enforced: true
+    ledger_rule: member-required
+  - capability: loan.lend
+    rule: Missing, empty or whitespace-only ISBN values are refused with an ISBN field error.
+    use_case: LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_lending_rejects_blank_fields_through_the_use_case
+    enforced: true
+    ledger_rule: isbn-required
+  - capability: loan.lend
+    rule: A new loan uses today's server-local date and is due 14 calendar days later.
+    use_case: LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_lending_creates_a_persisted_loan_with_a_fourteen_day_due_date
+    enforced: true
+    ledger_rule: loan-dates
+  - capability: loan.lend
+    rule: A new loan receives the next L<count+1> identifier.
+    use_case: LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_lending_creates_a_persisted_loan_with_a_fourteen_day_due_date
+    enforced: true
+    ledger_rule: loan-identifier
+  - capability: loan.return-date
+    rule: The first successful return persists today's server-local date.
+    use_case: LoanApplication.return_loan
+    test: tests/loans/test_circulation.py::test_repeated_return_is_rejected_without_replacing_the_first_return_date
+    enforced: true
+    ledger_rule: initial-return-date
+  - capability: loan.return-date
+    rule: A repeated return is rejected and leaves the original return date unchanged.
+    use_case: LoanApplication.return_loan
+    test: tests/loans/test_circulation.py::test_repeated_return_is_rejected_without_replacing_the_first_return_date
+    enforced: true
+    ledger_rule: preserve-return-date
+  - capability: loan.return
+    rule: Returning an unknown loan is rejected without creating or changing a loan.
+    use_case: LoanApplication.return_loan
+    test: tests/loans/test_circulation.py::test_returning_an_unknown_loan_is_rejected_by_the_use_case
+    enforced: true
+    ledger_rule: known-loan-required

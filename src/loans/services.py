@@ -7,7 +7,6 @@ from .ports import Clock, LoanRecord, LoanStore
 class LoanInputError(ValueError):
     def __init__(self, errors):
         self.errors = errors
-        super().__init__('Loan fields cannot be blank.')
 
 
 class LoanNotFound(LookupError):

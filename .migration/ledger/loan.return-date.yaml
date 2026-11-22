@@ -9,9 +9,25 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/loans/test_circulation.py::test_repeated_return_is_rejected_without_replacing_the_first_return_date
+  - tests/loans/test_circulation.py::test_return_endpoint_persists_date_and_rejects_repeated_returns
+  - .migration/evidence/runs/LL-02.md
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components: [src.loans.services.LoanApplication, src.loans.repository.LoanRepository]
+rules:
+  - id: initial-return-date
+    rule: The first successful return persists today's server-local date.
+    source: "legacy/src/main/java/lib/LoanRepository.java:36-44; .migration/plan/loan-circulation.md"
+  - id: preserve-return-date
+    rule: A repeated return is rejected and leaves the original return date unchanged.
+    source: martins-vds/ai-factory-synthetic-target#41 (fix)
