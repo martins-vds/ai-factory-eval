@@ -1,0 +1,23 @@
+role: afs-migrator
+ticket: REF-20261122-ADMIN-LIVE-MAP
+issue: martins-vds/ai-factory-eval#2415
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2418
+gates:
+  build: 0
+  behavior: 0
+  spec: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.000
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/REF-20261122-ADMIN-LIVE-MAP.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
+notes: >-
+  No tests were changed. The existing map-data tests exercise the public
+  build_admin_map_data boundary and do not reference the extracted private helpers.
