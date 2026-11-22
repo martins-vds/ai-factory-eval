@@ -29,4 +29,3 @@ Written by `afs-mutation` on its last run (base `1bc7875fe513f393ea9c7de89707628
                    [
                        format_value(getattr(row, table['fields'][column].attname), timezone)
   ```
-
