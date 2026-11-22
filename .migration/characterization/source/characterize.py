@@ -6,6 +6,7 @@ import re
 import subprocess
 import tempfile
 import time
+from datetime import date
 from pathlib import Path
 from urllib import error, parse, request
 
@@ -107,6 +108,59 @@ def exercise_browser():
     return {'pages': pages}
 
 
+def fee_cents(response):
+    match = re.search(r'Fee: \$(\d+)\.(\d{2})', response['body'])
+    if match is None:
+        raise AssertionError(f'fee amount missing from response: {response["body"]}')
+    return int(match.group(1)) * 100 + int(match.group(2))
+
+
+def exercise_edge_cases():
+    cases = (
+        ('missing loan', 'GET', '/loans/missing', None),
+        ('return missing loan', 'POST', '/loans/missing/return', None),
+        ('missing fee', 'GET', '/fees/missing', None),
+        ('pay missing loan', 'POST', '/payments/missing', None),
+        ('missing member', 'POST', '/loans', {'isbn': '123'}),
+        ('missing isbn', 'POST', '/loans', {'member': 'dee'}),
+    )
+    responses = {name: get_response(method, path, form) for name, method, path, form in cases}
+
+    before = get_response('GET', '/loans/L2', None)
+    fee_before = get_response('GET', '/fees/L2', None)
+    returned = get_response('POST', '/loans/L2/return', None)
+    after = get_response('GET', '/loans/L2', None)
+    fee_after = get_response('GET', '/fees/L2', None)
+    previous_date = before['body'].rstrip('\n').split(';')[-1]
+    loan_fields = after['body'].rstrip('\n').split(';')
+    returned_date = loan_fields[-1]
+    due_date = date.fromisoformat(loan_fields[-2])
+    return_date = date.fromisoformat(returned_date)
+    late_days = max(0, (return_date - due_date).days)
+    expected_fee = 0 if late_days <= 2 else min(1000, late_days * 25)
+
+    return {
+        'missing_or_invalid_requests': responses,
+        'repeated_return': {
+            'previous_return_date': previous_date,
+            'response_status': returned['status'],
+            'return_date_replaced': returned_date != previous_date,
+            'fee_before_cents': fee_cents(fee_before),
+            'fee_matches_return_date': fee_cents(fee_after) == expected_fee,
+        },
+    }
+
+
+def exercise_restart(initial_http):
+    response = get_response('GET', '/loans', None)
+    rows = response['body'].splitlines()
+    return {
+        'status': response['status'],
+        'seed_rows_restored': response['body'] == initial_http['GET /loans']['response']['body'],
+        'loan_count': len(rows),
+    }
+
+
 def normalize(observation, endpoint):
     response = observation['response']
     body = re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', response['body'])
@@ -165,17 +219,35 @@ def main():
             wait_until_ready(process, output)
             http = exercise_http()
             browser = exercise_browser()
-        finally:
+            edge_cases = exercise_edge_cases()
             process.terminate()
-            try:
-                process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait()
+            process.wait(timeout=10)
+            process = subprocess.Popen(
+                ['bash', str(RUN_SCRIPT)],
+                cwd=SOURCE,
+                env=os.environ.copy(),
+                stdout=output,
+                stderr=subprocess.STDOUT,
+            )
+            wait_until_ready(process, output)
+            restart = exercise_restart(http)
+        finally:
+            if process.poll() is None:
+                process.terminate()
+                try:
+                    process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
     write_or_compare('http', http, args.record)
     write_or_compare('browser', browser, args.record)
+    write_or_compare('edge-cases', edge_cases, args.record)
+    write_or_compare('restart', restart, args.record)
     action = 'recorded' if args.record else 'verified'
-    print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
+    print(
+        f'{action} {len(http)} source endpoints, {len(browser["pages"])} browser pages, '
+        f'{len(edge_cases["missing_or_invalid_requests"])} error cases, repeat-return, and restart reset'
+    )
 
 
 if __name__ == '__main__':

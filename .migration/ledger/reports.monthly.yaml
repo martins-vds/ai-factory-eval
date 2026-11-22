@@ -1,0 +1,13 @@
+id: reports.monthly
+kind: behavioral
+title: Produce the monthly lending report
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-9
+boundary: "The documented report runs on the first day of each month for the prior month, with one row per member and the specified late-fee sort order."
+status: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/characterization/source/SY-05.md
+notes: "The separate reporting product's code and runtime are unavailable; this document is the only surviving specification."

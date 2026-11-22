@@ -1,0 +1,16 @@
+id: integration.payment-gateway
+kind: integration
+title: Charge a late fee through the payment gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:26-41
+  risk: { crap: 20, complexity: 4 }
+boundary: "POST /payments/{id} checks that the loan exists and sends a charge request to PAYMENT_GATEWAY_URL (or the configured default)."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
+notes: "Only the unavailable default gateway path was observable; the real gateway success path was not substituted with a mock."

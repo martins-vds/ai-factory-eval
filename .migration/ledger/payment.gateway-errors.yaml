@@ -1,0 +1,16 @@
+id: payment.gateway-errors
+kind: behavioral
+title: Map payment gateway failures to HTTP responses
+source:
+  graph_node: function:legacy/src/main/java/lib/FinePayments.java:pay
+  location: legacy/src/main/java/lib/FinePayments.java:29-40
+  risk: { crap: 20, complexity: 4 }
+boundary: "An unknown loan returns 404; only a gateway 200 maps to 200; other gateway responses and I/O or interruption failures map to 502."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
+  - .migration/characterization/source/characterize.py::exercise_edge_cases
+notes: "The interruption path is tracked in .migration/quirks/payment-interrupt.md."

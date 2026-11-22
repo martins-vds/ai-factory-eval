@@ -1,0 +1,41 @@
+{
+  "missing_or_invalid_requests": {
+    "missing fee": {
+      "body": "<p>No such loan.</p>",
+      "content_type": "text/html",
+      "status": 404
+    },
+    "missing isbn": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    },
+    "missing loan": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    },
+    "missing member": {
+      "body": "member and isbn are required\n",
+      "content_type": "text/plain",
+      "status": 400
+    },
+    "pay missing loan": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    },
+    "return missing loan": {
+      "body": "no such loan\n",
+      "content_type": "text/plain",
+      "status": 404
+    }
+  },
+  "repeated_return": {
+    "fee_before_cents": 0,
+    "fee_matches_return_date": true,
+    "previous_return_date": "2026-01-20",
+    "response_status": 200,
+    "return_date_replaced": true
+  }
+}

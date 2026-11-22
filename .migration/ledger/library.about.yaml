@@ -1,0 +1,15 @@
+id: library.about
+kind: ui
+title: Display library information
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/AboutPage.java:GET /about
+  flow: View About Page
+  location: legacy/src/main/java/lib/AboutPage.java:12-21
+boundary: "GET /about serves the static HTML page with the library's hours, 14-day lending period, and contact details."
+status: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
+  - .migration/characterization/source/characterize.py::exercise_browser
