@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mb-10 max-w-2xl">
+  <p class="mb-3 text-sm font-semibold uppercase tracking-widest text-emerald-800">Reading room · Catalog</p>
+  <h1 class="font-serif text-4xl font-semibold tracking-tight md:text-5xl">The loan catalog</h1>
+  <p class="mt-4 text-lg leading-relaxed text-stone-600">Browse the books currently in our reading room.</p>
+</section>
+<section aria-label="Loans" class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+  {% for loan in loans %}
+  <article class="card border border-stone-200 bg-white shadow-sm">
+    <div class="card-body">
+      <div class="flex items-center justify-between">
+        <span class="badge badge-outline">Record {{ loan.loan_id }}</span>
+        <span class="text-sm text-stone-500">Due {{ loan.due_on|date:"Y-m-d" }}</span>
+      </div>
+      <h2 class="mt-4 font-serif text-2xl font-semibold">{{ loan.member }}</h2>
+      <p class="text-sm text-stone-600">ISBN {{ loan.isbn }}</p>
+      <a class="btn btn-ghost mt-3 self-start" href="{% url 'loan-page' loan_id=loan.loan_id %}">
+        View record {{ loan.loan_id }}
+      </a>
+    </div>
+  </article>
+  {% empty %}
+  <p class="text-stone-600">There are no loans in the catalog yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}
