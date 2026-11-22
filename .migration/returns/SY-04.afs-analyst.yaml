@@ -1,6 +1,6 @@
 role: afs-analyst
 ticket: SY-04
-issue: martins-vds/ai-factory-eval#2262
+issue: martins-vds/ai-factory-synthetic-target#35
 graphs:
   knowledge: .migration/graphs/source/full/knowledge-graph.json
   domain: .migration/graphs/source/full/domain-graph.json
@@ -8,13 +8,13 @@ graphs:
   edges: 119
   flows: 6
 ledger:
-  entries: 14
+  entries: 17
   by_kind:
-    structural: 1
-    behavioral: 8
-    ui: 1
+    structural: 3
+    behavioral: 9
+    ui: 2
     integration: 1
-    data: 3
+    data: 2
 risk_map:
   path: .migration/risk-map/SY-04.md
   methods: 19
@@ -24,8 +24,10 @@ risk_map:
     - "FinePayments.pay: CRAP 20, complexity 4"
     - "LoanResource.lend: CRAP 12, complexity 3"
 quirk_tickets:
-  - .migration/quirks/restart-data-loss.md
-  - .migration/quirks/repeated-loan-return.md
-  - .migration/quirks/payment-interrupt.md
-  - .migration/quirks/monthly-report-spec-only.md
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#40
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+  - .migration/quirks/loan-create-missing-content-type.md
 graph_discrepancies: []

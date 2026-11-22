@@ -4,11 +4,15 @@ title: Charge a late fee through the payment gateway
 source:
   graph_node: "endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}"
   flow: Pay Late Fee
-  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk:
     crap: 20
     complexity: 4
-boundary: "For an existing loan, POST /payments/{id} sends an HTTP POST without a body to PAYMENT_GATEWAY_URL/charge?loan={id}, defaulting to the source's invalid-domain URL."
+tickets: [martins-vds/ai-factory-synthetic-target#35]
+boundary: "POST /payments/{id} requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 status: pending
-verification: pending
-notes: "Interruption handling is unresolved in .migration/quirks/payment-interrupt.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "InterruptedException is swallowed while returning 502; the operator's ruling is in martins-vds/ai-factory-synthetic-target#40."
+quirks: [martins-vds/ai-factory-synthetic-target#40]

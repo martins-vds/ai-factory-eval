@@ -5,6 +5,10 @@ source:
   graph_node: "table:legacy/src/main/resources/META-INF/seed.sql:LOAN"
   location: legacy/src/main/resources/META-INF/seed.sql:1-3
 boundary: "The persistence unit loads three fixed sample loans, including one active loan and two returned loans, when the in-memory schema is created."
+tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: pending
-verification: pending
-notes: "The reload-on-start behavior is unresolved in .migration/quirks/restart-data-loss.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "The observed seed reload and reset are tracked in martins-vds/ai-factory-synthetic-target#42."
+quirks: [martins-vds/ai-factory-synthetic-target#42]

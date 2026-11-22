@@ -1,0 +1,18 @@
+id: loan.text-export
+kind: behavioral
+title: Format loans for spreadsheet export
+source:
+  graph_node: "method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line"
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:52-55
+  risk:
+    crap: 6
+    complexity: 2
+boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. Raw delimiter characters are not escaped."
+tickets: [martins-vds/ai-factory-synthetic-target#35]
+status: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "The operator's ruling to escape delimiter-containing values is recorded in martins-vds/ai-factory-synthetic-target#43."
+quirks: [martins-vds/ai-factory-synthetic-target#43]

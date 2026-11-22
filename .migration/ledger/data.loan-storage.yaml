@@ -3,11 +3,12 @@ kind: data
 title: Store and retrieve loan records
 source:
   graph_node: "table:legacy/src/main/java/lib/Loan.java:LOAN"
-  location: legacy/src/main/java/lib/LoanRepository.java:15-69
-  risk:
-    crap: 6
-    complexity: 2
+  location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN entity persists member, ISBN, lent date, and optional returned date through repository reads and write transactions; the source uses an in-memory H2 database recreated at startup."
+tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: pending
-verification: pending
-notes: "Restart behavior is unresolved in .migration/quirks/restart-data-loss.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "persistence.xml uses drop-and-create on startup; the observed reset is tracked in martins-vds/ai-factory-synthetic-target#42."
+quirks: [martins-vds/ai-factory-synthetic-target#42]

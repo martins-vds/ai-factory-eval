@@ -2,12 +2,16 @@ id: application.startup
 kind: structural
 title: Start the lending library service
 source:
-  graph_node: "file:legacy/src/main/java/lib/App.java"
-  location: legacy/src/main/java/lib/App.java:13-26
+  graph_node: "method:legacy/src/main/java/lib/App.java:App.main"
+  location: legacy/src/main/java/lib/App.java:13-25
   risk:
     crap: 2
     complexity: 1
 boundary: "The process reads PORT (default 8080), initializes the library persistence unit, registers the HTTP resources, binds the server, and closes the server and entity manager factory on shutdown."
+tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: pending
-verification: pending
-notes: "The startup database reset is an unresolved behavior in .migration/quirks/restart-data-loss.md."
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "The observed restart reset is tracked in martins-vds/ai-factory-synthetic-target#42."
+quirks: [martins-vds/ai-factory-synthetic-target#42]
