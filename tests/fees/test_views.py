@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 from playwright.sync_api import sync_playwright
 
@@ -23,6 +25,7 @@ def test_fee_api_matches_characterized_html(client):
     response = client.get('/fees/L3')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == (
         '<h1>Late fee for L3</h1><p>Due 2025-12-15, 19 day(s) late.</p>'
         '<p class="fee">Fee: $4.75</p>'
@@ -34,7 +37,26 @@ def test_unknown_fee_api_returns_characterized_404(client):
     response = client.get('/fees/L9')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == '<p>No such loan.</p>'
+
+
+@pytest.mark.django_db
+def test_fee_api_formats_capped_amount(client, monkeypatch):
+    monkeypatch.setattr(views.fee_application.clock, 'today', lambda: date(2026, 2, 25))
+
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert b'Fee: $10.00' in response.content
+
+
+@pytest.mark.django_db
+def test_unknown_fee_page_returns_404(client):
+    response = client.get('/ui/fees/L9/')
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
 
 
 @pytest.mark.django_db
@@ -65,6 +87,29 @@ def test_api_payment_preserves_success_response(client, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_payment_api_uses_default_composition_for_unknown_loan(client):
+    response = client.post('/payments/L9')
+
+    assert response.status_code == 404
+    assert response.content == b'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_htmx_payment_success_renders_status(client, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        'payment_application',
+        use_test_gateway(GatewayResponse(200, b'charged\n')),
+    )
+
+    response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'<div role="status">charged' in response.content
+    assert b'role="alert"' not in response.content
+
+
+@pytest.mark.django_db
 def test_htmx_payment_renders_escaped_gateway_failure(client, monkeypatch):
     monkeypatch.setattr(
         views,
@@ -77,6 +122,38 @@ def test_htmx_payment_renders_escaped_gateway_failure(client, monkeypatch):
     assert response.status_code == 502
     assert b'<div role="alert">' in response.content
     assert b'&lt;script&gt;bad()&lt;/script&gt;' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_replaces_invalid_gateway_bytes(client, monkeypatch):
+    monkeypatch.setattr(
+        views,
+        'payment_application',
+        use_test_gateway(GatewayResponse(503, b'\xff')),
+    )
+
+    response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 502
+    assert b'\xef\xbf\xbd' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('path', ['/fees/L3', '/ui/fees/L3/'])
+def test_fee_views_require_get(client, path):
+    assert client.post(path).status_code == 405
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('path', ['/payments/L3', '/ui/payments/L3/'])
+def test_payment_views_require_post(client, monkeypatch, path):
+    monkeypatch.setattr(
+        views,
+        'payment_application',
+        use_test_gateway(GatewayResponse(200, b'charged\n')),
+    )
+
+    assert client.get(path).status_code == 405
 
 
 @pytest.mark.django_db

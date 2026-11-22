@@ -29,8 +29,15 @@ evidence:
   - tests/fees/test_fee_services.py::test_payment_failure_keeps_interruption_context
   - tests/fees/test_fee_services.py::test_payment_io_failure_maps_to_gateway_unavailable
   - tests/fees/test_gateway.py::test_gateway_posts_empty_body_and_returns_gateway_response
+  - tests/fees/test_gateway.py::test_gateway_reads_configured_url
+  - tests/fees/test_gateway.py::test_gateway_uses_characterized_default_url
+  - tests/fees/test_gateway.py::test_gateway_uses_bounded_request_timeout
   - tests/fees/test_views.py::test_api_payment_preserves_success_response
+  - tests/fees/test_views.py::test_payment_api_uses_default_composition_for_unknown_loan
+  - tests/fees/test_views.py::test_htmx_payment_success_renders_status
   - tests/fees/test_views.py::test_htmx_payment_renders_escaped_gateway_failure
+  - tests/fees/test_views.py::test_htmx_payment_replaces_invalid_gateway_bytes
+  - tests/fees/test_views.py::test_payment_views_require_post
   - tests/fees/test_views.py::test_browser_displays_htmx_payment_failure
 rules:
   - id: payment-requires-loan

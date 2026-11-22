@@ -112,6 +112,7 @@ def test_payment_maps_gateway_response(gateway_response, expected_status, expect
     result = application.pay('L1')
 
     assert (result.status, result.body) == (expected_status, expected_body)
+    assert result.interruption is None
     assert gateway.loan_ids == ['L1']
 
 

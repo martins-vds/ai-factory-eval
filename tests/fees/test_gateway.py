@@ -44,7 +44,37 @@ def test_gateway_posts_empty_body_and_returns_gateway_response(
     base_url, response, requests = payment_gateway_server
     response.update(status=gateway_status, body=gateway_body)
 
-    result = HttpPaymentGateway(base_url).charge('L1')
+    result = HttpPaymentGateway(f'{base_url}/prefixX/').charge('L/1')
 
     assert (result.status, result.body) == (expected_status, gateway_body)
-    assert requests == [('POST', '/charge?loan=L1', b'')]
+    assert requests == [('POST', '/prefixX/charge?loan=L%2F1', b'')]
+
+
+def test_gateway_reads_configured_url(monkeypatch):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'https://payments.example.test/custom')
+
+    assert HttpPaymentGateway().base_url == 'https://payments.example.test/custom'
+
+
+def test_gateway_uses_characterized_default_url(monkeypatch):
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+
+    assert HttpPaymentGateway().base_url == 'https://payments.lending-library.invalid'
+
+
+def test_gateway_uses_bounded_request_timeout(payment_gateway_server, monkeypatch):
+    base_url, response, _ = payment_gateway_server
+    response.update(status=200, body=b'charged\n')
+    timeouts = []
+
+    def open_url(request, timeout):
+        timeouts.append(timeout)
+        return real_urlopen(request, timeout=timeout)
+
+    from src.fees.gateway import urlopen as real_urlopen
+
+    monkeypatch.setattr('src.fees.gateway.urlopen', open_url)
+
+    HttpPaymentGateway(base_url).charge('L1')
+
+    assert timeouts == [5]

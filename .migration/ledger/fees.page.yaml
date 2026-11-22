@@ -23,6 +23,9 @@ evidence:
   - .migration/evidence/runs/LL-03.md
   - tests/fees/test_views.py::test_fee_api_matches_characterized_html
   - tests/fees/test_views.py::test_unknown_fee_api_returns_characterized_404
+  - tests/fees/test_views.py::test_fee_api_formats_capped_amount
+  - tests/fees/test_views.py::test_unknown_fee_page_returns_404
+  - tests/fees/test_views.py::test_fee_views_require_get
   - tests/fees/test_views.py::test_reading_room_fee_page_has_payment_action
   - tests/fees/test_views.py::test_browser_displays_htmx_payment_failure
 no_rules: "Presentation capability; fee calculation and unknown-loan behavior are enforced in fees.calculation."
