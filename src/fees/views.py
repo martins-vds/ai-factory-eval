@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application
-from .presentation import fee_or_404, format_fee_amount, gateway_result
+from .presentation import fee_or_404, format_fee_amount, payment_gateway_result
 
 
 @require_GET
@@ -24,7 +24,7 @@ def fee_detail(request, loan_id):
 
 @require_POST
 def payment(request, loan_id):
-    body, status = gateway_result(loan_id)
+    body, status = payment_gateway_result(loan_id)
     if status == 404:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
     return HttpResponse(body, status=status, content_type='text/plain')
@@ -45,7 +45,7 @@ def fee_page(request, loan_id):
 
 @require_POST
 def payment_page(request, loan_id):
-    body, status = gateway_result(loan_id)
+    body, status = payment_gateway_result(loan_id)
     if status == 404:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
 

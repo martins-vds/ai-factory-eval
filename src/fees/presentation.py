@@ -8,7 +8,7 @@ def format_fee_amount(amount_cents):
     return f'${amount_cents // 100}.{amount_cents % 100:02d}'
 
 
-def gateway_result(loan_id):
+def payment_gateway_result(loan_id):
     try:
         result = fee_application.pay(loan_id)
     except PaymentGatewayFailure as error:
