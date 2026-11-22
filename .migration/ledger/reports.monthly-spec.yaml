@@ -19,8 +19,8 @@ evidence:
   - legacy/docs/reports-spec.md
   - .migration/references/characterization-SY-05.md
   - .migration/evidence/runs/LL-05.md
-  - tests/reports/test_services.py::test_monthly_report_aggregates_prior_month_and_sorts_by_fees_then_member
-  - tests/reports/test_services.py::test_monthly_report_includes_previous_december_at_year_boundary
+  - tests/reports/test_monthly_report.py::test_monthly_report_application_aggregates_prior_month_and_sorts_by_fees_then_member
+  - tests/reports/test_monthly_report.py::test_monthly_report_includes_previous_december_at_year_boundary
   - tests/reports/test_command.py::test_monthly_report_command_outputs_previous_month_csv
 rules:
   - id: previous-month-window

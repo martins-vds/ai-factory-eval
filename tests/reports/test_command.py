@@ -21,7 +21,7 @@ def test_monthly_report_command_outputs_previous_month_csv(monkeypatch):
 
     call_command('monthly_report', stdout=output)
 
-    assert output.getvalue() == (
-        'member_id,loans_started,loans_returned_late,total_late_fees_cents\n'
-        '"ada, smith",1,1,125\n'
+    assert (
+        output.getvalue()
+        == 'member_id,loans_started,loans_returned_late,total_late_fees_cents\n"ada, smith",1,1,125\n'
     )

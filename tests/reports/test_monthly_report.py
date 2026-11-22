@@ -29,7 +29,7 @@ class Clock:
         return self.value
 
 
-def test_monthly_report_aggregates_prior_month_and_sorts_by_fees_then_member():
+def test_monthly_report_application_aggregates_prior_month_and_sorts_by_fees_then_member():
     application = MonthlyReportApplication(
         LoanRepository(
             [
@@ -39,9 +39,12 @@ def test_monthly_report_aggregates_prior_month_and_sorts_by_fees_then_member():
                 Loan('L4', 'zoe', date(2026, 1, 5), date(2026, 1, 19), date(2026, 2, 20)),
                 Loan('L5', 'ada', date(2026, 3, 1), date(2026, 3, 15)),
                 Loan('L6', 'ada', date(2026, 2, 5), date(2026, 2, 19), date(2026, 3, 1)),
+                Loan('L10', 'amy', date(2026, 1, 1), date(2026, 1, 28), date(2026, 2, 1)),
                 Loan('L8', 'amy', date(2026, 2, 1), date(2026, 2, 15)),
                 Loan('L7', 'amy', date(2026, 2, 8), date(2026, 2, 22)),
+                Loan('L11', 'bea', date(2026, 2, 5), date(2026, 2, 20), date(2026, 2, 20)),
                 Loan('L9', 'zoe', date(2026, 1, 31), date(2026, 2, 14)),
+                Loan('L12', 'carol', date(2026, 2, 3), date(2026, 2, 17), date(2026, 2, 20)),
             ]
         ),
         Clock(),
@@ -51,8 +54,9 @@ def test_monthly_report_aggregates_prior_month_and_sorts_by_fees_then_member():
 
     assert report == [
         ReportRow('ada', loans_started=2, loans_returned_late=2, total_late_fees_cents=1125),
-        ReportRow('amy', loans_started=2, loans_returned_late=0, total_late_fees_cents=0),
-        ReportRow('bea', loans_started=1, loans_returned_late=1, total_late_fees_cents=0),
+        ReportRow('amy', loans_started=2, loans_returned_late=1, total_late_fees_cents=100),
+        ReportRow('carol', loans_started=1, loans_returned_late=1, total_late_fees_cents=75),
+        ReportRow('bea', loans_started=2, loans_returned_late=1, total_late_fees_cents=0),
     ]
 
 
@@ -60,6 +64,7 @@ def test_monthly_report_includes_previous_december_at_year_boundary():
     application = MonthlyReportApplication(
         LoanRepository(
             [
+                Loan('L0', 'member', date(2026, 12, 1), date(2026, 12, 15)),
                 Loan('L1', 'member', date(2026, 12, 31), date(2027, 1, 14)),
                 Loan('L2', 'member', date(2027, 1, 1), date(2027, 1, 15)),
             ]
@@ -68,5 +73,5 @@ def test_monthly_report_includes_previous_december_at_year_boundary():
     )
 
     assert application.generate() == [
-        ReportRow('member', loans_started=1, loans_returned_late=0, total_late_fees_cents=0)
+        ReportRow('member', loans_started=2, loans_returned_late=0, total_late_fees_cents=0)
     ]
