@@ -19,8 +19,8 @@ evidence:
   - .migration/evidence/runs/LL-03.md
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
-  - tests/fees/test_services.py::test_fee_calculation_applies_waiver_threshold_and_cap
-  - tests/fees/test_services.py::test_fee_calculation_uses_today_for_unreturned_loans
+  - tests/fees/test_fee_services.py::test_calculate_fee_applies_waiver_threshold_and_cap
+  - tests/fees/test_fee_services.py::test_fee_calculation_uses_today_for_unreturned_loans
 rules:
   - id: days-late
     rule: "Late days use returnedOn or today's date and are clamped to zero."

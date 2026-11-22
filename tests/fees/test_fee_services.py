@@ -50,7 +50,7 @@ class PaymentGateway:
     ('late_days', 'expected_days_late', 'expected_cents'),
     [(-1, 0, 0), (0, 0, 0), (2, 2, 0), (3, 3, 75), (19, 19, 475), (296, 296, 1000)],
 )
-def test_fee_calculation_applies_waiver_threshold_and_cap(
+def test_calculate_fee_applies_waiver_threshold_and_cap(
     late_days, expected_days_late, expected_cents
 ):
     due_on = date(2026, 1, 1)

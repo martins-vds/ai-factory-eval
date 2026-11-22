@@ -19,9 +19,9 @@ evidence:
   - .migration/evidence/runs/LL-03.md
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/gateway.json
-  - tests/fees/test_services.py::test_payment_requires_an_existing_loan_before_calling_gateway
-  - tests/fees/test_services.py::test_payment_maps_non_success_gateway_responses_to_bad_gateway
-  - tests/fees/test_services.py::test_payment_does_not_swallow_interruption
+  - tests/fees/test_fee_services.py::test_payment_requires_an_existing_loan_before_calling_gateway
+  - tests/fees/test_fee_services.py::test_payment_maps_non_success_gateway_responses_to_bad_gateway
+  - tests/fees/test_fee_services.py::test_payment_does_not_swallow_interruption
   - tests/fees/test_endpoints.py::test_payment_api_forwards_gateway_request_and_maps_responses
   - tests/fees/test_endpoints.py::test_payment_api_maps_redirects_to_bad_gateway_without_following_them
   - tests/fees/test_endpoints.py::test_interrupted_payment_is_a_gateway_failure_without_losing_interrupt
