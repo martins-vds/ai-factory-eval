@@ -5,10 +5,37 @@ title: Produce the specified monthly lending report
 source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
-boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "The monthly_report command prints one CSV row per member with prior-month loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2348]
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication
+    - src.reports.repository.DjangoReportLoanRepository
+    - src.reports.management.commands.monthly_report.Command
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+evidence:
+  - .migration/evidence/runs/LL-05.md
+  - .migration/references/characterization-SY-05.md
+  - tests/reports/test_monthly_report.py::test_monthly_report_aggregates_previous_calendar_month_loans
+  - tests/reports/test_monthly_report.py::test_monthly_report_orders_members_by_fees_then_member_id
+  - tests/reports/test_monthly_report.py::test_monthly_report_handles_previous_month_across_calendar_years
+  - tests/reports/test_monthly_report.py::test_monthly_report_command_prints_previous_month_totals_in_specified_order
+rules:
+  - id: previous-month-window
+    rule: "Include only loans started in the prior calendar month using a half-open date interval."
+    source: "legacy/docs/reports-spec.md:3-4; .migration/plan/monthly-report.md"
+  - id: member-loan-counts
+    rule: "Report one row for each member with a loan started during the report period and count those loans."
+    source: "legacy/docs/reports-spec.md:4"
+  - id: late-return-count
+    rule: "Count a loan as returned late only when its return date is after its due date."
+    source: ".migration/plan/monthly-report.md"
+  - id: late-fee-cents
+    rule: "Sum the member's late fees and report the total in integer cents."
+    source: "legacy/docs/reports-spec.md:4"
+  - id: fee-order
+    rule: "Sort report rows by late fees descending, then member id ascending."
+    source: "legacy/docs/reports-spec.md:5-6"
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
