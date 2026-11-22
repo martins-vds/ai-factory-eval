@@ -1,0 +1,23 @@
+role: afs-characterizer
+ticket: FS-01
+issue: martins-vds/ai-factory-eval#2292
+pr: martins-vds/ai-factory-eval#2296
+tier_used: {A: 2, B: 0, C: 0}
+suite:
+  path: .migration/spec/fees-payments/
+  cases: 11
+  passing: 11
+  run_log: .migration/evidence/runs/FS-01.md
+predicted_vs_observed: {match: 2, differs: 0}
+ledger_updated:
+  - fees.calculation
+  - fees.page
+quirk_tickets: []
+review_only_requests: []
+spec:
+  files:
+    - .migration/spec/fees-payments/fees.calculation.yaml
+    - .migration/spec/fees-payments/fees.page.yaml
+  cases: 11
+  rules_proved: 7
+notes: "The exact fee-boundary values are source-predicted in characterization-SY-05.md; the tier-A characterization notes they were not directly reachable through the legacy HTTP interface."
