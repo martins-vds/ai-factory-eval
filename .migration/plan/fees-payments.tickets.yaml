@@ -1,22 +1,39 @@
 slice: fees-payments
 tickets:
-  - id: LL-03
-    title: View and pay late fees
-    role: afs-migrator
-    specialty: null
-    files:
-      - config/urls.py
-      - src/fees/
-      - tests/fees/
-      - templates/fees/
-      - .migration/ledger/fees.calculation.yaml
-      - .migration/ledger/fees.page.yaml
-      - .migration/ledger/integration.payment-gateway.yaml
-      - .migration/evidence/runs/LL-03.md
-      - .migration/returns/LL-03.afs-migrator.yaml
-    capabilities: [fees.calculation, fees.page, integration.payment-gateway]
-    blocked_by: [LL-02]
+- id: LL-03
+  title: View and pay late fees
+  role: afs-migrator
+  specialty: null
+  files:
+  - config/urls.py
+  - src/fees/
+  - tests/fees/
+  - templates/fees/
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+  - .migration/evidence/runs/LL-03.md
+  - .migration/returns/LL-03.afs-migrator.yaml
+  capabilities:
+  - fees.calculation
+  - fees.page
+  - integration.payment-gateway
+  blocked_by:
+  - LL-02
+- id: REF-02
+  title: Move the fee views' helpers into their own module, preserving behaviour
+  role: afs-migrator
+  specialty: null
+  files:
+  - src/fees/
+  - tests/fees/
+  blocked_by: []
 cross_slice:
-  - file: config/urls.py
-    slices: [loan-catalog, loan-circulation, fees-payments, library-info]
-    note: This slice extends root route composition before the library-info route is added.
+- file: config/urls.py
+  slices:
+  - loan-catalog
+  - loan-circulation
+  - fees-payments
+  - library-info
+  note: This slice extends root route composition before the library-info route is
+    added.
