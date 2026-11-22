@@ -48,3 +48,20 @@ def test_gateway_preserves_interrupted_request(monkeypatch):
         HttpPaymentGateway('http://127.0.0.1:8080').charge('L1')
 
     assert raised.value.__cause__ is interruption
+
+
+def test_gateway_preserves_interruption_wrapped_by_urllib(monkeypatch):
+    import urllib.error
+    import urllib.request
+
+    interruption = InterruptedError('request interrupted')
+
+    def interrupt_request(*args, **kwargs):
+        raise urllib.error.URLError(interruption)
+
+    monkeypatch.setattr(urllib.request, 'urlopen', interrupt_request)
+
+    with pytest.raises(PaymentGatewayInterrupted) as raised:
+        HttpPaymentGateway('http://127.0.0.1:8080').charge('L1')
+
+    assert raised.value.__cause__ is interruption

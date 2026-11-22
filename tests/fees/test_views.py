@@ -1,4 +1,5 @@
 import pytest
+from playwright.sync_api import sync_playwright
 
 from src.fees.composition import payment_application
 from src.fees.services import PaymentGatewayInterrupted
@@ -115,3 +116,37 @@ def test_interrupted_payment_returns_gateway_failure_without_losing_cause(
         record for record in caplog.records if record.name == 'src.fees.views' and record.exc_info
     )
     assert gateway_error.exc_info[1].__cause__ is interruption
+
+
+@pytest.mark.django_db
+def test_real_browser_can_pay_a_late_fee(live_server, payment_gateway_server):
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            assert page.get_by_role('heading', name='Late fee for L1').count() == 1
+            page.get_by_role('button', name='Pay late fee').click()
+            page.get_by_role('status').wait_for()
+
+            assert page.get_by_role('status').inner_text() == 'charged'
+        finally:
+            browser.close()
+
+
+@pytest.mark.django_db
+def test_real_browser_renders_a_payment_gateway_error(live_server, payment_gateway_server):
+    _, reply = payment_gateway_server
+    reply.update(status=503, body=b'declined\n')
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L1/')
+            page.get_by_role('button', name='Pay late fee').click()
+            page.get_by_role('alert').wait_for()
+
+            assert page.get_by_role('alert').inner_text() == 'declined'
+        finally:
+            browser.close()
