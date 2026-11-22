@@ -8,10 +8,41 @@ source:
   location: legacy/src/main/java/lib/FinePayments.java:26-40
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2368]
+target:
+  components:
+    - src.fees.services.FeeApplication.pay
+    - src.fees.gateway.HttpPaymentGateway
+    - src.fees.views.payment_api
+    - src.fees.views.payment_page
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - tests/fees/test_fee_services.py::test_payment_for_unknown_loan_does_not_call_gateway
+  - tests/fees/test_fee_services.py::test_payment_only_succeeds_for_gateway_http_200
+  - tests/fees/test_fee_services.py::test_payment_outcome_keeps_interrupted_failure_cause
+  - tests/fees/test_views.py::test_payment_api_forwards_gateway_success_and_request
+  - tests/fees/test_views.py::test_payment_api_maps_gateway_failure_to_bad_gateway
+  - tests/fees/test_views.py::test_payment_api_does_not_follow_gateway_redirects
+  - tests/fees/test_views.py::test_payment_for_unknown_loan_does_not_call_gateway
+  - tests/fees/test_views.py::test_payment_ui_renders_gateway_failure_for_htmx
+  - tests/fees/test_views.py::test_interrupted_gateway_call_is_wrapped_without_losing_interrupt
+  - tests/fees/test_views.py::test_interrupted_payment_is_a_gateway_failure
+  - .migration/evidence/runs/LL-03.md
+rules:
+  - id: known-loan
+    rule: A payment is sent only for an existing loan; an unknown loan is not sent to the gateway.
+    source: legacy/src/main/java/lib/FinePayments.java:32-33
+  - id: gateway-status
+    rule: Only gateway HTTP 200 succeeds; all other gateway statuses become HTTP 502 with the gateway body.
+    source: legacy/src/main/java/lib/FinePayments.java:36-38
+  - id: interruption
+    rule: An interrupted gateway call becomes a gateway failure while retaining the interruption as its cause.
+    source: martins-vds/ai-factory-synthetic-target#40
 quirks: [martins-vds/ai-factory-synthetic-target#40]
+notes: "The #40 ruling fixes the swallowed interruption by preserving it as the gateway failure's cause."

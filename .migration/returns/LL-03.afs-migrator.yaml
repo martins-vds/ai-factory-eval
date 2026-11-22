@@ -1,0 +1,64 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#2368
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2373
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: "n/a: not run, handed off"
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: .migration/handoffs/LL-03.md
+rules:
+  - capability: fees.calculation
+    rule: Late days are clamped at zero between the due date and the effective date.
+    use_case: FeeApplication.calculate_fee
+    test: tests/fees/test_fee_services.py::test_fee_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: late-days
+  - capability: fees.calculation
+    rule: Use returnedOn when present; otherwise use today's date.
+    use_case: FeeApplication.calculate_fee
+    test: tests/fees/test_fee_services.py::test_fee_uses_return_date_instead_of_today
+    enforced: true
+    ledger_rule: effective-date
+  - capability: fees.calculation
+    rule: Fees are waived through two days late, then accrue at 25 cents per day up to 1000 cents.
+    use_case: FeeApplication.calculate_fee
+    test: tests/fees/test_fee_services.py::test_fee_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: waiver-rate-cap
+  - capability: fees.page
+    rule: Unknown loan IDs produce no fee quote.
+    use_case: FeeApplication.calculate_fee
+    test: tests/fees/test_fee_services.py::test_fee_for_unknown_loan_is_not_calculated
+    enforced: true
+    ledger_rule: unknown-loan
+  - capability: integration.payment-gateway
+    rule: A payment is sent only for an existing loan.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_for_unknown_loan_does_not_call_gateway
+    enforced: true
+    ledger_rule: known-loan
+  - capability: integration.payment-gateway
+    rule: Only gateway HTTP 200 succeeds; all other gateway statuses fail while preserving the response body.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_only_succeeds_for_gateway_http_200
+    enforced: true
+    ledger_rule: gateway-status
+  - capability: integration.payment-gateway
+    rule: An interrupted gateway call becomes a failure while retaining the interruption as its cause.
+    use_case: FeeApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_outcome_keeps_interrupted_failure_cause
+    enforced: true
+    ledger_rule: interruption

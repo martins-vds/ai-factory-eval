@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee for {{ fee.loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Late fee · Loan {{ fee.loan.id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Keep this book close.</h1>
+      <p class="mt-2">{{ fee.loan.member }} · ISBN {{ fee.loan.isbn }}</p>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ fee.loan.due_on|date:"Y-m-d" }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">Late days</dt><dd>{{ fee.days_late }} day(s) late</dd></div>
+      </dl>
+      <p class="mt-6 text-2xl">Fee: {{ fee.amount }}</p>
+      <div id="payment-status" aria-live="polite"
+           hx-on::before-swap="if (event.detail.isError) event.detail.shouldSwap = true">
+        {% if payment_message != None %}
+          {% include "fees/payment-result.html" %}
+        {% endif %}
+      </div>
+      <form class="mt-6" method="post" action="/ui/payments/{{ fee.loan.id }}/"
+            hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="innerHTML">
+        {% csrf_token %}
+        <button class="btn btn-neutral" type="submit">Pay late fee</button>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}
