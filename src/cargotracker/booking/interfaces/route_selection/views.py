@@ -41,18 +41,12 @@ def create_route_selection_views(
             cargo_routing,
             cargo_dashboard,
             tracking_id,
-            'Try setting an arrival deadline further into the future.',
         )
         return render(request, 'booking/route_selection/route.html', context)
 
     @require_http_methods(['GET'])
     def select_itinerary(request: HttpRequest, tracking_id: str) -> HttpResponse:
-        context = _selection_context(
-            cargo_routing,
-            cargo_dashboard,
-            tracking_id,
-            'Try setting the arrival deadline further into the future (a few weeks at least).',
-        )
+        context = _selection_context(cargo_routing, cargo_dashboard, tracking_id)
         return render(request, 'booking/route_selection/select_itinerary.html', context)
 
     return route_selection, select_itinerary
@@ -62,7 +56,6 @@ def _selection_context(
     cargo_routing: CargoRouting,
     cargo_dashboard: CargoDashboard,
     tracking_id_value: str,
-    no_route_guidance: str,
 ) -> dict:
     tracking_id = TrackingId(tracking_id_value)
     cargo = cargo_dashboard.get_cargo_details(tracking_id)
@@ -72,7 +65,6 @@ def _selection_context(
     return {
         'cargo': cargo,
         'candidate_count': len(itineraries),
-        'no_route_guidance': no_route_guidance,
         'routes': [
             {
                 'itinerary': itinerary,
