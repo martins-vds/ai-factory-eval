@@ -24,11 +24,11 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/gateway.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_missing_loan_is_rejected_before_payment_gateway_is_called
-  - tests/fees/test_services.py::test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure
-  - tests/fees/test_services.py::test_payment_application_returns_success_only_for_gateway_http_200
-  - tests/fees/test_services.py::test_payment_application_maps_non_200_response_to_bad_gateway
-  - tests/fees/test_services.py::test_payment_application_maps_io_failure_to_gateway_unavailable
+  - tests/fees/test_fee_services.py::test_missing_loan_is_rejected_before_payment_gateway_is_called
+  - tests/fees/test_fee_services.py::test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure
+  - tests/fees/test_fee_services.py::test_payment_application_returns_success_only_for_gateway_http_200
+  - tests/fees/test_fee_services.py::test_payment_application_maps_non_200_response_to_bad_gateway
+  - tests/fees/test_fee_services.py::test_payment_application_maps_io_failure_to_gateway_unavailable
   - tests/fees/test_http.py::test_payment_api_posts_to_gateway_and_returns_success_body
   - tests/fees/test_http.py::test_payment_api_maps_gateway_failure_to_bad_gateway
   - tests/fees/test_http.py::test_payment_api_rejects_missing_loan_without_calling_gateway

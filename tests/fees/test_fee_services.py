@@ -24,7 +24,7 @@ class FixedClock:
         return date(2026, 11, 22)
 
 
-class PaymentGateway:
+class InMemoryPaymentGateway:
     def __init__(self, response=None, error=None):
         self.response = response
         self.error = error
@@ -79,7 +79,7 @@ def test_missing_loan_has_no_fee():
 
 
 def test_missing_loan_is_rejected_before_payment_gateway_is_called():
-    gateway = PaymentGateway(GatewayResponse(200, 'charged\n'))
+    gateway = InMemoryPaymentGateway(GatewayResponse(200, 'charged\n'))
     application = PaymentApplication(LoanRepository(None), gateway)
 
     result = application.pay('missing')
@@ -90,7 +90,7 @@ def test_missing_loan_is_rejected_before_payment_gateway_is_called():
 
 def test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure():
     interruption = InterruptedError('request cancelled')
-    gateway = PaymentGateway(error=interruption)
+    gateway = InMemoryPaymentGateway(error=interruption)
     application = PaymentApplication(LoanRepository(Loan('L1', date(2026, 11, 22))), gateway)
 
     result = application.pay('L1')
@@ -100,7 +100,7 @@ def test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure
 
 
 def test_payment_application_returns_success_only_for_gateway_http_200():
-    gateway = PaymentGateway(GatewayResponse(200, 'charged\n'))
+    gateway = InMemoryPaymentGateway(GatewayResponse(200, 'charged\n'))
     application = PaymentApplication(
         LoanRepository(Loan('L1', date(2026, 11, 22))),
         gateway,
@@ -112,7 +112,7 @@ def test_payment_application_returns_success_only_for_gateway_http_200():
 
 
 def test_payment_application_maps_non_200_response_to_bad_gateway():
-    gateway = PaymentGateway(GatewayResponse(503, 'declined\n'))
+    gateway = InMemoryPaymentGateway(GatewayResponse(503, 'declined\n'))
     application = PaymentApplication(
         LoanRepository(Loan('L1', date(2026, 11, 22))),
         gateway,
@@ -124,7 +124,7 @@ def test_payment_application_maps_non_200_response_to_bad_gateway():
 
 
 def test_payment_application_maps_io_failure_to_gateway_unavailable():
-    gateway = PaymentGateway(error=OSError('connection refused'))
+    gateway = InMemoryPaymentGateway(error=OSError('connection refused'))
     application = PaymentApplication(
         LoanRepository(Loan('L1', date(2026, 11, 22))),
         gateway,

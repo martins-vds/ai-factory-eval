@@ -23,7 +23,7 @@ evidence:
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/characterization/source/goldens/browser.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_missing_loan_has_no_fee
+  - tests/fees/test_fee_services.py::test_missing_loan_has_no_fee
   - tests/fees/test_http.py::test_fee_api_returns_characterized_html
   - tests/fees/test_http.py::test_fee_api_returns_characterized_not_found_response
   - tests/fees/test_http.py::test_fee_page_uses_reading_room_layout_and_separate_payment_action

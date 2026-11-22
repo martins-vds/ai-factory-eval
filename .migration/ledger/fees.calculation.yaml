@@ -20,11 +20,11 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_early_or_on_time_loan_has_no_late_days
-  - tests/fees/test_services.py::test_fee_is_waived_through_two_days_late
-  - tests/fees/test_services.py::test_fee_is_twenty_five_cents_per_day_after_grace_period
-  - tests/fees/test_services.py::test_fee_is_capped_at_ten_dollars
-  - tests/fees/test_services.py::test_return_date_is_used_instead_of_today_for_fee_calculation
+  - tests/fees/test_fee_services.py::test_early_or_on_time_loan_has_no_late_days
+  - tests/fees/test_fee_services.py::test_fee_is_waived_through_two_days_late
+  - tests/fees/test_fee_services.py::test_fee_is_twenty_five_cents_per_day_after_grace_period
+  - tests/fees/test_fee_services.py::test_fee_is_capped_at_ten_dollars
+  - tests/fees/test_fee_services.py::test_return_date_is_used_instead_of_today_for_fee_calculation
 rules:
   - id: late-days-floor
     rule: "Late days are clamped at zero when the due date is today or in the future."
