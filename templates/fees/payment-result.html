@@ -1,0 +1,9 @@
+<div id="payment-result" class="mt-6" aria-live="polite">
+  {% if status_code == 200 %}
+  <p role="status">Payment received for loan {{ loan_id }}.</p>
+  {% if result.body %}<p>{{ result.body }}</p>{% endif %}
+  {% else %}
+  <p role="alert">Payment could not be completed for loan {{ loan_id }}.</p>
+  {% if result %}<p>{{ result.body }}</p>{% else %}<p>No such loan.</p>{% endif %}
+  {% endif %}
+</div>

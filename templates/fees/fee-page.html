@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee for {{ quote.loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Late fee · Loan {{ quote.loan.id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ quote.loan.id }}</h1>
+      <p class="mt-2">Due {{ quote.loan.due_on|date:"M j, Y" }}, {{ quote.days_late }} day(s) late.</p>
+      <p class="mt-6 text-2xl font-bold">Fee: ${{ amount }}</p>
+      <div id="payment-result" class="mt-6" aria-live="polite">
+        <form method="post" action="/ui/payments/{{ quote.loan.id }}/"
+              hx-post="/ui/payments/{{ quote.loan.id }}/" hx-target="#payment-result" hx-swap="outerHTML">
+          {% csrf_token %}
+          <button class="btn btn-ghost text-[#a94e37]" type="submit">Pay late fee</button>
+        </form>
+      </div>
+    </div>
+  </article>
+</section>
+<script>
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true;
+  });
+</script>
+{% endblock %}

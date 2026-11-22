@@ -76,3 +76,15 @@ def test_interrupted_payment_remains_available_with_gateway_failure():
     assert result.status_code == 502
     assert result.body == 'payment gateway unavailable\n'
     assert result.failure is interruption
+
+
+def test_network_failure_remains_available_with_gateway_failure():
+    failure = OSError('connection failed')
+    gateway = PaymentGateway(failure=failure)
+    application = PaymentApplication(LoanRepository(Loan('L1')), gateway)
+
+    result = application.pay('L1')
+
+    assert result.status_code == 502
+    assert result.body == 'payment gateway unavailable\n'
+    assert result.failure is failure
