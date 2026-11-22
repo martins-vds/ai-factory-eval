@@ -1,0 +1,67 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#2330
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2333
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.due-date
+    rule: Every loan is due 14 calendar days after its lent-on date.
+    use_case: Loan.due_on
+    test: tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: fourteen-day-term
+  - capability: loan.get
+    rule: Looking up an id that is not in the catalog raises the not-found domain error.
+    use_case: LoanCatalog.get_loan
+    test: tests/loans/test_catalog.py::test_catalog_use_case_refuses_an_unknown_loan
+    enforced: true
+    ledger_rule: unknown-loan
+  - capability: loan.list
+    rule: The catalog returns every loan ordered by id.
+    use_case: LoanCatalog.list_loans
+    test: tests/loans/test_catalog.py::test_catalog_use_case_lists_loans_in_id_order
+    enforced: true
+    ledger_rule: id-order
+  - capability: loan.text-export
+    rule: Fields containing semicolons, line breaks, or quotes are CSV-escaped while every exported row retains its trailing newline.
+    use_case: LoanCatalog.export_text
+    test: tests/loans/test_catalog.py::test_catalog_use_case_escapes_export_delimiters
+    enforced: true
+    ledger_rule: csv-escaping
+  - capability: data.loan-storage
+    rule: Persisted loans retain their fields when startup migrations are applied again; they are not reset or replaced by seeds.
+    use_case: LoanCatalog.get_loan
+    test: tests/loans/test_catalog.py::test_catalog_data_survives_reapplying_migrations
+    enforced: true
+    ledger_rule: preserve-persisted-loans
+  - capability: data.seed-records
+    rule: An empty catalog starts with the characterized L1, L2, and L3 records and their exact member, ISBN, and date values.
+    use_case: LoanCatalog.list_loans
+    test: tests/loans/test_catalog.py::test_catalog_use_case_returns_the_characterized_seed_records
+    enforced: true
+    ledger_rule: initial-seed-records
+no_rules:
+  application.build: Build and deployment wiring have no loan-domain input rule; startup persistence and seed behavior are recorded separately.
+  application.startup: Port selection and schema migration are operational wiring; loan persistence and seed policy are recorded in their data capabilities.
+  repository.transactions: Transaction commit/rollback and connection cleanup are repository mechanics, not loan-domain business rules.
