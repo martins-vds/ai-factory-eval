@@ -25,3 +25,42 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-22T17:45:03Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-changed-code-mutation-fix-again` / requested live base `copilot/bk-05f-build-route-selection-itinerary-screens` (PR #394) · **Last commit:** 8dbb2c0
+
+### Done
+- Setup checks passed: source SHA `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d` matches the pin, is read-only and ignored; services and runtimes are healthy.
+- Ran the profile's exact changed-code command through `afs-run`: exit 0, but `AFS-RESULT gate=mutation score=n/a reason=no-mutable-code-changed base=1fd8c48200934554a753ec1a33c9eb0119052bfc`; log `.migration/runs/BK-05F/20261122T174126394369Z-mutation-changed.log`.
+- The specified starting commit was `4ce1c99ca2c5`; this checkout started at `c3678996d577a1659d665aac20896219648657a4` on a different branch. The BK-05F source, templates and tests have no diff from the mutation base. No live target branch was fetched, checked out or merged.
+- Classified the recorded survivors from their diffs, but the classifications cannot be verified against a mutation run on the requested base:
+  - #1 equivalent for this screen's self-issued token flow: dump and load use the same salt, with no rendered change.
+  - #2 missing security-interface test: POST an otherwise valid default-signed (unsalted) candidate and assert the user receives 404 and the cargo remains unrouted; salt=None would accept it.
+  - #5 missing/observable method guard: removing the decorator changes PUT from 405 to a rendered route page. The current test already asserts 405, so this conflicts with the survivor report.
+  - #10 equivalent at the UI boundary: changing the unknown-cargo 404 reason does not change the 404 response.
+  - #13 equivalent at the UI boundary: changing the stale-route 404 reason does not change the 404 response.
+  - #14 equivalent: adding `X` to quote's safe set has no effect because `X` is unreserved already.
+  - #16 missing/observable guidance assertion: the changed text is rendered when there are no routes. The current empty-state test already asserts it, so this conflicts with the survivor report.
+  - #20 missing/observable method guard: removing the GET-only decorator changes POST from 405 to a rendered page. The current unsupported-method test already asserts 405, so this conflicts with the survivor report.
+  - #21 missing/observable itinerary guidance assertion: the changed text is rendered. The current empty-state test already asserts it, so this conflicts with the survivor report.
+  - #27 equivalent at the UI boundary: the changed unknown-cargo 404 reason is not shown in the 404 page; the current direct-view test also asserts the original reason, so this conflicts with the survivor report.
+  - #40 equivalent: both the empty string and `XXXX` are invalid signatures and lead to the same 404.
+  - #44 equivalent: the changed BadSignature detail is caught and mapped to the same 404.
+  - #46 equivalent at the UI boundary: changing the invalid-route 404 reason does not change the response.
+
+### Remaining
+- [ ] Resume on the requested BK-05F base commit and rerun the profile mutation command so its changed-code selection and survivor report are authoritative.
+- [ ] Reconcile the reported survivors with the existing method/guidance/unknown-cargo assertions; add only genuinely missing interface coverage, then rerun mutation and every profile gate.
+- [ ] Update the ticket return with verified gate results and run migration validation.
+
+### Decisions made
+- No application or test changes were made: this checkout has no mutable BK-05F code diff, and adding tests here cannot produce the requested changed-code score.
+
+### Blockers / questions
+- The checkout branch and starting commit do not match the issue's specified base. The profile mutation gate therefore reports no mutable code changed instead of reproducing the stated 0.790 score. Do not manufacture a baseline or use `--paths`/`--all`; restore the requested ticket checkout before continuing.
+
+### Failing commands
+- None. The profile mutation command exited 0 but returned `score=n/a`; see `.migration/runs/BK-05F/20261122T174126394369Z-mutation-changed.log`.
+
+### Next step for the next session
+Restore the checkout to the requested BK-05F base at `4ce1c99ca2c5` without fetching or merging the live target branch, rerun setup and the exact profile mutation gate, and resolve the authoritative survivor list before editing.
