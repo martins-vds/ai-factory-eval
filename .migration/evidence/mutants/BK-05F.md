@@ -1,28 +1,6 @@
 # Surviving mutants: BK-05F
 
-Written by `afs-mutation` on its last run (base `efc825d24a5c7a60f0623774c8ec2f224357668f`): score 0.836, threshold 0.8, killed 51, survived 10. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:22 Mutant #1`
-
-  ```diff
-  @@ -19,7 +19,7 @@
-   from cargotracker.voyage.domain.voyage import Voyage
-   from cargotracker.voyage.domain.voyage_number import VoyageNumber
-  -_CANDIDATE_SALT = 'booking.route_selection'
-  +_CANDIDATE_SALT = 'XXbooking.route_selectionXX'
-   def create_route_selection_views(
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:22 Mutant #2`
-
-  ```diff
-  @@ -19,7 +19,7 @@
-   from cargotracker.voyage.domain.voyage import Voyage
-   from cargotracker.voyage.domain.voyage_number import VoyageNumber
-  -_CANDIDATE_SALT = 'booking.route_selection'
-  +_CANDIDATE_SALT = None
-   def create_route_selection_views(
-  ```
+Written by `afs-mutation` on its last run (base `efc825d24a5c7a60f0623774c8ec2f224357668f`): score 0.897, threshold 0.8, killed 52, survived 6. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/booking/interfaces/route_selection/views.py:34 Mutant #10`
 
@@ -66,36 +44,10 @@ Written by `afs-mutation` on its last run (base `efc825d24a5c7a60f0623774c8ec2f2
                cargo_dashboard,
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:44 Mutant #16`
+- `src/cargotracker/booking/interfaces/route_selection/views.py:63 Mutant #25`
 
   ```diff
-  @@ -41,7 +41,7 @@
-               cargo_routing,
-               cargo_dashboard,
-               tracking_id,
-  -            'Try setting an arrival deadline further into the future.',
-  +            'XXTry setting an arrival deadline further into the future.XX',
-           )
-           return render(request, 'booking/route_selection/route.html', context)
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:54 Mutant #21`
-
-  ```diff
-  @@ -51,7 +51,7 @@
-               cargo_routing,
-               cargo_dashboard,
-               tracking_id,
-  -            'Try setting the arrival deadline further into the future (a few weeks at least).',
-  +            'XXTry setting the arrival deadline further into the future (a few weeks at least).XX',
-           )
-           return render(request, 'booking/route_selection/select_itinerary.html', context)
-  ```
-
-- `src/cargotracker/booking/interfaces/route_selection/views.py:70 Mutant #27`
-
-  ```diff
-  @@ -67,7 +67,7 @@
+  @@ -60,7 +60,7 @@
        tracking_id = TrackingId(tracking_id_value)
        cargo = cargo_dashboard.get_cargo_details(tracking_id)
        if cargo is None:
@@ -106,10 +58,10 @@ Written by `afs-mutation` on its last run (base `efc825d24a5c7a60f0623774c8ec2f2
            'cargo': cargo,
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:95 Mutant #40`
+- `src/cargotracker/booking/interfaces/route_selection/views.py:87 Mutant #37`
 
   ```diff
-  @@ -92,7 +92,7 @@
+  @@ -84,7 +84,7 @@
    def _selected_itinerary(request: HttpRequest, tracking_id: str) -> Itinerary:
        try:
   -        candidate = signing.loads(request.POST.get('candidate', ''), salt=_CANDIDATE_SALT)
@@ -119,10 +71,10 @@ Written by `afs-mutation` on its last run (base `efc825d24a5c7a60f0623774c8ec2f2
            return _deserialize_itinerary(candidate['legs'])
   ```
 
-- `src/cargotracker/booking/interfaces/route_selection/views.py:100 Mutant #45`
+- `src/cargotracker/booking/interfaces/route_selection/views.py:92 Mutant #42`
 
   ```diff
-  @@ -97,7 +97,7 @@
+  @@ -89,7 +89,7 @@
                raise BadSignature
            return _deserialize_itinerary(candidate['legs'])
        except (BadSignature, KeyError, TypeError, ValueError) as error:

@@ -141,7 +141,8 @@ def test_select_itinerary_screen_explains_when_no_candidates_satisfy_the_deadlin
     assert response.status_code == 200
     assert 'No routes found that satisfy the route specification.' in content
     assert (
-        'Try setting the arrival deadline further into the future (a few weeks at least).' in content
+        'Try setting the arrival deadline further into the future (a few weeks at least).'
+        in content
     )
     assert 'Route option #' not in content
 
