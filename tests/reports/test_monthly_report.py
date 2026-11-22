@@ -41,8 +41,11 @@ class FeeCalculator:
 
 
 class Clock:
+    def __init__(self, today=date(2026, 3, 1)):
+        self.value = today
+
     def today(self):
-        return date(2026, 3, 1)
+        return self.value
 
 
 def test_monthly_report_aggregates_previous_calendar_month_loans():
@@ -93,6 +96,28 @@ def test_monthly_report_orders_members_by_fees_then_member_id():
         ('member-z', 75),
         ('member-c', 0),
     ]
+
+
+def test_monthly_report_handles_previous_month_across_calendar_years():
+    application = MonthlyReportApplication(
+        LoanRepository(
+            [
+                Loan('L0', 'member-1', date(2025, 11, 30), date(2025, 12, 14)),
+                Loan('L1', 'member-1', date(2025, 12, 1), date(2025, 12, 15)),
+                Loan('L2', 'member-1', date(2025, 12, 31), date(2026, 1, 14)),
+                Loan('L3', 'member-2', date(2026, 1, 1), date(2026, 1, 15)),
+            ]
+        ),
+        FeeCalculator({'L1': Fee(0), 'L2': Fee(0)}),
+        Clock(date(2026, 1, 1)),
+    )
+
+    rows = application.generate()
+
+    assert [
+        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents)
+        for row in rows
+    ] == [('member-1', 2, 0, 0)]
 
 
 @pytest.mark.django_db
