@@ -7,11 +7,11 @@ from cargotracker.location.domain.location import Location
 UNKNOWN_LOCATION = {'code': 'XXXXX', 'name': 'Unknown'}
 
 
-def cargo_map_data(
+def build_cargo_map_data(
     cargo: Cargo, location_coordinates: Mapping[str, tuple[float, float]]
 ) -> dict[str, object]:
-    origin = location_data(cargo.origin)
-    last_known_location = location_data(cargo.delivery.last_known_location)
+    origin = build_location_map_data(cargo.origin)
+    last_known_location = build_location_map_data(cargo.delivery.last_known_location)
     location = (
         origin
         if cargo.delivery.transport_status is TransportStatus.NOT_RECEIVED
@@ -38,7 +38,7 @@ def cargo_map_data(
     }
 
 
-def location_data(location: Location | None) -> dict[str, str] | None:
+def build_location_map_data(location: Location | None) -> dict[str, str] | None:
     if location is None:
         return None
     code = location.unlocode.value
