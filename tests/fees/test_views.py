@@ -68,6 +68,23 @@ def test_payment_endpoint_matches_the_gateway_contract(
 
 
 @pytest.mark.django_db
+def test_payment_endpoint_maps_a_redirected_gateway_response_to_bad_gateway(
+    client, payment_gateway_server
+):
+    payment_gateway_server['status'] = 302
+    payment_gateway_server['body'] = b'redirected\n'
+    payment_gateway_server['redirect_to'] = f'{payment_gateway_server["base_url"]}/completed'
+
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'redirected\n'
+    assert payment_gateway_server['requests'] == [
+        ('POST', '/charge?loan=L1', b''),
+    ]
+
+
+@pytest.mark.django_db
 def test_fee_page_uses_reading_room_layout_and_posts_to_ui_payment_route(client):
     response = client.get('/ui/fees/L3/')
 

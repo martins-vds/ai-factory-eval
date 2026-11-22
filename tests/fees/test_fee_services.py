@@ -90,7 +90,7 @@ def test_payment_requires_an_existing_loan_before_calling_gateway():
 
 @pytest.mark.parametrize(
     ('gateway_status', 'gateway_body', 'expected_status'),
-    [(200, b'charged\n', 200), (503, b'declined\n', 502)],
+    [(200, b'charged\n', 200), (302, b'redirected\n', 502), (503, b'declined\n', 502)],
 )
 def test_payment_maps_gateway_status_and_preserves_its_response_body(
     gateway_status, gateway_body, expected_status
