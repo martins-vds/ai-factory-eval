@@ -45,6 +45,14 @@ def test_return_use_case_returns_none_for_an_unknown_loan():
 
 
 @pytest.mark.django_db
+def test_return_use_case_records_the_supplied_date():
+    loan = return_loan('L1', LoanRepository(), date(2026, 3, 1))
+
+    assert loan.returned_on == date(2026, 3, 1)
+    assert Loan.objects.get(pk='L1').returned_on == date(2026, 3, 1)
+
+
+@pytest.mark.django_db
 def test_return_use_case_rejects_a_repeat_and_preserves_the_original_date():
     original_return_date = Loan.objects.get(pk='L2').returned_on
 
@@ -69,6 +77,14 @@ def test_lending_api_preserves_the_characterized_response(client):
 @pytest.mark.django_db
 def test_lending_api_rejects_blank_fields_with_legacy_error(client):
     response = client.post('/loans', {'member': '  ', 'isbn': '123'})
+
+    assert response.status_code == 400
+    assert response.content.decode() == 'member and isbn are required\n'
+
+
+@pytest.mark.django_db
+def test_lending_api_preserves_missing_field_error(client):
+    response = client.post('/loans', {'member': 'reader'})
 
     assert response.status_code == 400
     assert response.content.decode() == 'member and isbn are required\n'
@@ -100,6 +116,14 @@ def test_return_api_preserves_the_characterized_response(client):
     assert response.status_code == 200
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode().endswith(f'{timezone.localdate().isoformat()}\n')
+
+
+@pytest.mark.django_db
+def test_return_api_returns_not_found_for_an_unknown_loan(client):
+    response = client.post('/loans/unknown/return')
+
+    assert response.status_code == 404
+    assert response.content.decode() == 'no such loan\n'
 
 
 @pytest.mark.django_db
