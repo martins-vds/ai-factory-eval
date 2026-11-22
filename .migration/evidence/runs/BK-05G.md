@@ -36,3 +36,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T17:59:21+00:00 | blank-deadline-red | 1 | 2.86 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_deadline_dialog_shows_parse_errors_without_updating_cargo` | `5f664baf34d3e321` | deadline = '', error = 'Choose an arrival deadline.' |  |
 | 2026-11-22T17:59:41+00:00 | dialogs-targeted | 0 | 7.56 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `e719ef04f1779c8b` |  |  |
 | 2026-11-22T18:02:51+00:00 | mutation-changed | 0 | 158.65 | `python .migration/harness/tools/afs-mutation` | `aa26c362dade515f` |  | gate=mutation score=0.846 threshold=0.8 killed=44 survived=8 files=1 base=69441c3a713bf54fcd5c5986d77603941a984e6d |
+| 2026-11-22T18:03:51+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:03:55+00:00 | build-check | 0 | 0.35 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-22T18:04:03+00:00 | idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T18:04:05+00:00 | idiom-format | 0 | 0.01 | `ruff format --check` | `3accebe6ea89f2c7` |  |  |
+| 2026-11-22T18:04:07+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-22T18:04:10+00:00 | idiom-ui | 0 | 0.72 | `python .migration/harness/tools/check_ui.py` | `1d5399c7b667e826` |  | gate=ui scope="templates changed since 69441c3a713bf54fcd5c5986d77603941a984e6d" templates=3 findings=0 |
+| 2026-11-22T18:05:14+00:00 | behavior | 0 | 61.76 | `pytest -q` | `3d5fb4d1e7616323` |  |  |
+| 2026-11-22T18:06:18+00:00 | crap-coverage | 0 | 61.73 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `5fe557c56ad5d039` |  |  |
+| 2026-11-22T18:06:20+00:00 | crap-lizard | 0 | 0.16 | `lizard --csv src` | `db937aa173031402` | 16,3,86,6,16,"_origin_step@38-53@src/cargotracker/booking/interfaces/wizard/views.py","src/cargotracker/booking/interfac |  |
+| 2026-11-22T18:06:25+00:00 | crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:06:27+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0345b092da7ec86a` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
+| 2026-11-22T18:09:08+00:00 | mutation-changed | 0 | 159.79 | `python .migration/harness/tools/afs-mutation` | `aa26c362dade515f` |  | gate=mutation score=0.846 threshold=0.8 killed=44 survived=8 files=1 base=69441c3a713bf54fcd5c5986d77603941a984e6d |
