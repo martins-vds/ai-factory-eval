@@ -21,6 +21,14 @@ def test_about_response_matches_characterization(client):
 
 
 @pytest.mark.django_db
+def test_modern_about_page_has_a_mailto_contact_link(client):
+    response = client.get('/ui/about/')
+
+    assert response.status_code == 200
+    assert b'href="mailto:desk@lending-library.invalid"' in response.content
+
+
+@pytest.mark.django_db
 def test_modern_about_page_shows_library_information_in_browser(live_server):
     with sync_playwright() as playwright:
         browser = playwright.chromium.launch()
