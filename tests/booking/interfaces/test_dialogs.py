@@ -78,6 +78,7 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
+    assert len(first_option_values) == len(original_locations) - 2
     assert first_option_values == second_option_values
     assert location_list == original_locations
 
@@ -103,8 +104,37 @@ def test_deadline_dialog_shows_current_value_and_parse_error(client):
     )
 
     assert invalid_response.status_code == 400
-    assert 'Enter a valid arrival deadline.' in invalid_response.content.decode()
-    assert 'aria-invalid="true"' in invalid_response.content.decode()
+    invalid_content = invalid_response.content.decode()
+    assert re.search(r'<p[^>]*role="alert">Enter a valid arrival deadline\.</p>', invalid_content)
+    assert 'value="not-a-date"' in invalid_content
+    assert 'aria-invalid="true"' in invalid_content
+
+    missing_response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert missing_response.status_code == 400
+    assert 'value=""' in missing_response.content.decode()
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_invalid_destination_is_rejected_without_changing_cargo(client):
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'CNHKG'},
+        HTTP_HX_REQUEST='true',
+    )
+    cargo = cargo_repository.find(TrackingId('DEF789'))
+    content = response.content.decode()
+
+    assert response.status_code == 400
+    assert re.search(r'<p[^>]*role="alert">Select a valid destination\.</p>', content)
+    assert 'aria-invalid="true"' in content
+    assert cargo is not None
+    assert cargo.route_specification.destination.unlocode.value == 'AUMEL'
 
 
 @pytest.mark.django_db
@@ -160,6 +190,30 @@ def test_deadline_update_preserves_other_fields_and_refreshes_table(client):
     assert updated_cargo.route_specification.arrival_deadline.date() == date(2026, 12, 1)
     assert '12/01/2026' in dashboard_response.content.decode()
     assert response.content == b''
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_non_htmx_update_redirects_to_the_dashboard(client):
+    response = client.post(
+        '/admin/cargo/DEF789/destination/',
+        {'destination': 'USCHI'},
+    )
+
+    assert response.status_code == 302
+    assert response.headers['Location'] == '/admin/dashboard/'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_dialog_views_allow_only_get_and_post(client):
+    destination_response = client.put('/admin/cargo/DEF789/destination/')
+    deadline_response = client.delete('/admin/cargo/DEF789/deadline/')
+
+    assert destination_response.status_code == 405
+    assert destination_response.headers['Allow'] == 'GET, POST'
+    assert deadline_response.status_code == 405
+    assert deadline_response.headers['Allow'] == 'GET, POST'
 
 
 @pytest.mark.django_db

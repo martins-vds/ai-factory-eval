@@ -7,14 +7,25 @@ source:
   risk: {crap: 2, complexity: 1, coverage: 0.0}
 boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#294]
 verification: legacy-test
 characterization_tier: A
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_booking_dialog_views
+    - templates/booking/dialogs/destination.html
+    - templates/booking/dialogs/deadline.html
+    - templates/booking/dashboard/not_routed_table.html
+status: migrated
 evidence:
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDestination"
   - "legacy-test: .source/src/test/java/org/eclipse/cargotracker/application/BookingServiceTest.java::testChangeDeadline"
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_not_routed_table_opens_edit_dialogs_without_changing_table_behavior"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_fields_and_refreshes_table"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_other_fields_and_refreshes_table"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "Dialog request and completion flow is structural; destination and deadline business rules belong to the application use cases."
+notes: "The not-routed table actions load the dialog fragments, and successful updates redirect to the refreshed dashboard. The unavailable-widget warning is omitted per martins-vds/ai-factory-pilot-target#251."

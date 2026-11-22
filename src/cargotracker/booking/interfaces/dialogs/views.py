@@ -53,15 +53,15 @@ def create_booking_dialog_views(
         context = {
             'cargo': cargo,
             'destinations': destinations,
-            'selected_destination': '',
-            'destination_error': '',
         }
 
         if request.method == 'POST':
-            selected_code = request.POST.get('destination', '')
-            context['selected_destination'] = selected_code
             destination = next(
-                (location for location in destinations if location.unlocode.value == selected_code),
+                (
+                    location
+                    for location in destinations
+                    if location.unlocode.value == request.POST.get('destination')
+                ),
                 None,
             )
             if destination is None:
@@ -81,7 +81,7 @@ def create_booking_dialog_views(
             return error_response
 
         deadline_value = cargo.route_specification.arrival_deadline.date().isoformat()
-        context = {'cargo': cargo, 'deadline_value': deadline_value, 'deadline_error': ''}
+        context = {'cargo': cargo, 'deadline_value': deadline_value}
 
         if request.method == 'POST':
             deadline_value = request.POST.get('deadline', '')
