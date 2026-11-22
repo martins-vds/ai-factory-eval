@@ -4,6 +4,7 @@ import pytest
 from django.conf import settings
 from django.core.management import call_command
 from django.db import IntegrityError
+from django.urls import reverse
 
 from src.loans.domain import Loan
 from src.loans.models import LoanRecord
@@ -21,6 +22,8 @@ def test_due_date_is_fourteen_calendar_days_after_lending():
     )
 
     assert loan.due_on == date(2026, 1, 16)
+    with pytest.raises(AttributeError):
+        loan.member = 'updated'
 
 
 @pytest.mark.django_db
@@ -42,9 +45,33 @@ def test_loan_lookup_returns_characterized_line_or_not_found(client):
     missing = client.get('/loans/unknown')
 
     assert found.status_code == 200
+    assert found['Content-Type'] == 'text/plain'
     assert found.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
     assert missing.status_code == 404
+    assert missing['Content-Type'] == 'text/plain'
     assert missing.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_catalog_page_renders_seeded_records_and_detail_links(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'The loan catalog' in response.content
+    assert b'Record L1' in response.content
+    assert b'href="/ui/loans/L1/"' in response.content
+
+
+@pytest.mark.django_db
+def test_loan_page_renders_the_selected_record(client):
+    response = client.get('/ui/loans/L1/')
+
+    assert response.status_code == 200
+    assert b'Loan L1' in response.content
+    assert b'Borrowed by ana' not in response.content
+    assert b'<dd class="font-medium">ana</dd>' in response.content
+    assert b'<dd class="font-medium">9780134685991</dd>' in response.content
+    assert b'href="/ui/loans/"' in response.content
 
 
 @pytest.mark.django_db
@@ -53,6 +80,29 @@ def test_missing_loan_page_renders_not_found_message(client):
 
     assert response.status_code == 404
     assert b'Loan not found' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    'path',
+    ['/loans', '/loans/L1', '/ui/loans/', '/ui/loans/L1/'],
+)
+def test_catalog_routes_reject_non_get_requests(client, path):
+    assert client.post(path).status_code == 405
+
+
+def test_catalog_routes_have_stable_names():
+    assert reverse('loan-list') == '/loans'
+    assert reverse('loan-detail', kwargs={'loan_id': 'L1'}) == '/loans/L1'
+    assert reverse('loan-catalog-page') == '/ui/loans/'
+    assert reverse('loan-page', kwargs={'loan_id': 'L1'}) == '/ui/loans/L1/'
+
+
+def test_returned_date_is_optional_in_the_database_and_forms():
+    returned_on = LoanRecord._meta.get_field('returned_on')
+
+    assert returned_on.null is True
+    assert returned_on.blank is True
 
 
 @pytest.mark.django_db
