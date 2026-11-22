@@ -5,6 +5,9 @@ from . import views
 urlpatterns = [
     path('loans', views.loan_list),
     path('loans/<str:loan_id>', views.loan_detail),
+    path('loans/<str:loan_id>/return', views.loan_return_api),
     path('ui/loans/', views.loan_catalog),
+    path('ui/loans/new/', views.loan_catalog_new),
+    path('ui/loans/<str:loan_id>/return/', views.loan_return_ui),
     path('ui/loans/<str:loan_id>/', views.loan_catalog_detail),
 ]

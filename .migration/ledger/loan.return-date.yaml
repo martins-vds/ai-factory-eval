@@ -8,10 +8,31 @@ source:
   location: legacy/src/main/java/lib/LoanRepository.java:36-44
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2343]
+target:
+  components:
+    - src.loans.services.ReturnBook
+    - src.loans.composition.return_loan
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.views.loan_return_api
+    - src.loans.views.loan_return_ui
+    - templates.loans._loan_row
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_sets_date_from_clock
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_date
+  - tests/loans/test_circulation.py::test_api_return_records_date_and_rejects_repeated_return
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - id: date-on-first-return
+    rule: A successful first return persists the date supplied by the clock.
+    source: LoanRepository.java:36-44
+  - id: return-once
+    rule: A loan that already has a return date is rejected and retains its original return date.
+    source: martins-vds/ai-factory-synthetic-target#41

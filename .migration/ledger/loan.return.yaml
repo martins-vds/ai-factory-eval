@@ -8,10 +8,31 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:45-50
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "POST /loans/{id}/return returns HTTP 200 with the formatted loan after marking it returned, or HTTP 404 with `no such loan` and a newline when the id is absent."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2343]
+target:
+  components:
+    - src.loans.services.ReturnBook
+    - src.loans.composition.return_loan
+    - src.loans.repository.LoanRepository.mark_returned
+    - src.loans.views.loan_return_api
+    - src.loans.views.loan_return_ui
+    - templates.loans._loan_row
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_unknown_loan
+  - tests/loans/test_circulation.py::test_api_return_rejects_unknown_loan
+  - tests/loans/test_circulation.py::test_browser_return_unknown_loan_shows_error
 notes: "Repeated-return date replacement is raised in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - id: known-loan
+    rule: An unknown loan cannot be returned and produces a not-found response.
+    source: LoanResource.java:45-50
+  - id: return-once
+    rule: A loan that already has a return date is rejected and retains its original return date.
+    source: martins-vds/ai-factory-synthetic-target#41

@@ -8,10 +8,32 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:37-43
   risk: {crap: 3, complexity: 3, coverage: 0.67}
 boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2343]
+target:
+  components:
+    - src.loans.services.LendBook
+    - src.loans.composition.lend_loan
+    - src.loans.repository.LoanRepository
+    - src.loans.views.loan_list
+    - src.loans.views.lend_loan_ui
+    - templates.loans._lend_form
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_lending_use_case_rejects_blank_fields
+  - tests/loans/test_circulation.py::test_api_lending_creates_and_returns_the_formatted_loan
+  - tests/loans/test_circulation.py::test_browser_lending_shows_field_errors_and_keeps_entered_values
+  - tests/loans/test_catalog.py::test_detail_export_quotes_delimiters_quotes_and_line_breaks
 notes: "Blank-value acceptance and unescaped export fields are raised in martins-vds/ai-factory-synthetic-target#39 and martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#39, martins-vds/ai-factory-synthetic-target#43]
+rules:
+  - id: member-required
+    rule: Missing, empty, and whitespace-only member values are refused with a member field error.
+    source: martins-vds/ai-factory-synthetic-target#39
+  - id: isbn-required
+    rule: Missing, empty, and whitespace-only ISBN values are refused with an ISBN field error.
+    source: martins-vds/ai-factory-synthetic-target#39

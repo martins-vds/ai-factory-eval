@@ -1,0 +1,60 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#2343
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2347
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.861
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Missing, empty, and whitespace-only member values are refused with a member field error.
+    use_case: LendBook.execute
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_blank_fields
+    enforced: true
+    ledger_rule: member-required
+  - capability: loan.lend
+    rule: Missing, empty, and whitespace-only ISBN values are refused with an ISBN field error.
+    use_case: LendBook.execute
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_blank_fields
+    enforced: true
+    ledger_rule: isbn-required
+  - capability: loan.return-date
+    rule: A successful first return persists the date supplied by the clock.
+    use_case: ReturnBook.execute
+    test: tests/loans/test_circulation.py::test_return_use_case_sets_date_from_clock
+    enforced: true
+    ledger_rule: date-on-first-return
+  - capability: loan.return-date
+    rule: A loan that already has a return date is rejected and retains its original return date.
+    use_case: ReturnBook.execute
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_date
+    enforced: true
+    ledger_rule: return-once
+  - capability: loan.return
+    rule: An unknown loan cannot be returned and produces a not-found response.
+    use_case: ReturnBook.execute
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_unknown_loan
+    enforced: true
+    ledger_rule: known-loan
+  - capability: loan.return
+    rule: A loan that already has a return date is rejected and retains its original return date.
+    use_case: ReturnBook.execute
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_repeat_without_replacing_date
+    enforced: true
+    ledger_rule: return-once
