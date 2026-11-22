@@ -10,7 +10,7 @@ def _catalog() -> LoanCatalog:
 
 
 def _plain_text(body: str, status: int = 200) -> HttpResponse:
-    response = HttpResponse(body, status=status, content_type='text/plain')
+    response = HttpResponse(body, status=status)
     response['Content-Type'] = 'text/plain'
     return response
 
@@ -22,10 +22,11 @@ def api_list(request):
 
 
 def api_detail(request, loan_id: str):
-    loan = _catalog().get_loan(loan_id)
+    catalog = _catalog()
+    loan = catalog.get_loan(loan_id)
     if loan is None:
         return _plain_text('no such loan\n', status=404)
-    return _plain_text(LoanCatalog.format_loan(loan))
+    return _plain_text(catalog.format_loan(loan))
 
 
 def ui_list(request):
