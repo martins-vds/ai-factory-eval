@@ -1,0 +1,14 @@
+id: payment.gateway-errors
+kind: behavioral
+title: Report gateway failures
+source:
+  graph_node: function:legacy/src/main/java/lib/FinePayments.java:pay
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "An unknown loan returns HTTP 404 with `no such loan`; IOException or InterruptedException returns HTTP 502 with `payment gateway unavailable`."
+notes: "The source swallows InterruptedException without restoring interrupt status; see .migration/quirks/payment-interrupt.md."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

@@ -1,0 +1,12 @@
+id: reporting.monthly-report
+kind: behavioral
+title: Produce the monthly lending report described by the legacy specification
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-8
+boundary: "The retired reporting specification describes a first-of-month report for the prior month: one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member ID; members without loans are omitted."
+notes: "The specification says the separate reporting module's code and runtime are no longer available; this is documentation-only source behavior."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

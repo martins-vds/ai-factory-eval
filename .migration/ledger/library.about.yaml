@@ -1,0 +1,13 @@
+id: library.about
+kind: ui
+title: Display public library information
+source:
+  graph_node: page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-9
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "GET /about serves the classpath HTML page with the library name, Monday-to-Saturday hours of 9:00 to 18:00, a 14-day lending period, and contact details."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

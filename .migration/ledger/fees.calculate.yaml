@@ -1,0 +1,13 @@
+id: fees.calculate
+kind: behavioral
+title: Calculate late fees
+source:
+  graph_node: function:legacy/src/main/java/lib/LateFeeView.java:page
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "Late days are measured through returnedOn or today and floored at zero; fees are waived for up to two late days, then accrue at 25 cents per day up to $10."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

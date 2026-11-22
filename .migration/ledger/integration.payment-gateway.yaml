@@ -1,0 +1,14 @@
+id: integration.payment-gateway
+kind: integration
+title: Charge a late fee through the payment gateway
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:29-41
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "POST /payments/{id} first requires an existing loan, then POSTs to PAYMENT_GATEWAY_URL/charge?loan=<id> (defaulting to the configured invalid URL) with no body; gateway status 200 maps to HTTP 200 and other statuses map to HTTP 502, with the gateway response body."
+notes: "Interrupted gateway calls are caught with I/O failures without restoring the interrupt; see .migration/quirks/payment-interrupt.md."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

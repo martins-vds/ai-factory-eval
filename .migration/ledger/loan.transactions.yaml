@@ -1,0 +1,12 @@
+id: loan.transactions
+kind: behavioral
+title: Bound loan persistence transactions
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.write
+  location: legacy/src/main/java/lib/LoanRepository.java:47-69
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "Reads close their EntityManager in a finally block; writes begin and commit a transaction, roll back if still active after failure, and close the EntityManager."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

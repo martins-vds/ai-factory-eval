@@ -1,0 +1,11 @@
+id: data.loan-schema
+kind: data
+title: Persist loan records
+source:
+  graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
+  location: legacy/src/main/java/lib/Loan.java:13-51
+boundary: "LOAN records have an ID primary key, required MEMBER, ISBN, and LENT_ON fields, and nullable RETURNED_ON; the entity exposes these values and derives dueOn."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending

@@ -1,0 +1,13 @@
+id: fees.page
+kind: ui
+title: View a loan's late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "GET /fees/{id} renders the loan ID, due date, days late, and dollar-formatted fee as HTML; an unknown loan returns HTTP 404 with an HTML paragraph."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending
