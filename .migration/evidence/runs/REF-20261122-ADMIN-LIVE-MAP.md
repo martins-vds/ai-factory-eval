@@ -5,3 +5,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | UTC | Gate | Exit | Seconds | Command | Log SHA-256 | First highlight | Result |
 |---|---|---|---|---|---|---|---|
 | 2026-11-22T22:46:14+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T22:47:11+00:00 | behavior-targeted | 0 | 3.57 | `pytest -q tests/cargo/interfaces/test_admin_live_map_data.py` | `ebc0f53354694c7d` |  |  |
