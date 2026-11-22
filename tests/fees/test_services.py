@@ -42,6 +42,12 @@ class PaymentGateway:
         return self.response
 
 
+@dataclass
+class GatewayResponse:
+    status: int
+    body: bytes
+
+
 @pytest.mark.parametrize(
     ('late_days', 'expected_cents'),
     [(0, 0), (1, 0), (2, 0), (3, 75), (40, 1000), (296, 1000)],
@@ -89,7 +95,7 @@ def test_payment_requires_an_existing_loan_before_calling_gateway():
 def test_payment_maps_gateway_status_and_preserves_its_response_body(
     gateway_status, gateway_body, expected_status
 ):
-    gateway = PaymentGateway(response=type('Response', (), {'status': gateway_status, 'body': gateway_body})())
+    gateway = PaymentGateway(response=GatewayResponse(gateway_status, gateway_body))
     application = PaymentApplication(LoanRepository(LoanRecord('L1', date(2026, 1, 1))), gateway)
 
     result = application.pay('L1')
