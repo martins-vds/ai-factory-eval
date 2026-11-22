@@ -1,0 +1,14 @@
+<div id="payment-status" class="mt-6">
+  {% if success %}
+  <p role="status">{{ message }}</p>
+  {% if gateway_body %}<p>{{ gateway_body }}</p>{% endif %}
+  {% else %}
+  <p role="alert">Payment could not be completed: {{ message }}</p>
+  <form method="post" action="/ui/payments/{{ loan_id }}/"
+        hx-post="/ui/payments/{{ loan_id }}/" hx-target="#payment-status" hx-swap="outerHTML"
+        hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = true; event.detail.isError = false; }">
+    {% csrf_token %}
+    <button class="btn btn-ghost text-[#a94e37]" type="submit">Try payment again</button>
+  </form>
+  {% endif %}
+</div>
