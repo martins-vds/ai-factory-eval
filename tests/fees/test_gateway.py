@@ -34,6 +34,19 @@ def test_gateway_uses_the_source_default_and_sends_a_bodyless_post(monkeypatch):
     assert requests[0].data is None
 
 
+def test_gateway_prefers_explicit_base_url_over_environment(monkeypatch):
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://environment.invalid')
+    requests = []
+    monkeypatch.setattr(
+        'src.fees.gateway.urlopen',
+        lambda request: requests.append(request) or GatewayResponse(),
+    )
+
+    HttpPaymentGateway('http://configured.invalid').charge('L1')
+
+    assert requests[0].full_url == 'http://configured.invalid/charge?loan=L1'
+
+
 def test_gateway_keeps_an_interruption_as_the_failure_cause(monkeypatch):
     interruption = InterruptedError('request interrupted')
 
@@ -45,4 +58,5 @@ def test_gateway_keeps_an_interruption_as_the_failure_cause(monkeypatch):
     with pytest.raises(PaymentGatewayFailure) as failure:
         HttpPaymentGateway('http://gateway.invalid').charge('L1')
 
+    assert str(failure.value) == 'payment gateway unavailable'
     assert failure.value.__cause__ is interruption

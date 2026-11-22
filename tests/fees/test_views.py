@@ -88,6 +88,15 @@ def test_fee_page_uses_reading_room_layout_and_posts_to_ui_payment(client):
 
 
 @pytest.mark.django_db
+def test_fee_page_renders_not_found_for_unknown_loan(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
 def test_payment_api_posts_to_gateway_and_returns_success_body(client, gateway_server):
     expected = GATEWAY_GOLDENS['responses']['POST /payments/L1 via test gateway']['response']
     gateway_server.response_body = b'charged\n'
@@ -121,6 +130,7 @@ def test_payment_api_returns_not_found_without_calling_gateway(client, gateway_s
     response = client.post('/payments/unknown')
 
     assert response.status_code == 404
+    assert response['Content-Type'] == 'text/plain'
     assert response.content == b'no such loan\n'
     assert gateway_server.requests == []
 
@@ -149,6 +159,47 @@ def test_ui_payment_renders_gateway_failure_for_htmx(client, gateway_server):
     assert b'id="payment-status"' in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_ui_payment_renders_gateway_success(client, gateway_server):
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="status"' in response.content
+    assert b'charged' in response.content
+
+
+@pytest.mark.django_db
+def test_ui_payment_renders_not_found_without_calling_gateway(client, gateway_server):
+    response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'no such loan' in response.content
+    assert gateway_server.requests == []
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L3', 'post'),
+        ('/ui/fees/L3/', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(
+    client,
+    gateway_server,
+    path,
+    method,
+):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert gateway_server.requests == []
 
 
 @pytest.mark.django_db
