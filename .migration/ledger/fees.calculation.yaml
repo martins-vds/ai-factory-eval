@@ -8,8 +8,25 @@ source:
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2368]
+target:
+  components: [src.fees.services.FeeApplication.calculate_fee]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/fees/test_services.py::test_fee_waiver_daily_rate_and_cap
+  - tests/fees/test_services.py::test_fee_uses_return_date_instead_of_today
+  - tests/fees/test_services.py::test_fee_for_unknown_loan_is_not_calculated
+  - .migration/evidence/runs/LL-03.md
+rules:
+  - id: late-days
+    rule: Late days are clamped at zero and use returnedOn when present, otherwise today's date.
+    source: legacy/src/main/java/lib/LateFeeView.java:31-35
+  - id: waiver-rate-cap
+    rule: Fees are waived through two days late, then accrue at 25 cents per day up to 1000 cents.
+    source: legacy/src/main/java/lib/LateFeeView.java:36-37

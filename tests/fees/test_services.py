@@ -43,15 +43,15 @@ class PaymentGateway:
 
 
 @pytest.mark.parametrize(
-    ('days_late', 'amount_cents'),
-    [(0, 0), (1, 0), (2, 0), (3, 75), (40, 1000), (41, 1000)],
+    ('days_after_due', 'days_late', 'amount_cents'),
+    [(-3, 0, 0), (0, 0, 0), (1, 1, 0), (2, 2, 0), (3, 3, 75), (40, 40, 1000), (41, 41, 1000)],
 )
-def test_fee_waiver_daily_rate_and_cap(days_late, amount_cents):
+def test_fee_waiver_daily_rate_and_cap(days_after_due, days_late, amount_cents):
     due_on = date(2026, 10, 12)
     loan = Loan('L1', due_on)
     application = FeeApplication(
         LoanRepository([loan]),
-        Clock(due_on + timedelta(days=days_late)),
+        Clock(due_on + timedelta(days=days_after_due)),
         PaymentGateway(),
     )
 
