@@ -37,6 +37,15 @@ def test_fee_endpoint_matches_the_unknown_loan_response(client):
 
 
 @pytest.mark.django_db
+def test_fee_endpoint_matches_the_characterized_capped_amount(client):
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert response['Content-Type'] == 'text/html'
+    assert b'<p class="fee">Fee: $10.00</p>' in response.content
+
+
+@pytest.mark.django_db
 def test_payment_endpoint_checks_the_loan_before_gateway_request(client, payment_gateway_server):
     response = client.post('/payments/unknown')
 
@@ -124,3 +133,19 @@ def test_ui_payment_error_fragment_renders_gateway_failure(client, payment_gatew
     assert response.status_code == 502
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('path', 'method'),
+    [
+        ('/fees/L1', 'post'),
+        ('/payments/L1', 'get'),
+        ('/ui/fees/L1/', 'post'),
+        ('/ui/payments/L1/', 'get'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(client, path, method):
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
