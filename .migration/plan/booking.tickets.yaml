@@ -1,4 +1,3 @@
-# Backfilled from the plan and its published tickets (harness #98).
 slice: booking
 tickets:
 - id: BK-03B
@@ -94,7 +93,7 @@ tickets:
   - BK-05C
 - id: BK-05F
   title: Build route selection and itinerary screens
-  role: afs-specialist-migrator
+  role: afs-migrator
   specialty: ui
   files:
   - src/cargotracker/booking/interfaces/route_selection/views.py
