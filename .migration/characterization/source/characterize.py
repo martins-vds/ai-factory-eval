@@ -26,6 +26,22 @@ CASES = (
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
 )
+EDGE_CASES = (
+    ('GET /loans/{id} unknown', 'GET', '/loans/unknown', None),
+    ('POST /loans missing content type', 'POST', '/loans', None),
+    ('POST /loans empty form', 'POST', '/loans', {}),
+    ('POST /loans missing member', 'POST', '/loans', {'isbn': '123'}),
+    ('POST /loans missing isbn', 'POST', '/loans', {'member': 'dee'}),
+    ('POST /loans empty fields', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    ('POST /loans delimiter fields', 'POST', '/loans', {'member': 'member;part', 'isbn': 'isbn\npart'}),
+    ('POST /loans/{id}/return unknown', 'POST', '/loans/unknown/return', None),
+    ('GET /fees/{id} unknown', 'GET', '/fees/unknown', None),
+    ('GET /fees/{id} cap', 'GET', '/fees/L1', None),
+    ('GET /fees/{id} early return', 'GET', '/fees/L2', None),
+    ('POST /loans/{id}/return already returned', 'POST', '/loans/L2/return', None),
+    ('GET /fees/{id} after repeated return', 'GET', '/fees/L2', None),
+    ('POST /payments/{id} unknown', 'POST', '/payments/unknown', None),
+)
 
 
 def verify_graph_coverage():
@@ -73,15 +89,15 @@ def wait_until_ready(process, output):
 
 def exercise_http():
     observations = {}
-    for endpoint, method, path, form in CASES:
+    for endpoint, method, path, form in (*CASES, *EDGE_CASES):
         observations[endpoint] = {
-            'request': {
-                'method': method,
-                'path': path,
-                'form': form,
-            },
+            'request': {'method': method, 'path': path, 'form': form},
             'response': get_response(method, path, form),
         }
+    observations['GET /loans after writes'] = {
+        'request': {'method': 'GET', 'path': '/loans', 'form': None},
+        'response': get_response('GET', '/loans', None),
+    }
     return observations
 
 
@@ -107,10 +123,10 @@ def exercise_browser():
     return {'pages': pages}
 
 
-def normalize(observation, endpoint):
+def normalize(observation):
     response = observation['response']
     body = re.sub(r'\d{4}-\d{2}-\d{2}', '<date>', response['body'])
-    if endpoint == 'GET /fees/{id}':
+    if observation['request']['path'].startswith('/fees/'):
         body = re.sub(r'\d+ day\(s\) late', '<days> day(s) late', body)
         body = re.sub(r'Fee: \$\d+\.\d{2}', 'Fee: $<amount>', body)
     return {
@@ -132,8 +148,8 @@ def write_or_compare(name, observation, record):
         return
     expected = json.loads(path.read_text(encoding='utf-8'))
     if name == 'http':
-        actual = {key: normalize(value, key) for key, value in observation.items()}
-        baseline = {key: normalize(value, key) for key, value in expected.items()}
+        actual = {key: normalize(value) for key, value in observation.items()}
+        baseline = {key: normalize(value) for key, value in expected.items()}
     else:
         actual = observation
         baseline = expected
@@ -172,10 +188,41 @@ def main():
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+    with tempfile.TemporaryFile() as output:
+        process = subprocess.Popen(
+            ['bash', str(RUN_SCRIPT)],
+            cwd=SOURCE,
+            env=os.environ.copy(),
+            stdout=output,
+            stderr=subprocess.STDOUT,
+        )
+        try:
+            wait_until_ready(process, output)
+            restarted_loans = get_response('GET', '/loans', None)
+        finally:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+    written_loans = http['GET /loans after writes']['response']['body']
+    if (
+        'L4;dee;123;' not in written_loans
+        or 'L5;;;' not in written_loans
+        or 'L6;member;part;isbn\npart;' not in written_loans
+    ):
+        raise AssertionError('the source did not persist loans created during the run')
+    if restarted_loans['body'] != http['GET /loans']['response']['body']:
+        raise AssertionError('the seeded loans changed after restarting the source')
+    http['GET /loans after restart'] = {
+        'request': {'method': 'GET', 'path': '/loans', 'form': None},
+        'response': restarted_loans,
+    }
     write_or_compare('http', http, args.record)
     write_or_compare('browser', browser, args.record)
     action = 'recorded' if args.record else 'verified'
-    print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
+    print(f'{action} {len(http)} source HTTP observations and {len(browser["pages"])} browser pages')
 
 
 if __name__ == '__main__':

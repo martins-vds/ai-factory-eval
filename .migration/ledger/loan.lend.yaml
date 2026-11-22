@@ -1,0 +1,20 @@
+id: loan.lend
+kind: behavioral
+title: Lend a book to a member
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans"
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43
+  risk:
+    crap: 12
+    complexity: 3
+boundary: "POST /loans requires non-null member and ISBN form fields (otherwise HTTP 400); it creates a loan dated today with id L<count+1> and returns HTTP 201 with the formatted record."
+tickets: [martins-vds/ai-factory-synthetic-target#35]
+status: pending
+verification: characterized
+characterization_tier: A
+evidence: [.migration/evidence/characterization-SY-05.md]
+notes: "Empty member and ISBN values are accepted (#39); delimiter-containing values are not escaped (#43). A request without form content type returns a Grizzly 500; see .migration/quirks/loan-create-missing-content-type.md."
+quirks:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#43
