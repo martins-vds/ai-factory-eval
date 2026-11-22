@@ -16,3 +16,14 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-22T18:15:30Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-not-routed-table-30c7acfe-8918-4dea-971b-dbf692d6a294  ·  **Last commit:** 1628050c5
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] You changed `tests/booking/interfaces/test_dialogs.py` after your last run of `idiom`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 1 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
