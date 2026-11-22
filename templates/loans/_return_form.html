@@ -1,0 +1,11 @@
+<div id="return-interaction" class="mt-6">
+  {% if error %}<p class="mb-4 text-[#a94e37]" role="alert">{{ error }}</p>{% endif %}
+  {% if loan.returned_on %}
+  <p class="text-sm text-[#66705b]" role="status">Returned {{ loan.returned_on|date:"M j, Y" }}.</p>
+  {% else %}
+  <form id="return-form" method="post" action="/ui/loans/{{ loan.id }}/return/" hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#return-interaction" hx-swap="outerHTML" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+    {% csrf_token %}
+    <button class="btn btn-primary" type="submit">Mark returned</button>
+  </form>
+  {% endif %}
+</div>

@@ -1,0 +1,54 @@
+role: afs-migrator
+ticket: LL-02
+issue: martins-vds/ai-factory-eval#2355
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2359
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.810
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-02.md
+ledger_updated:
+  - .migration/ledger/loan.lend.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/loan.return.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#39
+  - martins-vds/ai-factory-synthetic-target#41
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.lend
+    rule: Reject missing, empty, or whitespace-only member values.
+    use_case: src.loans.services.LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_blank_required_fields
+    enforced: true
+    ledger_rule: required-member
+  - capability: loan.lend
+    rule: Reject missing, empty, or whitespace-only ISBN values.
+    use_case: src.loans.services.LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_lending_use_case_rejects_blank_required_fields
+    enforced: true
+    ledger_rule: required-isbn
+  - capability: loan.lend
+    rule: Assign the next L<count+1> id atomically so concurrent lends receive distinct ids.
+    use_case: src.loans.services.LoanApplication.lend
+    test: tests/loans/test_circulation.py::test_concurrent_lending_assigns_distinct_loan_ids
+    enforced: true
+    ledger_rule: sequential-loan-id
+  - capability: loan.return-date
+    rule: Reject repeat returns and preserve the original returned_on date.
+    use_case: src.loans.services.LoanApplication.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_keeps_the_original_date_on_a_repeat_return
+    enforced: true
+    ledger_rule: no-repeat-return
+  - capability: loan.return
+    rule: Reject return requests for loan ids that do not exist.
+    use_case: src.loans.services.LoanApplication.return_loan
+    test: tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
+    enforced: true
+    ledger_rule: unknown-loan
