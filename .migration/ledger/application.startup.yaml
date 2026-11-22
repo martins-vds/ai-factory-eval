@@ -6,5 +6,10 @@ source:
   location: legacy/run.sh:1-6
 boundary: "Run the legacy launcher to package the Java application and start the HTTP server on PORT (default 8080)."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::wait_until_ready
+  - .migration/characterization/source/characterize.py::exercise_restart
 notes: "App.main wires the loan repository and four JAX-RS resources (legacy/src/main/java/lib/App.java:13-25). Startup behavior is also covered by quirk draft .migration/quirks/restart-data-loss.md."

@@ -8,5 +8,10 @@ source:
   risk: { crap: 20, complexity: 4 }
 boundary: "GET /fees/{id} renders an HTML fee page; the fee is 25 cents per late day, waived through two days late, capped at $10, and an unknown id returns HTTP 404."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
+  - .migration/characterization/source/characterize.py::exercise_edge_cases
 notes: "The fee uses returnedOn when present, so the repeat-return decision affects this output."

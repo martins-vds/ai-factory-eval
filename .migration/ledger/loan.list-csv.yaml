@@ -7,5 +7,9 @@ source:
   location: legacy/src/main/java/lib/LoanResource.java:25-28
 boundary: "GET /loans returns all loans ordered by id as newline-terminated semicolon-separated rows containing id, member, ISBN, lent date, due date, and returned date."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
 notes: "The format is explicitly documented for spreadsheet users in legacy/docs/export-csv.md:1-3."

@@ -8,5 +8,10 @@ source:
   risk: { crap: 6, complexity: 2 }
 boundary: "POST /loans/{id}/return records a return and returns the loan row, or HTTP 404 with `no such loan` for an unknown id."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
+  - .migration/characterization/source/characterize.py::exercise_edge_cases
 notes: "The HTTP endpoint is legacy/src/main/java/lib/LoanResource.java:45-50. Repeat-return behavior is tracked in .migration/quirks/repeated-loan-return.md."

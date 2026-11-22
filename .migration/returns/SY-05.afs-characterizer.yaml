@@ -1,0 +1,35 @@
+role: afs-characterizer
+ticket: SY-05
+issue: martins-vds/ai-factory-eval#2264
+tier_used:
+  A: 13
+  B: 0
+  C: 1
+suite:
+  path: .migration/characterization/source/
+  cases: 17
+  passing: 17
+  run_log: .migration/evidence/runs/SY-05.md
+predicted_vs_observed:
+  match: 13
+  differs: 0
+ledger_updated:
+  - .migration/ledger/application.startup.yaml
+  - .migration/ledger/data.loan-storage.yaml
+  - .migration/ledger/data.seed-records.yaml
+  - .migration/ledger/loan.list-csv.yaml
+  - .migration/ledger/loan.lookup.yaml
+  - .migration/ledger/loan.create.yaml
+  - .migration/ledger/loan.due-date.yaml
+  - .migration/ledger/loan.return.yaml
+  - .migration/ledger/loan.return-date.yaml
+  - .migration/ledger/fees.view.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+  - .migration/ledger/payment.gateway-errors.yaml
+  - .migration/ledger/library.about.yaml
+  - .migration/ledger/reports.monthly.yaml
+quirk_tickets:
+  - .migration/quirks/payment-interrupt.md
+  - .migration/quirks/repeated-loan-return.md
+  - .migration/quirks/restart-data-loss.md
+review_only_requests: []

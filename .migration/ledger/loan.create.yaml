@@ -8,4 +8,9 @@ source:
   risk: { crap: 12, complexity: 3 }
 boundary: "POST /loans accepts member and isbn form fields, creates a loan dated today, and returns HTTP 201 and its row; either missing field returns HTTP 400."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_http
+  - .migration/characterization/source/characterize.py::exercise_edge_cases

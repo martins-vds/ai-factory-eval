@@ -5,11 +5,11 @@ When `POST /loans/{id}/return` is called for a loan that is already returned, th
 
 ## Evidence
 - Source: `method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned`, `legacy/src/main/java/lib/LoanRepository.java:36-44`; route `legacy/src/main/java/lib/LoanResource.java:45-50`
-- Characterization: the tier-A HTTP suite exercised the return route's general behavior; this repeated-return sequence was not separately exercised.
+- Characterization: tier-A harness repeated the return for L2, changing `returnedOn` from `2026-01-20` to today's date; the displayed fee increased from $0.00 to $10.00.
 - Why it looks wrong: repeating the request changes the historical return date and can change the late fee shown for that loan.
 
 ## Impact
-- Ledger capabilities: `loan.return-date`, `loan.return`
+- Ledger capabilities: `loan.return-date`, `loan.return`, `fees.view`, `integration.payment-gateway`
 - Blocks: future migration tickets implementing these capabilities (not yet filed)
 
 ## Options

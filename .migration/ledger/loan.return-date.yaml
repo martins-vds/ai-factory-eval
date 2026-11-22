@@ -6,5 +6,9 @@ source:
   location: legacy/src/main/java/lib/Loan.java:48-50
 boundary: "The returnedOn field is stored on the loan and is the end date used by late-fee calculation; each return request currently replaces it with today's date."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/SY-05.md
+  - .migration/characterization/source/characterize.py::exercise_edge_cases
 notes: "See .migration/quirks/repeated-loan-return.md; the human must decide whether repeated return is preserved or changed."
