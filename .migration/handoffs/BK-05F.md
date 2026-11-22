@@ -25,3 +25,29 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-22T17:42:00Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-continue-changed-code-mutation-one-more-time` / evaluation task PR · **Last commit:** a0ec00271
+
+### Done
+- Setup checks passed for pinned source `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`; migration validation, test service, and runtime checks passed.
+- Ran the profile's changed-code mutation command through `afs-run`: exit 0, but result was `score=n/a reason=no-mutable-code-changed`, base `c7f7f06311c2b59f0aa325c478eaa55ceb7fbacb`. Evidence: `.migration/evidence/runs/BK-05F.md`; raw log `.migration/runs/BK-05F/20261122T174117792467Z-mutation-changed.log`.
+- Read-only lookup confirmed BK-05F (#293) is closed and PR #394 is merged in `martins-vds/ai-factory-pilot-target`.
+
+### Remaining
+- [ ] Resume on the requested target base `4ce1c99ca2c5` / `copilot/bk-05f-build-route-selection-itinerary-screens`.
+- [ ] Run changed-code mutation on that base, classify all survivors from the recorded diffs, and add interface tests or simplify equivalent code.
+- [ ] Rerun all profile gates, CodeQL, and migration validation; update the return with actual gate outcomes.
+
+### Decisions made
+- Stopped before changing application code or tests because this checkout does not match the requested base and the required mutation run produced no score.
+
+### Blockers / questions
+- This checkout is at `f8e8722ba6b666f6fe83c9053bed70a92736d571` on branch `copilot/bk-05f-continue-changed-code-mutation-one-more-time`, not the stated base `4ce1c99ca2c5` or branch `copilot/bk-05f-build-route-selection-itinerary-screens`. Do not infer a passing mutation result from `n/a`.
+- The existing survivor list remains `.migration/evidence/mutants/BK-05F.md`; no survivor was classified in this session because the requested base checkout was unavailable.
+
+### Failing commands
+- None. The mutation command exited 0 but reported no mutable code changed, so it did not measure the gate.
+
+### Next step for the next session
+Provide the requested base checkout, rerun `python .migration/harness/tools/afs-mutation` through `afs-run` first, then classify and resolve its survivors before running the remaining profile gates.
