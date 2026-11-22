@@ -1,0 +1,80 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: martins-vds/ai-factory-eval#2396
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.869
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: .migration/handoffs/BK-05F.md
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_missing_candidate
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline
+  - .migration/evidence/runs/BK-05F.md
+  - .migration/evidence/mutants/BK-05F.md
+mutant_dispositions:
+  - mutant: "views.py:22 #1"
+    diff: "_CANDIDATE_SALT 'booking.route_selection' -> 'XXbooking.route_selectionXX'"
+    classification: equivalent
+    reason: signing.dumps and signing.loads share the salt; the signed token changes internally but still round-trips through the same page flow.
+  - mutant: "views.py:22 #2"
+    diff: "_CANDIDATE_SALT 'booking.route_selection' -> None"
+    classification: equivalent
+    reason: Django's default signing salt is used by both producer and consumer, so normal candidate signing and verification remain paired.
+  - mutant: "views.py:29 #5"
+    diff: "Remove @require_http_methods(['GET', 'POST'])"
+    classification: killed_by_existing_interface_test
+    reason: test_route_screens_reject_unsupported_http_methods asserts HTTP 405 for unsupported route-selection methods.
+  - mutant: "views.py:34 #10"
+    diff: "Wrap the unknown-cargo Http404 reason in XX"
+    classification: equivalent
+    reason: The non-debug interface response remains the same generic 404; the diagnostic reason is not rendered to the user.
+  - mutant: "views.py:37 #13"
+    diff: "Wrap the stale-route-specification Http404 reason in XX"
+    classification: equivalent
+    reason: The non-debug interface response remains the same generic 404; the diagnostic reason is not rendered to the user.
+  - mutant: "views.py:39 #14"
+    diff: "quote(tracking_id, safe='') -> quote(tracking_id, safe='XXXX')"
+    classification: equivalent
+    reason: X is unreserved and is never escaped by quote; slash remains escaped by both safe values, so the redirect URL is unchanged.
+  - mutant: "views.py:44 #16"
+    diff: "Wrap the route-screen no-route guidance in XX"
+    classification: missing_test
+    reason: Replaced substring-only checking with a full paragraph-boundary assertion; it fails on the wrapped visible text.
+  - mutant: "views.py:48 #20"
+    diff: "Remove @require_http_methods(['GET'])"
+    classification: killed_by_existing_interface_test
+    reason: test_route_screens_reject_unsupported_http_methods asserts HTTP 405 for itinerary POST.
+  - mutant: "views.py:54 #21"
+    diff: "Wrap the itinerary-screen no-route guidance in XX"
+    classification: missing_test
+    reason: Replaced substring-only checking with a full paragraph-boundary assertion; it fails on the wrapped visible text.
+  - mutant: "views.py:70 #27"
+    diff: "Wrap the _selection_context unknown-cargo Http404 reason in XX"
+    classification: equivalent
+    reason: The non-debug interface response remains the same generic 404; the diagnostic reason is not rendered to the user.
+  - mutant: "views.py:95 #40"
+    diff: "request.POST.get('candidate', '') default -> 'XXXX'"
+    classification: equivalent_simplified
+    reason: Removed the redundant default; missing input now raises a caught TypeError and still returns 404 without assigning a route.
+  - mutant: "views.py:97 #43 (original #44)"
+    diff: "Wrap the BadSignature reason in XX"
+    classification: equivalent
+    reason: BadSignature is caught and translated to the same invalid-route 404; its internal reason is never rendered.
+  - mutant: "views.py:100 #45 (original #46)"
+    diff: "Wrap the invalid-route Http404 reason in XX"
+    classification: equivalent
+    reason: The non-debug interface response remains the same generic 404; the diagnostic reason is not rendered to the user.
