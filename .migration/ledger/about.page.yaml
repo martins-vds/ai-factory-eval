@@ -7,9 +7,24 @@ source:
   flow: View About Page
   location: legacy/src/main/resources/static/about.html:1-9
   risk: {crap: 1, complexity: 1, coverage: 1.0}
-boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
+boundary: "GET /about preserves the characterized static HTML response; GET /ui/about/ presents the library name, Monday–Saturday opening hours, 14-day lending period, and contact address in the approved reading-room layout."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.library_info.views.about
+    - src.library_info.views.about_page
+    - templates.library_info.about
+status: migrated
 verification: differential
+characterization_tier: A
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - tests/library_info/test_endpoints.py::test_about_preserves_the_characterized_html_response
+  - tests/library_info/test_endpoints.py::test_about_page_shows_library_information_in_the_browser
+  - .migration/evidence/runs/LL-04.md
+no_rules: "Both routes serve static library information without validating input or enforcing business decisions."
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
