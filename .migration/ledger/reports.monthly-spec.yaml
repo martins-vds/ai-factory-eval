@@ -7,8 +7,32 @@ source:
   location: legacy/docs/reports-spec.md:1-9
 boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication
+    - src.reports.repository.DjangoReportLoanRepository
+    - src.reports.management.commands.monthly_report.Command
+status: migrated
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_services.py::test_monthly_report_aggregates_prior_month_and_sorts_by_fees_then_member
+  - tests/reports/test_services.py::test_monthly_report_includes_previous_december_at_year_boundary
+  - tests/reports/test_command.py::test_monthly_report_command_outputs_previous_month_csv
+rules:
+  - id: previous-month-window
+    rule: The report covers the previous calendar month, including its first day and excluding the first day of the current month.
+    source: legacy/docs/reports-spec.md:4; .migration/plan/monthly-report.md:5
+  - id: qualifying-members
+    rule: Include only members with at least one loan started in the report month, and count only starts in that month.
+    source: legacy/docs/reports-spec.md:5-8; .migration/plan/monthly-report.md:5
+  - id: late-returns-and-fees
+    rule: Count loans returned after their due date in the report month, even if the late fee is waived, and sum applicable late fees in cents.
+    source: legacy/docs/reports-spec.md:5; .migration/ledger/fees.calculation.yaml
+  - id: fee-order
+    rule: Sort rows by total late fees descending, then member id ascending.
+    source: legacy/docs/reports-spec.md:7-8
 notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
