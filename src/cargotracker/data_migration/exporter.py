@@ -36,11 +36,7 @@ def _mapping_timezone(mapping):
 
 
 def _model_index():
-    return {
-        model._meta.db_table: model
-        for model in apps.get_models()
-        if not model._meta.proxy and not model._meta.auto_created
-    }
+    return {model._meta.db_table: model for model in apps.get_models() if not model._meta.proxy}
 
 
 def _field_for_column(model, column):
@@ -64,7 +60,7 @@ def _mapped_tables(mapping, models):
     prepared = []
     for spec in specs:
         target = spec['target']
-        if Path(target).name != target or target in {'.', '..'}:
+        if Path(target).name != target or target == '..':
             raise DataExportError(f'{target!r}: invalid target table name')
         model = models.get(target)
         if model is None:
@@ -115,7 +111,7 @@ def export_snapshot(mapping_path, output_dir):
                 rows = (
                     model._base_manager.order_by(model._meta.pk.name)
                     .values_list(*(field.attname for field in fields))
-                    .iterator(chunk_size=1000)
+                    .iterator()
                 )
                 count = 0
                 for row in rows:
