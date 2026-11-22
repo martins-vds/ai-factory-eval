@@ -126,6 +126,12 @@ def _write_mapping(tmp_path, mapping):
 
 @pytest.mark.django_db(transaction=True)
 def test_export_snapshot_round_trips_fixture_and_preserves_null_and_empty(tmp_path):
+    help_output = StringIO()
+    with redirect_stdout(help_output), pytest.raises(SystemExit) as help_exit:
+        call_command('export_data_snapshot', '--help')
+    assert help_exit.value.code == 0
+    assert 'Export mapped target tables as a relational snapshot.' in help_output.getvalue().splitlines()
+
     _load_fixture()
     output_dir = tmp_path / 'target' / 'nested'
     output = StringIO()
@@ -337,12 +343,3 @@ def test_export_command_requires_mapping_and_output(options, missing):
         match=f'^{re.escape(f"Error: the following arguments are required: {missing}")}',
     ):
         call_command('export_data_snapshot', **options)
-
-
-def test_export_command_describes_its_purpose():
-    output = StringIO()
-    with redirect_stdout(output), pytest.raises(SystemExit) as help_exit:
-        call_command('export_data_snapshot', '--help')
-
-    assert help_exit.value.code == 0
-    assert 'Export mapped target tables as a relational snapshot.' in output.getvalue()

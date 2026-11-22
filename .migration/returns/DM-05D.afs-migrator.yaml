@@ -1,0 +1,29 @@
+role: afs-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#2252
+pr: martins-vds/ai-factory-eval#2254
+specialty: data
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.989
+  regression: 0
+specialty_evidence:
+  - .migration/evidence/runs/DM-05D.md
+  - .migration/data/mapping.yaml
+  - tests/data_migration/test_export.py
+  - .migration/evidence/mutants/DM-05D.md
+evidence_logs:
+  - .migration/evidence/runs/DM-05D.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+no_rules:
+  snapshot-export: Snapshot serialization is a technical contract, not a domain business rule.
+equivalent_mutants:
+  - >-
+    exporter.py:84 #58: target timestamps are returned by Django as timezone-aware values under
+    USE_TZ=True, so the naive-datetime fallback does not affect ORM exports.

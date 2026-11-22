@@ -67,6 +67,41 @@
         "promptRequest",
         "requestId"
       ],
+      "session.compaction_complete": [
+        "behaviorModelId",
+        "checkpointNumber",
+        "checkpointPath",
+        "compactionAttemptId",
+        "compactionTokensUsed",
+        "conversationTokens",
+        "messagesRemoved",
+        "outcome",
+        "postCompactionTokens",
+        "preCompactionMessagesLength",
+        "preCompactionTokens",
+        "requestId",
+        "responsesReasoning",
+        "serviceRequestId",
+        "success",
+        "summarizerProgress",
+        "summaryContent",
+        "systemTokens",
+        "tokenAccountingBasis",
+        "tokenLimit",
+        "tokensRemoved",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
+      "session.compaction_start": [
+        "compactionAttemptId",
+        "conversationTokens",
+        "currentTokens",
+        "model",
+        "systemTokens",
+        "tokenLimit",
+        "toolDefinitionsTokens",
+        "trigger"
+      ],
       "session.start": [
         "alreadyInUse",
         "context",
@@ -159,6 +194,7 @@
         "role"
       ],
       "tool.execution_complete": [
+        "error",
         "fileEdits",
         "interactionId",
         "model",
@@ -200,43 +236,65 @@
       ]
     },
     "event_types": {
-      "assistant.message": 70,
-      "assistant.turn_end": 41,
-      "assistant.turn_start": 42,
-      "external_tool.completed": 1,
-      "external_tool.requested": 1,
-      "hook.end": 156,
-      "hook.start": 157,
-      "permission.completed": 78,
-      "permission.requested": 78,
+      "assistant.message": 236,
+      "assistant.turn_end": 127,
+      "assistant.turn_start": 127,
+      "external_tool.completed": 2,
+      "external_tool.requested": 2,
+      "hook.end": 361,
+      "hook.start": 362,
+      "permission.completed": 193,
+      "permission.requested": 193,
+      "session.compaction_complete": 1,
+      "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 42,
-      "skill.context_delivered_ref": 12,
-      "skill.invoked": 10,
+      "session.usage_record": 127,
+      "skill.context_delivered_ref": 13,
+      "skill.invoked": 11,
       "skill.invoked_ref": 2,
-      "subagent.completed": 1,
+      "subagent.completed": 2,
       "subagent.configured": 2,
       "subagent.selected": 3,
       "subagent.started": 2,
       "system.message": 3,
-      "tool.execution_complete": 94,
-      "tool.execution_start": 95,
-      "user.message": 3
+      "tool.execution_complete": 211,
+      "tool.execution_start": 211,
+      "user.message": 4
     },
-    "events": 894,
+    "events": 2197,
     "usage_fields": []
   },
-  "ended_at": "2026-11-21T23:51:51.315Z",
+  "ended_at": "2026-11-22T00:30:12.664Z",
   "event": "agentStop",
   "harness_tools": [
     {
-      "count": 10,
+      "count": 6,
+      "exit": 0,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 1,
+      "exit": 1,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 3,
+      "exit": 2,
+      "tool": "afs-mutation"
+    },
+    {
+      "count": 45,
       "exit": 0,
       "tool": "afs-run"
     },
     {
-      "count": 2,
+      "count": 9,
       "exit": 1,
+      "tool": "afs-run"
+    },
+    {
+      "count": 4,
+      "exit": 2,
       "tool": "afs-run"
     },
     {
@@ -284,11 +342,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 70
+      "requests": 236
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-21T23:51:54+00:00",
+  "recorded_at": "2026-11-22T00:31:05+00:00",
   "schema": "afs-cost/1",
   "session_id": "c329c0f1-5360-4f6c-a822-941625f12dce",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -323,6 +381,10 @@
     },
     {
       "count": 1,
+      "skill": "diagnosing-bugs"
+    },
+    {
+      "count": 1,
       "skill": "postgresql-code-review"
     },
     {
@@ -336,6 +398,5 @@
   ],
   "started_at": "2026-11-21T23:45:02.878Z",
   "surface": "coding-agent",
-  "trigger_id": "9c4b5f68-4166-4510-bee1-60a3f545c260",
   "usage_source": "assistant.message (output only, partial)"
 }
