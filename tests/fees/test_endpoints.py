@@ -3,6 +3,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
+from src.fees.gateway import HttpPaymentGateway
+from src.fees.services import InterruptedPayment
+
 
 @pytest.fixture
 def payment_gateway(monkeypatch):
@@ -111,7 +114,7 @@ def test_payment_page_swaps_gateway_error_fragment(client, payment_gateway):
     )
 
     assert response.status_code == 502
-    assert response['Content-Type'] == 'text/html'
+    assert response['Content-Type'].startswith('text/html')
     assert 'Payment could not be completed' in response.content.decode()
     assert 'declined' in response.content.decode()
 
@@ -124,6 +127,30 @@ def test_interrupted_payment_is_a_gateway_failure_without_losing_interrupt(
         raise InterruptedError('request interrupted')
 
     monkeypatch.setattr('urllib.request.urlopen', interrupt)
+    response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content.decode() == 'payment gateway unavailable\n'
+
+
+def test_http_gateway_preserves_interruption_as_the_cause(monkeypatch):
+    def interrupt(_request):
+        raise InterruptedError('request interrupted')
+
+    monkeypatch.setattr('urllib.request.urlopen', interrupt)
+
+    with pytest.raises(InterruptedPayment) as raised:
+        HttpPaymentGateway().charge('L1')
+
+    assert isinstance(raised.value.__cause__, InterruptedError)
+
+
+@pytest.mark.django_db
+def test_io_failure_is_returned_as_gateway_unavailable(client, monkeypatch):
+    def fail(_request):
+        raise OSError('connection unavailable')
+
+    monkeypatch.setattr('urllib.request.urlopen', fail)
     response = client.post('/payments/L1')
 
     assert response.status_code == 502
