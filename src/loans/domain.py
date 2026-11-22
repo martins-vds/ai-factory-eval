@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from io import StringIO
 
 
-@dataclass(frozen=True)
+@dataclass
 class Loan:
     id: str
     member: str

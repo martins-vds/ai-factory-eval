@@ -53,6 +53,14 @@ def test_catalog_use_case_exposes_the_characterized_seed_records():
     ]
 
 
+@pytest.mark.django_db
+def test_unreturned_loan_passes_model_validation():
+    loan = Loan(id='L4', member='dee', isbn='123', lent_on=date(2026, 2, 1))
+
+    loan.full_clean()
+    assert Loan._meta.get_field('returned_on').null is True
+
+
 def test_catalog_use_case_rejects_an_unknown_loan():
     catalog = LoanCatalog(LoanRepositoryStub([]))
 
@@ -90,10 +98,12 @@ def test_lookup_returns_one_loan_or_the_legacy_not_found_response(client):
     response = client.get('/loans/L1')
 
     assert response.status_code == 200
+    assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'L1;ana;9780134685991;2026-01-02;2026-01-16;\n'
 
     missing = client.get('/loans/unknown')
     assert missing.status_code == 404
+    assert missing['Content-Type'] == 'text/plain'
     assert missing.content.decode() == 'no such loan\n'
 
 
@@ -176,6 +186,19 @@ def test_catalog_page_references_pinned_ui_assets(client):
     assert '/static/css/tailwind.css' in html
     assert 'daisyui@4.12.24' in html
     assert 'htmx.org@2.0.11' in html
+    assert '9780134685991' in html
+
+
+@pytest.mark.django_db
+def test_catalog_detail_page_shows_loan_and_missing_page_identifies_unknown_loan(client):
+    detail = client.get('/ui/loans/L1/')
+    assert detail.status_code == 200
+    assert b'9780134685991' in detail.content
+    assert b'ana' in detail.content
+
+    missing = client.get('/ui/loans/unknown/')
+    assert missing.status_code == 404
+    assert b'unknown' in missing.content
 
 
 @pytest.mark.django_db
