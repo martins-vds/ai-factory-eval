@@ -1,0 +1,79 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#2308
+pr: martins-vds/ai-factory-eval#2313
+gates:
+  build: 0
+  behavior: 0
+  spec: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: Days late run from the due date to return date or today while out and never below zero.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_stops_on_return_date_and_never_counts_days_early
+    enforced: true
+    ledger_rule: late-days-end-at-return
+  - capability: fees.calculation
+    rule: Up to two days late costs nothing.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_for_loan_applies_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-waived-two-days
+  - capability: fees.calculation
+    rule: Late days beyond the waiver are charged at 25 cents per day, with the first two days included.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_for_loan_applies_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-25-cents-a-day
+  - capability: fees.calculation
+    rule: The fee never exceeds $10.00.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_for_loan_applies_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-capped-at-10
+  - capability: fees.calculation
+    rule: A fee request for an unknown loan is refused.
+    use_case: FeeApplication.fee_for
+    test: tests/fees/test_fee_services.py::test_fee_for_unknown_loan_raises_not_found
+    enforced: true
+    ledger_rule: unknown-loan-404
+  - capability: integration.payment-gateway
+    rule: An unknown loan is refused before a gateway request is sent.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_for_unknown_loan_does_not_call_gateway
+    enforced: true
+    ledger_rule: loan-exists-before-charge
+  - capability: integration.payment-gateway
+    rule: Only gateway HTTP 200 is a successful payment; other statuses become HTTP 502.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_maps_gateway_status_and_forwards_response
+    enforced: true
+    ledger_rule: gateway-success-status
+  - capability: integration.payment-gateway
+    rule: Gateway I/O failures become HTTP 502 with the unavailable message.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_gateway_unavailable_returns_gateway_failure
+    enforced: true
+    ledger_rule: gateway-unavailable
+  - capability: integration.payment-gateway
+    rule: An interrupted gateway request surfaces as a gateway failure without losing the interruption.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_preserves_interrupted_gateway_call
+    enforced: true
+    ledger_rule: interruption-preserved
+no_rules:
+  fees.page: The page presents calculated fee details and a payment action; business rules are recorded under fees.calculation and integration.payment-gateway.
