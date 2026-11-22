@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from .composition import fee_application
 from .services import GatewayUnavailable, PaymentOutcome
@@ -48,7 +49,7 @@ def payment_page(request, loan_id):
     if outcome.status_code == 200:
         if request.headers.get('HX-Request') == 'true':
             return render(request, 'fees/payment-status.html', {'payment_body': outcome.body})
-        return redirect(f'/ui/fees/{loan_id}/')
+        return redirect(reverse('fee-page', kwargs={'loan_id': loan_id}))
 
     if request.headers.get('HX-Request') == 'true':
         return render(

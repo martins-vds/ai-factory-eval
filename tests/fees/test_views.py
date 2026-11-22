@@ -121,6 +121,19 @@ def test_htmx_payment_page_renders_success_and_failure_responses(
 
 
 @pytest.mark.django_db
+def test_regular_payment_redirects_to_the_local_fee_page(client, payment_server, monkeypatch):
+    monkeypatch.setenv(
+        'PAYMENT_GATEWAY_URL',
+        f'http://127.0.0.1:{payment_server.server_port}',
+    )
+
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L1/'
+
+
+@pytest.mark.django_db
 def test_browser_renders_htmx_gateway_failure(live_server, payment_server, monkeypatch):
     payment_server.response_status = 503
     payment_server.response_body = b'declined\n'
