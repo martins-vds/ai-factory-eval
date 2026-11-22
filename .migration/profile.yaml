@@ -125,3 +125,6 @@ ui_checks:                   # harness ADR-0043: htmx error responses render (ch
   templates: ["templates/**/*.html", "src/**/templates/**/*.html"]
   scripts: ["static/**/*.js", "assets/**/*.js"]
   htmx_errors: true
+
+test_health:                  # ADR-0064: the coupling guard refuses new test lines that lean on the code's internals
+  block: true
