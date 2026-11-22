@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-
 ABOUT_PAGE = """<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>About the Lending Library</title></head>
