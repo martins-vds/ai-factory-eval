@@ -30,5 +30,39 @@
     "blocks_before": 0,
     "decision": "allow",
     "why": "self_heal.enabled is off; would have blocked"
+  },
+  {
+    "at": "2026-11-22T00:32:36Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 19856,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": false,
+    "ticket": "DM-05D",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/c329c0f1-5360-4f6c-a822-941625f12dce.json",
+      ".migration/evidence/mutants/DM-05D.md",
+      ".migration/evidence/runs/DM-05D.md",
+      ".migration/returns/DM-05D.afs-migrator.yaml",
+      "src/cargotracker/data_migration/exporter.py",
+      "src/cargotracker/data_migration/management/commands/export_data_snapshot.py",
+      "tests/data_migration/test_export.py"
+    ],
+    "findings": [
+      "[mechanical] CI's validate.py will fail on this: .migration/returns/DM-05D.afs-migrator.yaml: list `rules` (each business rule the ticket's capabilities carry, with the use-case test that shows where it's enforced) and `no_rules: {<capability>: <why>}` for a capability with none. Fix it and commit.",
+      "[mechanical] You changed `tests/data_migration/test_export.py` after your last run of `build`, `idiom`, `crap`, `regression`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return."
+    ],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "self_heal.enabled is off; would have blocked"
   }
 ]
