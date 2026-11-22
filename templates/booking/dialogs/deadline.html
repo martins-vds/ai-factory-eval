@@ -1,0 +1,32 @@
+<section aria-labelledby="change-deadline-title" class="space-y-4">
+  <h2 id="change-deadline-title" class="text-xl font-semibold">Change arrival deadline</h2>
+  <p>
+    Origin: {{ cargo.route_specification.origin.name }}.
+    Destination: {{ cargo.route_specification.destination.name }}.
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+    hx-target="#cargo-edit-dialog-content"
+    hx-swap="innerHTML"
+  >
+    {% csrf_token %}
+    <label class="mb-1 block font-medium" for="arrival-deadline">Arrival deadline</label>
+    <input
+      class="input input-bordered w-full"
+      type="date"
+      id="arrival-deadline"
+      name="deadline"
+      value="{{ deadline_value }}"
+      {% if error %}aria-describedby="deadline-error" aria-invalid="true"{% endif %}
+    >
+    {% if error %}
+      <p class="mt-2 text-red-700" id="deadline-error" role="alert">{{ error }}</p>
+    {% endif %}
+    <div class="mt-4 flex justify-end gap-3">
+      <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">Cancel</button>
+      <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+  </form>
+</section>

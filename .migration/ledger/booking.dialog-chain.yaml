@@ -7,8 +7,14 @@ source:
   risk: {crap: 2, complexity: 1, coverage: 0.0}
 boundary: "Not-routed table actions open PrimeFaces dynamic dialogs with trackingId; view-scoped edit beans call BookingServiceFacade and DefaultBookingService, then close with DONE; cancel closes with an empty result."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_destination_dialog_view
+    - cargotracker.booking.interfaces.dialogs.views.create_deadline_dialog_view
+    - templates/booking/dashboard/not_routed_table.html
+    - templates/booking/dialogs/
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -17,4 +23,10 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "These tests cover service state changes, not PrimeFaces dialog presentation or return callbacks; both handleReturn methods are empty. Successful updates also emit the browser-console warning in .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_dashboard_opens_destination_and_deadline_dialogs_for_not_routed_cargo"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_fields_and_refreshes_dashboard"
+  - "tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_route_and_completes_the_dialog"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "Dialog choreography delegates destination and deadline changes to booking application use cases; it introduces no additional business invariants."
+quirks: [martins-vds/ai-factory-pilot-target#251]
+notes: "The characterized tests cover service state changes, not source dialog presentation or return callbacks; both source handleReturn methods are empty. Ruling #251 omits the unavailable-widget console warning while retaining successful updates and dialog completion."

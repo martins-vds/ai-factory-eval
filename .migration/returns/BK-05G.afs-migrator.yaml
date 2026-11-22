@@ -1,0 +1,31 @@
+role: afs-migrator
+ticket: BK-05G
+issue: martins-vds/ai-factory-pilot-target#294
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2406
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05G.md
+specialty_evidence:
+  - tests/booking/interfaces/test_dialogs.py::test_dashboard_opens_destination_and_deadline_dialogs_for_not_routed_cargo
+  - tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_fields_and_refreshes_dashboard
+  - tests/booking/interfaces/test_dialogs.py::test_deadline_update_preserves_route_and_completes_the_dialog
+  - .migration/evidence/runs/BK-05G.md
+ledger_updated:
+  - booking.dialog-chain
+  - booking.dialog-deadline
+  - booking.dialog-destination
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules:
+  booking.dialog-chain: Dialog choreography delegates destination and deadline changes to application use cases without adding business invariants.
+  booking.dialog-deadline: Date-string parsing is a UI concern; the application use case receives a valid datetime.
+  booking.dialog-destination: Choice filtering is dialog presentation under ruling #235; valid changes use CargoSpecification.
