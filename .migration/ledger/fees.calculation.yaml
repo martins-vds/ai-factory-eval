@@ -15,3 +15,16 @@ status: migrated
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap, tests/fees/test_fee_calculation.py::test_fee_for_returned_loan_uses_return_date_instead_of_today]
+rules:
+  - id: days-late-never-below-zero
+    rule: Days late are never negative, even before a loan's due date.
+    source: LateFeeView.java:31-37
+  - id: fee-waived-through-two-days
+    rule: A loan up to two days late has no fee; after that, each day late costs $0.25.
+    source: LateFeeView.java:31-37
+  - id: fee-capped-at-ten-dollars
+    rule: The late fee never exceeds $10.00.
+    source: LateFeeView.java:31-37
+  - id: returned-on-sets-fee-date
+    rule: For a returned loan, late days are measured through its return date, not today's date.
+    source: LateFeeView.java:31-37

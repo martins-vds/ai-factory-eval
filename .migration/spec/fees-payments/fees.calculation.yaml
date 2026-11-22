@@ -1,0 +1,45 @@
+capability: fees.calculation
+title: Calculate a loan's late fee
+cases:
+  - title: Late days and fee follow the date and fee boundaries
+    rule:
+      - days-late-never-below-zero
+      - fee-waived-through-two-days
+      - fee-capped-at-ten-dollars
+    oracle: .migration/references/characterization-SY-05.md
+    given:
+      clock: "{clock}"
+    when:
+      http:
+        method: GET
+        path: /fees/L1
+    then:
+      status: 200
+      text:
+        - "Due 2026-01-16, {days_late} day(s) late."
+        - "Fee: {fee}"
+    examples:
+      columns: [clock, days_late, fee]
+      rows:
+        - ["2026-01-15", 0, "$0.00"]
+        - ["2026-01-16", 0, "$0.00"]
+        - ["2026-01-17", 1, "$0.00"]
+        - ["2026-01-18", 2, "$0.00"]
+        - ["2026-01-19", 3, "$0.75"]
+        - ["2026-02-24", 39, "$9.75"]
+        - ["2026-02-25", 40, "$10.00"]
+        - ["2026-02-26", 41, "$10.00"]
+  - title: A returned loan uses its return date
+    rule: returned-on-sets-fee-date
+    oracle: .migration/characterization/source/goldens/http.json
+    given:
+      clock: "2026-11-08"
+    when:
+      http:
+        method: GET
+        path: /fees/L3
+    then:
+      status: 200
+      text:
+        - "Due 2025-12-15, 19 day(s) late."
+        - "Fee: $4.75"
