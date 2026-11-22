@@ -11,7 +11,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 
 from cargotracker.cargo.infrastructure.models import CargoRecord
-from cargotracker.data_migration import exporter, schema
+from cargotracker.data_migration import schema
 from cargotracker.location.infrastructure.models import LocationRecord
 
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
