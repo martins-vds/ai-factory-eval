@@ -9,7 +9,21 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /about serves the packaged static HTML page with the library name, Monday–Saturday opening hours, 14-day lending period, and contact address."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
+target:
+  components:
+    - src.library_info.views.about_page
+    - src.library_info.views.about_ui
+    - src.library_info.urls
+    - templates/library_info/about.html
+status: migrated
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - .migration/evidence/runs/LL-04.md
+  - tests/library_info/test_about.py::test_about_response_matches_characterization
+  - tests/library_info/test_about.py::test_modern_about_page_shows_library_information_in_browser
+no_rules: "The public About page is read-only and displays library information without enforcing business rules."
