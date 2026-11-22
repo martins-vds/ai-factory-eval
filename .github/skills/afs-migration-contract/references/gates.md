@@ -8,6 +8,7 @@ from this session, or verified durable Actions output for identical execution in
 |---|---|---|
 | 1 · Build | Compiles, loads and configures cleanly? (`gates.build`) | every PR |
 | 2 · Behavior | Characterization and transcribed legacy tests pass at the boundary? (`gates.tests`) | every PR |
+| 2s · Spec | The slice's customer spec passes for every capability the ticket builds? (`gates.spec`, `afs-spec run`, [spec.md](spec.md)). Reported as `gates.spec: <exit>` by a Migrator ticket whose capability has a spec, run after the ledger marks it `migrated` so its cases aren't skipped as pending (ADR-0063). At slice acceptance, `afs-mutation --all --spec` reports how many mutants the spec alone kills (`spec_mutation_score`, a report, not a threshold) | every PR / slice |
 | 3 · Idiom & architecture | Idiomatic for the target (`gates.idiom`); conforms to target ADRs — layers, DI, domain boundaries (review with `clean-architecture`, `domain-driven-design`, `code-review`) | every PR |
 | 4 · CRAP | No method above `thresholds.crap_max_per_method` (`gates.crap`) | every PR |
 | 5 · Mutation | Mutation score on the **files a PR changes** ≥ `thresholds.mutation_score_min` (`gates.mutation_changed`, run by `afs-mutation`: changed files only, each mutant runs its context's tests, shards run in parallel; CI runs it too). The full run (`gates.mutation_full`) happens **once, at slice acceptance**, never per ticket | every PR / slice |
@@ -16,12 +17,28 @@ from this session, or verified durable Actions output for identical execution in
 
 ## Per-PR gate function (Migrator, then Verifier)
 ```
-1 build ok? 2 behavior ok? 3 idiom ok? 4 CRAP ok? 5 mutation (changed) ok? 6 full suite ok?
+1 build ok? 2 behavior ok? 2s spec ok (if specced)? 3 idiom ok? 4 CRAP ok? 5 mutation (changed) ok? 6 full suite ok?
 all yes → open/mark the PR ready, ledger entries updated in the same PR
 any no  → fix; same failure after two honest attempts → stop, handoff, escalate
 ```
 Never weaken a threshold, skip a gate, disable a test, or use `--no-verify`. Thresholds are a human
 decision recorded in the profile.
+
+## Tests that survive a refactor (ADR-0064)
+Test what the code does, not how. Go through a public entry point (the HTTP client, a use case, a command)
+and assert on the outcome: the response, the stored state, what left the system. Patch only boundaries: the
+clock, randomness, the network, a gateway adapter. Don't patch the project's own functions, don't reach into
+private names (`_helper`, `obj._cache`), and don't assert which internal call was made (`assert_called_*` on
+your own code). The coupling guard (`afs-test-health --check`) flags these on the lines your branch adds. A
+line that truly needs one ends with `# afs: allow-mock <why>`; the reason is reviewed with the PR.
+
+## Test isolation
+Tests leave shared state as they found it. A test that commits for real (a browser test against a live
+server, a transactional test) restores the database afterwards, so seed rows from data migrations survive
+for the tests after it. Prefer one project-wide setting to per-test marks (Django + pytest-django: a
+`django_db_serialized_rollback` fixture returning `True` in `tests/conftest.py`). The profile's
+`target.shared_test_files` lists where that setting lives; any ticket may change those files. Run the full
+suite in its default order before finishing: a test that passes alone can still break another one.
 
 ## Differential fidelity
 
@@ -55,7 +72,7 @@ A passing classification is not a passing gate. Unapproved differences remain fi
 behavior or regression runs cannot support a `pass` verdict. Verifiers fix tests/evidence only,
 never production code, and send implementation defects back to a Migrator.
 
-## Slice acceptance (Slice Coordinator + Auditor)
+## Slice acceptance (Program Orchestrator with `afs-slice-acceptance`, + Auditor)
 1. Slice's end-to-end characterization suite against the target.
 2. Automated differential checks where a legacy environment exists (tier A); otherwise against the
    characterization tests and derived specs.
