@@ -23,7 +23,7 @@ class HttpPaymentGateway:
             method='POST',
         )
         try:
-            with request.urlopen(req, timeout=10) as response:
+            with request.urlopen(req) as response:
                 status = response.status
                 body = response.read().decode('utf-8')
         except error.HTTPError as response:

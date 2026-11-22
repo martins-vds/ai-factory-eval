@@ -2,7 +2,7 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application, payment_application
 from .gateway import PaymentGatewayUnavailable
@@ -11,6 +11,7 @@ from .services import PaymentResponse
 logger = logging.getLogger(__name__)
 
 
+@require_GET
 def fee_detail(request, loan_id):
     fee = fee_application.calculate(loan_id)
     if fee is None:
@@ -26,6 +27,7 @@ def fee_detail(request, loan_id):
     return HttpResponse(body, content_type='text/html')
 
 
+@require_GET
 def fee_page(request, loan_id):
     fee = fee_application.calculate(loan_id)
     if fee is None:
