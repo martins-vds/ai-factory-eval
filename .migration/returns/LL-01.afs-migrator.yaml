@@ -2,6 +2,7 @@ role: afs-migrator
 ticket: LL-01
 issue: martins-vds/ai-factory-eval#2342
 pr: https://github.com/martins-vds/ai-factory-eval/pull/2345
+# Refreshed after the repository.py change from the finish-* afs-run rows: build=0, behavior=0, idiom=0, crap=0, mutation_changed=1.000, regression=0.
 gates:
   build: 0
   behavior: 0
