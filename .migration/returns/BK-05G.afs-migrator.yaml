@@ -7,7 +7,7 @@ gates:
   build: 0
   behavior: 0
   idiom: 0
-  crap: 26.0
+  crap: 0
   mutation_changed: 0.846
   regression: 0
 specialty_evidence:
@@ -20,7 +20,6 @@ ledger_updated:
   - booking.dialog-chain
   - booking.dialog-deadline
   - booking.dialog-destination
-  - booking.screen-not-routed-table
 quirk_tickets: []
 new_tickets: []
 handoff: none
@@ -29,4 +28,3 @@ no_rules:
   booking.dialog-chain: "The dialog chain has no business invariant; cargo edits delegate to CargoSpecification and RouteSpecification."
   booking.dialog-deadline: "The dialog parses date input for presentation; deadline business invariants belong to CargoSpecification.change_deadline."
   booking.dialog-destination: "The dialog filters editable options for the UI; route-specification invariants belong to CargoSpecification.change_destination."
-  booking.screen-not-routed-table: "The table displays cargo data and dialog actions; domain invariants are enforced by booking application use cases."

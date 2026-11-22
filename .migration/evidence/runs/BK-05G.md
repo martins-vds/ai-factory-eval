@@ -51,3 +51,7 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T18:10:47+00:00 | regression | 0 | 59.81 | `pytest -q` | `ad63c7b68646ac02` |  |  |
 | 2026-11-22T18:13:46+00:00 | final-regression | 0 | 60.78 | `pytest -q` | `49ba936cdfc08662` |  |  |
 | 2026-11-22T18:16:49+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:17:40+00:00 | dialogs-after-scope-revert | 0 | 6.52 | `pytest -q tests/booking/interfaces/test_dialogs.py` | `94d7d072a7085a7d` |  |  |
+| 2026-11-22T18:18:43+00:00 | crap-coverage-final | 0 | 60.88 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `c82ac6d975c10a96` |  |  |
+| 2026-11-22T18:18:46+00:00 | crap-lizard-final | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:18:49+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0345b092da7ec86a` |  | gate=crap max=26.0 threshold=30 over=0 methods=205 |
