@@ -1,0 +1,33 @@
+[
+  {
+    "at": "2026-11-22T04:31:42Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 21894,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "REF-01",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/1fe46115-0f6f-4569-ab47-a94f535604e5.json",
+      ".migration/evidence/mutants/REF-01.md",
+      ".migration/evidence/runs/REF-01.md",
+      ".migration/returns/REF-01.afs-migrator.yaml",
+      "src/cargotracker/data_migration/exporter.py",
+      "src/cargotracker/data_migration/schema.py",
+      "tests/data_migration/test_export.py"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
