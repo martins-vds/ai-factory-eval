@@ -30,13 +30,13 @@ class Clock:
 def test_monthly_report_uses_previous_calendar_month_across_year_boundary():
     repository = ReportLoanRepository(
         [
+            Loan('Outside', date(2026, 1, 1), date(2026, 1, 15), None),
             Loan('Alpha', date(2025, 12, 1), date(2025, 12, 15), date(2025, 12, 18)),
             Loan('Beta', date(2025, 11, 1), date(2025, 11, 15), date(2025, 12, 20)),
             Loan('Gamma', date(2025, 11, 1), date(2025, 11, 15), date(2025, 12, 20)),
             Loan('First day', date(2025, 11, 1), date(2025, 11, 15), date(2025, 12, 1)),
             Loan('Due date', date(2025, 11, 17), date(2025, 12, 1), date(2025, 12, 1)),
             Loan('On time', date(2025, 12, 31), date(2026, 1, 14), date(2025, 12, 31)),
-            Loan('Outside', date(2026, 1, 1), date(2026, 1, 15), None),
             Loan('End boundary', date(2025, 11, 1), date(2025, 11, 15), date(2026, 1, 1)),
         ]
     )
