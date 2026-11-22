@@ -1,0 +1,33 @@
+<dialog class="w-full max-w-lg rounded-md border border-gray-300 p-0 shadow-xl backdrop:bg-black/50" aria-labelledby="deadline-dialog-title">
+  <div class="space-y-4 p-6">
+    <h2 id="deadline-dialog-title" class="text-xl font-semibold text-gray-900">Change arrival deadline</h2>
+    <p class="text-gray-700">Origin: {{ cargo.route_specification.origin.name }}</p>
+    <p class="text-gray-700">Destination: {{ cargo.route_specification.destination.name }}</p>
+    <form
+      method="post"
+      action="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+      hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+      hx-target="#cargo-edit-dialog"
+      hx-swap="innerHTML"
+    >
+      {% csrf_token %}
+      <label for="deadline" class="block font-medium text-gray-700">Arrival deadline</label>
+      <input
+        id="deadline"
+        name="deadline"
+        type="date"
+        class="mt-1 min-h-11 w-full rounded-md border border-gray-300 p-2"
+        value="{{ deadline_value }}"
+        {% if deadline_error %}aria-invalid="true" aria-describedby="deadline-error"{% endif %}
+        required
+      >
+      {% if deadline_error %}
+        <p id="deadline-error" class="text-red-700" role="alert">{{ deadline_error }}</p>
+      {% endif %}
+      <button class="btn btn-primary min-h-11 rounded-md bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800" type="submit">Update</button>
+    </form>
+    <form method="dialog">
+      <button class="btn btn-ghost min-h-11 rounded-md px-5 py-2 font-semibold text-slate-800 hover:bg-slate-100" type="submit">Cancel</button>
+    </form>
+  </div>
+</dialog>

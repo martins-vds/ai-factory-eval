@@ -4,7 +4,11 @@
   hx-on::response-error="document.getElementById('cargo-edit-dialog').textContent = 'Unable to load the cargo editor. Refresh and try again.'"
 >
   <h2 id="not-routed-cargo-heading" class="mb-3 text-xl font-semibold text-gray-900">Not Routed Cargo</h2>
-  <div id="cargo-edit-dialog" aria-live="polite"></div>
+  <div
+    id="cargo-edit-dialog"
+    aria-live="polite"
+    hx-on::after-swap="this.querySelector('dialog').showModal()"
+  ></div>
   <div class="overflow-x-auto">
     <table class="w-full border-collapse text-left">
       <thead>
@@ -36,6 +40,7 @@
               <br>
               <button
                 type="button"
+                class="min-h-11 rounded-md px-2 py-1 text-sm font-medium text-blue-700 underline"
                 aria-controls="cargo-edit-dialog"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
                 hx-target="#cargo-edit-dialog"
@@ -49,6 +54,7 @@
               <br>
               <button
                 type="button"
+                class="min-h-11 rounded-md px-2 py-1 text-sm font-medium text-blue-700 underline"
                 aria-controls="cargo-edit-dialog"
                 hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
                 hx-target="#cargo-edit-dialog"
