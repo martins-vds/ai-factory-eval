@@ -51,7 +51,7 @@ def test_monthly_report_aggregates_prior_month_and_orders_members():
         LoanRecord('B', date(2028, 2, 29), date(2028, 3, 14), date(2028, 3, 14)),
         LoanRecord('A', date(2028, 2, 2), date(2028, 2, 16), date(2028, 2, 19)),
         LoanRecord('Z', date(2028, 2, 10), date(2028, 2, 24), date(2028, 2, 27)),
-        LoanRecord('C', date(2028, 2, 28), date(2028, 3, 13)),
+        LoanRecord('C', date(2028, 2, 1), date(2028, 2, 15), date(2028, 2, 15)),
         LoanRecord('OLD', date(2028, 1, 1), date(2028, 1, 15), date(2028, 2, 18)),
         LoanRecord('END', date(2028, 3, 1), date(2028, 3, 15), date(2028, 3, 18)),
     ]
@@ -65,13 +65,25 @@ def test_monthly_report_aggregates_prior_month_and_orders_members():
     ]
 
 
+def test_monthly_report_uses_previous_december_at_year_boundary():
+    loans = [
+        LoanRecord('PREV', date(2027, 12, 31), date(2028, 1, 14)),
+        LoanRecord('DEC-FIRST', date(2028, 12, 1), date(2028, 12, 15)),
+        LoanRecord('DEC', date(2028, 12, 31), date(2029, 1, 14)),
+        LoanRecord('JAN', date(2029, 1, 1), date(2029, 1, 15)),
+    ]
+    application = MonthlyReportApplication(LoanRepository(loans), FixedClock(date(2029, 1, 1)))
+
+    assert report_rows(application) == [('DEC', 1, 0, 0), ('DEC-FIRST', 1, 0, 0)]
+
+
 @pytest.mark.parametrize(
     ('due_on', 'returned_on', 'expected_fee_cents'),
     [
         (date(2028, 1, 31), date(2028, 2, 1), 0),
         (date(2028, 1, 31), date(2028, 2, 2), 0),
         (date(2028, 1, 31), date(2028, 2, 3), 75),
-        (date(2028, 1, 1), date(2028, 2, 10), 1000),
+        (date(2028, 1, 1), date(2028, 2, 20), 1000),
     ],
 )
 def test_monthly_report_calculates_late_fees_in_cents(due_on, returned_on, expected_fee_cents):
@@ -100,11 +112,31 @@ def test_monthly_report_command_reads_postgres_and_writes_csv(monkeypatch):
         lent_on=date(2099, 2, 1),
         returned_on=date(2099, 2, 18),
     )
+    Loan.objects.create(
+        id='REPORT-2',
+        member='member,1',
+        isbn='456',
+        lent_on=date(2099, 1, 31),
+        returned_on=date(2099, 2, 17),
+    )
+    Loan.objects.create(
+        id='REPORT-3',
+        member='next-month',
+        isbn='789',
+        lent_on=date(2099, 3, 1),
+        returned_on=date(2099, 3, 18),
+    )
+    Loan.objects.create(
+        id='REPORT-4',
+        member='no-start',
+        isbn='012',
+        lent_on=date(2099, 1, 1),
+        returned_on=date(2099, 2, 18),
+    )
     output = StringIO()
 
     call_command('monthly_report', stdout=output)
 
     assert output.getvalue() == (
-        'member_id,loans_started,late_returns,late_fees_cents\n'
-        '"member,1",1,1,75\n'
+        'member_id,loans_started,late_returns,late_fees_cents\n"member,1",1,2,150\n'
     )

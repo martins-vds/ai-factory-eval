@@ -1,0 +1,43 @@
+role: afs-migrator
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#2384
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2387
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 10.0
+  mutation_changed: 0.926
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+ledger_updated:
+  - .migration/ledger/reports.monthly-spec.yaml
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: reports.monthly-spec
+    rule: The report covers the half-open prior-calendar-month window and counts loan starts and late returns in that window.
+    use_case: MonthlyReportApplication.generate_previous_month_report
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+    enforced: true
+    ledger_rule: previous-month-window
+  - capability: reports.monthly-spec
+    rule: Include only members with loans started during the report month.
+    use_case: MonthlyReportApplication.generate_previous_month_report
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+    enforced: true
+    ledger_rule: member-inclusion
+  - capability: reports.monthly-spec
+    rule: Count late returns and total their late fees in cents using the established grace period and cap.
+    use_case: MonthlyReportApplication.generate_previous_month_report
+    test: tests/reports/test_monthly_report.py::test_monthly_report_calculates_late_fees_in_cents
+    enforced: true
+    ledger_rule: late-fee-total
+  - capability: reports.monthly-spec
+    rule: Sort rows by total late fees descending, then member id ascending.
+    use_case: MonthlyReportApplication.generate_previous_month_report
+    test: tests/reports/test_monthly_report.py::test_monthly_report_aggregates_prior_month_and_orders_members
+    enforced: true
+    ledger_rule: report-order
