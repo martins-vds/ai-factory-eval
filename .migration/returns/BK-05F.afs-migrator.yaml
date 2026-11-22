@@ -1,0 +1,80 @@
+role: afs-migrator
+ticket: BK-05F
+issue: martins-vds/ai-factory-pilot-target#293
+pr: https://github.com/martins-vds/ai-factory-pilot-target/pull/394
+specialty: ui
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.823
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/BK-05F.md
+ledger_updated:
+  - booking.routing-chain
+  - booking.screen-route
+  - booking.screen-select-itinerary
+  - booking.routing-assign
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty_evidence:
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_explains_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_itinerary_selection_explains_when_no_candidates_satisfy_the_deadline
+  - tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available
+  - tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary
+  - tests/booking/interfaces/test_route_selection.py::test_route_assignment_rejects_a_modified_candidate
+  - tests/booking/interfaces/test_route_selection.py::test_route_screens_reject_unsupported_http_methods
+  - tests/booking/interfaces/test_route_selection.py::test_route_selection_raises_not_found_for_unknown_cargo
+  - .migration/evidence/runs/BK-05F.md
+  - .migration/evidence/mutants/BK-05F.md
+mutation_survivors:
+  - id: 1
+    classification: equivalent
+    diff: "_CANDIDATE_SALT: 'booking.route_selection' -> 'XXbooking.route_selectionXX'"
+    why: Signing and verification use the same constant, so a newly rendered candidate remains verifiable.
+  - id: 2
+    classification: equivalent
+    diff: "_CANDIDATE_SALT: 'booking.route_selection' -> None"
+    why: Signing and verification use the same constant, so a newly rendered candidate remains verifiable.
+  - id: 10
+    classification: equivalent
+    diff: "POST missing-cargo Http404 text is wrapped in XX"
+    why: The user still receives the same not-found status and generic 404 page.
+  - id: 13
+    classification: equivalent
+    diff: "Unsatisfied-route-specification Http404 text is wrapped in XX"
+    why: The user still receives the same not-found status and generic 404 page.
+  - id: 14
+    classification: equivalent
+    diff: 'quote(tracking_id, safe="") -> quote(tracking_id, safe="XXXX")'
+    why: X is unreserved and quote leaves it unescaped either way, so the redirect URL is unchanged.
+  - id: 16
+    classification: missing-test
+    diff: "Route empty-state guidance is wrapped in XX"
+    test: tests/booking/interfaces/test_route_selection.py::test_route_selection_explains_when_no_candidates_satisfy_the_deadline
+    why: The route page must display the exact deadline guidance. The focused interface test asserts it; the final mutation run still reports this mutant as surviving.
+  - id: 21
+    classification: missing-test
+    diff: "Itinerary empty-state guidance is wrapped in XX"
+    test: tests/booking/interfaces/test_route_selection.py::test_itinerary_selection_explains_when_no_candidates_satisfy_the_deadline
+    why: The itinerary page must display the exact deadline guidance. The focused interface test asserts it; the final mutation run still reports this mutant as surviving.
+  - id: 27
+    classification: equivalent
+    diff: "GET missing-cargo Http404 text is wrapped in XX"
+    why: The user still receives the same not-found status and generic 404 page.
+  - id: 40
+    classification: equivalent
+    diff: "Missing candidate default changes from an empty string to XXXX"
+    why: Either input fails signature validation and produces the same not-found response.
+  - id: 44
+    classification: equivalent
+    diff: "Internal BadSignature message is wrapped in XX"
+    why: The caught message is replaced by the same generic invalid-route 404.
+  - id: 46
+    classification: equivalent
+    diff: "Invalid-route Http404 message is wrapped in XX"
+    why: The user still receives the same not-found status and generic 404 page.
