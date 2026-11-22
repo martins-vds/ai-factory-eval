@@ -24,4 +24,5 @@ evidence:
 - .migration/characterization/source/goldens/browser.json
 - .migration/evidence/runs/LL-03.md
 - tests/fees/test_views.py::test_fee_page_shows_fee_and_htmx_payment_form
+- tests/fees/test_views.py::test_fee_page_returns_the_missing_loan_fragment
 - tests/fees/test_views.py::test_real_browser_can_pay_a_late_fee

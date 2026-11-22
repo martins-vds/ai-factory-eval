@@ -44,8 +44,9 @@ evidence:
 - .migration/characterization/source/goldens/http.json
 - .migration/characterization/source/goldens/edge-cases.json
 - .migration/evidence/runs/LL-03.md
-- tests/fees/test_services.py::test_fee_for_loan_applies_waiver_daily_rate_and_cap
-- tests/fees/test_services.py::test_fee_stops_on_return_date_and_never_counts_days_early
-- tests/fees/test_services.py::test_fee_for_unknown_loan_raises_not_found
+- tests/fees/test_fee_services.py::test_fee_for_loan_applies_waiver_daily_rate_and_cap
+- tests/fees/test_fee_services.py::test_fee_stops_on_return_date_and_never_counts_days_early
+- tests/fees/test_fee_services.py::test_fee_for_unknown_loan_raises_not_found
 - tests/fees/test_views.py::test_fee_endpoint_matches_characterized_html
+- tests/fees/test_views.py::test_fee_endpoint_formats_the_maximum_fee
 - tests/fees/test_views.py::test_fee_endpoint_returns_characterized_missing_loan_response

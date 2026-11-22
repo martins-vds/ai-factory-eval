@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 from playwright.sync_api import sync_playwright
 
@@ -36,6 +38,29 @@ def test_fee_page_shows_fee_and_htmx_payment_form(client):
     assert b'Fee: $4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'htmx.config.responseHandling' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_endpoint_formats_the_maximum_fee(client, monkeypatch):
+    monkeypatch.setattr(
+        'src.loans.clock.SystemClock.today',
+        lambda clock: date(2026, 6, 30),
+    )
+
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert b'165 day(s) late' in response.content
+    assert b'Fee: $10.00' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_returns_the_missing_loan_fragment(client):
+    response = client.get('/ui/fees/L9/')
+
+    assert response.status_code == 404
+    assert response['Content-Type'] == 'text/html'
+    assert response.content == b'<p>No such loan.</p>'
 
 
 @pytest.mark.django_db
@@ -115,7 +140,29 @@ def test_interrupted_payment_returns_gateway_failure_without_losing_cause(
     gateway_error = next(
         record for record in caplog.records if record.name == 'src.fees.views' and record.exc_info
     )
+    assert gateway_error.message == 'payment gateway request interrupted'
     assert gateway_error.exc_info[1].__cause__ is interruption
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ('method', 'path'),
+    [
+        ('post', '/fees/L3'),
+        ('post', '/ui/fees/L3/'),
+        ('get', '/payments/L1'),
+        ('get', '/ui/payments/L1/'),
+    ],
+)
+def test_fee_and_payment_routes_reject_unsupported_methods(
+    client, payment_gateway_server, method, path
+):
+    requests, _ = payment_gateway_server
+
+    response = getattr(client, method)(path)
+
+    assert response.status_code == 405
+    assert requests == []
 
 
 @pytest.mark.django_db

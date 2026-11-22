@@ -23,6 +23,43 @@ def test_gateway_returns_non_success_response_for_application_mapping(payment_ga
     assert requests == [('POST', '/charge?loan=L2', b'')]
 
 
+def test_gateway_uses_explicit_base_url_instead_of_environment(payment_gateway_server, monkeypatch):
+    requests, reply = payment_gateway_server
+    monkeypatch.setenv('PAYMENT_GATEWAY_URL', 'http://127.0.0.1:1')
+
+    response = HttpPaymentGateway(reply['base_url']).charge('L3')
+
+    assert response == GatewayResponse(200, 'charged\n')
+    assert requests == [('POST', '/charge?loan=L3', b'')]
+
+
+def test_gateway_does_not_follow_redirects(payment_gateway_server):
+    requests, reply = payment_gateway_server
+    reply.update(status=302, body=b'redirected\n', location='/redirected')
+
+    response = HttpPaymentGateway().charge('L4')
+
+    assert response == GatewayResponse(302, 'redirected\n')
+    assert requests == [('POST', '/charge?loan=L4', b'')]
+
+
+@pytest.mark.parametrize(
+    ('status', 'body'),
+    [
+        (200, b'\xff'),
+        (503, b'\xff'),
+    ],
+)
+def test_gateway_decodes_invalid_utf8_like_java_gateway(payment_gateway_server, status, body):
+    requests, reply = payment_gateway_server
+    reply.update(status=status, body=body)
+
+    response = HttpPaymentGateway().charge('L5')
+
+    assert response == GatewayResponse(status, '\ufffd')
+    assert requests == [('POST', '/charge?loan=L5', b'')]
+
+
 def test_gateway_wraps_connection_failure():
     import socket
 
@@ -39,10 +76,11 @@ def test_gateway_preserves_interrupted_request(monkeypatch):
 
     interruption = InterruptedError('request interrupted')
 
-    def interrupt_request(*args, **kwargs):
-        raise interruption
+    class Opener:
+        def open(self, request):
+            raise interruption
 
-    monkeypatch.setattr(urllib.request, 'urlopen', interrupt_request)
+    monkeypatch.setattr(urllib.request, 'build_opener', lambda *args: Opener())
 
     with pytest.raises(PaymentGatewayInterrupted) as raised:
         HttpPaymentGateway('http://127.0.0.1:8080').charge('L1')
@@ -56,12 +94,32 @@ def test_gateway_preserves_interruption_wrapped_by_urllib(monkeypatch):
 
     interruption = InterruptedError('request interrupted')
 
-    def interrupt_request(*args, **kwargs):
-        raise urllib.error.URLError(interruption)
+    class Opener:
+        def open(self, request):
+            raise urllib.error.URLError(interruption)
 
-    monkeypatch.setattr(urllib.request, 'urlopen', interrupt_request)
+    monkeypatch.setattr(urllib.request, 'build_opener', lambda *args: Opener())
 
     with pytest.raises(PaymentGatewayInterrupted) as raised:
         HttpPaymentGateway('http://127.0.0.1:8080').charge('L1')
 
     assert raised.value.__cause__ is interruption
+
+
+def test_gateway_uses_the_configured_default_url(monkeypatch):
+    import urllib.request
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    requests = []
+
+    class Opener:
+        def open(self, request):
+            requests.append(request.full_url)
+            raise InterruptedError('request interrupted')
+
+    monkeypatch.setattr(urllib.request, 'build_opener', lambda *args: Opener())
+
+    with pytest.raises(PaymentGatewayInterrupted):
+        HttpPaymentGateway().charge('L6')
+
+    assert requests == ['https://payments.lending-library.invalid/charge?loan=L6']

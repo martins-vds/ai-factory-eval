@@ -17,7 +17,7 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
-@dataclass(frozen=True)
+@dataclass
 class GatewayResponse:
     status_code: int
     body: str
@@ -39,7 +39,7 @@ class PaymentGatewayInterrupted(PaymentGatewayUnavailable):
     pass
 
 
-@dataclass(frozen=True)
+@dataclass
 class LateFee:
     loan: LoanRecord
     days_late: int
@@ -62,7 +62,7 @@ class FeeApplication:
         return LateFee(loan, days_late, amount_cents)
 
 
-@dataclass(frozen=True)
+@dataclass
 class PaymentResult:
     status_code: int
     body: str

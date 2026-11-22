@@ -9,9 +9,15 @@ from .services import (
 )
 
 
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, file, code, message, headers, new_url):
+        return None
+
+
 class HttpPaymentGateway:
     def __init__(self, base_url: str | None = None):
         self.base_url = base_url
+        self.opener = urllib.request.build_opener(_NoRedirectHandler())
 
     def charge(self, loan_id: str) -> GatewayResponse:
         gateway_url = self.base_url or os.environ.get(
@@ -25,19 +31,19 @@ class HttpPaymentGateway:
         )
 
         try:
-            with urllib.request.urlopen(request) as response:
+            with self.opener.open(request) as response:
                 return GatewayResponse(
                     response.status, response.read().decode('utf-8', errors='replace')
                 )
         except InterruptedError as error:
-            raise PaymentGatewayInterrupted('payment request interrupted') from error
+            raise PaymentGatewayInterrupted from error
         except urllib.error.HTTPError as response:
             with response:
                 body = response.read().decode('utf-8', errors='replace')
             return GatewayResponse(response.code, body)
         except urllib.error.URLError as error:
             if isinstance(error.reason, InterruptedError):
-                raise PaymentGatewayInterrupted('payment request interrupted') from error.reason
-            raise PaymentGatewayUnavailable('payment gateway unavailable') from error
+                raise PaymentGatewayInterrupted from error.reason
+            raise PaymentGatewayUnavailable from error
         except OSError as error:
-            raise PaymentGatewayUnavailable('payment gateway unavailable') from error
+            raise PaymentGatewayUnavailable from error
