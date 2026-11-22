@@ -42,3 +42,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T18:04:20+00:00 | crap-lizard-final | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-22T18:04:22+00:00 | crap-score-final | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `7938dca3a718c5db` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
 | 2026-11-22T18:06:48+00:00 | mutation-changed-final | 0 | 144.08 | `python .migration/harness/tools/afs-mutation` | `9124f3c7c184f77b` |  | gate=mutation score=1.000 threshold=0.8 killed=60 survived=0 files=1 base=a5a2fdf4f0431a1e6fbf29dcbda1a9df126efa17 |
+| 2026-11-22T18:07:36+00:00 | return-validate-final | 1 | 6.49 | `python .migration/harness/tools/validate.py .migration` | `5ec8a47e8b570c65` | 195 file(s) checked, 3 error(s) |  |
+| 2026-11-22T18:07:47+00:00 | return-validate-final | 1 | 6.6 | `python .migration/harness/tools/validate.py .migration` | `4bf2175061f90b26` | 195 file(s) checked, 1 error(s) |  |
+| 2026-11-22T18:07:58+00:00 | return-validate-final | 0 | 6.65 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
