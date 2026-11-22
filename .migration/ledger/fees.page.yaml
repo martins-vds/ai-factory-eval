@@ -21,6 +21,7 @@ evidence:
   - .migration/characterization/source/goldens/browser.json
   - tests/fees/test_endpoints.py::test_fee_api_matches_characterized_fragment
   - tests/fees/test_endpoints.py::test_fee_api_returns_characterized_not_found_response
+  - tests/fees/test_endpoints.py::test_fee_api_formats_a_capped_fee_as_two_decimal_places
   - tests/fees/test_endpoints.py::test_fee_page_returns_not_found_for_unknown_loan
   - tests/fees/test_endpoints.py::test_fee_page_renders_in_a_browser
 rules:

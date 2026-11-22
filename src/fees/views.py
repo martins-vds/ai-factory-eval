@@ -31,7 +31,6 @@ def fee_page(request, loan_id):
         return render(
             request,
             'fees/fee.html',
-            {'quote': None},
             status=404,
         )
     return render(
@@ -86,7 +85,6 @@ def _payment_error(request, loan_id, message, status):
             {
                 'loan_id': loan_id,
                 'message': message,
-                'success': False,
             },
             status=status,
         )

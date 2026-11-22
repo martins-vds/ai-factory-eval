@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from datetime import date
-from typing import Protocol
+from typing import NamedTuple, Protocol
 
 
 class LoanRecord(Protocol):
@@ -17,8 +16,7 @@ class LoanRepository(Protocol):
     def find(self, loan_id: str) -> LoanRecord | None: ...
 
 
-@dataclass(frozen=True)
-class GatewayResponse:
+class GatewayResponse(NamedTuple):
     status: int
     body: str
 
@@ -35,8 +33,7 @@ class InterruptedPayment(PaymentGatewayFailure):
     pass
 
 
-@dataclass(frozen=True)
-class FeeQuote:
+class FeeQuote(NamedTuple):
     loan: LoanRecord
     days_late: int
     amount_cents: int

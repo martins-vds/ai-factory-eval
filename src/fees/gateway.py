@@ -29,12 +29,12 @@ class HttpPaymentGateway:
             status = response.code
             body = response.read().decode('utf-8', errors='replace')
         except InterruptedError as exc:
-            raise InterruptedPayment('payment request interrupted') from exc
+            raise InterruptedPayment from exc
         except error.URLError as exc:
             if isinstance(exc.reason, InterruptedError):
-                raise InterruptedPayment('payment request interrupted') from exc.reason
-            raise PaymentGatewayFailure('payment gateway unavailable') from exc
+                raise InterruptedPayment from exc.reason
+            raise PaymentGatewayFailure from exc
         except OSError as exc:
-            raise PaymentGatewayFailure('payment gateway unavailable') from exc
+            raise PaymentGatewayFailure from exc
 
         return GatewayResponse(status, body)
