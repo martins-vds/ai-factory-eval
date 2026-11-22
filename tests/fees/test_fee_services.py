@@ -13,7 +13,7 @@ class LoanRecord:
     returned_on: date | None = None
 
 
-class LoanRepository:
+class FakeLoanRepository:
     def __init__(self, loan=None):
         self.loan = loan
 
@@ -55,7 +55,7 @@ class GatewayResponse:
 def test_fee_calculation_waives_at_most_two_days_then_charges_and_caps(late_days, expected_cents):
     due_on = date(2026, 1, 1)
     application = FeeApplication(
-        LoanRepository(LoanRecord('L1', due_on)),
+        FakeLoanRepository(LoanRecord('L1', due_on)),
         FixedClock(due_on + timedelta(days=late_days)),
     )
 
@@ -68,7 +68,7 @@ def test_fee_calculation_waives_at_most_two_days_then_charges_and_caps(late_days
 def test_fee_calculation_uses_return_date_and_returns_no_fee_for_unknown_loan():
     today = date(2026, 3, 1)
     loan = LoanRecord('L1', today - timedelta(days=20), today - timedelta(days=19))
-    application = FeeApplication(LoanRepository(loan), FixedClock(today))
+    application = FeeApplication(FakeLoanRepository(loan), FixedClock(today))
 
     fee = application.calculate('L1')
     missing = application.calculate('unknown')
@@ -80,7 +80,7 @@ def test_fee_calculation_uses_return_date_and_returns_no_fee_for_unknown_loan():
 
 def test_payment_requires_an_existing_loan_before_calling_gateway():
     gateway = PaymentGateway()
-    application = PaymentApplication(LoanRepository(), gateway)
+    application = PaymentApplication(FakeLoanRepository(), gateway)
 
     result = application.pay('unknown')
 
@@ -96,7 +96,9 @@ def test_payment_maps_gateway_status_and_preserves_its_response_body(
     gateway_status, gateway_body, expected_status
 ):
     gateway = PaymentGateway(response=GatewayResponse(gateway_status, gateway_body))
-    application = PaymentApplication(LoanRepository(LoanRecord('L1', date(2026, 1, 1))), gateway)
+    application = PaymentApplication(
+        FakeLoanRepository(LoanRecord('L1', date(2026, 1, 1))), gateway
+    )
 
     result = application.pay('L1')
 
@@ -107,7 +109,9 @@ def test_payment_maps_gateway_status_and_preserves_its_response_body(
 @pytest.mark.parametrize('error', [OSError('unavailable'), InterruptedError('interrupted')])
 def test_payment_maps_transport_failures_to_gateway_unavailable(error):
     gateway = PaymentGateway(error=error)
-    application = PaymentApplication(LoanRepository(LoanRecord('L1', date(2026, 1, 1))), gateway)
+    application = PaymentApplication(
+        FakeLoanRepository(LoanRecord('L1', date(2026, 1, 1))), gateway
+    )
 
     result = application.pay('L1')
 

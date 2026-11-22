@@ -9,9 +9,40 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.75}
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components:
+    - src.fees.services.PaymentApplication.pay
+    - src.fees.gateway.HttpPaymentGateway.charge
+    - src.fees.views.payment_api
+    - src.fees.views.payment_page
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json]
-notes: "The source swallows InterruptedException while returning 502; human decision draft: martins-vds/ai-factory-synthetic-target#40."
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/gateway.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_fee_services.py::test_payment_requires_an_existing_loan_before_calling_gateway
+  - tests/fees/test_fee_services.py::test_payment_maps_gateway_status_and_preserves_its_response_body
+  - tests/fees/test_fee_services.py::test_payment_maps_transport_failures_to_gateway_unavailable
+  - tests/fees/test_views.py::test_payment_endpoint_checks_the_loan_before_gateway_request
+  - tests/fees/test_views.py::test_payment_endpoint_matches_the_gateway_contract
+  - tests/fees/test_views.py::test_ui_payment_success_fragment_renders_gateway_response
+  - tests/fees/test_views.py::test_ui_payment_error_fragment_renders_gateway_failure
+rules:
+  - id: loan-required
+    rule: Reject an unknown loan before making a payment-gateway request.
+    source: legacy/src/main/java/lib/FinePayments.java:30-32
+  - id: gateway-status
+    rule: Return gateway HTTP 200 as 200 and map every other gateway status to 502 while preserving its body.
+    source: legacy/src/main/java/lib/FinePayments.java:35-37
+  - id: gateway-failure
+    rule: Map gateway I/O failures to HTTP 502 with the payment-gateway-unavailable body.
+    source: legacy/src/main/java/lib/FinePayments.java:38-40
+  - id: preserve-interruption
+    rule: Surface an interrupted payment call as a 502 gateway failure while retaining the interruption.
+    source: martins-vds/ai-factory-synthetic-target#40
+notes: "The approved #40 fix retains the InterruptedError on PaymentResult while surfacing the gateway failure as HTTP 502."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
