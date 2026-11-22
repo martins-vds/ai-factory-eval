@@ -29,3 +29,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T17:56:14+00:00 | mutation-changed | 0 | 144.51 | `python .migration/harness/tools/afs-mutation` | `4c5fa3ec525d129f` |  | gate=mutation score=0.967 threshold=0.8 killed=58 survived=2 files=1 base=a5a2fdf4f0431a1e6fbf29dcbda1a9df126efa17 |
 | 2026-11-22T17:57:13+00:00 | dialogs-targeted | 0 | 5.8 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `42e845863bdec10d` |  |  |
 | 2026-11-22T17:59:43+00:00 | mutation-changed | 0 | 146.57 | `python .migration/harness/tools/afs-mutation` | `9124f3c7c184f77b` |  | gate=mutation score=1.000 threshold=0.8 killed=60 survived=0 files=1 base=a5a2fdf4f0431a1e6fbf29dcbda1a9df126efa17 |
+| 2026-11-22T18:01:55+00:00 | ledger-validate | 0 | 5.92 | `python .migration/harness/tools/validate.py .migration` | `a3cead9cf227b8af` |  |  |
