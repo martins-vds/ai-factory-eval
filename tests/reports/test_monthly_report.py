@@ -67,6 +67,34 @@ def test_monthly_report_aggregates_previous_calendar_month_loans():
     ] == [('member-1', 2, 1, 75)]
 
 
+def test_monthly_report_orders_members_by_fees_then_member_id():
+    application = MonthlyReportApplication(
+        LoanRepository(
+            [
+                Loan('L1', 'member-z', date(2026, 2, 1), date(2026, 2, 15)),
+                Loan('L2', 'member-b', date(2026, 2, 2), date(2026, 2, 16)),
+                Loan('L3', 'member-a', date(2026, 2, 3), date(2026, 2, 17)),
+                Loan('L4', 'member-c', date(2026, 2, 4), date(2026, 2, 18)),
+            ]
+        ),
+        FeeCalculator(
+            {'L1': Fee(75), 'L2': Fee(75), 'L3': Fee(100), 'L4': Fee(0)}
+        ),
+        Clock(),
+    )
+
+    rows = application.generate()
+
+    assert [
+        (row.member_id, row.late_fees_cents) for row in rows
+    ] == [
+        ('member-a', 100),
+        ('member-b', 75),
+        ('member-z', 75),
+        ('member-c', 0),
+    ]
+
+
 @pytest.mark.django_db
 def test_monthly_report_command_prints_previous_month_totals_in_specified_order():
     current_month_start = timezone.localdate().replace(day=1)
