@@ -1,0 +1,19 @@
+role: afs-migrator
+ticket: REF-02
+issue: martins-vds/ai-factory-eval#2287
+pr: martins-vds/ai-factory-eval#2289
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/REF-02.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
