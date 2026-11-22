@@ -55,19 +55,19 @@ def test_monthly_report_aggregates_previous_calendar_month_loans():
                 Loan('L0', 'member-1', date(2026, 1, 31), date(2026, 2, 14)),
                 Loan('L1', 'member-1', date(2026, 2, 1), date(2026, 2, 10), date(2026, 2, 13)),
                 Loan('L2', 'member-1', date(2026, 2, 28), date(2026, 3, 14)),
-                Loan('L3', 'member-2', date(2026, 3, 1), date(2026, 3, 15)),
+                Loan('L3', 'member-1', date(2026, 2, 2), date(2026, 2, 16), date(2026, 2, 19)),
+                Loan('L4', 'member-2', date(2026, 3, 1), date(2026, 3, 15)),
             ]
         ),
-        FeeCalculator({'L1': Fee(75), 'L2': Fee(0)}),
+        FeeCalculator({'L1': Fee(75), 'L2': Fee(0), 'L3': Fee(75)}),
         Clock(),
     )
 
     rows = application.generate()
 
     assert [
-        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents)
-        for row in rows
-    ] == [('member-1', 2, 1, 75)]
+        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents) for row in rows
+    ] == [('member-1', 3, 2, 150)]
 
 
 def test_monthly_report_orders_members_by_fees_then_member_id():
@@ -80,17 +80,13 @@ def test_monthly_report_orders_members_by_fees_then_member_id():
                 Loan('L4', 'member-c', date(2026, 2, 4), date(2026, 2, 18)),
             ]
         ),
-        FeeCalculator(
-            {'L1': Fee(75), 'L2': Fee(75), 'L3': Fee(100), 'L4': Fee(0)}
-        ),
+        FeeCalculator({'L1': Fee(75), 'L2': Fee(75), 'L3': Fee(100), 'L4': Fee(0)}),
         Clock(),
     )
 
     rows = application.generate()
 
-    assert [
-        (row.member_id, row.late_fees_cents) for row in rows
-    ] == [
+    assert [(row.member_id, row.late_fees_cents) for row in rows] == [
         ('member-a', 100),
         ('member-b', 75),
         ('member-z', 75),
@@ -115,8 +111,7 @@ def test_monthly_report_handles_previous_month_across_calendar_years():
     rows = application.generate()
 
     assert [
-        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents)
-        for row in rows
+        (row.member_id, row.loans_started, row.late_returns, row.late_fees_cents) for row in rows
     ] == [('member-1', 2, 0, 0)]
 
 

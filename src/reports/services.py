@@ -57,7 +57,5 @@ class MonthlyReportApplication:
 
         return [
             MonthlyReportRow(member_id, *values)
-            for member_id, values in sorted(
-                totals.items(), key=lambda item: (-item[1][2], item[0])
-            )
+            for member_id, values in sorted(totals.items(), key=lambda item: (-item[1][2], item[0]))
         ]
