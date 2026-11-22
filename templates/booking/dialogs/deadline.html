@@ -25,7 +25,11 @@
       <p class="mt-2 text-red-700" id="deadline-error" role="alert">{{ error }}</p>
     {% endif %}
     <div class="mt-4 flex justify-end gap-3">
-      <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">Cancel</button>
+      {% if is_dialog %}
+        <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">Cancel</button>
+      {% else %}
+        <a href="/admin/dashboard/" class="btn btn-ghost">Cancel</a>
+      {% endif %}
       <button type="submit" class="btn btn-primary">Update</button>
     </div>
   </form>

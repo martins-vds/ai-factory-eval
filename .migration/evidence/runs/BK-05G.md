@@ -51,3 +51,34 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T17:49:25+00:00 | final-crap-threshold | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `0d6078663616a9ed` |  | gate=crap max=26.0 threshold=30 over=0 methods=206 |
 | 2026-11-22T17:49:47+00:00 | final-behavior | 0 | 8.5 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `707f20b3419e1680` |  |  |
 | 2026-11-22T17:50:52+00:00 | regression | 0 | 62.47 | `pytest -q` | `6e0519bd410c813b` |  |  |
+| 2026-11-22T17:56:53+00:00 | no-js-fallback-red | 1 | 2.94 | `pytest -q tests/booking/interfaces/test_dialogs.py::test_dialog_url_renders_a_full_page_form_without_htmx` | `66e10ab4e294516a` | assert response.status_code == 200 |  |
+| 2026-11-22T17:57:20+00:00 | no-js-fallback-green | 1 | 9.13 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `f9cb552e0dc161b3` | assert response.status_code == 200 |  |
+| 2026-11-22T17:57:39+00:00 | no-js-fallback-green | 0 | 9.77 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `8553667f022d95da` |  |  |
+| 2026-11-22T17:58:01+00:00 | no-js-workflow-regression | 0 | 9.97 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `a895862c6f0d52e8` |  |  |
+| 2026-11-22T17:58:10+00:00 | final-build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T17:58:13+00:00 | final-build-check | 0 | 0.37 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-22T17:58:15+00:00 | final-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T17:58:17+00:00 | final-ruff-format | 0 | 0.01 | `ruff format --check` | `3accebe6ea89f2c7` |  |  |
+| 2026-11-22T17:58:19+00:00 | final-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-22T17:58:22+00:00 | final-ui | 0 | 0.72 | `python .migration/harness/tools/check_ui.py` | `83be1e5fd731c015` |  | gate=ui scope="templates changed since b3309f44a4a34d8fd929b76624590374d44a746f" templates=5 findings=0 |
+| 2026-11-22T17:58:35+00:00 | final-behavior | 0 | 9.42 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `16c2057a56085ea8` |  |  |
+| 2026-11-22T17:59:40+00:00 | final-crap-coverage | 0 | 63.46 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `f84c4ecdf7173eb3` |  |  |
+| 2026-11-22T17:59:43+00:00 | final-crap-lizard | 0 | 0.17 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T17:59:45+00:00 | final-crap-threshold | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `2fb960951ccaedcf` |  | gate=crap max=26.0 threshold=30 over=0 methods=207 |
+| 2026-11-22T18:03:44+00:00 | final-mutation-changed | 0 | 236.71 | `python .migration/harness/tools/afs-mutation` | `c14de08cd8a58af8` |  | gate=mutation score=0.859 threshold=0.8 killed=55 survived=9 files=1 base=b3309f44a4a34d8fd929b76624590374d44a746f |
+| 2026-11-22T18:04:12+00:00 | final-dialog-assertions | 0 | 9.05 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `bbded1ec4499bd44` |  |  |
+| 2026-11-22T18:07:42+00:00 | final-mutation-changed | 0 | 207.34 | `python .migration/harness/tools/afs-mutation` | `5c0cacd764448f21` |  | gate=mutation score=0.984 threshold=0.8 killed=63 survived=1 files=1 base=b3309f44a4a34d8fd929b76624590374d44a746f |
+| 2026-11-22T18:08:03+00:00 | no-js-final-green | 0 | 9.83 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `cf11a796ffd28c24` |  |  |
+| 2026-11-22T18:11:25+00:00 | final-mutation-changed | 0 | 199.39 | `python .migration/harness/tools/afs-mutation` | `ffeb4f3493d39dbc` |  | gate=mutation score=1.000 threshold=0.8 killed=62 survived=0 files=1 base=b3309f44a4a34d8fd929b76624590374d44a746f |
+| 2026-11-22T18:11:33+00:00 | final-build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:11:36+00:00 | final-build-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-22T18:11:38+00:00 | final-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T18:11:40+00:00 | final-ruff-format | 0 | 0.01 | `ruff format --check` | `3accebe6ea89f2c7` |  |  |
+| 2026-11-22T18:11:42+00:00 | final-layers | 0 | 0.17 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-22T18:11:45+00:00 | final-ui | 0 | 0.72 | `python .migration/harness/tools/check_ui.py` | `83be1e5fd731c015` |  | gate=ui scope="templates changed since b3309f44a4a34d8fd929b76624590374d44a746f" templates=5 findings=0 |
+| 2026-11-22T18:11:58+00:00 | final-behavior | 0 | 9.17 | `pytest -q tests/booking/interfaces/test_dialogs.py tests/booking/interfaces/test_dashboard.py` | `185b71de9336c257` |  |  |
+| 2026-11-22T18:13:04+00:00 | final-crap-coverage | 0 | 63.69 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `d43bb3c99549ec39` |  |  |
+| 2026-11-22T18:13:06+00:00 | final-crap-lizard | 0 | 0.16 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:13:09+00:00 | final-crap-threshold | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `2fb960951ccaedcf` |  | gate=crap max=26.0 threshold=30 over=0 methods=207 |
+| 2026-11-22T18:14:17+00:00 | final-regression | 0 | 64.18 | `pytest -q` | `9a393b63ec8e32b0` |  |  |
+| 2026-11-22T18:14:31+00:00 | final-migration-validation | 0 | 7.12 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |

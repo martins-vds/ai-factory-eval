@@ -45,14 +45,16 @@ def sample_booking():
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_destination_dialog_shows_current_specification_and_filters_choices(client, sample_booking):
-    response = client.get('/admin/cargo/DEF789/destination/')
+    response = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true')
 
     content = response.content.decode()
     options = re.search(r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>', content, re.DOTALL)
 
     assert response.status_code == 200
+    assert not content.lstrip().startswith('<!doctype html>')
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
+    assert 'onclick="this.closest(\'dialog\').close()">Cancel</button>' in content
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
@@ -111,12 +113,14 @@ def test_deadline_dialog_shows_current_specification(client, sample_booking):
     assert cargo is not None
     deadline = cargo.route_specification.arrival_deadline.strftime('%Y-%m-%d')
 
-    response = client.get('/admin/cargo/DEF789/deadline/')
+    response = client.get('/admin/cargo/DEF789/deadline/', HTTP_HX_REQUEST='true')
 
     content = response.content.decode()
     assert response.status_code == 200
+    assert not content.lstrip().startswith('<!doctype html>')
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
+    assert 'onclick="this.closest(\'dialog\').close()">Cancel</button>' in content
     assert 'name="deadline"' in content
     assert f'value="{deadline}"' in content
 
@@ -189,12 +193,27 @@ def test_deadline_update_preserves_route_and_completes_the_dialog(client, sample
 
 @pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
+def test_deadline_form_submits_without_htmx(client, sample_booking):
+    response = client.post(
+        '/admin/cargo/DEF789/deadline/',
+        {'deadline': '2099-12-31'},
+    )
+
+    updated = cargo_repository.find(TrackingId('DEF789'))
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/dashboard/'
+    assert updated is not None
+    assert updated.route_specification.arrival_deadline.strftime('%Y-%m-%d') == '2099-12-31'
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
 def test_destination_choices_are_stable_across_renders_without_mutating_locations(
     client, sample_booking
 ):
     original_locations = list(locations)
-    first = client.get('/admin/cargo/DEF789/destination/').content.decode()
-    second = client.get('/admin/cargo/DEF789/destination/').content.decode()
+    first = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true').content.decode()
+    second = client.get('/admin/cargo/DEF789/destination/', HTTP_HX_REQUEST='true').content.decode()
     pattern = r'<select\b[^>]*name="destination"[^>]*>(.*?)</select>'
     first_options = re.search(pattern, first, re.DOTALL)
     second_options = re.search(pattern, second, re.DOTALL)
@@ -219,7 +238,37 @@ def test_dashboard_opens_destination_and_deadline_dialogs_for_not_routed_cargo(
     assert response.status_code == 200
     assert 'hx-get="/admin/cargo/DEF789/destination/"' in not_routed
     assert 'hx-get="/admin/cargo/DEF789/deadline/"' in not_routed
+    assert re.search(
+        r'<a\b(?=[^>]*href="/admin/cargo/DEF789/destination/")[^>]*>Change destination</a>',
+        not_routed,
+        re.DOTALL,
+    )
+    assert re.search(
+        r'<a\b(?=[^>]*href="/admin/cargo/DEF789/deadline/")[^>]*>Change deadline</a>',
+        not_routed,
+        re.DOTALL,
+    )
     assert 'id="cargo-edit-dialog"' in not_routed
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+@pytest.mark.parametrize(
+    ('url', 'field_name'),
+    (
+        ('/admin/cargo/DEF789/destination/', 'destination'),
+        ('/admin/cargo/DEF789/deadline/', 'deadline'),
+    ),
+)
+def test_dialog_url_renders_a_full_page_form_without_htmx(client, sample_booking, url, field_name):
+    response = client.get(url)
+
+    content = response.content.decode()
+    assert response.status_code == 200
+    assert content.lstrip().startswith('<!doctype html>')
+    assert 'Edit Cargo DEF789' in content
+    assert f'name="{field_name}"' in content
+    assert 'class="btn btn-ghost">Cancel</a>' in content
 
 
 @pytest.mark.django_db

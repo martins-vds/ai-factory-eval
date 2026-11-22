@@ -11,12 +11,31 @@ from cargotracker.cargo.domain.tracking_id import TrackingId
 from cargotracker.location.domain.location import Location
 
 
-def _not_found(request: HttpRequest, tracking_id: str) -> HttpResponse:
+def _render_dialog(
+    request: HttpRequest,
+    template: str,
+    context: dict[str, object],
+    status: int = 200,
+) -> HttpResponse:
+    if request.headers.get('HX-Request') == 'true':
+        return render(request, template, {**context, 'is_dialog': True}, status=status)
+    page_context = {**context, 'dialog_template': template}
+    if cargo := context.get('cargo'):
+        page_context['tracking_id'] = cargo.tracking_id.value
     return render(
+        request,
+        'booking/dialogs/page.html',
+        page_context,
+        status=status,
+    )
+
+
+def _not_found(request: HttpRequest, tracking_id: str) -> HttpResponse:
+    return _render_dialog(
         request,
         'booking/dialogs/not_found.html',
         {'tracking_id': tracking_id},
-        status=404,
+        404,
     )
 
 
@@ -51,7 +70,7 @@ def create_destination_dialog_view(
                 None,
             )
             if destination is None:
-                return render(
+                return _render_dialog(
                     request,
                     'booking/dialogs/destination.html',
                     {
@@ -59,11 +78,11 @@ def create_destination_dialog_view(
                         'destination_choices': choices,
                         'error': 'Select a valid destination.',
                     },
-                    status=400,
+                    400,
                 )
             specification.change_destination(TrackingId(tracking_id), destination)
             return _dialog_complete(request)
-        return render(
+        return _render_dialog(
             request,
             'booking/dialogs/destination.html',
             {'cargo': cargo, 'destination_choices': choices},
@@ -86,7 +105,7 @@ def create_deadline_dialog_view(
             try:
                 deadline = date.fromisoformat(deadline_value)
             except ValueError:
-                return render(
+                return _render_dialog(
                     request,
                     'booking/dialogs/deadline.html',
                     {
@@ -94,14 +113,14 @@ def create_deadline_dialog_view(
                         'deadline_value': deadline_value,
                         'error': 'Enter a valid arrival deadline.',
                     },
-                    status=400,
+                    400,
                 )
             specification.change_deadline(
                 TrackingId(tracking_id),
                 timezone.make_aware(datetime.combine(deadline, time.min)),
             )
             return _dialog_complete(request)
-        return render(
+        return _render_dialog(
             request,
             'booking/dialogs/deadline.html',
             {'cargo': cargo, 'deadline_value': deadline_value},

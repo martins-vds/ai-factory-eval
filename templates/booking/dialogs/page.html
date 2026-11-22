@@ -1,0 +1,12 @@
+{% extends "booking/dashboard/admin_base.html" %}
+
+{% block title %}Edit Cargo {{ tracking_id }} | Cargo Tracker{% endblock %}
+
+{% block admin_content %}
+  <h1 class="mb-6 text-2xl font-semibold text-gray-900">
+    Edit Cargo {{ tracking_id }}
+  </h1>
+  <div id="cargo-edit-dialog-content">
+    {% include dialog_template %}
+  </div>
+{% endblock %}
