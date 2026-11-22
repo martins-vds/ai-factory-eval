@@ -30,7 +30,7 @@ class FixedClock:
         return self._today
 
 
-def test_fee_is_25_cents_per_day_after_grace_period():
+def test_late_fee_is_25_cents_per_day_after_grace_period():
     application = LateFeeApplication(
         LoanRepository(Loan('L1', date(2026, 1, 16))),
         FixedClock(date(2026, 2, 24)),
