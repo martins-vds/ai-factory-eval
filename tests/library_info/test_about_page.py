@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import sync_playwright
 
-
 HTTP_GOLDEN_PATH = (
     Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
 )
@@ -38,8 +37,9 @@ def test_about_page_renders_library_information_in_browser(live_server):
                 'Open Monday to Saturday, 9:00 to 18:00.', exact=True
             ).is_visible()
             assert page.get_by_text('Books are lent for 14 days.', exact=True).is_visible()
-            assert page.get_by_role(
-                'link', name='desk@lending-library.invalid'
-            ).get_attribute('href') == 'mailto:desk@lending-library.invalid'
+            assert (
+                page.get_by_role('link', name='desk@lending-library.invalid').get_attribute('href')
+                == 'mailto:desk@lending-library.invalid'
+            )
         finally:
             browser.close()
