@@ -12,7 +12,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_escapes_export_delimiters]
 notes: "Approved fix: exported fields containing field or record delimiters are escaped so each row parses back to its fields; ruling martins-vds/ai-factory-synthetic-target#43."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
 approval:
@@ -28,3 +28,4 @@ rules:
   - id: escaped-delimited-export
     rule: "Text exports keep the characterized field order and escape field or record delimiter characters so every record parses back to its fields."
     source: "legacy/src/main/java/lib/LoanResource.java:52-55 and approved quirk ruling martins-vds/ai-factory-synthetic-target#43."
+    no_spec: "Found by LL-01; needs a Characterizer case."

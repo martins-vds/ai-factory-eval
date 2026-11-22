@@ -10,7 +10,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/evidence/runs/LL-01.md, tests/test_ui_smoke.py::test_loan_catalog_pages_render_in_browser]
 notes: "The source has no src/test tree or legacy test suite."
 target:
   components:

@@ -11,7 +11,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_orders_loans_and_calculates_due_dates]
 target:
   components:
     - src/loans/domain.py
@@ -20,3 +20,4 @@ rules:
   - id: due-fourteen-days
     rule: A loan due date is exactly 14 calendar days after its lending date.
     source: "legacy/src/main/java/lib/Loan.java:44-46."
+    no_spec: "Found by LL-01; needs a Characterizer case."

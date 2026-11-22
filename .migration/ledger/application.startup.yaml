@@ -11,7 +11,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_reads_persisted_data_after_a_repeated_migration]
 notes: "Approved fix for restart reset behavior: martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
 approval:
@@ -20,6 +20,7 @@ approval:
   reason: "Approved persistent PostgreSQL storage without reloading seed records over existing data."
 target:
   components:
+    - Makefile
     - config/settings.py
     - src/loans/apps.py
     - src/loans/migrations/0001_initial.py

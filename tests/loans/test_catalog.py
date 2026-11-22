@@ -142,6 +142,15 @@ def test_catalog_use_case_reads_persisted_data_after_a_repeated_migration():
 
 
 @pytest.mark.django_db
+def test_repository_persists_and_reads_a_loan_record():
+    repository = DjangoLoanRepository()
+    loan = LoanEntity('L4', 'dee', '123', date(2026, 2, 1), None)
+
+    assert repository.save(loan) == loan
+    assert repository.find_by_id('L4') == loan
+
+
+@pytest.mark.django_db
 def test_repository_write_rolls_back_with_its_transaction():
     repository = DjangoLoanRepository()
     loan = LoanEntity('L4', 'dee', '123', date(2026, 2, 1), None)

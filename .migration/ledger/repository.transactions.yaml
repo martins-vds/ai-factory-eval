@@ -11,7 +11,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/risk-map/SY-05.md, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_repository_write_rolls_back_with_its_transaction, tests/loans/test_catalog.py::test_repository_persists_and_reads_a_loan_record]
 target:
   components:
     - src/loans/repository.py

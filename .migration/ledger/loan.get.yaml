@@ -11,7 +11,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_rejects_an_unknown_loan]
 target:
   components:
     - src/loans/services.py
@@ -21,3 +21,4 @@ rules:
   - id: unknown-loan-not-found
     rule: An unknown loan ID is rejected as not found.
     source: "legacy/src/main/java/lib/LoanResource.java:30-35."
+    no_spec: "Found by LL-01; needs a Characterizer case."

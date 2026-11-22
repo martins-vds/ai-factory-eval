@@ -1,8 +1,13 @@
 TAILWIND_VERSION := v4.1.17
 TAILWIND_BIN ?= $(HOME)/.local/bin/tailwindcss
 TAILWIND_URL := https://github.com/tailwindlabs/tailwindcss/releases/download/$(TAILWIND_VERSION)/tailwindcss-linux-x64
+PORT ?= 8080
 
-.PHONY: tailwind-install tailwind-build
+.PHONY: run tailwind-install tailwind-build
+
+run:
+	python manage.py migrate --noinput
+	python manage.py runserver 0.0.0.0:$(PORT)
 
 tailwind-install:
 	mkdir -p "$(dir $(TAILWIND_BIN))"

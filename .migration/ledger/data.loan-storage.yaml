@@ -10,7 +10,7 @@ tickets: [martins-vds/ai-factory-synthetic-target#35]
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_reads_persisted_data_after_a_repeated_migration]
 notes: "Approved fix for reset-on-restart behavior: martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
 approval:
@@ -26,3 +26,4 @@ rules:
   - id: preserve-persisted-loans
     rule: "Previously stored loan records remain available after repeated startup migrations and are not overwritten by seed values."
     source: "Approved quirk ruling martins-vds/ai-factory-synthetic-target#42."
+    no_spec: "Found by LL-01; needs a Characterizer case."
