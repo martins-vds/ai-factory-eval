@@ -1,0 +1,16 @@
+<div id="loan-return">
+  {% if error %}
+  <p class="mt-2 text-sm text-[#a94e37]" role="alert">{{ error }}</p>
+  {% endif %}
+  {% if loan.returned_on %}
+  <p class="mt-2 text-sm text-[#66705b]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+  {% elif loan %}
+  <p class="mt-2 text-sm text-[#a94e37]">On loan</p>
+  <form method="post" action="/ui/loans/{{ loan.id }}/return/"
+        hx-post="/ui/loans/{{ loan.id }}/return/" hx-target="#loan-return" hx-swap="outerHTML"
+        hx-on::response-error="document.getElementById('loan-return').outerHTML = event.detail.xhr.responseText">
+    {% csrf_token %}
+    <button class="btn btn-primary mt-6" type="submit">Mark returned</button>
+  </form>
+  {% endif %}
+</div>

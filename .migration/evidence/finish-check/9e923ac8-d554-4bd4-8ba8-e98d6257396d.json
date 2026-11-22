@@ -1,0 +1,49 @@
+[
+  {
+    "at": "2026-11-22T16:31:53Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 19937,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/9e923ac8-d554-4bd4-8ba8-e98d6257396d.json",
+      ".migration/evidence/runs/LL-02.md",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/returns/LL-02.afs-migrator.yaml",
+      "src/loans/clock.py",
+      "src/loans/composition.py",
+      "src/loans/forms.py",
+      "src/loans/ports.py",
+      "src/loans/repository.py",
+      "src/loans/services.py",
+      "src/loans/urls.py",
+      "src/loans/views.py",
+      "templates/loans/detail.html",
+      "templates/loans/list.html",
+      "templates/loans/new.html",
+      "templates/loans/return-status.html",
+      "tests/loans/test_circulation.py"
+    ],
+    "test_health": {
+      "block": true,
+      "findings": []
+    },
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
