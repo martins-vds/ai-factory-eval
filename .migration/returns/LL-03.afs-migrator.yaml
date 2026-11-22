@@ -3,10 +3,10 @@ ticket: LL-03
 issue: martins-vds/ai-factory-eval#2356
 pr: https://github.com/martins-vds/ai-factory-eval/pull/2361
 gates:
-  build: 0
+  build: 0 # build-post-edit-compile and build-post-edit-system-check
   behavior: 0
-  idiom: 0
-  crap: 0
+  idiom: 0 # idiom-post-edit-* profile commands all exited 0
+  crap: 0 # crap-post-edit-* profile commands all exited 0; max 7.0 (threshold 30)
   mutation_changed: 0.933
   regression: 0
 evidence_logs:
