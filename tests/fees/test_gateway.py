@@ -46,9 +46,7 @@ def test_payment_gateway_uses_the_configured_default_url(monkeypatch):
     result = HttpPaymentGateway().charge('L1')
 
     assert result == PaymentResponse(200, 'charged\n')
-    assert captured[0].full_url == (
-        'https://payments.lending-library.invalid/charge?loan=L1'
-    )
+    assert captured[0].full_url == ('https://payments.lending-library.invalid/charge?loan=L1')
     assert captured[0].method == 'POST'
 
 
