@@ -1,5 +1,6 @@
 from .repository import LoanRepository
-from .services import get_loan_text as get_loan, list_loans_text as list_loans, loan_line
+from .services import get_loan_text as get_loan
+from .services import list_loans_text as list_loans
 
 
 def list_loans_text():

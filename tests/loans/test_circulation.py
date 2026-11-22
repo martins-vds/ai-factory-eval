@@ -2,6 +2,7 @@ from datetime import date, timedelta
 from types import SimpleNamespace
 
 import pytest
+from django.test import Client
 from django.utils import timezone
 
 from src.loans.models import Loan
@@ -19,6 +20,7 @@ class LoanRepository:
         self.lend_calls = []
         self.loan = None
         self.return_calls = []
+        self.concurrent_return_date = None
 
     def lend(self, member, isbn, lent_on):
         self.lend_calls.append((member, isbn, lent_on))
@@ -29,6 +31,9 @@ class LoanRepository:
 
     def mark_returned(self, loan_id, returned_on):
         self.return_calls.append((loan_id, returned_on))
+        if self.concurrent_return_date is not None:
+            self.loan.returned_on = self.concurrent_return_date
+            return None
         self.loan.returned_on = returned_on
         return self.loan
 
@@ -95,6 +100,19 @@ def test_return_use_case_rejects_repeat_without_replacing_date():
     assert repository.return_calls == []
 
 
+def test_return_use_case_preserves_date_when_another_return_wins_the_race():
+    concurrent_date = date(2026, 11, 20)
+    repository = LoanRepository()
+    repository.loan = SimpleNamespace(returned_on=None)
+    repository.concurrent_return_date = concurrent_date
+    use_case = ReturnBook(repository, FrozenClock())
+
+    with pytest.raises(LoanAlreadyReturned) as error:
+        use_case.execute('L7')
+
+    assert error.value.loan.returned_on == concurrent_date
+
+
 def test_return_use_case_rejects_unknown_loan():
     use_case = ReturnBook(LoanRepository(), FrozenClock())
 
@@ -155,6 +173,7 @@ def test_api_return_records_date_and_rejects_repeated_return(client):
     repeated_response = client.post('/loans/L1/return')
 
     assert repeated_response.status_code == 409
+    assert repeated_response['Content-Type'] == 'text/plain'
     assert repeated_response.content.decode() == 'loan already returned\n'
     assert Loan.objects.get(pk='L1').returned_on == today
 
@@ -184,6 +203,7 @@ def test_browser_can_open_the_reading_room_lending_form(client):
     assert b'Lend a book' in response.content
     assert b'name="member"' in response.content
     assert b'name="isbn"' in response.content
+    assert response.content.count(b'value=""') == 2
 
 
 @pytest.mark.django_db
@@ -265,6 +285,17 @@ def test_browser_return_updates_row_and_repeat_keeps_original_date(client):
 
 
 @pytest.mark.django_db
+def test_browser_return_without_htmx_redirects_to_collection(client):
+    today = timezone.localdate()
+
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/'
+    assert Loan.objects.get(pk='L1').returned_on == today
+
+
+@pytest.mark.django_db
 def test_browser_repeat_return_keeps_a_preexisting_return_date(client):
     response = client.post(
         '/ui/loans/L2/return/',
@@ -282,3 +313,25 @@ def test_browser_return_unknown_loan_shows_error(client):
 
     assert response.status_code == 404
     assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_return_only_accepts_post(client):
+    response = client.get('/ui/loans/L1/return/')
+
+    assert response.status_code == 405
+    assert Loan.objects.get(pk='L1').returned_on is None
+
+
+@pytest.mark.django_db
+def test_legacy_api_posts_do_not_require_browser_csrf_tokens():
+    client = Client(enforce_csrf_checks=True)
+
+    lending = client.post('/loans', {'member': 'reader', 'isbn': '123'})
+
+    assert lending.status_code == 201
+    returned = client.post('/loans/L4/return')
+    assert returned.status_code == 200
+
+    browser_post = client.post('/ui/loans/', {'member': 'another', 'isbn': '456'})
+    assert browser_post.status_code == 403

@@ -1,11 +1,12 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from .composition import lend_loan, return_loan
 from .models import Loan
-from .queries import get_loan_text, list_loans_text, loan_line
-from .services import InvalidLoan, LoanAlreadyReturned, LoanNotFound
+from .queries import get_loan_text, list_loans_text
+from .services import InvalidLoan, LoanAlreadyReturned, LoanNotFound, loan_line
 
 
 @require_http_methods(['GET', 'POST'])
@@ -31,6 +32,7 @@ def loan_catalog_detail(request, loan_id):
 
 
 @require_http_methods(['GET', 'POST'])
+@csrf_exempt
 def loan_list(request):
     if request.method == 'POST':
         try:
@@ -54,6 +56,7 @@ def loan_detail(request, loan_id):
 
 
 @require_POST
+@csrf_exempt
 def loan_return_api(request, loan_id):
     try:
         loan = return_loan(loan_id)
