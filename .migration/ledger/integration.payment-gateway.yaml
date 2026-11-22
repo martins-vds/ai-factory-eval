@@ -10,7 +10,7 @@ source:
 boundary: "POST /payments/{id} first requires an existing loan, then POSTs /charge?loan={id} to PAYMENT_GATEWAY_URL or the configured default; gateway HTTP 200 is returned as 200, other responses and I/O/interruption failures become 502."
 tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-synthetic-target#63]
 target:
-  components: [src.fees.services.PaymentApplication, src.fees.gateway.HttpPaymentGateway, src.fees.views.payment]
+  components: [src.fees.services.PaymentApplication, src.fees.gateway.HttpPaymentGateway, src.fees.views.payment, src.fees.urls]
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/gateway.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_payment_use_case_rejects_an_unknown_loan_without_calling_gateway, tests/fees/test_gateway.py::test_payment_gateway_sends_post_without_body_and_returns_success, tests/fees/test_gateway.py::test_payment_gateway_maps_non_200_response_to_502, tests/fees/test_gateway.py::test_payment_gateway_preserves_interruption_as_gateway_failure, tests/fees/test_views.py::test_payment_api_logs_interruption_and_returns_gateway_failure]
