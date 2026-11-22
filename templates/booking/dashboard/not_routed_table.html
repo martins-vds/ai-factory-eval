@@ -28,11 +28,41 @@
             <td class="p-3">
               {{ cargo.route_specification.destination.name }}<br>
               <span class="text-sm text-gray-600">{{ cargo.route_specification.destination.unlocode.value }}</span>
+              <br>
+              <a
+                class="btn btn-ghost min-h-11 rounded-md px-3 py-1 text-sm font-semibold text-blue-700 hover:bg-slate-100"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+                hx-target="#booking-edit-dialog-content"
+                hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = true; event.detail.isError = false; }"
+                hx-on::after-swap="document.getElementById('booking-edit-dialog').showModal()"
+                aria-label="Change destination for cargo {{ cargo.tracking_id.value }}"
+              >Change destination</a>
             </td>
-            <td class="p-3">{{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}</td>
+            <td class="p-3">
+              {{ cargo.route_specification.arrival_deadline|date:"m/d/Y" }}<br>
+              <a
+                class="btn btn-ghost min-h-11 rounded-md px-3 py-1 text-sm font-semibold text-blue-700 hover:bg-slate-100"
+                href="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-get="/admin/cargo/{{ cargo.tracking_id.value }}/deadline/"
+                hx-target="#booking-edit-dialog-content"
+                hx-swap="innerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = true; event.detail.isError = false; }"
+                hx-on::after-swap="document.getElementById('booking-edit-dialog').showModal()"
+                aria-label="Change arrival deadline for cargo {{ cargo.tracking_id.value }}"
+              >Change deadline</a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <dialog id="booking-edit-dialog" class="modal">
+    <div id="booking-edit-dialog-content" class="modal-box rounded-box max-w-xl rounded-lg border border-slate-200 bg-white p-6 shadow-xl">
+      <form method="dialog">
+        <button class="btn btn-ghost btn-sm btn-circle absolute right-3 top-3" aria-label="Close dialog">✕</button>
+      </form>
+    </div>
+  </dialog>
 </section>
