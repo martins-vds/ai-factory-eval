@@ -9,6 +9,7 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from typing import ClassVar
 from urllib import error, parse, request
 
 from playwright.sync_api import sync_playwright
@@ -138,7 +139,10 @@ def exercise_edge_cases():
         raise AssertionError('repeated return did not produce the same current-date record')
     if '2026-01-20' in cases['return_l2_first']['response']['body']:
         raise AssertionError('POST /loans/L2/return did not replace the prior return date')
-    if any(cases[name]['response']['status'] != 200 for name in ('fee_l1_cap', 'fee_l2_zero', 'fee_l3_late')):
+    if any(
+        cases[name]['response']['status'] != 200
+        for name in ('fee_l1_cap', 'fee_l2_zero', 'fee_l3_late')
+    ):
         raise AssertionError('a seeded loan fee request did not return 200')
     if 'Fee: $0.00' not in cases['fee_l2_zero']['response']['body']:
         raise AssertionError('the early-returned L2 fee was not zero')
@@ -159,7 +163,7 @@ def exercise_edge_cases():
 class GatewayHandler(BaseHTTPRequestHandler):
     status = 200
     body = b'approved\n'
-    requests = []
+    requests: ClassVar[list[dict[str, str]]] = []
 
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length', '0'))
@@ -185,9 +189,11 @@ def start_application(output, gateway_url=None, package=False):
     env = os.environ.copy()
     env.pop('PAYMENT_GATEWAY_URL', None)
     env['PORT'] = '8080'
-    command = ['bash', str(RUN_SCRIPT)] if package else [
-        'java', '-cp', 'target/classes:target/dependency/*', 'lib.App'
-    ]
+    command = (
+        ['bash', str(RUN_SCRIPT)]
+        if package
+        else ['java', '-cp', 'target/classes:target/dependency/*', 'lib.App']
+    )
     if gateway_url is not None:
         env['PAYMENT_GATEWAY_URL'] = gateway_url
     return subprocess.Popen(
@@ -220,7 +226,9 @@ def exercise_restart(created_loan_id):
         finally:
             stop_application(process)
     if observations['created_loan_after_restart']['response']['status'] != 404:
-        raise AssertionError('a loan created before restart survived the in-memory database restart')
+        raise AssertionError(
+            'a loan created before restart survived the in-memory database restart'
+        )
     if observations['list_after_restart']['response']['body'].count('\n') != 3:
         raise AssertionError('restart did not restore exactly the three seeded loans')
     return observations
@@ -263,11 +271,20 @@ def exercise_gateway():
     }
     if success['response']['status'] != 200 or success['response']['body'] != 'approved\n':
         raise AssertionError('a successful gateway response was not relayed')
-    if gateway_error['response']['status'] != 502 or gateway_error['response']['body'] != 'gateway unavailable\n':
+    if (
+        gateway_error['response']['status'] != 502
+        or gateway_error['response']['body'] != 'gateway unavailable\n'
+    ):
         raise AssertionError('a non-200 gateway response was not mapped to 502 with its body')
-    if unknown_loan['response']['status'] != 404 or len(GatewayHandler.requests) != requests_before_unknown:
+    if (
+        unknown_loan['response']['status'] != 404
+        or len(GatewayHandler.requests) != requests_before_unknown
+    ):
         raise AssertionError('an unknown loan was not rejected before calling the gateway')
-    if io_error['response']['status'] != 502 or io_error['response']['body'] != 'payment gateway unavailable\n':
+    if (
+        io_error['response']['status'] != 502
+        or io_error['response']['body'] != 'payment gateway unavailable\n'
+    ):
         raise AssertionError('a gateway I/O failure did not produce the generic 502 response')
     if GatewayHandler.requests != [
         {'method': 'POST', 'path': '/charge?loan=L3', 'body': ''},
