@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Loan catalog · The Lending Library{% endblock %}
+
+{% block content %}
+<div class="grid gap-12 lg:grid-cols-[1fr_19rem]">
+  <section aria-labelledby="catalog-heading">
+    <p class="text-xs uppercase tracking-[0.2em] text-[#555b4d]">The collection · {{ loans|length }} loans in view</p>
+    <h1 id="catalog-heading" class="mb-4 mt-3 text-5xl md:text-6xl">Loan catalog</h1>
+    <p class="mb-8 text-[#555b4d]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    {% for loan in loans %}
+      <article class="grid gap-4 border-b border-[#d8cdbb] py-5 sm:grid-cols-[1fr_auto]">
+        <div>
+          <h2 class="text-xl font-semibold">
+            <a class="text-[#2f3428] underline-offset-4 hover:underline" href="/ui/loans/{{ loan.id }}/">
+              Loan {{ loan.id }}
+            </a>
+          </h2>
+          <p class="mt-1 text-[#555b4d]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+        </div>
+        <div class="sm:text-right">
+          <p>Due {{ loan.due_on|date:"M j, Y" }}</p>
+          {% if loan.returned_on %}
+            <p class="text-sm text-[#555b4d]">Returned {{ loan.returned_on|date:"M j, Y" }}</p>
+          {% else %}
+            <span class="badge badge-outline mt-2">On loan</span>
+          {% endif %}
+        </div>
+      </article>
+    {% empty %}
+      <p class="rounded-box border border-[#d8cdbb] bg-[#fffdf7] p-6">No loans are in the catalog.</p>
+    {% endfor %}
+  </section>
+  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-none">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-widest text-[#555b4d]">At the desk</p>
+      <h2 class="card-title text-2xl">A little time to read</h2>
+      <p>Books are lent for 14 days. Each record keeps its original lending and return dates.</p>
+      <p class="mt-2 text-sm text-[#555b4d]">The catalog is backed by the library’s persistent loan register.</p>
+    </div>
+  </aside>
+</div>
+{% endblock %}

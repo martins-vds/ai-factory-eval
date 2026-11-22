@@ -17,8 +17,11 @@ Including another URLconf
 
 from django.urls import path
 
-from src.loans.views import loan_list
+from src.loans.views import loan_catalog, loan_detail, loan_list, loan_page
 
 urlpatterns = [
     path('loans', loan_list, name='loan-list'),
+    path('loans/<str:loan_id>', loan_detail, name='loan-detail'),
+    path('ui/loans/', loan_catalog, name='loan-catalog'),
+    path('ui/loans/<str:loan_id>/', loan_page, name='loan-page'),
 ]
