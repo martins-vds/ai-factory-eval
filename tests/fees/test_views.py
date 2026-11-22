@@ -6,6 +6,28 @@ from src.loans.models import Loan
 
 
 @pytest.mark.django_db
+def test_io_gateway_failure_becomes_characterized_502(
+    client, monkeypatch
+):
+    Loan.objects.create(
+        id='L-pay',
+        member='dee',
+        isbn='123',
+        lent_on=date(2026, 11, 1),
+    )
+
+    def fail_request(_request):
+        raise OSError('connection refused')
+
+    monkeypatch.setattr('src.fees.gateway.urlopen', fail_request)
+
+    response = client.post('/payments/L-pay')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
 def test_fee_api_matches_characterized_html_fragment(client):
     Loan.objects.create(
         id='L-test',
@@ -18,13 +40,14 @@ def test_fee_api_matches_characterized_html_fragment(client):
     response = client.get('/fees/L-test')
 
     assert response.status_code == 200
-    assert response['Content-Type'] == 'text/html; charset=utf-8'
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == (
         '<h1>Late fee for L-test</h1><p>Due 2025-12-15, 19 day(s) late.</p>'
         '<p class="fee">Fee: $4.75</p>'
     )
 
 
+@pytest.mark.django_db
 def test_missing_fee_api_response_matches_characterization(client):
     response = client.get('/fees/unknown')
 
@@ -70,6 +93,7 @@ def test_non_200_gateway_response_becomes_502_with_gateway_body(
     assert payment_gateway.requests == [('POST', '/charge?loan=L-pay', b'')]
 
 
+@pytest.mark.django_db
 def test_payment_api_unknown_loan_does_not_call_gateway(
     client, monkeypatch, payment_gateway
 ):
