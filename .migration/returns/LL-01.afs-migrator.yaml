@@ -1,0 +1,47 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#2318
+pr: martins-vds/ai-factory-eval#2321
+gates:
+  build: pending
+  behavior: pending
+  idiom: pending
+  crap: pending
+  mutation_changed: pending
+  regression: pending
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: .migration/handoffs/LL-01.md
+rules:
+  - capability: loan.due-date
+    rule: Every loan is due 14 calendar days after its lent-on date.
+    use_case: Loan.due_on
+    test: tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: due-in-fourteen-days
+  - capability: loan.list
+    rule: Loan lists are returned in ascending ID order.
+    use_case: list_loans
+    test: tests/loans/test_catalog.py::test_list_loans_are_ordered_by_id
+    enforced: true
+    ledger_rule: loans-ordered-by-id
+  - capability: loan.text-export
+    rule: Export fields containing a delimiter, quote, or line break are escaped without changing field boundaries.
+    use_case: export_loans
+    test: tests/loans/test_catalog.py::test_export_escapes_delimiters_and_line_breaks
+    enforced: true
+    ledger_rule: escape-export-fields
