@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee for {{ quote.loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Reading room · late fees</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ quote.loan.id }}</h1>
+      <p class="mt-2">Due {{ quote.loan.due_on|date:"M j, Y" }}, {{ quote.late_days }} day(s) late.</p>
+      <p class="fee">Fee: ${{ fee_amount }}</p>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div><dt class="text-sm text-[#66705b]">Member</dt><dd>{{ quote.loan.member }}</dd></div>
+        <div><dt class="text-sm text-[#66705b]">ISBN</dt><dd>{{ quote.loan.isbn }}</dd></div>
+      </dl>
+      {% if payment_status %}
+      {% include "fees/payment-status.html" with success=payment_status.success message=payment_status.message %}
+      {% else %}
+      <div id="payment-status" class="mt-6"></div>
+      {% endif %}
+      <form method="post" action="/ui/payments/{{ quote.loan.id }}/"
+            hx-post="/ui/payments/{{ quote.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
+        {% csrf_token %}
+        <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+      </form>
+    </div>
+  </article>
+</section>
+<script>
+document.body.addEventListener("htmx:beforeSwap", function (event) {
+  if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true;
+});
+</script>
+{% endblock %}

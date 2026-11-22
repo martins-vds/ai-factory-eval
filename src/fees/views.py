@@ -56,6 +56,8 @@ def payment_page(request, loan_id):
         )
 
     quote = fee_application.calculate_fee(loan_id)
+    if quote is None:
+        return render(request, 'fees/not-found.html', status=404)
     return render(
         request,
         'fees/page.html',

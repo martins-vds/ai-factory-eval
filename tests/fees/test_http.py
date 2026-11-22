@@ -107,3 +107,65 @@ def test_payment_api_maps_unavailable_gateway_to_characterized_failure(client, m
     assert response.status_code == 502
     assert response['Content-Type'] == 'text/plain'
     assert response.content == b'payment gateway unavailable\n'
+
+
+@pytest.mark.django_db
+def test_fee_page_uses_reading_room_layout_and_separate_payment_action(client):
+    response = client.get('/ui/fees/L3/')
+
+    assert response.status_code == 200
+    assert b'<h1 class="card-title mt-2 text-4xl">Late fee for L3</h1>' in response.content
+    assert b'Due Dec 15, 2025, 19 day(s) late.' in response.content
+    assert b'Fee: $4.75' in response.content
+    assert b'hx-post="/ui/payments/L3/"' in response.content
+    assert b'htmx:beforeSwap' in response.content
+    assert b'event.detail.shouldSwap = true' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_renders_unknown_loan_as_a_not_found_page(client):
+    response = client.get('/ui/fees/missing/')
+
+    assert response.status_code == 404
+    assert b'<p>No such loan.</p>' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_success_returns_a_status_fragment(client, local_gateway):
+    local_gateway()
+
+    response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'<div id="payment-status"' in response.content
+    assert b'role="status">Payment received.</p>' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_failure_renders_error_fragment_for_error_status(client, local_gateway):
+    local_gateway(status=503, body=b'declined\n')
+
+    response = client.post('/ui/payments/L3/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 502
+    assert b'<div id="payment-status"' in response.content
+    assert b'role="alert">declined\n</p>' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_payment_not_found_renders_error_fragment(client):
+    response = client.post('/ui/payments/missing/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 404
+    assert b'role="alert">No such loan.</p>' in response.content
+
+
+@pytest.mark.django_db
+def test_regular_payment_failure_renders_full_fee_page(client, local_gateway):
+    local_gateway(status=503, body=b'declined\n')
+
+    response = client.post('/ui/payments/L3/')
+
+    assert response.status_code == 502
+    assert b'<!doctype html>' in response.content
+    assert b'role="alert">declined\n</p>' in response.content
