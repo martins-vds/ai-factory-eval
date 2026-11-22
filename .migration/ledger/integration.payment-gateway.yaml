@@ -8,4 +8,8 @@ source:
   risk: { crap: 20, complexity: 4, coverage: 0 }
 boundary: For an existing loan, the application sends a bodyless HTTP POST to PAYMENT_GATEWAY_URL (default https://payments.lending-library.invalid) at /charge?loan={id} and relays the gateway response body.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

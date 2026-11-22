@@ -8,4 +8,8 @@ source:
   risk: { crap: 12, complexity: 3, coverage: 0 }
 boundary: POST /loans reads form fields member and isbn, returns HTTP 400 only when either is null, otherwise creates a loan dated today and responds HTTP 201 with its formatted line and newline.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

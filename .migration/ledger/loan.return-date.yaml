@@ -7,4 +7,8 @@ source:
   location: legacy/src/main/java/lib/Loan.java:48-50
 boundary: A successful return stores the provided date in returnedOn; the API supplies today's date even when a prior return date already exists.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md

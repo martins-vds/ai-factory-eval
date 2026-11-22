@@ -6,4 +6,8 @@ source:
   location: legacy/pom.xml:1-53
 boundary: Maven packages the Java 17 application and copies runtime dependencies; the configured runtime uses Jersey/Grizzly, Hibernate ORM, and H2.
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+- .migration/characterization/source/observations.md
+- .migration/evidence/runs/SY-05.md
