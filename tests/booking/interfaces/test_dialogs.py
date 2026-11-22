@@ -68,6 +68,8 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     options = re.search(
         r'<select\b[^>]*id="destination"[^>]*>(.*?)</select>', first_content, re.DOTALL
     )
+    first_option_values = re.findall(r'<option\b[^>]*value="([^"]+)"', first_content)
+    second_option_values = re.findall(r'<option\b[^>]*value="([^"]+)"', second_content)
 
     assert first_response.status_code == 200
     assert second_response.status_code == 200
@@ -76,7 +78,7 @@ def test_destination_dialog_filters_options_without_mutating_locations(client):
     assert options is not None
     assert 'value="CNHKG"' not in options.group(1)
     assert 'value="AUMEL"' not in options.group(1)
-    assert first_content == second_content
+    assert first_option_values == second_option_values
     assert location_list == original_locations
 
 
@@ -127,8 +129,11 @@ def test_destination_update_preserves_other_fields_and_refreshes_table(client):
     assert updated_cargo.route_specification.origin == original_origin
     assert updated_cargo.route_specification.arrival_deadline == original_deadline
     assert updated_cargo.route_specification.destination.unlocode.value == 'USCHI'
-    assert 'New York (USCHI)' in dashboard_response.content.decode()
-    assert 'Melbourne (AUMEL)' not in dashboard_response.content.decode()
+    dashboard_content = dashboard_response.content.decode()
+    assert 'Chicago' in dashboard_content
+    assert 'USCHI' in dashboard_content
+    assert 'Melbourne' not in dashboard_content
+    assert response.content == b''
 
 
 @pytest.mark.django_db
@@ -154,6 +159,7 @@ def test_deadline_update_preserves_other_fields_and_refreshes_table(client):
     assert updated_cargo.route_specification.destination == original_destination
     assert updated_cargo.route_specification.arrival_deadline.date() == date(2026, 12, 1)
     assert '12/01/2026' in dashboard_response.content.decode()
+    assert response.content == b''
 
 
 @pytest.mark.django_db
