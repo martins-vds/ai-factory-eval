@@ -65,7 +65,7 @@ def test_monthly_report_groups_activity_by_member_and_orders_by_late_fees(monkey
                 member='Zeta',
                 isbn='8',
                 lent_on=date(2026, 1, 1),
-                returned_on=date(2026, 2, 24),
+                returned_on=date(2026, 2, 25),
             ),
             Loan(
                 id='R9',

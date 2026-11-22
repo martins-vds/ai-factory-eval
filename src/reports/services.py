@@ -42,14 +42,17 @@ class MonthlyReportApplication:
 
         members = {}
         for loan in self.repository.for_period(period_start, period_end):
+            started_this_month = period_start <= loan.lent_on < period_end
+            returned_this_month = (
+                loan.returned_on is not None and period_start <= loan.returned_on < period_end
+            )
+            if not started_this_month and not returned_this_month:
+                continue
+
             report = members.setdefault(loan.member, [0, 0, 0])
-            if period_start <= loan.lent_on < period_end:
+            if started_this_month:
                 report[0] += 1
-            if (
-                loan.returned_on is not None
-                and period_start <= loan.returned_on < period_end
-                and loan.returned_on > loan.due_on
-            ):
+            if returned_this_month and loan.returned_on > loan.due_on:
                 report[1] += 1
                 days_late = (loan.returned_on - loan.due_on).days
                 report[2] += 0 if days_late <= 2 else min(1000, days_late * 25)

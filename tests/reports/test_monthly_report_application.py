@@ -12,20 +12,14 @@ class Loan:
     returned_on: date | None
 
 
-class LoanRepository:
+class ReportLoanRepository:
     def __init__(self, loans):
         self.loans = loans
         self.period = None
 
     def for_period(self, start, end):
         self.period = (start, end)
-        return [
-            loan
-            for loan in self.loans
-            if start <= loan.lent_on < end
-            or loan.returned_on is not None
-            and start <= loan.returned_on < end
-        ]
+        return self.loans
 
 
 class Clock:
@@ -34,13 +28,16 @@ class Clock:
 
 
 def test_monthly_report_uses_previous_calendar_month_across_year_boundary():
-    repository = LoanRepository(
+    repository = ReportLoanRepository(
         [
             Loan('Alpha', date(2025, 12, 1), date(2025, 12, 15), date(2025, 12, 18)),
             Loan('Beta', date(2025, 11, 1), date(2025, 11, 15), date(2025, 12, 20)),
             Loan('Gamma', date(2025, 11, 1), date(2025, 11, 15), date(2025, 12, 20)),
+            Loan('First day', date(2025, 11, 1), date(2025, 11, 15), date(2025, 12, 1)),
+            Loan('Due date', date(2025, 11, 17), date(2025, 12, 1), date(2025, 12, 1)),
             Loan('On time', date(2025, 12, 31), date(2026, 1, 14), date(2025, 12, 31)),
             Loan('Outside', date(2026, 1, 1), date(2026, 1, 15), None),
+            Loan('End boundary', date(2025, 11, 1), date(2025, 11, 15), date(2026, 1, 1)),
         ]
     )
 
@@ -50,6 +47,8 @@ def test_monthly_report_uses_previous_calendar_month_across_year_boundary():
     assert report == [
         MonthlyReportRow('Beta', 0, 1, 875),
         MonthlyReportRow('Gamma', 0, 1, 875),
+        MonthlyReportRow('First day', 0, 1, 400),
         MonthlyReportRow('Alpha', 1, 1, 75),
+        MonthlyReportRow('Due date', 0, 0, 0),
         MonthlyReportRow('On time', 1, 0, 0),
     ]
