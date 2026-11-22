@@ -4,6 +4,7 @@ from io import StringIO
 
 import pytest
 
+from src.fees.services import FeeApplication
 from src.reports.services import MonthlyReportApplication
 
 
@@ -13,6 +14,10 @@ class LoanRecord:
     lent_on: date
     due_on: date
     returned_on: date | None = None
+
+    @property
+    def id(self):
+        return f'{self.member}-{self.lent_on.isoformat()}-{self.due_on.isoformat()}'
 
 
 class LoanRepository:
@@ -28,6 +33,9 @@ class LoanRepository:
             and start_on <= loan.returned_on < end_on
         ]
 
+    def find(self, loan_id):
+        return next((loan for loan in self.loans if loan.id == loan_id), None)
+
 
 class FixedClock:
     def __init__(self, today):
@@ -35,6 +43,18 @@ class FixedClock:
 
     def today(self):
         return self.value
+
+
+class PaymentGateway:
+    def charge(self, loan_id):
+        raise AssertionError('monthly report must not charge payments')
+
+
+def report_application(loans, today):
+    repository = LoanRepository(loans)
+    clock = FixedClock(today)
+    fees = FeeApplication(repository, clock, PaymentGateway())
+    return MonthlyReportApplication(repository, clock, fees)
 
 
 def report_rows(application):
@@ -55,7 +75,7 @@ def test_monthly_report_aggregates_prior_month_and_orders_members():
         LoanRecord('OLD', date(2028, 1, 1), date(2028, 1, 15), date(2028, 2, 18)),
         LoanRecord('END', date(2028, 3, 1), date(2028, 3, 15), date(2028, 3, 18)),
     ]
-    application = MonthlyReportApplication(LoanRepository(loans), FixedClock(date(2028, 3, 1)))
+    application = report_application(loans, date(2028, 3, 1))
 
     assert report_rows(application) == [
         ('B', 2, 2, 150),
@@ -72,7 +92,7 @@ def test_monthly_report_uses_previous_december_at_year_boundary():
         LoanRecord('DEC', date(2028, 12, 31), date(2029, 1, 14)),
         LoanRecord('JAN', date(2029, 1, 1), date(2029, 1, 15)),
     ]
-    application = MonthlyReportApplication(LoanRepository(loans), FixedClock(date(2029, 1, 1)))
+    application = report_application(loans, date(2029, 1, 1))
 
     assert report_rows(application) == [('DEC', 1, 0, 0), ('DEC-FIRST', 1, 0, 0)]
 
@@ -91,7 +111,7 @@ def test_monthly_report_calculates_late_fees_in_cents(due_on, returned_on, expec
         LoanRecord('M', date(2028, 2, 1), date(2028, 2, 15)),
         LoanRecord('M', due_on - timedelta(days=14), due_on, returned_on),
     ]
-    application = MonthlyReportApplication(LoanRepository(loans), FixedClock(date(2028, 3, 1)))
+    application = report_application(loans, date(2028, 3, 1))
 
     assert report_rows(application) == [('M', 1, 1, expected_fee_cents)]
 
