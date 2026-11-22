@@ -16,3 +16,16 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-22T18:20:35Z
+**State:** blocked  ·  **Branch / PR:** copilot/bk-05g-continue-dialogs-from-not-routed-table-85431377-f406-412b-9345-db6cdb2c02c8  ·  **Last commit:** 740933f8a
+### Done
+- See this branch's commits and `afs-run` journal.
+### Remaining
+- [ ] `.migration/returns/BK-05G.afs-migrator.yaml` reports failing gates and no handoff: `crap: 26.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop.
+- [ ] You changed `src/cargotracker/booking/interfaces/dialogs/views.py` after your last run of `build`, `behavior`, `idiom`, `crap`, `regression`, `mutation_changed`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.
+- [ ] These files are outside ticket BK-05G's planned files: `src/cargotracker/booking/interfaces/dialogs/__init__.py`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides.
+### Blockers / questions
+- self-check failed: `afs-finish-check` still found 3 problem(s) after its retry budget (ADR-0034). Written by the stop hook, not by the agent.
+### Next step for the next session
+Fix the items under Remaining, run `afs-finish-check`, and commit. Scope items need the operator.
