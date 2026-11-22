@@ -5,7 +5,7 @@ The source rejects missing `member` or `isbn` parameters but accepts empty strin
 
 ## Evidence
 - Source: `method:legacy/src/main/java/lib/LoanResource.java:LoanResource.lend`, `legacy/src/main/java/lib/LoanResource.java:38-43`
-- Characterization: predicted from source pending tier-A confirmation: `member=` and `isbn=` satisfy the null-only check and produce HTTP 201.
+- Characterization: tier A observed `member=` and `isbn=` creating `L5;;;2026-11-22;2026-12-06;\n` with HTTP 201 (`goldens/edges.json`, `empty-loan-fields`).
 - Why it looks wrong: the error response says both fields are required, but the source distinguishes only missing parameters from empty values.
 
 ## Impact

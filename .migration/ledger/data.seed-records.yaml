@@ -7,4 +7,10 @@ source:
 boundary: "The L1, L2, and L3 records present after source application startup"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/restart.json
+  - .migration/evidence/runs/SY-05.md

@@ -8,5 +8,9 @@ source:
 boundary: "Run script builds the Java 17 app and starts Jersey/Grizzly on PORT or 8080 with shutdown cleanup"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/evidence/runs/SY-05.md
 notes: legacy/pom.xml pins the Maven dependencies and Java release.

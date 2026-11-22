@@ -8,4 +8,10 @@ source:
 boundary: "GET /about: HTML page status, content type, and public hours, lending policy, and contact content"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/browser.json
+  - .migration/evidence/runs/SY-05.md

@@ -5,7 +5,7 @@ When a member or ISBN contains a semicolon or newline, the source inserts it raw
 
 ## Evidence
 - Source: `method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line`, `legacy/src/main/java/lib/LoanResource.java:52-55`
-- Characterization: predicted from source pending tier-A confirmation: a member value `a;b` is returned as an extra field in the semicolon-separated loan line.
+- Characterization: tier A observed member `a;b` and ISBN `456` returning `L6;a;b;456;2026-11-22;2026-12-06;\n`, splitting the member across output fields (`goldens/edges.json`, `semicolon-member`).
 - Why it looks wrong: `legacy/docs/export-csv.md:3` defines a semicolon-separated six-field format used by spreadsheets, but raw values can change its field count.
 
 ## Impact

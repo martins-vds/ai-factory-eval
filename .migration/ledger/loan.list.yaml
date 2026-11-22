@@ -9,5 +9,11 @@ source:
 boundary: "GET /loans: status, text/plain body, ascending id order, six semicolon-separated fields, and trailing newline"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edges.json
+  - .migration/evidence/runs/SY-05.md
 notes: legacy/docs/export-csv.md documents the six-field spreadsheet format.

@@ -6,6 +6,7 @@ import re
 import subprocess
 import tempfile
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from urllib import error, parse, request
 
@@ -25,6 +26,19 @@ CASES = (
     ('GET /loans/{id}', 'GET', '/loans/L1', None),
     ('POST /loans', 'POST', '/loans', {'member': 'dee', 'isbn': '123'}),
     ('POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
+)
+EDGE_CASES = (
+    ('unknown-loan', 'GET /loans/{id}', 'GET', '/loans/unknown', None),
+    ('unknown-fee', 'GET /fees/{id}', 'GET', '/fees/unknown', None),
+    ('unknown-payment', 'POST /payments/{id}', 'POST', '/payments/unknown', None),
+    ('missing-loan-fields', 'POST /loans', 'POST', '/loans', {}),
+    ('missing-loan-isbn', 'POST /loans', 'POST', '/loans', {'member': 'dee'}),
+    ('empty-loan-fields', 'POST /loans', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    ('semicolon-member', 'POST /loans', 'POST', '/loans', {'member': 'a;b', 'isbn': '456'}),
+    ('new-loan-zero-fee', 'GET /fees/{id}', 'GET', '/fees/L4', None),
+    ('unknown-return', 'POST /loans/{id}/return', 'POST', '/loans/unknown/return', None),
+    ('repeat-return', 'POST /loans/{id}/return', 'POST', '/loans/L1/return', None),
+    ('loans-after-mutations', 'GET /loans', 'GET', '/loans', None),
 )
 
 
@@ -85,6 +99,62 @@ def exercise_http():
     return observations
 
 
+def exercise_cases(cases):
+    observations = {}
+    for name, endpoint, method, path, form in cases:
+        observations[name] = {
+            'endpoint': endpoint,
+            'request': {
+                'method': method,
+                'path': path,
+                'form': form,
+            },
+            'response': get_response(method, path, form),
+        }
+    return observations
+
+
+def stop_source(process):
+    process.terminate()
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        process.wait()
+
+
+@contextmanager
+def running_source():
+    with tempfile.TemporaryFile() as output:
+        process = subprocess.Popen(
+            ['bash', str(RUN_SCRIPT)],
+            cwd=SOURCE,
+            env=os.environ.copy(),
+            stdout=output,
+            stderr=subprocess.STDOUT,
+        )
+        try:
+            wait_until_ready(process, output)
+            yield
+        finally:
+            stop_source(process)
+
+
+def exercise_restart():
+    return {
+        'seed-loans-after-restart': {
+            'endpoint': 'GET /loans',
+            'request': {'method': 'GET', 'path': '/loans', 'form': None},
+            'response': get_response('GET', '/loans', None),
+        },
+        'returned-loan-after-restart': {
+            'endpoint': 'GET /loans/{id}',
+            'request': {'method': 'GET', 'path': '/loans/L1', 'form': None},
+            'response': get_response('GET', '/loans/L1', None),
+        },
+    }
+
+
 def exercise_browser():
     pages = []
     with sync_playwright() as playwright:
@@ -123,6 +193,16 @@ def normalize(observation, endpoint):
     }
 
 
+def normalize_cases(observations):
+    return {
+        name: {
+            'endpoint': observation['endpoint'],
+            **normalize(observation, observation['endpoint']),
+        }
+        for name, observation in observations.items()
+    }
+
+
 def write_or_compare(name, observation, record):
     path = GOLDENS / f'{name}.json'
     rendered = json.dumps(observation, indent=2, sort_keys=True) + '\n'
@@ -134,6 +214,9 @@ def write_or_compare(name, observation, record):
     if name == 'http':
         actual = {key: normalize(value, key) for key, value in observation.items()}
         baseline = {key: normalize(value, key) for key, value in expected.items()}
+    elif name in {'edges', 'restart'}:
+        actual = normalize_cases(observation)
+        baseline = normalize_cases(expected)
     else:
         actual = observation
         baseline = expected
@@ -153,29 +236,23 @@ def main():
     )
     args = parser.parse_args()
     verify_graph_coverage()
-    with tempfile.TemporaryFile() as output:
-        process = subprocess.Popen(
-            ['bash', str(RUN_SCRIPT)],
-            cwd=SOURCE,
-            env=os.environ.copy(),
-            stdout=output,
-            stderr=subprocess.STDOUT,
-        )
-        try:
-            wait_until_ready(process, output)
-            http = exercise_http()
-            browser = exercise_browser()
-        finally:
-            process.terminate()
-            try:
-                process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                process.kill()
-                process.wait()
+    with running_source():
+        http = exercise_http()
+        edges = exercise_cases(EDGE_CASES)
+        browser = exercise_browser()
+    with running_source():
+        restart = exercise_restart()
     write_or_compare('http', http, args.record)
+    write_or_compare('edges', edges, args.record)
+    write_or_compare('restart', restart, args.record)
     write_or_compare('browser', browser, args.record)
     action = 'recorded' if args.record else 'verified'
-    print(f'{action} {len(http)} source endpoints and {len(browser["pages"])} browser pages')
+    case_count = len(http) + len(edges) + len(restart) + len(browser['pages'])
+    print(
+        f'{action} {len(http)} source endpoints, {len(edges)} edge cases, '
+        f'{len(restart)} restart cases, and {len(browser["pages"])} browser pages '
+        f'({case_count} observations)'
+    )
 
 
 if __name__ == '__main__':

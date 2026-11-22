@@ -9,4 +9,10 @@ source:
 boundary: "The persisted returnedOn value as exposed by loan list/detail responses and used by late-fee calculation"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/restart.json
+  - .migration/evidence/runs/SY-05.md

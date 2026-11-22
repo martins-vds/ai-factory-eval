@@ -8,5 +8,10 @@ source:
 boundary: "LOAN table mapping and read/write transaction behavior across loan HTTP operations"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/characterization/source/observations.md
+  - .migration/characterization/source/goldens/restart.json
+  - .migration/evidence/runs/SY-05.md
 notes: legacy/src/main/resources/META-INF/persistence.xml configures in-memory H2 and drop-and-create schema generation.

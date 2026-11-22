@@ -7,5 +7,8 @@ source:
 boundary: "The documented monthly report schedule, row fields, omission rule, and ordering; no executable source is present"
 tickets: [martins-vds/ai-factory-eval#2266]
 status: pending
-verification: pending
+verification: spec-derived
+characterization_tier: C
+evidence:
+  - .migration/characterization/source/observations.md
 notes: This document is the only remaining artifact for a retired reporting module.
