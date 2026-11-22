@@ -6,7 +6,6 @@ import pytest
 from django.core.management import call_command
 from django.test import RequestFactory, override_settings
 from django.urls import path
-from django.utils import timezone
 
 from cargotracker.booking.application.dashboard import CargoDashboard
 from cargotracker.booking.application.specification import CargoSpecification
@@ -128,7 +127,10 @@ def test_deadline_dialog_shows_a_field_error_for_unparseable_input(client):
     assert response.status_code == 400
     assert 'Enter a valid arrival deadline.' in response.content.decode()
     assert updated is not None
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
 
 
 @pytest.mark.django_db
@@ -158,7 +160,8 @@ def test_destination_update_preserves_other_route_specification_fields(client):
     original = cargo_repository.find(TrackingId('DEF789'))
     assert original is not None
     destination = next(
-        location for location in DjangoLocationRepository().find_all()
+        location
+        for location in DjangoLocationRepository().find_all()
         if location
         not in (original.route_specification.origin, original.route_specification.destination)
     )
@@ -175,7 +178,10 @@ def test_destination_update_preserves_other_route_specification_fields(client):
     assert updated is not None
     assert updated.route_specification.origin == original.route_specification.origin
     assert updated.route_specification.destination == destination
-    assert updated.route_specification.arrival_deadline == original.route_specification.arrival_deadline
+    assert (
+        updated.route_specification.arrival_deadline
+        == original.route_specification.arrival_deadline
+    )
     dashboard = client.get('/admin/dashboard/').content.decode()
     not_routed_table = dashboard.split('id="not-routed-cargo"', 1)[1].split('</section>', 1)[0]
     assert destination.name in not_routed_table

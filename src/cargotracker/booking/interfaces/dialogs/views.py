@@ -39,7 +39,8 @@ def _destination_context(
         'destinations': [
             location
             for location in locations
-            if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+            if location
+            not in (cargo.route_specification.origin, cargo.route_specification.destination)
         ],
         'selected_destination': selected_destination,
         'destination_error': error,
@@ -47,9 +48,9 @@ def _destination_context(
 
 
 def _deadline_context(cargo: Cargo, value: str = '', error: str = '') -> dict[str, object]:
-    deadline_value = value or timezone.localtime(
-        cargo.route_specification.arrival_deadline
-    ).date().isoformat()
+    deadline_value = (
+        value or timezone.localtime(cargo.route_specification.arrival_deadline).date().isoformat()
+    )
     return {
         'cargo': cargo,
         'deadline_value': deadline_value,
@@ -82,7 +83,8 @@ def create_dialog_views(
             destinations = {
                 location.unlocode.value: location
                 for location in locations
-                if location not in (cargo.route_specification.origin, cargo.route_specification.destination)
+                if location
+                not in (cargo.route_specification.origin, cargo.route_specification.destination)
             }
             destination = destinations.get(destination_code)
             if destination is None:
