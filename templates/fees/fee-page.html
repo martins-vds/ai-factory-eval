@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee for {{ loan_id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Member account · {{ loan_id }}</p>
+      <h1 class="card-title mt-2 text-4xl">Late fee for {{ loan_id }}</h1>
+      <p class="mt-2">Due {{ due_on }}, {{ days_late }} day(s) late.</p>
+      <p class="fee mt-6 text-2xl">Fee: ${{ amount }}</p>
+      <div id="payment-status" class="mt-6"></div>
+      <form method="post" action="/ui/payments/{{ loan_id }}/"
+            hx-post="/ui/payments/{{ loan_id }}/" hx-target="#payment-status" hx-swap="outerHTML"
+            hx-on::response-error="document.getElementById('payment-status').outerHTML = event.detail.xhr.responseText">
+        {% csrf_token %}
+        <button class="btn btn-ghost text-[#a94e37]" type="submit">Pay late fee</button>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}

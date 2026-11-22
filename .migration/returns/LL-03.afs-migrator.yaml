@@ -1,0 +1,67 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#2300
+pr: martins-vds/ai-factory-eval#2305
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.8
+  regression: 0
+  spec: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: Days late use the return date or today, never below zero.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_returned_loan_fee_ends_on_return_date
+    enforced: true
+    ledger_rule: late-days-end-at-return
+  - capability: fees.calculation
+    rule: Up to two days late costs nothing.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-waived-two-days
+  - capability: fees.calculation
+    rule: Beyond two days, every day late costs 25 cents, with the first two days included.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-25-cents-a-day
+  - capability: fees.calculation
+    rule: The fee never exceeds $10.00.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_waiver_daily_rate_and_cap
+    enforced: true
+    ledger_rule: fee-capped-at-10
+  - capability: fees.calculation
+    rule: A fee cannot be calculated for a loan that doesn't exist.
+    use_case: LateFeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_rejects_an_unknown_loan
+    enforced: true
+    ledger_rule: unknown-loan-404
+  - capability: integration.payment-gateway
+    rule: Payment requires an existing loan before contacting the gateway.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_payments.py::test_payment_rejects_an_unknown_loan_before_calling_the_gateway
+    enforced: true
+    ledger_rule: existing-loan-before-charge
+  - capability: integration.payment-gateway
+    rule: The payment use case propagates a gateway interruption instead of swallowing it.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_payments.py::test_payment_application_does_not_swallow_an_interruption
+    enforced: true
+    ledger_rule: interruption-not-swallowed
+no_rules:
+  fees.page: Fee display and payment controls rely on the fee and payment capabilities for business rules.
