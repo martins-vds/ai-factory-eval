@@ -93,7 +93,9 @@ def test_payment_does_not_call_gateway_for_unknown_loan():
     [(200, 200), (503, 502)],
 )
 def test_payment_maps_gateway_status_and_preserves_response_body(gateway_status, expected_status):
-    gateway = PaymentGateway(result=type('Response', (), {'status_code': gateway_status, 'body': 'declined\n'})())
+    gateway = PaymentGateway(
+        result=type('Response', (), {'status_code': gateway_status, 'body': 'declined\n'})()
+    )
     application = fee_application(Loan('L1', date(2026, 10, 1)), gateway=gateway)
 
     outcome = application.pay('L1')

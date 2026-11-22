@@ -5,11 +5,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 HTTP_GOLDENS = json.loads(
     (
-        Path(__file__).resolve().parents[2]
-        / '.migration/characterization/source/goldens/http.json'
+        Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
     ).read_text(encoding='utf-8')
 )
 GATEWAY_GOLDENS = json.loads(
@@ -149,3 +149,33 @@ def test_ui_payment_renders_gateway_failure_for_htmx(client, gateway_server):
     assert b'id="payment-status"' in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
+
+
+@pytest.mark.django_db
+def test_browser_renders_a_gateway_failure_after_payment(live_server, gateway_server):
+    gateway_server.response_status = 503
+    gateway_server.response_body = b'declined\n'
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            htmx_available = page.evaluate("typeof window.htmx !== 'undefined'")
+
+            if htmx_available:
+                with page.expect_response(
+                    lambda response: response.url.endswith('/ui/payments/L3/')
+                ) as payment_response:
+                    page.get_by_role('button', name='Pay late fee').click()
+                assert payment_response.value.status == 502
+                assert payment_response.value.request.headers.get('HX-Request') == 'true'
+            else:
+                page.get_by_role('button', name='Pay late fee').click()
+
+            page.get_by_role('alert').wait_for()
+            assert 'declined' in page.get_by_role('alert').inner_text()
+            if htmx_available:
+                assert page.get_by_role('heading', name='Late fees').is_visible()
+        finally:
+            browser.close()

@@ -10,7 +10,7 @@
   <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
     <div class="card-body">
       <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">Loan · {{ quote.loan.id }}</p>
-      <h2 class="card-title mt-2 text-3xl">A book in good company.</h2>
+      <h2 class="card-title mt-2 text-4xl">A book in good company.</h2>
       <p>{{ quote.loan.member }} · ISBN {{ quote.loan.isbn }}</p>
       <dl class="mt-6 grid gap-4 sm:grid-cols-2">
         <div><dt class="text-sm text-[#66705b]">Due</dt><dd>{{ quote.loan.due_on|date:"M j, Y" }}</dd></div>
@@ -23,7 +23,7 @@
       <form method="post" action="/ui/payments/{{ quote.loan.id }}/"
             hx-post="/ui/payments/{{ quote.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML">
         {% csrf_token %}
-        <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+        <button class="btn btn-outline text-[#a94e37]" type="submit">Pay late fee</button>
       </form>
     </div>
   </article>

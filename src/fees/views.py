@@ -35,16 +35,22 @@ def fee_page(request, loan_id):
 
 def _payment_outcome(loan_id):
     outcome = fee_application.pay(loan_id)
-    if outcome is not None and outcome.failure is not None:
-        if isinstance(outcome.failure.__cause__, InterruptedError):
-            logger.warning(
-                'Payment gateway request was interrupted',
-                exc_info=(
-                    type(outcome.failure),
-                    outcome.failure,
-                    outcome.failure.__traceback__,
-                ),
-            )
+    if (
+        outcome is not None
+        and outcome.failure is not None
+        and isinstance(
+            outcome.failure.__cause__,
+            InterruptedError,
+        )
+    ):
+        logger.warning(
+            'Payment gateway request was interrupted',
+            exc_info=(
+                type(outcome.failure),
+                outcome.failure,
+                outcome.failure.__traceback__,
+            ),
+        )
     return outcome
 
 
