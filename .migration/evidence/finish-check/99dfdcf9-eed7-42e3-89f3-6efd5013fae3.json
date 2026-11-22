@@ -1,0 +1,53 @@
+[
+  {
+    "at": "2026-11-22T16:57:56Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 19511,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/evidence/runs/LL-02.md",
+      ".migration/ledger/loan.lend.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/returns/LL-02.afs-migrator.yaml",
+      "src/loans/composition.py",
+      "src/loans/domain.py",
+      "src/loans/ports.py",
+      "src/loans/repository.py",
+      "src/loans/services.py",
+      "src/loans/urls.py",
+      "src/loans/views.py",
+      "templates/loans/_lend_form.html",
+      "templates/loans/_lend_result.html",
+      "templates/loans/_return_form.html",
+      "templates/loans/_ui_error.html",
+      "templates/loans/detail.html",
+      "templates/loans/list.html",
+      "templates/loans/new.html",
+      "templates/loans/ui_error.html",
+      "tests/loans/test_circulation.py"
+    ],
+    "test_health": {
+      "block": true,
+      "findings": []
+    },
+    "findings": [
+      "[mechanical] `.migration/returns/LL-02.afs-migrator.yaml` reports failing gates and no handoff: `crap: 6`. CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
