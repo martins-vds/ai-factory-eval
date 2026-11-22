@@ -20,7 +20,8 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
   - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_renders_candidate_routes_when_available"
-  - "tests/booking/interfaces/test_route_selection.py::test_route_screens_explain_when_no_candidates_satisfy_the_deadline"
+  - "tests/booking/interfaces/test_route_selection.py::test_select_itinerary_screen_explains_when_no_candidates_satisfy_the_deadline"
   - ".migration/evidence/runs/BK-05F.md"
 notes: "The target preserves the empty-route guidance and renders candidate itineraries under ruling #252; no named JUnit class exercises the source page."
 quirks: [martins-vds/ai-factory-pilot-target#252]
+no_rules: "Presentation of itinerary candidates and empty-state guidance; it introduces no independent business policy."

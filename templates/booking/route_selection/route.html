@@ -19,5 +19,5 @@
     <dt class="font-semibold text-blue-700">Potential routes:</dt>
     <dd>{{ candidate_count }}</dd>
   </dl>
-  {% include "booking/route_selection/_candidate_routes.html" %}
+  {% include "booking/route_selection/_candidate_routes.html" with no_route_guidance="Try setting an arrival deadline further into the future." %}
 {% endblock %}
