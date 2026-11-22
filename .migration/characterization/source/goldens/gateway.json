@@ -1,0 +1,22 @@
+[
+  {
+    "body": "",
+    "method": "POST",
+    "path": "/charge?loan=L3"
+  },
+  {
+    "body": "",
+    "method": "POST",
+    "path": "/charge?loan=L1"
+  },
+  {
+    "body": "",
+    "method": "POST",
+    "path": "/charge?loan=L1"
+  },
+  {
+    "body": "",
+    "method": "POST",
+    "path": "/charge?loan=L2"
+  }
+]
