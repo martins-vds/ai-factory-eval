@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.loan_id }} · The Lending Library{% endblock %}
+
+{% block content %}
+<a class="link link-hover text-sm text-emerald-800" href="{% url 'loan-catalog-page' %}">← Back to catalog</a>
+<article class="card mt-6 max-w-2xl border border-stone-200 bg-white shadow-sm">
+  <div class="card-body gap-5">
+    <p class="text-sm font-semibold uppercase tracking-widest text-emerald-800">Loan record</p>
+    <h1 class="font-serif text-4xl font-semibold">Loan {{ loan.loan_id }}</h1>
+    <dl class="grid gap-4 sm:grid-cols-2">
+      <div>
+        <dt class="text-sm text-stone-500">Member</dt>
+        <dd class="font-medium">{{ loan.member }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-stone-500">ISBN</dt>
+        <dd class="font-medium">{{ loan.isbn }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-stone-500">Lent on</dt>
+        <dd class="font-medium">{{ loan.lent_on|date:"Y-m-d" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-stone-500">Due on</dt>
+        <dd class="font-medium">{{ loan.due_on|date:"Y-m-d" }}</dd>
+      </div>
+      <div>
+        <dt class="text-sm text-stone-500">Returned on</dt>
+        <dd class="font-medium">{{ loan.returned_on|date:"Y-m-d"|default:"Not yet returned" }}</dd>
+      </div>
+    </dl>
+  </div>
+</article>
+{% endblock %}
