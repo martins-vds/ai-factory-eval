@@ -1,0 +1,18 @@
+id: data.loan-storage
+kind: data
+title: Store loans in the configured persistence unit
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:3-11; legacy/src/main/java/lib/LoanRepository.java:47-68
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "The library persistence unit uses an in-memory H2 database, creates the schema from the Loan entity, loads seed.sql, and wraps writes in JPA transactions."
+status: pending
+verification: pending
+rules:
+  - id: schema-lifecycle
+    rule: Startup uses drop-and-create schema generation and loads META-INF/seed.sql.
+    source: legacy/src/main/resources/META-INF/persistence.xml:9-10
+  - id: write-transaction
+    rule: Writes begin a transaction, commit on success, roll back if still active, and close the EntityManager.
+    source: legacy/src/main/java/lib/LoanRepository.java:56-68
+notes: In-memory persistence and drop-and-create discard runtime changes on restart; see .migration/quirks/restart-data-loss.md.

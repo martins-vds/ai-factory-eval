@@ -1,0 +1,16 @@
+id: payment.gateway-errors
+kind: behavioral
+title: Handle payment gateway failures
+source:
+  graph_node: function:legacy/src/main/java/lib/FinePayments.java:pay
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:34-40
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "Gateway I/O failures and interrupted calls return HTTP 502 with `payment gateway unavailable`."
+status: pending
+verification: pending
+rules:
+  - id: gateway-exception
+    rule: IOException or InterruptedException is mapped to HTTP 502 with a plain-text `payment gateway unavailable` body.
+    source: legacy/src/main/java/lib/FinePayments.java:38-40
+notes: InterruptedException is caught without restoring the interrupt flag; see .migration/quirks/payment-interrupt.md.

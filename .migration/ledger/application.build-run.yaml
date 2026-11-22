@@ -1,0 +1,10 @@
+id: application.build-run
+kind: structural
+title: Build and launch the legacy application
+source:
+  graph_node: config:legacy/pom.xml
+  location: legacy/pom.xml:10-52; legacy/run.sh:1-6
+boundary: "Running legacy/run.sh builds the Java 17 Maven package without tests, copies dependencies, and starts lib.App."
+status: pending
+verification: pending
+no_rules: Build and launch mechanics have no standalone business rule.

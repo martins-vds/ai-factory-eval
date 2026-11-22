@@ -1,0 +1,22 @@
+id: loan.create
+kind: behavioral
+title: Create a loan
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/LoanResource.java:POST /loans"
+  flow: Lend Book
+  location: legacy/src/main/java/lib/LoanResource.java:37-43; legacy/src/main/java/lib/LoanRepository.java:27-34
+  risk: { crap: 12, complexity: 3, coverage: 0 }
+boundary: "POST /loans accepts member and isbn form fields, creates a loan dated today, and returns HTTP 201 with its formatted record."
+status: pending
+verification: pending
+rules:
+  - id: required-fields
+    rule: If member or isbn is absent (null), creation is rejected with HTTP 400 and `member and isbn are required`.
+    source: legacy/src/main/java/lib/LoanResource.java:38-41
+  - id: loan-id
+    rule: A created loan ID is `L` followed by the current loan row count plus one.
+    source: legacy/src/main/java/lib/LoanRepository.java:27-32
+  - id: lent-date
+    rule: A created loan's lentOn date is the current local date.
+    source: legacy/src/main/java/lib/LoanResource.java:42
+notes: The null-only field check accepts empty strings; see .migration/quirks/loan-empty-inputs.md. Count-based IDs may collide under concurrent writes; see .migration/quirks/loan-id-allocation.md.
