@@ -1,7 +1,7 @@
 from datetime import date
+from typing import ClassVar
 
 from django.db import migrations
-
 
 SEED_LOANS = (
     ('L1', 'ana', '9780134685991', date(2026, 1, 2), None),
@@ -25,10 +25,10 @@ def seed_loans(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
+    dependencies: ClassVar[list] = [
         ('loans', '0001_initial'),
     ]
 
-    operations = [
+    operations: ClassVar[list] = [
         migrations.RunPython(seed_loans, migrations.RunPython.noop),
     ]

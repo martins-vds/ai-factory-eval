@@ -9,4 +9,4 @@ class LoanRecord(models.Model):
     returned_on = models.DateField(null=True, blank=True)
 
     class Meta:
-        ordering = ['id']
+        ordering = ('id',)
