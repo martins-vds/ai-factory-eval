@@ -8,4 +8,7 @@ boundary: "legacy/run.sh packages the Java 17 Maven application without tests an
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md

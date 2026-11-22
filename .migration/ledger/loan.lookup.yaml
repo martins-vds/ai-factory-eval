@@ -9,4 +9,7 @@ boundary: "GET /loans/{id} returns the formatted loan with HTTP 200, or HTTP 404
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md

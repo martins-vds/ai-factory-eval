@@ -9,4 +9,7 @@ boundary: "Reads close their EntityManager in a finally block; writes begin and 
 tickets:
   - martins-vds/ai-factory-eval#2258
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/SY-05/characterization.md
