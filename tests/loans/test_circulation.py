@@ -1,6 +1,9 @@
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
+from threading import Barrier
 
 import pytest
+from django.db import close_old_connections
 from django.utils import timezone
 from playwright.sync_api import sync_playwright
 
@@ -26,6 +29,16 @@ class InMemoryLoanStore:
     def save_returned(self, loan):
         self.loans[loan.id] = loan
         return loan
+
+
+class SynchronizedLoanStore:
+    def __init__(self, repository, barrier):
+        self.repository = repository
+        self.barrier = barrier
+
+    def lend(self, member, isbn, lent_on):
+        self.barrier.wait(timeout=10)
+        return self.repository.lend(member, isbn, lent_on)
 
 
 @pytest.mark.django_db
@@ -134,6 +147,24 @@ def test_api_lending_escapes_field_and_record_delimiters(client):
         f'L4;"Reader; Example\nSecond line";"978""xyz;123";{today.isoformat()};'
         f'{(today + timedelta(days=14)).isoformat()};\n'
     )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_lending_assigns_distinct_loan_ids():
+    barrier = Barrier(2)
+    application = LoanApplication(SynchronizedLoanStore(LoanRepository(), barrier))
+
+    def lend(member):
+        close_old_connections()
+        try:
+            return application.lend(member, '123', date(2026, 3, 1))
+        finally:
+            close_old_connections()
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        loans = list(workers.map(lend, ('reader one', 'reader two')))
+
+    assert sorted(loan.id for loan in loans) == ['L4', 'L5']
 
 
 @pytest.mark.django_db

@@ -14,12 +14,13 @@ class LoanRepository:
         return self._record(loan) if loan else None
 
     @transaction.atomic
-    def add(self, loan):
+    def lend(self, member, isbn, lent_on):
+        LoanModel.objects.select_for_update().order_by('id').first()
         record = LoanModel.objects.create(
-            id=loan.id,
-            member=loan.member,
-            isbn=loan.isbn,
-            lent_on=loan.lent_on,
+            id=f'L{LoanModel.objects.count() + 1}',
+            member=member,
+            isbn=isbn,
+            lent_on=lent_on,
         )
         return self._record(record)
 

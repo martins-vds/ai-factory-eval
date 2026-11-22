@@ -25,5 +25,9 @@ evidence:
   - .migration/evidence/runs/LL-02.md
   - tests/loans/test_circulation.py::test_return_use_case_rejects_an_unknown_loan
   - tests/loans/test_circulation.py::test_api_return_records_date_and_unknown_id_returns_not_found
+rules:
+  - id: unknown-loan
+    rule: Reject return requests for loan ids that do not exist.
+    source: legacy/src/main/java/lib/LoanResource.java:45-50
 notes: "The approved repeated-return fix is tracked in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
