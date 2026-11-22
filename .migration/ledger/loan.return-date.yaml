@@ -15,3 +15,19 @@ characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
 notes: "The human decision on overwriting an existing return date is in martins-vds/ai-factory-synthetic-target#41."
 quirks: [martins-vds/ai-factory-synthetic-target#41]
+target:
+  components: [src.loans.services.return_book, src.loans.repository.LoanRepository.mark_returned]
+status: migrated
+rules:
+  - id: return-date-recorded-once
+    rule: The first return records the supplied date; repeated returns are refused without replacing it.
+    source: "martins-vds/ai-factory-synthetic-target#41 (fix); LoanRepository.java:36-44"
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_sets_date_once_and_rejects_a_repeat
+  - tests/loans/test_circulation.py::test_return_endpoint_sets_date_once_and_rejects_a_repeat
+  - tests/loans/test_circulation.py::test_ui_return_rejects_repeated_returns_without_replacing_date

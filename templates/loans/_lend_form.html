@@ -1,0 +1,16 @@
+<form id="lend-form" class="card border border-[#d8cdbb] bg-[#fffdf7] shadow-sm" action="/ui/loans/new/" method="post" hx-post="/ui/loans/new/" hx-target="#lend-form" hx-swap="outerHTML" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true;">
+  {% csrf_token %}
+  <div class="card-body">
+    <label class="form-control">
+      <span class="label-text">Member</span>
+      <input class="input input-bordered" type="text" name="member" value="{{ member|default:'' }}" required aria-invalid="{% if errors.member %}true{% else %}false{% endif %}" aria-describedby="member-error">
+      {% if errors.member %}<span id="member-error" class="text-sm text-[#a94e37]">{{ errors.member }}</span>{% endif %}
+    </label>
+    <label class="form-control">
+      <span class="label-text">ISBN</span>
+      <input class="input input-bordered" type="text" name="isbn" value="{{ isbn|default:'' }}" required aria-invalid="{% if errors.isbn %}true{% else %}false{% endif %}" aria-describedby="isbn-error">
+      {% if errors.isbn %}<span id="isbn-error" class="text-sm text-[#a94e37]">{{ errors.isbn }}</span>{% endif %}
+    </label>
+    <button class="btn btn-primary mt-2" type="submit">Lend book</button>
+  </div>
+</form>
