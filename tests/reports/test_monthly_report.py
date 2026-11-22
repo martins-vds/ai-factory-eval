@@ -60,6 +60,39 @@ def test_monthly_report_groups_activity_by_member_and_orders_by_late_fees(monkey
                 lent_on=date(2026, 1, 1),
                 returned_on=date(2026, 1, 10),
             ),
+            Loan(
+                id='R8',
+                member='Zeta',
+                isbn='8',
+                lent_on=date(2026, 1, 1),
+                returned_on=date(2026, 2, 24),
+            ),
+            Loan(
+                id='R9',
+                member='Month end',
+                isbn='9',
+                lent_on=date(2026, 2, 28),
+            ),
+            Loan(
+                id='R10',
+                member='Next month',
+                isbn='10',
+                lent_on=date(2026, 3, 1),
+            ),
+            Loan(
+                id='R11',
+                member='Grace',
+                isbn='11',
+                lent_on=date(2026, 1, 20),
+                returned_on=date(2026, 2, 5),
+            ),
+            Loan(
+                id='R12',
+                member='On-time return',
+                isbn='12',
+                lent_on=date(2026, 1, 20),
+                returned_on=date(2026, 2, 1),
+            ),
         ]
     )
     monkeypatch.setattr(timezone, 'localdate', lambda: date(2026, 3, 1))
@@ -69,8 +102,12 @@ def test_monthly_report_groups_activity_by_member_and_orders_by_late_fees(monkey
 
     assert list(csv.reader(output.getvalue().splitlines())) == [
         ['member_id', 'loans_started', 'late_returns', 'late_fees_cents'],
+        ['Zeta', '0', '1', '1000'],
         ['Alpha', '2', '2', '900'],
         ['Beta', '0', '1', '825'],
         ['Gamma', '0', '1', '825'],
+        ['Grace', '0', '1', '0'],
+        ['Month end', '1', '0', '0'],
         ['New member', '1', '0', '0'],
+        ['On-time return', '0', '0', '0'],
     ]
