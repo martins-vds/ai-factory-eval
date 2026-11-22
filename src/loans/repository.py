@@ -7,7 +7,7 @@ from src.loans.models import LoanRecord
 class DjangoLoanRepository:
     @transaction.atomic
     def list_all(self) -> list[Loan]:
-        return [self._to_domain(record) for record in LoanRecord.objects.order_by('id')]
+        return [self._to_domain(record) for record in LoanRecord.objects.all()]
 
     @transaction.atomic
     def find_by_id(self, loan_id: str) -> Loan | None:

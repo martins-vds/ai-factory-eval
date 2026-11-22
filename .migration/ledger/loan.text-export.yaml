@@ -9,9 +9,22 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 1.0}
 boundary: "Each exported record has fields in id, member, isbn, lent-on, due-on, returned-on order, separated by semicolons; an unreturned loan has an empty final field. The docs state spreadsheet users rely on this format."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
-notes: "Delimiter-containing input is not escaped; human decision draft: martins-vds/ai-factory-synthetic-target#43."
+notes: "Human ruling #43 approves escaping field and record delimiters in exported values."
 quirks: [martins-vds/ai-factory-synthetic-target#43]
+target:
+  components: [src.loans.services.LoanCatalog.format_loan, src.loans.views.api_list]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - tests/loans/test_catalog.py::test_text_export_escapes_field_and_record_delimiters
+  - tests/loans/test_catalog.py::test_api_lists_seeded_loans_in_order_with_legacy_text
+  - .migration/evidence/runs/LL-01.md
+rules:
+  - id: escape-delimiters
+    rule: Field and record delimiters inside exported values are escaped so each record remains parseable.
+    source: martins-vds/ai-factory-synthetic-target#43

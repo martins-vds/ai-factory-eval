@@ -1,0 +1,59 @@
+role: afs-migrator
+ticket: LL-01
+issue: martins-vds/ai-factory-eval#2366
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2369
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 2
+  mutation_changed: 1.0
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-01.md
+ledger_updated:
+  - application.build
+  - application.startup
+  - data.loan-storage
+  - data.seed-records
+  - repository.transactions
+  - loan.due-date
+  - loan.get
+  - loan.list
+  - loan.text-export
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#42
+  - martins-vds/ai-factory-synthetic-target#43
+new_tickets: []
+handoff: none
+rules:
+  - capability: loan.due-date
+    rule: Every loan is due 14 calendar days after its lending date.
+    use_case: src.loans.services.LoanCatalog.due_date
+    test: tests/loans/test_catalog.py::test_due_date_is_fourteen_calendar_days_after_lending
+    enforced: true
+    ledger_rule: due-date-14-days
+  - capability: loan.get
+    rule: An unknown loan ID has no catalog result.
+    use_case: src.loans.services.LoanCatalog.get_loan
+    test: tests/loans/test_catalog.py::test_unknown_loan_is_not_found_at_use_case_boundary
+    enforced: true
+    ledger_rule: unknown-id-not-found
+  - capability: loan.list
+    rule: Loan records are listed in ascending ID order.
+    use_case: src.loans.services.LoanCatalog.list_loans
+    test: tests/loans/test_catalog.py::test_catalog_orders_loan_records_by_id
+    enforced: true
+    ledger_rule: ascending-id-order
+  - capability: loan.text-export
+    rule: Field and record delimiters inside exported values are escaped so each record remains parseable.
+    use_case: src.loans.services.LoanCatalog.format_loan
+    test: tests/loans/test_catalog.py::test_text_export_escapes_field_and_record_delimiters
+    enforced: true
+    ledger_rule: escape-delimiters
+no_rules:
+  application.build: Build and launch are structural capabilities with no business input to refuse.
+  application.startup: Startup composition applies migrations and validates no business input.
+  data.loan-storage: Persistence adapters store records and do not own business input validation.
+  data.seed-records: The seed migration initializes examples and does not validate business input.
+  repository.transactions: Transaction boundaries are infrastructure behavior, not business input validation.
