@@ -35,7 +35,7 @@ def test_list_loans_are_ordered_by_id():
         Loan(id='L1', member='ana', isbn='1', lent_on=date(2026, 1, 2)),
     ]
 
-    assert list_loans(InMemoryLoanRepository(loans)) == list(reversed(loans))
+    assert [loan.id for loan in list_loans(InMemoryLoanRepository(loans))] == ['L1', 'L2']
 
 
 def test_get_returns_none_when_loan_is_missing():
@@ -57,6 +57,12 @@ def test_export_escapes_delimiters_and_line_breaks():
     assert export_loans(InMemoryLoanRepository([loan])) == (
         'L1;"a;b";"123\n456";2026-01-02;2026-01-16;\n'
     )
+
+
+def test_empty_export_retains_the_trailing_newline():
+    from src.loans.services import export_loans
+
+    assert export_loans(InMemoryLoanRepository([])) == '\n'
 
 
 @pytest.mark.django_db
