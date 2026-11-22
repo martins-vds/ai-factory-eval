@@ -31,6 +31,13 @@ class MonthlyReportRow:
     late_fees_cents: int
 
 
+@dataclass
+class _MemberTotals:
+    loans_started: int = 0
+    late_returns: int = 0
+    late_fees_cents: int = 0
+
+
 class MonthlyReportApplication:
     def __init__(
         self,
@@ -46,16 +53,23 @@ class MonthlyReportApplication:
         month_end = self.clock.today().replace(day=1)
         previous_month_end = month_end - timedelta(days=1)
         month_start = previous_month_end.replace(day=1)
-        totals = defaultdict(lambda: [0, 0, 0])
+        totals = defaultdict(_MemberTotals)
 
         for loan in self.loans.started_between(month_start, month_end):
             member_totals = totals[loan.member]
-            member_totals[0] += 1
+            member_totals.loans_started += 1
             if loan.returned_on is not None and loan.returned_on > loan.due_on:
-                member_totals[1] += 1
-            member_totals[2] += self.fees.fee_for(loan.id).amount_cents
+                member_totals.late_returns += 1
+            member_totals.late_fees_cents += self.fees.fee_for(loan.id).amount_cents
 
         return [
-            MonthlyReportRow(member_id, *values)
-            for member_id, values in sorted(totals.items(), key=lambda item: (-item[1][2], item[0]))
+            MonthlyReportRow(
+                member_id,
+                member_totals.loans_started,
+                member_totals.late_returns,
+                member_totals.late_fees_cents,
+            )
+            for member_id, member_totals in sorted(
+                totals.items(), key=lambda item: (-item[1].late_fees_cents, item[0])
+            )
         ]
