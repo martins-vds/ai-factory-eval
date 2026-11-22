@@ -40,3 +40,15 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-21T23:57:18+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
 | 2026-11-21T23:57:20+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |
 | 2026-11-21T23:59:04+00:00 | mutation-changed | 0 | 100.02 | `python .migration/harness/tools/afs-mutation` | `f14cdecddbdb85fe` |  | gate=mutation score=0.815 threshold=0.8 killed=75 survived=17 files=2 base=939fd6e0e29b7dd77ccf0c1267a6ab0d4df62998 |
+| 2026-11-22T00:00:14+00:00 | build-compileall | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T00:00:18+00:00 | build-django-check | 0 | 0.36 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-22T00:00:22+00:00 | idiom-ruff-check | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T00:00:25+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |
+| 2026-11-22T00:01:17+00:00 | tests-full | 0 | 49.26 | `pytest -q` | `6fbfe42ee0faa2cc` |  |  |
+| 2026-11-22T00:02:11+00:00 | crap-pytest-coverage | 0 | 48.83 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `b50696ec6abf43fb` |  |  |
+| 2026-11-22T00:02:14+00:00 | crap-lizard | 0 | 0.15 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T00:02:18+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `6fd27a5031ea9911` |  | gate=crap max=26.0 threshold=30 over=0 methods=185 |
+| 2026-11-22T00:04:02+00:00 | mutation-changed | 0 | 97.27 | `python .migration/harness/tools/afs-mutation` | `f14cdecddbdb85fe` |  | gate=mutation score=0.815 threshold=0.8 killed=75 survived=17 files=2 base=939fd6e0e29b7dd77ccf0c1267a6ab0d4df62998 |
+| 2026-11-22T00:07:54+00:00 | export-tests-final | 0 | 2.35 | `pytest -q tests/data_migration/test_export.py` | `44e8e3588ac7674a` |  |  |
+| 2026-11-22T00:07:58+00:00 | idiom-ruff-check | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T00:08:04+00:00 | idiom-ruff-format | 0 | 0.01 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |

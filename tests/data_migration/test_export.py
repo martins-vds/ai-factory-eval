@@ -14,12 +14,16 @@ FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
 MAPPING = ROOT / '.migration' / 'data' / 'mapping.yaml'
 
 
-def _export_fixture(output):
+def _load_fixture():
     call_command(
         'load_data_snapshot',
         snapshot=str(FIXTURE_SNAPSHOT),
         mapping=str(MAPPING),
     )
+
+
+def _export_fixture(output):
+    _load_fixture()
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
 
 
@@ -211,11 +215,7 @@ def test_export_command_help_and_required_options(capsys):
 
 @pytest.mark.django_db(transaction=True)
 def test_export_command_reports_row_counts(tmp_path):
-    call_command(
-        'load_data_snapshot',
-        snapshot=str(FIXTURE_SNAPSHOT),
-        mapping=str(MAPPING),
-    )
+    _load_fixture()
     output = StringIO()
 
     call_command(
@@ -230,11 +230,7 @@ def test_export_command_reports_row_counts(tmp_path):
 
 @pytest.mark.django_db(transaction=True)
 def test_export_orders_rows_by_primary_key(tmp_path):
-    call_command(
-        'load_data_snapshot',
-        snapshot=str(FIXTURE_SNAPSHOT),
-        mapping=str(MAPPING),
-    )
+    _load_fixture()
     LocationRecord.objects.create(pk=204, unlocode='ZZZ02', name='Second')
     LocationRecord.objects.create(pk=203, unlocode='ZZZ01', name='First')
     output = tmp_path / 'export'
