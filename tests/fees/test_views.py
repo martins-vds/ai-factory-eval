@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+from typing import ClassVar
 
 import pytest
 
@@ -10,7 +11,7 @@ from src.fees.gateway import HttpPaymentGateway, PaymentGatewayFailure
 @pytest.fixture
 def local_gateway(monkeypatch):
     class GatewayHandler(BaseHTTPRequestHandler):
-        calls = []
+        calls: ClassVar[list[tuple[str, str]]] = []
         status_code = 200
         response_body = b'charged\n'
         redirect_location = None
