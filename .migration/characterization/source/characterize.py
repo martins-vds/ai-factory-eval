@@ -33,6 +33,13 @@ CASES = (
     ('POST /loans', 'lend-missing-isbn', 'POST', '/loans', {'member': 'dee'}),
     ('POST /loans', 'lend-missing-member', 'POST', '/loans', {'isbn': '123'}),
     ('POST /loans', 'lend-empty-fields', 'POST', '/loans', {'member': '', 'isbn': ''}),
+    (
+        'POST /loans',
+        'lend-delimiter-fields',
+        'POST',
+        '/loans',
+        {'member': 'one;two', 'isbn': 'isbn;test'},
+    ),
     ('GET /loans', 'loans-after-lending', 'GET', '/loans', None),
     ('POST /loans/{id}/return', 'return-known-loan', 'POST', '/loans/L1/return', None),
     ('POST /loans/{id}/return', 'return-already-returned-loan', 'POST', '/loans/L2/return', None),
