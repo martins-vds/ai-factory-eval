@@ -1,0 +1,31 @@
+role: afs-migrator
+ticket: LL-05
+issue: martins-vds/ai-factory-eval#2360
+pr: martins-vds/ai-factory-eval#2365
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.867
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-05.md
+ledger_updated:
+  - reports.monthly-spec
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules:
+  - capability: reports.monthly-spec
+    rule: Use the prior local calendar month and include only members who started at least one loan in that period.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_monthly_report_application_applies_month_rules_and_fee_ordering
+    enforced: true
+    ledger_rule: monthly-membership
+  - capability: reports.monthly-spec
+    rule: Count late returns and total late fees in cents for the period, then sort by fees descending and member id ascending.
+    use_case: MonthlyReportApplication.generate
+    test: tests/reports/test_monthly_report_application.py::test_monthly_report_application_applies_month_rules_and_fee_ordering
+    enforced: true
+    ledger_rule: monthly-metrics-order
