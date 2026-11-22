@@ -7,9 +7,20 @@ source:
   location: legacy/src/main/resources/META-INF/seed.sql:1-3
 boundary: "The persistence unit loads three fixed example loan rows at startup: L1, L2, and L3, with their member, ISBN, and lent/returned dates."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/restart.json]
-notes: "Seed reload and reset-on-restart behavior are raised in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md]
+notes: "Seeds are inserted by the initial migration once; the approved restart fix is martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#42
+  reason: "Approved to retain persisted loans rather than reload the three seeds on restart."
+target:
+  components:
+    - src/loans/migrations/0001_initial.py
+rules:
+  - id: seed-characterized-loans
+    rule: "An empty catalog starts with L1, L2, and L3 using the characterized member, ISBN, and date values."
+    source: "legacy/src/main/resources/META-INF/seed.sql:1-3 and .migration/characterization/source/goldens/http.json."
