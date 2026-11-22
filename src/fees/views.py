@@ -11,11 +11,11 @@ def fee_api(request, loan_id):
     if quote is None:
         return HttpResponse('<p>No such loan.</p>', status=404, content_type='text/html')
 
-    amount = quote.amount_cents
+    amount = format_fee_amount(quote.amount_cents)
     body = (
         f'<h1>Late fee for {escape(quote.loan.id)}</h1>'
         f'<p>Due {quote.loan.due_on.isoformat()}, {quote.late_days} day(s) late.</p>'
-        f'<p class="fee">Fee: ${amount // 100}.{amount % 100:02d}</p>'
+        f'<p class="fee">Fee: ${amount}</p>'
     )
     return HttpResponse(body, content_type='text/html')
 
@@ -69,6 +69,10 @@ def payment_page(request, loan_id):
 def fee_page_context(quote, payment_status=None):
     return {
         'quote': quote,
-        'fee_amount': f'{quote.amount_cents // 100}.{quote.amount_cents % 100:02d}',
+        'fee_amount': format_fee_amount(quote.amount_cents),
         'payment_status': payment_status,
     }
+
+
+def format_fee_amount(amount_cents):
+    return f'{amount_cents // 100}.{amount_cents % 100:02d}'
