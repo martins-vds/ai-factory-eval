@@ -19,11 +19,11 @@ evidence:
   - .migration/evidence/runs/SY-05.md
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
-  - tests/fees/test_services.py::test_late_fee_uses_return_date_instead_of_today
-  - tests/fees/test_services.py::test_early_return_has_no_late_days_or_fee
-  - tests/fees/test_services.py::test_late_fee_is_waived_through_two_days_late
-  - tests/fees/test_services.py::test_late_fee_charges_all_late_days_after_the_waiver
-  - tests/fees/test_services.py::test_late_fee_is_capped_at_ten_dollars
+  - tests/fees/test_fee_services.py::test_late_fee_uses_return_date_instead_of_today
+  - tests/fees/test_fee_services.py::test_early_return_has_no_late_days_or_fee
+  - tests/fees/test_fee_services.py::test_late_fee_is_waived_through_two_days_late
+  - tests/fees/test_fee_services.py::test_late_fee_charges_all_late_days_after_the_waiver
+  - tests/fees/test_fee_services.py::test_late_fee_is_capped_at_ten_dollars
   - .migration/evidence/runs/LL-03.md
 rules:
   - id: end-date-and-days

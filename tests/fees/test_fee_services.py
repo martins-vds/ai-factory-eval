@@ -5,7 +5,7 @@ from src.fees.services import FeeApplication
 
 
 @dataclass
-class Loan:
+class FeeLoan:
     id: str
     due_on: date
     returned_on: date | None = None
@@ -25,7 +25,7 @@ class FixedClock:
 
 
 def test_late_fee_is_waived_through_two_days_late():
-    loan = Loan('L1', due_on=date(2026, 11, 20))
+    loan = FeeLoan('L1', due_on=date(2026, 11, 20))
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
     quote = application.calculate('L1')
@@ -35,7 +35,7 @@ def test_late_fee_is_waived_through_two_days_late():
 
 
 def test_late_fee_charges_all_late_days_after_the_waiver():
-    loan = Loan('L1', due_on=date(2026, 11, 19))
+    loan = FeeLoan('L1', due_on=date(2026, 11, 19))
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
     quote = application.calculate('L1')
@@ -45,7 +45,7 @@ def test_late_fee_charges_all_late_days_after_the_waiver():
 
 
 def test_late_fee_uses_return_date_instead_of_today():
-    loan = Loan('L1', due_on=date(2026, 11, 8), returned_on=date(2026, 11, 10))
+    loan = FeeLoan('L1', due_on=date(2026, 11, 8), returned_on=date(2026, 11, 10))
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
     quote = application.calculate('L1')
@@ -55,7 +55,7 @@ def test_late_fee_uses_return_date_instead_of_today():
 
 
 def test_early_return_has_no_late_days_or_fee():
-    loan = Loan('L1', due_on=date(2026, 11, 24), returned_on=date(2026, 11, 20))
+    loan = FeeLoan('L1', due_on=date(2026, 11, 24), returned_on=date(2026, 11, 20))
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
     quote = application.calculate('L1')
@@ -65,7 +65,7 @@ def test_early_return_has_no_late_days_or_fee():
 
 
 def test_late_fee_is_capped_at_ten_dollars():
-    loan = Loan('L1', due_on=date(2026, 10, 1))
+    loan = FeeLoan('L1', due_on=date(2026, 10, 1))
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
     quote = application.calculate('L1')

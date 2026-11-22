@@ -24,6 +24,7 @@ evidence:
   - tests/fees/test_views.py::test_fee_api_returns_the_characterized_not_found_response
   - tests/fees/test_views.py::test_fee_page_shows_late_fee_and_htmx_payment_action
   - tests/fees/test_views.py::test_unknown_fee_page_renders_a_not_found_message
+  - tests/fees/test_fee_services.py::test_missing_loan_has_no_late_fee
   - .migration/evidence/runs/LL-03.md
 notes: "The fee formula and date edge cases are inventoried separately in fees.calculation."
 rules:
