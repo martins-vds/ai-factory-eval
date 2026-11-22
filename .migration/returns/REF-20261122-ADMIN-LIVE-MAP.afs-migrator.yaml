@@ -1,0 +1,19 @@
+role: afs-migrator
+ticket: REF-20261122-ADMIN-LIVE-MAP
+issue: martins-vds/ai-factory-eval#2414
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2417
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.973
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/REF-20261122-ADMIN-LIVE-MAP.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
