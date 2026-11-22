@@ -6,7 +6,7 @@ gates:
   build: 0
   behavior: 0
   idiom: 0
-  crap: 7.0
+  crap: 0
   mutation_changed: 1.0
   regression: 0
 evidence_logs:
@@ -17,4 +17,4 @@ new_tickets: []
 handoff: none
 rules: []
 no_rules: {}
-notes: No tests changed; existing fee endpoint and calculation tests were used as the regression safety net.
+notes: No tests changed; existing fee endpoint and calculation tests were used as the regression safety net. CRAP max was 7.0 (threshold 30).
