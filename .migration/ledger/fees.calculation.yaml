@@ -26,10 +26,10 @@ evidence:
 - .migration/characterization/source/goldens/http.json
 - .migration/characterization/source/goldens/edge-cases.json
 - .migration/evidence/runs/LL-03.md
-- tests/fees/test_services.py::test_fee_for_loan_applies_grace_period_daily_rate_and_cap
-- tests/fees/test_services.py::test_fee_for_returned_loan_uses_return_date_and_never_counts_early_days
-- tests/fees/test_services.py::test_early_return_has_no_late_days_or_fee
-- tests/fees/test_services.py::test_fee_for_unknown_loan_is_absent
+- tests/fees/test_fee_services.py::test_fee_for_loan_applies_grace_period_daily_rate_and_cap
+- tests/fees/test_fee_services.py::test_fee_for_returned_loan_uses_return_date_and_never_counts_early_days
+- tests/fees/test_fee_services.py::test_early_return_has_no_late_days_or_fee
+- tests/fees/test_fee_services.py::test_fee_for_unknown_loan_is_absent
 rules:
 - id: late-days-end-at-return
   rule: Days late run from the due date (14 days after lending) to the return date,

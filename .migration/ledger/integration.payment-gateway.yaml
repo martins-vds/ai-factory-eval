@@ -24,10 +24,10 @@ evidence:
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/gateway.json
   - .migration/evidence/runs/LL-03.md
-  - tests/fees/test_services.py::test_payment_for_unknown_loan_does_not_call_gateway
-  - tests/fees/test_services.py::test_payment_maps_gateway_response
-  - tests/fees/test_services.py::test_payment_failure_keeps_interruption_context
-  - tests/fees/test_services.py::test_payment_io_failure_maps_to_gateway_unavailable
+  - tests/fees/test_fee_services.py::test_payment_for_unknown_loan_does_not_call_gateway
+  - tests/fees/test_fee_services.py::test_payment_maps_gateway_response
+  - tests/fees/test_fee_services.py::test_payment_failure_keeps_interruption_context
+  - tests/fees/test_fee_services.py::test_payment_io_failure_maps_to_gateway_unavailable
   - tests/fees/test_gateway.py::test_gateway_posts_empty_body_and_returns_gateway_response
   - tests/fees/test_views.py::test_api_payment_preserves_success_response
   - tests/fees/test_views.py::test_htmx_payment_renders_escaped_gateway_failure
