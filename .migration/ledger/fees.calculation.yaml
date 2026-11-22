@@ -15,3 +15,9 @@ status: migrated
 verification: differential
 characterization_tier: A
 evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fee_calculation.py::test_fee_calculates_unreturned_loan_with_grace_period_and_cap, tests/fees/test_fee_calculation.py::test_fee_for_returned_loan_uses_return_date_instead_of_today]
+rules:
+  - {id: late-days-clamped-at-zero, rule: "A loan returned or checked on or before its due date has zero late days.", source: "legacy/src/main/java/lib/LateFeeView.java:33"}
+  - {id: two-day-grace-period, rule: "A loan that is no more than two days late has no fee.", source: "legacy/src/main/java/lib/LateFeeView.java:34"}
+  - {id: fee-per-late-day, rule: "When a loan is more than two days late, the fee is 25 cents per late day.", source: "legacy/src/main/java/lib/LateFeeView.java:34"}
+  - {id: fee-capped-at-ten-dollars, rule: "A late fee is capped at $10.00.", source: "legacy/src/main/java/lib/LateFeeView.java:34"}
+  - {id: returned-date-used, rule: "For a returned loan, late days are measured through its return date instead of today.", source: "legacy/src/main/java/lib/LateFeeView.java:32"}

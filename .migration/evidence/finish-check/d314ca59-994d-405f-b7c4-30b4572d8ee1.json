@@ -1,0 +1,32 @@
+[
+  {
+    "at": "2026-11-22T14:36:01Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16809,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "FS-01",
+    "role": "afs-characterizer",
+    "changed": [
+      ".migration/evidence/runs/FS-01.md",
+      ".migration/ledger/fees.calculation.yaml",
+      ".migration/ledger/fees.page.yaml",
+      ".migration/returns/FS-01.afs-characterizer.yaml",
+      ".migration/spec/fees-payments/fees.calculation.yaml",
+      ".migration/spec/fees-payments/fees.page.yaml"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]
