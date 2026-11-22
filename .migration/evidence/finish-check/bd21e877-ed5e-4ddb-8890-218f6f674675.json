@@ -1,0 +1,36 @@
+[
+  {
+    "at": "2026-11-22T14:52:03Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "agentId",
+      "agentType",
+      "cwd",
+      "parentAgentId",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 24372,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "REF-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/a3f26435-2088-48c7-862c-9366b1250e00.json",
+      ".migration/evidence/mutants/REF-02.md",
+      ".migration/evidence/runs/REF-02.md",
+      "src/fees/presentation.py",
+      "src/fees/views.py"
+    ],
+    "findings": [
+      "[mechanical] No return file. Write and commit `.migration/returns/REF-02.afs-migrator.yaml` with `role: afs-migrator`, `ticket: REF-02`, `issue:` this ticket's issue, `pr:` this PR, and every gate copied from your `afs-run` journal (`.migration/evidence/runs/REF-02.md`). See afs-migration-contract \u2192 Return files."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
