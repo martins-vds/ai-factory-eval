@@ -123,3 +123,38 @@ def test_gateway_uses_the_configured_default_url(monkeypatch):
         HttpPaymentGateway().charge('L6')
 
     assert requests == ['https://payments.lending-library.invalid/charge?loan=L6']
+
+
+def test_gateway_maps_error_response_body_read_failure_to_unavailable(monkeypatch):
+    import urllib.error
+    import urllib.request
+
+    read_error = OSError('response body read failed')
+
+    class FailedBody:
+        closed = False
+
+        def read(self, *args):
+            raise read_error
+
+        def close(self):
+            self.closed = True
+
+    response = urllib.error.HTTPError(
+        'http://127.0.0.1/charge?loan=L7',
+        503,
+        'Service Unavailable',
+        {},
+        FailedBody(),
+    )
+
+    class Opener:
+        def open(self, request):
+            raise response
+
+    monkeypatch.setattr(urllib.request, 'build_opener', lambda *args: Opener())
+
+    with pytest.raises(PaymentGatewayUnavailable) as raised:
+        HttpPaymentGateway('http://127.0.0.1').charge('L7')
+
+    assert raised.value.__cause__ is read_error

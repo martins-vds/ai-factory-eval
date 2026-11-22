@@ -52,6 +52,7 @@ evidence:
 - tests/fees/test_gateway.py::test_gateway_preserves_interrupted_request
 - tests/fees/test_gateway.py::test_gateway_preserves_interruption_wrapped_by_urllib
 - tests/fees/test_gateway.py::test_gateway_uses_the_configured_default_url
+- tests/fees/test_gateway.py::test_gateway_maps_error_response_body_read_failure_to_unavailable
 - tests/fees/test_views.py::test_payment_endpoint_forwards_successful_gateway_response
 - tests/fees/test_views.py::test_payment_endpoint_maps_gateway_failure_to_bad_gateway
 - tests/fees/test_views.py::test_payment_endpoint_does_not_call_gateway_for_unknown_loan
