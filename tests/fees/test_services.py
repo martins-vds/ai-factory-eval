@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, GatewayResponse, PaymentApplication
 
 
 @dataclass
@@ -22,6 +22,19 @@ class LoanRepository:
 class FixedClock:
     def today(self):
         return date(2026, 11, 22)
+
+
+class PaymentGateway:
+    def __init__(self, response=None, error=None):
+        self.response = response
+        self.error = error
+        self.charged = []
+
+    def charge(self, loan_id):
+        self.charged.append(loan_id)
+        if self.error:
+            raise self.error
+        return self.response
 
 
 def fee_for(*, due_on, returned_on=None):
@@ -63,3 +76,24 @@ def test_missing_loan_has_no_fee():
     fee = FeeApplication(LoanRepository(None), FixedClock()).calculate_fee('missing')
 
     assert fee is None
+
+
+def test_missing_loan_is_rejected_before_payment_gateway_is_called():
+    gateway = PaymentGateway(GatewayResponse(200, 'charged\n'))
+    application = PaymentApplication(LoanRepository(None), gateway)
+
+    result = application.pay('missing')
+
+    assert result is None
+    assert gateway.charged == []
+
+
+def test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure():
+    interruption = InterruptedError('request cancelled')
+    gateway = PaymentGateway(error=interruption)
+    application = PaymentApplication(LoanRepository(Loan('L1', date(2026, 11, 22))), gateway)
+
+    result = application.pay('L1')
+
+    assert (result.status_code, result.body) == (502, 'payment gateway unavailable\n')
+    assert result.interruption is interruption
