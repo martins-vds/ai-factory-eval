@@ -1,0 +1,13 @@
+id: data.loan-storage
+kind: data
+title: Store loans in the configured H2 database
+source:
+  graph_node: config:legacy/src/main/resources/META-INF/persistence.xml
+  location: legacy/src/main/resources/META-INF/persistence.xml:2-11
+boundary: "The library persistence unit uses in-memory H2, drop-and-create schema generation, and loads META-INF/seed.sql at startup."
+notes: "Reset-on-restart behavior is raised in .migration/quirks/restart-data-loss.md."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending
+

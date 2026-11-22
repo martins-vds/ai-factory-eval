@@ -1,0 +1,12 @@
+id: application.build
+kind: structural
+title: Build and launch the legacy application
+source:
+  graph_node: file:legacy/run.sh
+  location: legacy/run.sh:2-6
+boundary: "legacy/run.sh packages the Java 17 Maven application without tests and starts lib.App with the built classes and copied dependencies."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending
+

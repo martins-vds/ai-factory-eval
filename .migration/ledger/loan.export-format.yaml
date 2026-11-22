@@ -1,0 +1,15 @@
+id: loan.export-format
+kind: behavioral
+title: Format loans for CSV consumers
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:52-55
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "Each loan line contains id, member, ISBN, lent date, due date, and returned date separated by semicolons; an unreturned loan has an empty final field. The line is documented for spreadsheet users."
+notes: "Semicolons in field values are not escaped; see .migration/quirks/csv-field-escaping.md."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending
+

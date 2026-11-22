@@ -1,0 +1,12 @@
+id: data.seed-records
+kind: data
+title: Load the three seeded loans
+source:
+  graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+boundary: "Application startup inserts loans L1, L2, and L3 with their member, ISBN, lent date, and optional returned date."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending
+

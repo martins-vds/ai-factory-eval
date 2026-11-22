@@ -1,0 +1,13 @@
+id: application.startup
+kind: structural
+title: Configure and start the HTTP server
+source:
+  graph_node: file:legacy/src/main/java/lib/App.java
+  location: legacy/src/main/java/lib/App.java:13-26
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: "PORT selects the Grizzly port (default 8080); startup creates the persistence unit, registers all four resources, binds on 0.0.0.0, and closes the server and EntityManagerFactory on shutdown."
+tickets:
+  - martins-vds/ai-factory-eval#2258
+status: pending
+verification: pending
+
