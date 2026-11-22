@@ -5,6 +5,7 @@ from typing import Protocol
 
 
 class LoanRecord(Protocol):
+    id: str
     member: str
     lent_on: date
     due_on: date
@@ -19,6 +20,14 @@ class Clock(Protocol):
     def today(self) -> date: ...
 
 
+class FeeRecord(Protocol):
+    amount_cents: int
+
+
+class FeeCalculator(Protocol):
+    def fee_for(self, loan_id: str) -> FeeRecord | None: ...
+
+
 @dataclass
 class ReportRow:
     member_id: str
@@ -28,9 +37,10 @@ class ReportRow:
 
 
 class MonthlyReportApplication:
-    def __init__(self, loans: LoanRepository, clock: Clock):
+    def __init__(self, loans: LoanRepository, clock: Clock, fees: FeeCalculator):
         self.loans = loans
         self.clock = clock
+        self.fees = fees
 
     def generate(self) -> list[ReportRow]:
         loans = list(self.loans.all())
@@ -53,14 +63,11 @@ class MonthlyReportApplication:
             ):
                 row = rows[loan.member]
                 row.loans_returned_late += 1
-                row.total_late_fees_cents += _late_fee_cents(loan.due_on, loan.returned_on)
+                fee = self.fees.fee_for(loan.id)
+                if fee is not None:
+                    row.total_late_fees_cents += fee.amount_cents
 
         return sorted(
             rows.values(),
             key=lambda row: (-row.total_late_fees_cents, row.member_id),
         )
-
-
-def _late_fee_cents(due_on: date, returned_on: date) -> int:
-    days_late = (returned_on - due_on).days
-    return 0 if days_late <= 2 else min(1000, days_late * 25)

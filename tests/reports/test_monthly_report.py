@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
 
+from src.fees.services import FeeApplication
 from src.reports.services import MonthlyReportApplication, ReportRow
 
 
@@ -20,6 +21,14 @@ class LoanRepository:
     def all(self):
         return self.loans
 
+    def find(self, loan_id):
+        return next((loan for loan in self.loans if loan.id == loan_id), None)
+
+
+class NoPaymentGateway:
+    def charge(self, loan_id):
+        raise AssertionError('monthly reports must not charge loans')
+
 
 class Clock:
     def __init__(self, today=date(2026, 3, 1)):
@@ -29,25 +38,29 @@ class Clock:
         return self.value
 
 
+def report_application(loans, today=date(2026, 3, 1)):
+    repository = LoanRepository(loans)
+    clock = Clock(today)
+    fees = FeeApplication(repository, clock, NoPaymentGateway())
+    return MonthlyReportApplication(repository, clock, fees)
+
+
 def test_monthly_report_application_aggregates_prior_month_and_sorts_by_fees_then_member():
-    application = MonthlyReportApplication(
-        LoanRepository(
-            [
-                Loan('L1', 'ada', date(2026, 2, 2), date(2026, 2, 16), date(2026, 2, 21)),
-                Loan('L2', 'ada', date(2026, 1, 3), date(2026, 1, 17), date(2026, 2, 28)),
-                Loan('L3', 'bea', date(2026, 2, 4), date(2026, 2, 18), date(2026, 2, 20)),
-                Loan('L4', 'zoe', date(2026, 1, 5), date(2026, 1, 19), date(2026, 2, 20)),
-                Loan('L5', 'ada', date(2026, 3, 1), date(2026, 3, 15)),
-                Loan('L6', 'ada', date(2026, 2, 5), date(2026, 2, 19), date(2026, 3, 1)),
-                Loan('L10', 'amy', date(2026, 1, 1), date(2026, 1, 28), date(2026, 2, 1)),
-                Loan('L8', 'amy', date(2026, 2, 1), date(2026, 2, 15)),
-                Loan('L7', 'amy', date(2026, 2, 8), date(2026, 2, 22)),
-                Loan('L11', 'bea', date(2026, 2, 5), date(2026, 2, 20), date(2026, 2, 20)),
-                Loan('L9', 'zoe', date(2026, 1, 31), date(2026, 2, 14)),
-                Loan('L12', 'carol', date(2026, 2, 3), date(2026, 2, 17), date(2026, 2, 20)),
-            ]
-        ),
-        Clock(),
+    application = report_application(
+        [
+            Loan('L1', 'ada', date(2026, 2, 2), date(2026, 2, 16), date(2026, 2, 21)),
+            Loan('L2', 'ada', date(2026, 1, 3), date(2026, 1, 17), date(2026, 2, 28)),
+            Loan('L3', 'bea', date(2026, 2, 4), date(2026, 2, 18), date(2026, 2, 20)),
+            Loan('L4', 'zoe', date(2026, 1, 5), date(2026, 1, 19), date(2026, 2, 20)),
+            Loan('L5', 'ada', date(2026, 3, 1), date(2026, 3, 15)),
+            Loan('L6', 'ada', date(2026, 2, 5), date(2026, 2, 19), date(2026, 3, 1)),
+            Loan('L10', 'amy', date(2026, 1, 1), date(2026, 1, 28), date(2026, 2, 1)),
+            Loan('L8', 'amy', date(2026, 2, 1), date(2026, 2, 15)),
+            Loan('L7', 'amy', date(2026, 2, 8), date(2026, 2, 22)),
+            Loan('L11', 'bea', date(2026, 2, 5), date(2026, 2, 20), date(2026, 2, 20)),
+            Loan('L9', 'zoe', date(2026, 1, 31), date(2026, 2, 14)),
+            Loan('L12', 'carol', date(2026, 2, 3), date(2026, 2, 17), date(2026, 2, 20)),
+        ]
     )
 
     report = application.generate()
@@ -61,15 +74,13 @@ def test_monthly_report_application_aggregates_prior_month_and_sorts_by_fees_the
 
 
 def test_monthly_report_includes_previous_december_at_year_boundary():
-    application = MonthlyReportApplication(
-        LoanRepository(
-            [
-                Loan('L0', 'member', date(2026, 12, 1), date(2026, 12, 15)),
-                Loan('L1', 'member', date(2026, 12, 31), date(2027, 1, 14)),
-                Loan('L2', 'member', date(2027, 1, 1), date(2027, 1, 15)),
-            ]
-        ),
-        Clock(date(2027, 1, 1)),
+    application = report_application(
+        [
+            Loan('L0', 'member', date(2026, 12, 1), date(2026, 12, 15)),
+            Loan('L1', 'member', date(2026, 12, 31), date(2027, 1, 14)),
+            Loan('L2', 'member', date(2027, 1, 1), date(2027, 1, 15)),
+        ],
+        today=date(2027, 1, 1),
     )
 
     assert application.generate() == [

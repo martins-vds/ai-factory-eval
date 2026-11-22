@@ -14,6 +14,7 @@ target:
     - src.reports.services.MonthlyReportApplication
     - src.reports.repository.DjangoReportLoanRepository
     - src.reports.management.commands.monthly_report.Command
+    - src.fees.services.FeeApplication.fee_for
 status: migrated
 evidence:
   - legacy/docs/reports-spec.md
@@ -30,9 +31,9 @@ rules:
     rule: Include only members with at least one loan started in the report month, and count only starts in that month.
     source: legacy/docs/reports-spec.md:5-8; .migration/plan/monthly-report.md:5
   - id: late-returns-and-fees
-    rule: Count loans returned after their due date in the report month, even if the late fee is waived, and sum applicable late fees in cents.
+    rule: For qualifying members, count loans returned after their due date during the report month regardless of their start date, even if the late fee is waived, and sum applicable late fees in cents.
     source: legacy/docs/reports-spec.md:5; .migration/ledger/fees.calculation.yaml
   - id: fee-order
     rule: Sort rows by total late fees descending, then member id ascending.
     source: legacy/docs/reports-spec.md:7-8
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable. Late-return metrics are attributed to the return month, including loans started earlier, for members who started at least one loan in the report month."

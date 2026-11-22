@@ -3,6 +3,8 @@ from io import StringIO
 
 from django.core.management.base import BaseCommand
 
+from src.fees.gateway import HttpPaymentGateway
+from src.fees.services import FeeApplication
 from src.loans.clock import SystemClock
 from src.reports.repository import DjangoReportLoanRepository
 from src.reports.services import MonthlyReportApplication
@@ -12,7 +14,10 @@ class Command(BaseCommand):
     help = 'Write the previous month lending report as CSV.'
 
     def handle(self, *args, **options):
-        report = MonthlyReportApplication(DjangoReportLoanRepository(), SystemClock()).generate()
+        loans = DjangoReportLoanRepository()
+        clock = SystemClock()
+        fees = FeeApplication(loans, clock, HttpPaymentGateway())
+        report = MonthlyReportApplication(loans, clock, fees).generate()
         output = StringIO(newline='')
         writer = csv.writer(output, lineterminator='\n')
         writer.writerow(
