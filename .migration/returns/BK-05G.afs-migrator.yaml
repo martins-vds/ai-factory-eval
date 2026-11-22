@@ -7,7 +7,7 @@ gates:
   behavior: null
   idiom: null
   crap: null
-  mutation_changed: null
+  mutation_changed: "n/a: not run, handed off"
   regression: null
 evidence_logs:
   - .migration/evidence/runs/BK-05G.md
