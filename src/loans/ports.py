@@ -1,4 +1,3 @@
-from datetime import date
 from typing import Protocol
 
 from .domain import Loan
