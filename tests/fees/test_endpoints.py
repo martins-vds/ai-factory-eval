@@ -156,6 +156,14 @@ def test_payment_page_swaps_gateway_error_fragment(client, payment_gateway):
 
 
 @pytest.mark.django_db
+def test_regular_payment_page_redirects_to_fee_page(client, payment_gateway):
+    response = client.post('/ui/payments/L1/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/fees/L1/'
+
+
+@pytest.mark.django_db
 def test_interrupted_payment_is_a_gateway_failure_without_losing_interrupt(client, monkeypatch):
     class InterruptedOpener:
         def open(self, _request):

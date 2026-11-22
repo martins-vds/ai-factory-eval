@@ -69,7 +69,7 @@ def payment_page(request, loan_id):
 
     if result.status == 200:
         if request.headers.get('HX-Request') != 'true':
-            return redirect(f'/ui/fees/{loan_id}/')
+            return redirect('fee_page', loan_id=loan_id)
         return render(
             request,
             'fees/payment-status.html',
