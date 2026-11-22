@@ -1,0 +1,13 @@
+id: late-fee.view
+kind: behavioral
+title: View a loan's late fee
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}"
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk:
+    crap: 20
+    complexity: 4
+boundary: "GET /fees/{id} returns an HTML fee fragment or 404; late days are measured through the return date or today, fees are 25 cents per day after a two-day waiver, and the total is capped at $10."
+status: pending
+verification: pending

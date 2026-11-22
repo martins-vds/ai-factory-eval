@@ -1,0 +1,10 @@
+id: reports.monthly-spec
+kind: behavioral
+title: Monthly lending report specification
+source:
+  graph_node: "document:legacy/docs/reports-spec.md"
+  location: legacy/docs/reports-spec.md:1-9
+boundary: "The document specifies a first-of-month report for the previous month, one row per member with loans started, late returns, and late fees; rows are sorted by fees descending then member id, and members without loans are omitted."
+status: pending
+verification: pending
+notes: "The same document says this was a separate, retired product and its code and runtime are unavailable. Scope is unresolved in .migration/quirks/monthly-report-spec-only.md."

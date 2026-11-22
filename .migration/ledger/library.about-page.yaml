@@ -1,0 +1,14 @@
+id: library.about-page
+kind: ui
+title: Serve the public library information page
+source:
+  graph_node: "page:legacy/src/main/resources/static/about.html:legacy/src/main/resources/static/about.html"
+  flow: View About Page
+  location: legacy/src/main/resources/static/about.html:1-9
+  risk:
+    crap: 2
+    complexity: 1
+boundary: "GET /about serves the static HTML page with the library name, Monday-to-Saturday hours, 14-day lending period, and contact address."
+status: pending
+verification: pending
+no_rules: "Static public information page; its content and route are the observable capability."

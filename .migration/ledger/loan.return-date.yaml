@@ -1,0 +1,14 @@
+id: loan.return-date
+kind: data
+title: Record the return date on a loan
+source:
+  graph_node: "method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned"
+  flow: Return Book
+  location: legacy/src/main/java/lib/LoanRepository.java:36-45
+  risk:
+    crap: 6
+    complexity: 2
+boundary: "Returning an existing loan writes the supplied date to returnedOn; the source does not reject or preserve the original date on a repeated return."
+status: pending
+verification: pending
+notes: "The repeated-return behavior is unresolved in .migration/quirks/repeated-loan-return.md."

@@ -1,0 +1,10 @@
+id: data.seed-records
+kind: data
+title: Load the initial loan records
+source:
+  graph_node: "table:legacy/src/main/resources/META-INF/seed.sql:LOAN"
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+boundary: "The persistence unit loads three fixed sample loans, including one active loan and two returned loans, when the in-memory schema is created."
+status: pending
+verification: pending
+notes: "The reload-on-start behavior is unresolved in .migration/quirks/restart-data-loss.md."
