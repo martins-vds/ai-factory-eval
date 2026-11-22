@@ -26,5 +26,3 @@ evidence:
   - tests/library_info/test_endpoints.py::test_about_page_shows_library_information_in_the_browser
   - .migration/evidence/runs/LL-04.md
 no_rules: "Both routes serve static library information without validating input or enforcing business decisions."
-characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/browser.json]
