@@ -1,0 +1,10 @@
+id: loans.get
+kind: behavioral
+title: Retrieve one loan
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans/{id}
+  location: legacy/src/main/java/lib/LoanResource.java:30-35
+  risk: { crap: 2, complexity: 1, coverage: 0 }
+boundary: GET /loans/{id} returns the formatted loan line followed by a newline, or HTTP 404 with "no such loan\n" when the id is unknown.
+status: pending
+verification: pending

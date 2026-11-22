@@ -1,0 +1,52 @@
+[
+  {
+    "at": "2026-11-22T00:29:07Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16977,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "SY-04",
+    "role": "afs-analyst",
+    "changed": [
+      ".migration/evidence/runs/SY-04.md",
+      ".migration/ledger/app.launch.yaml",
+      ".migration/ledger/app.maven-build.yaml",
+      ".migration/ledger/application.startup.yaml",
+      ".migration/ledger/data.loan-storage.yaml",
+      ".migration/ledger/data.seed-records.yaml",
+      ".migration/ledger/docs.csv-export.yaml",
+      ".migration/ledger/docs.monthly-report.yaml",
+      ".migration/ledger/fees.view.yaml",
+      ".migration/ledger/integration.payment-gateway.yaml",
+      ".migration/ledger/library.about.yaml",
+      ".migration/ledger/loan.return-date.yaml",
+      ".migration/ledger/loan.return.yaml",
+      ".migration/ledger/loans.create.yaml",
+      ".migration/ledger/loans.due-date.yaml",
+      ".migration/ledger/loans.get.yaml",
+      ".migration/ledger/loans.list.yaml",
+      ".migration/ledger/loans.repository.yaml",
+      ".migration/ledger/loans.schema.yaml",
+      ".migration/ledger/loans.text-format.yaml",
+      ".migration/ledger/payment.gateway-errors.yaml",
+      ".migration/quirks/blank-loan-fields.md",
+      ".migration/quirks/concurrent-loan-identifiers.md",
+      ".migration/quirks/monthly-report-spec-only.md",
+      ".migration/returns/SY-04.afs-analyst.yaml",
+      ".migration/risk-map/SY-04.md"
+    ],
+    "findings": [],
+    "blocks_before": 0,
+    "decision": "allow",
+    "why": "clean"
+  }
+]

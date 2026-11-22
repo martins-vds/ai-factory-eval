@@ -1,0 +1,9 @@
+id: loans.due-date
+kind: behavioral
+title: Calculate loan due dates
+source:
+  graph_node: method:legacy/src/main/java/lib/Loan.java:Loan.dueOn
+  location: legacy/src/main/java/lib/Loan.java:14-46
+boundary: Each loan is due 14 days after lentOn; dueOn is exposed in the formatted loan record and used to calculate late fees.
+status: pending
+verification: pending

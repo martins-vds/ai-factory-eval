@@ -1,0 +1,9 @@
+id: app.maven-build
+kind: structural
+title: Build the Lending Library
+source:
+  graph_node: config:legacy/pom.xml
+  location: legacy/pom.xml:1-53
+boundary: Maven packages the Java 17 application and copies runtime dependencies; the configured runtime uses Jersey/Grizzly, Hibernate ORM, and H2.
+status: pending
+verification: pending

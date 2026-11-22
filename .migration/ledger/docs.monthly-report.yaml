@@ -1,0 +1,9 @@
+id: docs.monthly-report
+kind: behavioral
+title: Preserve the monthly lending report specification
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-9
+boundary: The remaining specification calls for a first-of-month report of the previous month, one row per member with loans started, loans returned late, and late fees in cents, sorted by fees descending then member id; members without monthly loans are omitted. The document says the separate product's code and runtime are unavailable.
+status: pending
+verification: pending

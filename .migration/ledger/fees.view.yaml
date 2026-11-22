@@ -1,0 +1,11 @@
+id: fees.view
+kind: behavioral
+title: View a loan's late fee
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:26-38
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: GET /fees/{id} returns HTTP 404 with an HTML fragment for an unknown loan; otherwise it computes lateness through returnedOn or today, waives up to two days, charges 25 cents per later day up to $10, and renders an HTML fee page.
+status: pending
+verification: pending

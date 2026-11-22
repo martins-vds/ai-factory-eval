@@ -1,0 +1,10 @@
+id: docs.csv-export
+kind: structural
+title: Document the loan export format
+source:
+  graph_node: document:legacy/docs/export-csv.md
+  flow: List Loans
+  location: legacy/docs/export-csv.md:1-4
+boundary: The source document records that GET /loans uses semicolon-delimited id, member, isbn, lent on, due on, and returned on fields, relied on by spreadsheet users.
+status: pending
+verification: pending

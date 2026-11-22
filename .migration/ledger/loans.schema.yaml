@@ -1,0 +1,9 @@
+id: loans.schema
+kind: data
+title: Persist loan records
+source:
+  graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
+  location: legacy/src/main/java/lib/Loan.java:11-26
+boundary: The LOAN table stores id, member, isbn, and nullable returnedOn; id is the primary key and member, isbn, and lentOn are required. JPA maps this schema to the `library` persistence unit.
+status: pending
+verification: pending
