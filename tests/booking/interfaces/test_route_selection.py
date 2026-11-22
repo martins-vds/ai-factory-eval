@@ -11,6 +11,7 @@ from cargotracker.booking.application.registration import CargoRegistration
 from cargotracker.booking.application.routing import CargoRouting
 from cargotracker.booking.interfaces.dashboard.views import create_booking_views
 from cargotracker.booking.interfaces.route_selection.views import create_route_selection_views
+from cargotracker.cargo.infrastructure.models import CargoRecord
 from cargotracker.cargo.infrastructure.repository import DjangoCargoRepository
 from cargotracker.handling.infrastructure.repository import DjangoHandlingEventRepository
 from cargotracker.location.domain.location import Location
@@ -125,12 +126,14 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert itinerary_response.status_code == 200
     route_content = route_response.content.decode()
     itinerary_content = itinerary_response.content.decode()
-    assert 'No routes found that satisfy the route specification.' in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
-    assert 'No routes found that satisfy the route specification.' in itinerary_content
     assert (
+        'No routes found that satisfy the route specification. '
+        'Try setting an arrival deadline further into the future.' in route_content
+    )
+    assert (
+        'No routes found that satisfy the route specification. '
         'Try setting the arrival deadline further into the future (a few weeks at least).'
         in itinerary_content
     )
@@ -177,6 +180,27 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
 
 
 @pytest.mark.django_db
+def test_assignment_quotes_tracking_id_as_one_redirect_path_segment():
+    tracking_id = _create_cargo(_candidate_paths())
+    unsafe_tracking_id = 'ABC/DEF'
+    CargoRecord.objects.filter(tracking_id=tracking_id.value).update(tracking_id=unsafe_tracking_id)
+    route_url = f'/admin/cargo/{unsafe_tracking_id}/route/'
+    route_response = route_view(RequestFactory().get(route_url), unsafe_tracking_id)
+    candidate_token = re.search(
+        r'name="candidate" value="([^"]+)"',
+        route_response.content.decode(),
+    ).group(1)
+
+    response = route_view(
+        RequestFactory().post(route_url, {'candidate': candidate_token}),
+        unsafe_tracking_id,
+    )
+
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/cargo/ABC%2FDEF/'
+
+
+@pytest.mark.django_db
 @override_settings(ROOT_URLCONF=__name__)
 def test_route_assignment_rejects_a_modified_candidate(client):
     tracking_id = _create_cargo(_candidate_paths())
@@ -200,6 +224,18 @@ def test_route_screens_reject_unsupported_http_methods(client):
     tracking_id = _create_cargo(())
     route_response = client.put(f'/admin/cargo/{tracking_id.value}/route/')
     itinerary_response = client.post(f'/admin/cargo/{tracking_id.value}/itineraries/')
+
+    assert route_response.status_code == 405
+    assert itinerary_response.status_code == 405
+
+
+@pytest.mark.django_db
+def test_route_selection_views_reject_unsupported_methods_before_lookup():
+    route_response = route_view(RequestFactory().put('/admin/cargo/MISSING1/route/'), 'MISSING1')
+    itinerary_response = itinerary_view(
+        RequestFactory().post('/admin/cargo/MISSING1/itineraries/'),
+        'MISSING1',
+    )
 
     assert route_response.status_code == 405
     assert itinerary_response.status_code == 405
