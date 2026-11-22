@@ -19,9 +19,9 @@ evidence:
   - .migration/evidence/runs/SY-05.md
   - .migration/characterization/source/goldens/http.json
   - .migration/characterization/source/goldens/edge-cases.json
-  - tests/fees/test_services.py::test_fee_waiver_daily_rate_and_cap
-  - tests/fees/test_services.py::test_fee_uses_return_date_instead_of_today
-  - tests/fees/test_services.py::test_fee_for_unknown_loan_is_not_calculated
+  - tests/fees/test_fee_services.py::test_fee_waiver_daily_rate_and_cap
+  - tests/fees/test_fee_services.py::test_fee_uses_return_date_instead_of_today
+  - tests/fees/test_fee_services.py::test_fee_for_unknown_loan_is_not_calculated
   - .migration/evidence/runs/LL-03.md
 rules:
   - id: late-days

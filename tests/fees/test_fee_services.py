@@ -13,7 +13,7 @@ class Loan:
     returned_on: date | None = None
 
 
-class LoanRepository:
+class InMemoryLoanRepository:
     def __init__(self, loans):
         self.loans = {loan.id: loan for loan in loans}
 
@@ -50,7 +50,7 @@ def test_fee_waiver_daily_rate_and_cap(days_after_due, days_late, amount_cents):
     due_on = date(2026, 10, 12)
     loan = Loan('L1', due_on)
     application = FeeApplication(
-        LoanRepository([loan]),
+        InMemoryLoanRepository([loan]),
         Clock(due_on + timedelta(days=days_after_due)),
         PaymentGateway(),
     )
@@ -65,7 +65,7 @@ def test_fee_uses_return_date_instead_of_today():
     due_on = date(2026, 10, 12)
     loan = Loan('L1', due_on, returned_on=due_on + timedelta(days=1))
     application = FeeApplication(
-        LoanRepository([loan]),
+        InMemoryLoanRepository([loan]),
         Clock(due_on + timedelta(days=20)),
         PaymentGateway(),
     )
@@ -77,14 +77,18 @@ def test_fee_uses_return_date_instead_of_today():
 
 
 def test_fee_for_unknown_loan_is_not_calculated():
-    application = FeeApplication(LoanRepository([]), Clock(date(2026, 10, 12)), PaymentGateway())
+    application = FeeApplication(
+        InMemoryLoanRepository([]),
+        Clock(date(2026, 10, 12)),
+        PaymentGateway(),
+    )
 
     assert application.calculate_fee('missing') is None
 
 
 def test_payment_for_unknown_loan_does_not_call_gateway():
     gateway = PaymentGateway()
-    application = FeeApplication(LoanRepository([]), Clock(date(2026, 10, 12)), gateway)
+    application = FeeApplication(InMemoryLoanRepository([]), Clock(date(2026, 10, 12)), gateway)
 
     assert application.pay('missing') is None
     assert gateway.charges == []
@@ -98,7 +102,7 @@ def test_payment_only_succeeds_for_gateway_http_200(gateway_status, succeeded):
     loan = Loan('L1', date(2026, 10, 12))
     gateway = PaymentGateway(PaymentResult(gateway_status, 'gateway response'))
     application = FeeApplication(
-        LoanRepository([loan]),
+        InMemoryLoanRepository([loan]),
         Clock(date(2026, 10, 12)),
         gateway,
     )
@@ -117,7 +121,7 @@ def test_payment_outcome_keeps_interrupted_failure_cause():
     failure.__cause__ = interrupted
     gateway = PaymentGateway(failure=failure)
     application = FeeApplication(
-        LoanRepository([loan]),
+        InMemoryLoanRepository([loan]),
         Clock(date(2026, 10, 12)),
         gateway,
     )
