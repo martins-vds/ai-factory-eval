@@ -1,5 +1,6 @@
 from datetime import date
 
+from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import GatewayResponse, PaymentApplication
 
 
@@ -88,3 +89,33 @@ def test_network_failure_remains_available_with_gateway_failure():
     assert result.status_code == 502
     assert result.body == 'payment gateway unavailable\n'
     assert result.failure is failure
+
+
+def test_gateway_uses_the_characterized_default_url(monkeypatch):
+    class GatewayReply:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc_value, traceback):
+            return None
+
+        def read(self):
+            return b'charged\n'
+
+    requests = []
+
+    def open_request(request):
+        requests.append(request.full_url)
+        return GatewayReply()
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    monkeypatch.setattr('src.fees.gateway.urlopen', open_request)
+
+    response = HttpPaymentGateway().charge('L1')
+
+    assert response == GatewayResponse(200, 'charged\n')
+    assert requests == [
+        'https://payments.lending-library.invalid/charge?loan=L1',
+    ]

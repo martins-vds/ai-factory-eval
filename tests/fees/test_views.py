@@ -1,8 +1,12 @@
 import json
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
+from django.utils import timezone
 from playwright.sync_api import sync_playwright
+
+from src.loans.models import Loan
 
 HTTP_GOLDENS = json.loads(
     (
@@ -48,6 +52,26 @@ def test_fee_api_formats_zero_fee_for_an_early_return(client):
     assert response.status_code == expected['status']
     assert response['Content-Type'] == expected['content_type']
     assert response.content.decode() == expected['body']
+
+
+@pytest.mark.django_db
+def test_fee_endpoints_format_the_capped_fee_as_ten_dollars(client):
+    today = timezone.localdate()
+    loan = Loan.objects.create(
+        id='L10',
+        member='reader',
+        isbn='123',
+        lent_on=today - timedelta(days=60),
+    )
+
+    response = client.get('/fees/L10')
+    page = client.get('/ui/fees/L10/')
+
+    assert response.content.decode() == (
+        f'<h1>Late fee for L10</h1><p>Due {loan.due_on.isoformat()}, 46 day(s) late.</p>'
+        '<p class="fee">Fee: $10.00</p>'
+    )
+    assert b'Fee: $10.00' in page.content
 
 
 @pytest.mark.django_db
@@ -107,6 +131,14 @@ def test_payment_api_does_not_call_gateway_for_an_unknown_loan(
 
 
 @pytest.mark.django_db
+def test_payment_endpoints_reject_non_post_methods(client, local_payment_gateway):
+    for path in ('/payments/L1', '/ui/payments/L1/'):
+        assert client.get(path).status_code == 405
+
+    assert local_payment_gateway.requests == []
+
+
+@pytest.mark.django_db
 def test_fee_page_shows_late_fee_and_htmx_payment_action(client):
     response = client.get('/ui/fees/L3/')
 
@@ -134,6 +166,7 @@ def test_htmx_payment_success_renders_a_status_message(client, local_payment_gat
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 200
+    assert b'<!doctype html>' not in response.content
     assert b'id="payment-result"' in response.content
     assert b'role="status"' in response.content
     assert b'Payment received for loan L1.' in response.content
@@ -151,6 +184,7 @@ def test_htmx_payment_failure_renders_an_error_message(
     response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 502
+    assert b'<!doctype html>' not in response.content
     assert b'id="payment-result"' in response.content
     assert b'role="alert"' in response.content
     assert b'declined' in response.content
@@ -161,6 +195,7 @@ def test_htmx_payment_unknown_loan_renders_the_error_response(client):
     response = client.post('/ui/payments/unknown/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 404
+    assert b'<!doctype html>' not in response.content
     assert b'role="alert"' in response.content
     assert b'No such loan.' in response.content
 
