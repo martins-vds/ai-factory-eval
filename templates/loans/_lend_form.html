@@ -1,0 +1,18 @@
+<form method="post" action="/ui/loans/new/" hx-post="/ui/loans/new/" hx-target="#loan-form-container" hx-swap="innerHTML" hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+  {% csrf_token %}
+  <div class="form-control">
+    <label class="label" for="member"><span class="label-text">Member</span></label>
+    <input class="input input-bordered" id="member" name="member" value="{{ member }}" required aria-describedby="member-error">
+    {% if errors.member %}
+    <p class="mt-1 text-sm text-[#a94e37]" id="member-error" role="alert">{{ errors.member }}</p>
+    {% endif %}
+  </div>
+  <div class="form-control mt-3">
+    <label class="label" for="isbn"><span class="label-text">ISBN</span></label>
+    <input class="input input-bordered" id="isbn" name="isbn" value="{{ isbn }}" required aria-describedby="isbn-error">
+    {% if errors.isbn %}
+    <p class="mt-1 text-sm text-[#a94e37]" id="isbn-error" role="alert">{{ errors.isbn }}</p>
+    {% endif %}
+  </div>
+  <button class="btn btn-primary mt-6" type="submit">Create loan</button>
+</form>

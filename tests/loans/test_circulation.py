@@ -67,7 +67,7 @@ def test_lending_api_preserves_the_characterized_response(client):
 
 
 @pytest.mark.django_db
-def test_lending_api_rejects_blank_fields_with_a_field_error(client):
+def test_lending_api_rejects_blank_fields_with_legacy_error(client):
     response = client.post('/loans', {'member': '  ', 'isbn': '123'})
 
     assert response.status_code == 400
@@ -122,8 +122,21 @@ def test_reading_room_lend_form_renders_field_errors_for_htmx(client):
 
     assert response.status_code == 422
     assert b'id="member-error"' in response.content
-    assert b'id="isbn-error"' in response.content
+    assert b'This field is required.' in response.content
     assert b'hx-swap' in response.content
+
+
+@pytest.mark.django_db
+def test_reading_room_lend_form_creates_a_loan_for_htmx(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'reader', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 201
+    assert b'Loan L4 is ready.' in response.content
+    assert Loan.objects.get(pk='L4').member == 'reader'
 
 
 @pytest.mark.django_db
@@ -131,4 +144,4 @@ def test_reading_room_return_renders_repeat_return_error_for_htmx(client):
     response = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
 
     assert response.status_code == 409
-    assert b'already returned' in response.content
+    assert b'already been returned' in response.content
