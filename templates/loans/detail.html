@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Loan {{ loan.id }} · The Lending Library{% endblock %}
+
+{% block content %}
+  <section class="mx-auto max-w-3xl">
+    <p class="text-xs uppercase tracking-[.2em] prototype-muted">The collection · Loan {{ loan.id }}</p>
+    <h1 class="mb-8 mt-3 text-5xl">A book in good company.</h1>
+    <article class="prototype-surface p-7">
+      <h2 class="text-3xl font-semibold">{{ loan.member }}</h2>
+      <dl class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div>
+          <dt class="text-sm prototype-muted">ISBN</dt>
+          <dd>{{ loan.isbn }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm prototype-muted">Lent on</dt>
+          <dd>{{ loan.lent_on|date:"M j, Y" }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm prototype-muted">Due on</dt>
+          <dd>{{ loan.due_on|date:"M j, Y" }}</dd>
+        </div>
+        <div>
+          <dt class="text-sm prototype-muted">Returned on</dt>
+          <dd>{% if loan.returned_on %}{{ loan.returned_on|date:"M j, Y" }}{% else %}Not yet returned{% endif %}</dd>
+        </div>
+      </dl>
+    </article>
+    <a class="btn btn-ghost mt-6 prototype-ink" href="/ui/loans/">← Back to the collection</a>
+  </section>
+{% endblock %}
