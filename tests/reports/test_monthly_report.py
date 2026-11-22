@@ -45,7 +45,7 @@ def test_monthly_report_aggregates_previous_calendar_month_loans():
             [
                 Loan('L0', 'member-1', date(2026, 1, 31), date(2026, 2, 14)),
                 Loan('L1', 'member-1', date(2026, 2, 1), date(2026, 2, 10), date(2026, 2, 13)),
-                Loan('L2', 'member-1', date(2026, 2, 28), date(2026, 3, 14), date(2026, 3, 14)),
+                Loan('L2', 'member-1', date(2026, 2, 28), date(2026, 3, 14)),
                 Loan('L3', 'member-2', date(2026, 3, 1), date(2026, 3, 15)),
             ]
         ),
