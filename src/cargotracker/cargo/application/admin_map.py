@@ -1,7 +1,8 @@
 from collections.abc import Mapping
 
-from .admin_map_data import cargo_map_data
 from cargotracker.cargo.domain.repository import CargoRepository
+
+from .admin_map_data import cargo_map_data
 
 
 def build_admin_map_data(
