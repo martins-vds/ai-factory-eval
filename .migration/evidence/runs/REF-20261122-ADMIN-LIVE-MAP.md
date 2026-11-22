@@ -15,3 +15,6 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T22:51:23+00:00 | crap | 0 | 69.35 | `bash -c 'pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov && lizard --csv src > .migration/runs/lizard.csv && python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30'` | `770ba33d319fe460` |  | gate=crap max=26.0 threshold=30 over=0 methods=213 |
 | 2026-11-22T22:52:45+00:00 | mutation_changed | 0 | 80.0 | `python .migration/harness/tools/afs-mutation` | `27a05fb4291dcda8` |  | gate=mutation score=1.000 threshold=0.8 killed=36 survived=0 files=2 base=b6040f86168f81fb0e686dba820244aeb87ce1cb |
 | 2026-11-22T22:54:06+00:00 | regression | 0 | 79.2 | `pytest -q` | `ad70934050fd869f` |  |  |
+| 2026-11-22T22:59:27+00:00 | build | 0 | 0.45 | `bash -c 'python -m compileall -q src && python manage.py check'` | `1e3e63f221bde888` |  |  |
+| 2026-11-22T23:00:41+00:00 | behavior | 0 | 71.78 | `pytest -q` | `0c2a8fd96137aa98` |  |  |
+| 2026-11-22T23:00:43+00:00 | spec | 0 | 0.06 | `python .migration/harness/tools/afs-spec run` | `1b0b939f3e1e502f` |  | gate=spec cases=0 failed=0 pending=0 |
