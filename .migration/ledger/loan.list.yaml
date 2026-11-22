@@ -1,0 +1,13 @@
+id: loan.list
+kind: behavioral
+title: List and export loans
+source:
+  graph_node: endpoint:legacy/src/main/java/lib/LoanResource.java:GET /loans
+  flow: List Loans
+  location: legacy/src/main/java/lib/LoanResource.java:26-28
+  risk: { crap: 1.0, complexity: 1, coverage: 1.0 }
+boundary: "GET /loans: status, text/plain body, ascending id order, six semicolon-separated fields, and trailing newline"
+tickets: [martins-vds/ai-factory-eval#2266]
+status: pending
+verification: pending
+notes: legacy/docs/export-csv.md documents the six-field spreadsheet format.

@@ -2,7 +2,7 @@
 
 # Graph gate: source
 
-- 86 nodes, 119 edges
+- 90 nodes, 123 edges
 - Edges added by harness enrichers: 67
 
 ## Required types (profile graph.require)
@@ -35,7 +35,7 @@ AFS-RESULT gate=graph side=source verdict=pass failures=0 entry_points=8 reachin
 
 - Commit: `563c316ed51462b08fd6e58f3781a3c8b2890453` · analyzed 2026-11-08T17:23:45.202Z
 - Languages: java, shell, sql, html, xml, markdown · frameworks: Jersey, Hibernate, Maven
-- 86 nodes, 119 edges, 4 layers
+- 90 nodes, 123 edges, 4 layers
 
 ## Required node types
 
@@ -47,8 +47,8 @@ AFS-RESULT gate=graph side=source verdict=pass failures=0 entry_points=8 reachin
 | `table` | 2 | data capabilities and data-migration slices |
 | `service` | **0** | service boundaries |
 | `domain` | 3 | bounded contexts |
-| `flow` | 6 | business flows → slice anchors |
-| `step` | 18 | flow steps → capabilities |
+| `flow` | 7 | business flows → slice anchors |
+| `step` | 21 | flow steps → capabilities |
 
 ## Required edge types
 
@@ -59,13 +59,13 @@ AFS-RESULT gate=graph side=source verdict=pass failures=0 entry_points=8 reachin
 | `writes_to` | 3 | data access (write) |
 | `routes` | 8 | UI/HTTP routing |
 | `tested_by` | **0** | legacy test inventory |
-| `contains_flow` | 6 | domain → flow |
-| `flow_step` | 18 | flow → step |
+| `contains_flow` | 7 | domain → flow |
+| `flow_step` | 21 | flow → step |
 
 ## All node types
 
-`method` 27, `step` 18, `file` 9, `class` 7, `endpoint` 7, `flow` 6, `domain` 3, `document` 2, `config` 2, `function` 2, `table` 2, `page` 1
+`method` 27, `step` 21, `file` 9, `class` 7, `endpoint` 7, `flow` 7, `domain` 3, `document` 2, `config` 2, `function` 2, `table` 2, `page` 1
 
 ## All edge types
 
-`contains` 33, `calls` 24, `flow_step` 18, `depends_on` 12, `routes` 8, `reads_from` 6, `contains_flow` 6, `writes_to` 3, `configures` 3, `defines_schema` 2, `triggers` 1, `documents` 1, `related` 1, `cross_domain` 1
+`contains` 33, `calls` 24, `flow_step` 21, `depends_on` 12, `routes` 8, `reads_from` 6, `contains_flow` 7, `writes_to` 3, `configures` 3, `defines_schema` 2, `triggers` 1, `documents` 1, `related` 1, `cross_domain` 1

@@ -1,0 +1,11 @@
+id: reports.monthly
+kind: behavioral
+title: Monthly lending report specification
+source:
+  graph_node: document:legacy/docs/reports-spec.md
+  location: legacy/docs/reports-spec.md:1-6
+boundary: "The documented monthly report schedule, row fields, omission rule, and ordering; no executable source is present"
+tickets: [martins-vds/ai-factory-eval#2266]
+status: pending
+verification: pending
+notes: This document is the only remaining artifact for a retired reporting module.

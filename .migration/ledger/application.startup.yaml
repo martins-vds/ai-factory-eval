@@ -1,0 +1,12 @@
+id: application.startup
+kind: structural
+title: Build and start the Lending Library
+source:
+  graph_node: method:legacy/src/main/java/lib/App.java:App.main
+  location: legacy/run.sh:1-6
+  risk: { crap: 1.0, complexity: 1, coverage: 0.85 }
+boundary: "Run script builds the Java 17 app and starts Jersey/Grizzly on PORT or 8080 with shutdown cleanup"
+tickets: [martins-vds/ai-factory-eval#2266]
+status: pending
+verification: pending
+notes: legacy/pom.xml pins the Maven dependencies and Java release.

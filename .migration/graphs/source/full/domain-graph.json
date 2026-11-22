@@ -423,6 +423,65 @@
       ],
       "complexity": "simple",
       "filePath": "legacy/src/main/resources/static/about.html"
+    },
+    {
+      "id": "flow:get-loan",
+      "type": "flow",
+      "name": "Get Loan",
+      "summary": "Returns one loan as a semicolon-separated line or 404 when its id is unknown.",
+      "tags": [
+        "lending"
+      ],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "GET /loans/{id}",
+        "entryType": "http"
+      }
+    },
+    {
+      "id": "step:get-loan:receive-request",
+      "type": "step",
+      "name": "Receive loan lookup request",
+      "summary": "Jersey routes GET /loans/{id} to LoanResource.one.",
+      "tags": [
+        "get-loan"
+      ],
+      "complexity": "simple",
+      "filePath": "legacy/src/main/java/lib/LoanResource.java",
+      "lineRange": [
+        31,
+        35
+      ]
+    },
+    {
+      "id": "step:get-loan:find-loan",
+      "type": "step",
+      "name": "Find loan",
+      "summary": "Repository reads the loan by its id.",
+      "tags": [
+        "get-loan"
+      ],
+      "complexity": "simple",
+      "filePath": "legacy/src/main/java/lib/LoanRepository.java",
+      "lineRange": [
+        23,
+        25
+      ]
+    },
+    {
+      "id": "step:get-loan:respond-with-loan-or-404",
+      "type": "step",
+      "name": "Respond with loan or 404",
+      "summary": "Formats a found loan or returns the no-such-loan response.",
+      "tags": [
+        "get-loan"
+      ],
+      "complexity": "simple",
+      "filePath": "legacy/src/main/java/lib/LoanResource.java",
+      "lineRange": [
+        31,
+        35
+      ]
     }
   ],
   "edges": [
@@ -590,6 +649,34 @@
     {
       "source": "flow:view-about-page",
       "target": "step:view-about-page:load-static-page",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "domain:lending",
+      "target": "flow:get-loan",
+      "type": "contains_flow",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "flow:get-loan",
+      "target": "step:get-loan:receive-request",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.33
+    },
+    {
+      "source": "flow:get-loan",
+      "target": "step:get-loan:find-loan",
+      "type": "flow_step",
+      "direction": "forward",
+      "weight": 0.67
+    },
+    {
+      "source": "flow:get-loan",
+      "target": "step:get-loan:respond-with-loan-or-404",
       "type": "flow_step",
       "direction": "forward",
       "weight": 1.0

@@ -1,0 +1,34 @@
+role: afs-analyst
+ticket: SY-04
+issue: martins-vds/ai-factory-eval#2266
+graphs:
+  knowledge: .migration/graphs/source/full/knowledge-graph.json
+  domain: .migration/graphs/source/full/domain-graph.json
+  nodes: 90
+  edges: 123
+  flows: 7
+ledger:
+  entries: 14
+  by_kind:
+    structural: 1
+    behavioral: 6
+    ui: 2
+    integration: 2
+    data: 3
+risk_map:
+  path: .migration/risk-map/SY-04.md
+  methods: 19
+  above_threshold: 0
+  hot_spots:
+    - "LateFeeView.page: CRAP 4.2, complexity 4, coverage 90%"
+    - "FinePayments.pay: CRAP 4.2, complexity 4, coverage 75%"
+    - "LoanResource.lend: CRAP 3.0, complexity 3, coverage 67%"
+quirk_tickets:
+  - .migration/quirks/payment-interrupt.md
+  - .migration/quirks/repeated-loan-return.md
+  - .migration/quirks/restart-data-loss.md
+  - .migration/quirks/monthly-report-spec-only.md
+  - .migration/quirks/loan-semicolon-output.md
+  - .migration/quirks/loan-empty-fields.md
+graph_discrepancies:
+  - Added the missing GET /loans/{id} domain flow with source-backed lookup and response steps.
