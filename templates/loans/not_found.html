@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Loan not found | The Lending Library{% endblock %}
+{% block content %}
+<main class="mx-auto max-w-3xl px-6 py-10 md:py-16">
+  <h1 class="text-4xl">No such loan.</h1>
+  <a class="mt-6 inline-block text-[#a94e37] underline underline-offset-4" href="{% url 'ui_loan_catalog' %}">Back to the collection</a>
+</main>
+{% endblock %}
