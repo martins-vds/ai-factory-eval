@@ -16,3 +16,23 @@
 - None.
 ### Next step for the next session
 Resume BK-05G after the ticket scope explicitly includes `templates/booking/dashboard/not_routed_table.html`; then implement test-first and run the profile gates through `afs-run`.
+
+## Handoff — afs-migrator · 2026-11-22T17:16:43Z
+**State:** blocked  ·  **Branch / PR:** `copilot/bk-05g-continue-dialogs-from-not-routed-table-6f2dc417-5eef-4128-a299-b1394c2a5d77` / no PR opened for this eval checkout  ·  **Last commit:** 8c135f55a
+### Done
+- Source is present, read-only and pinned at `f3beacf78de4f6d34edc4971ac87e38a5c6fe59d`; target history is complete.
+- Migration validation passed; setup probe passed; database service is healthy; runtime check passed with Python 3.13.18.
+- Confirmed `templates/booking/dashboard/not_routed_table.html` and `src/cargotracker/booking/application/specification.py` exist.
+- No application code was changed.
+### Remaining
+- [ ] Resolve the setup-input mismatch for the three paths required by BK-05G, then rerun `afs-setup-check`.
+- [ ] If setup passes, implement only the approved dashboard-template integration, run the ticket gates and update the return.
+### Decisions made
+- Stopped before implementation because `check_inputs.py` reports required BK-05G inputs missing; the operator scope extension does not make the listed dialog implementation inputs present.
+### Blockers / questions
+- `src/cargotracker/booking/interfaces/dialogs/views.py`, `templates/booking/dialogs/`, and `tests/booking/interfaces/test_dialogs.py` are absent from this checkout.
+- The task scope extension restricts code changes to `templates/booking/dashboard/not_routed_table.html`; an operator must reconcile the missing ticket inputs with that extension. Do not fetch or merge the referenced base branch.
+### Failing commands
+- `python .migration/harness/tools/check_inputs.py` (journaled with `afs-run` as `setup-inputs-check`) → exit 1; see `.migration/runs/BK-05G/20261122T171655013676Z-setup-inputs-check.log`.
+### Next step for the next session
+Resolve the missing-input/setup mismatch with the operator; rerun setup from the beginning before touching application code.
