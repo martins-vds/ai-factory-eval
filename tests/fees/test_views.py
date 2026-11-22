@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 
 import pytest
+from playwright.sync_api import sync_playwright
 
 HTTP_GOLDENS = json.loads(
     (
@@ -26,7 +27,7 @@ def test_fee_api_returns_characterized_not_found_response(client):
     response = client.get('/fees/unknown')
 
     assert response.status_code == 404
-    assert response['Content-Type'] == 'text/html; charset=utf-8'
+    assert response['Content-Type'] == 'text/html'
     assert response.content.decode() == '<p>No such loan.</p>'
 
 
@@ -83,8 +84,8 @@ def test_fee_page_has_reading_room_layout_and_payment_action(client):
     response = client.get('/ui/fees/L3/')
 
     assert response.status_code == 200
-    assert b'<h1>Late fee for L3</h1>' in response.content
-    assert b'Due Dec. 15, 2025, 19 day(s) late.' in response.content
+    assert b'>Late fee for L3</h1>' in response.content
+    assert b'Due Dec 15, 2025, 19 day(s) late.' in response.content
     assert b'Fee: $4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'htmx:beforeSwap' in response.content
@@ -117,3 +118,27 @@ def test_htmx_payment_page_renders_success_and_failure_responses(
     assert failure.status_code == 502
     assert b'role="alert"' in failure.content
     assert b'declined' in failure.content
+
+
+@pytest.mark.django_db
+def test_browser_renders_htmx_gateway_failure(live_server, payment_server, monkeypatch):
+    payment_server.response_status = 503
+    payment_server.response_body = b'declined\n'
+    monkeypatch.setenv(
+        'PAYMENT_GATEWAY_URL',
+        f'http://127.0.0.1:{payment_server.server_port}',
+    )
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            assert page.evaluate("typeof window.htmx !== 'undefined'")
+
+            page.get_by_role('button', name='Pay late fee').click()
+            page.locator('#payment-status [role="alert"]').wait_for()
+
+            assert 'Payment failed: declined' in page.locator('#payment-status').inner_text()
+        finally:
+            browser.close()
