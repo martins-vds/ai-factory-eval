@@ -1,0 +1,22 @@
+role: afs-migrator
+ticket: REF-01
+issue: martins-vds/ai-factory-eval#2282
+pr: martins-vds/ai-factory-eval#2284
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.978
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/REF-01.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
+notes:
+  - "tests/data_migration/test_export.py changed because two existing tests directly referenced the removed private helpers; they now exercise the corresponding public schema APIs."
+  - "Mutation survivors change unused prepared key metadata or the query iterator chunk size; neither changes exported file contents."
