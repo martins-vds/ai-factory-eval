@@ -1,4 +1,6 @@
+import csv
 from datetime import date
+from io import StringIO
 from typing import Protocol
 
 
@@ -7,11 +9,38 @@ class Clock(Protocol):
 
 
 class LoanRepositoryPort(Protocol):
+    def all(self): ...
+
     def lend(self, member: str, isbn: str, lent_on: date): ...
 
     def find(self, loan_id: str): ...
 
     def mark_returned(self, loan_id: str, returned_on: date): ...
+
+
+def loan_line(loan):
+    output = StringIO(newline='')
+    writer = csv.writer(output, delimiter=';', lineterminator='\n')
+    writer.writerow(
+        [
+            loan.id,
+            loan.member,
+            loan.isbn,
+            loan.lent_on.isoformat(),
+            loan.due_on.isoformat(),
+            loan.returned_on.isoformat() if loan.returned_on else '',
+        ]
+    )
+    return output.getvalue()
+
+
+def list_loans_text(repository: LoanRepositoryPort):
+    return ''.join(loan_line(loan) for loan in repository.all())
+
+
+def get_loan_text(repository: LoanRepositoryPort, loan_id: str):
+    loan = repository.find(loan_id)
+    return loan_line(loan) if loan else None
 
 
 class InvalidLoan(Exception):
@@ -59,5 +88,8 @@ class ReturnBook:
             raise LoanAlreadyReturned(loan)
         loan = self._repository.mark_returned(loan_id, self._clock.today())
         if loan is None:
-            raise LoanAlreadyReturned
+            loan = self._repository.find(loan_id)
+            if loan is None:
+                raise LoanNotFound
+            raise LoanAlreadyReturned(loan)
         return loan
