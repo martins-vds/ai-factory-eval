@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Late fee · The Lending Library{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl">
+  <a class="link link-hover text-[#a94e37]" href="/ui/loans/">← Back to the collection</a>
+  <p class="mt-6 text-xs uppercase tracking-[.2em] text-[#66705b]">A small nudge, never a surprise</p>
+  <h1 class="mt-2 text-4xl">Late fees</h1>
+  <div class="grid gap-4 sm:grid-cols-2">
+    <article class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <p class="text-xs uppercase tracking-[.2em] text-[#66705b]">
+          Loan record · {{ fee.loan.id }}
+        </p>
+        <h2 class="card-title mt-2">{{ fee.loan.member }}</h2>
+        <p>Due {{ fee.loan.due_on|date:"M j, Y" }}
+          {% if fee.loan.returned_on %} · returned {{ fee.loan.returned_on|date:"M j, Y" }}{% endif %}
+        </p>
+        <p class="mt-2">{{ fee.late_days }} day(s) late · first two days waived</p>
+        <p class="mt-6 text-4xl font-bold text-[#a94e37]">{{ fee.amount }}</p>
+        <p class="mt-2 text-sm text-[#66705b]">25¢ per late day once more than two days late, capped at $10.00.</p>
+      </div>
+    </article>
+    <aside class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title">Settle this fee</h2>
+        <p class="text-sm text-[#66705b]">The payment is sent securely through the library gateway.</p>
+        <div id="payment-status" class="mt-6">
+          <form method="post" action="/ui/payments/{{ fee.loan.id }}/"
+                hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML"
+                hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
+            {% csrf_token %}
+            <button class="btn" style="background-color: #a94e37; color: #fff" type="submit">Pay late fee</button>
+          </form>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+{% endblock %}
