@@ -17,6 +17,28 @@ ledger_updated:
   - booking.screen-route
   - booking.screen-select-itinerary
   - booking.routing-assign
+rules:
+  - capability: booking.routing-chain
+    rule: Candidate itineraries must satisfy the cargo's route specification.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification
+    enforced: true
+    ledger_rule: route-specification
+  - capability: booking.routing-chain
+    rule: Route candidates cannot be generated for missing or stale cargo.
+    use_case: CargoRouting.route_candidates
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
+    enforced: true
+    ledger_rule: cargo-exists
+  - capability: booking.routing-assign
+    rule: Route assignment cannot target missing or stale cargo.
+    use_case: CargoRouting.assign_route
+    test: tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found
+    enforced: true
+    ledger_rule: cargo-exists
+no_rules:
+  booking.screen-route: This capability presents cargo details and candidate routes; route eligibility rules belong to booking.routing-chain.
+  booking.screen-select-itinerary: This capability displays the no-route state; route eligibility rules belong to booking.routing-chain.
 quirk_tickets: []
 new_tickets: []
 handoff: none

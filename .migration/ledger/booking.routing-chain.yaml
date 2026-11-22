@@ -22,7 +22,16 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
+  - "tests/booking/application/test_routing.py::test_route_candidates_convert_paths_and_filter_by_route_specification"
+  - "tests/booking/application/test_routing.py::test_unknown_or_stale_routing_updates_raise_cargo_not_found"
   - "tests/booking/interfaces/test_route_selection.py::test_route_selection_renders_populated_candidates_and_numbered_legs"
   - "tests/booking/interfaces/test_route_selection.py::test_assigning_candidate_redirects_to_details_with_the_selected_itinerary"
   - ".migration/evidence/runs/BK-05F.md"
 notes: "Decision #89 selects in-process routing in the target while preserving random routes; this source entry records the current REST client and graph traversal behavior as the equivalence boundary."
+rules:
+  - id: route-specification
+    rule: Candidate itineraries must satisfy the cargo's route specification.
+    source: "src/main/java/org/eclipse/cargotracker/interfaces/booking/facade/internal/DefaultBookingServiceFacade.java:134-144"
+  - id: cargo-exists
+    rule: Route candidates cannot be generated for missing or stale cargo.
+    source: "src/main/java/org/eclipse/cargotracker/interfaces/booking/facade/internal/DefaultBookingServiceFacade.java:66-79"
