@@ -42,6 +42,8 @@ VERIFIER_VERDICT_RULE_V1 = "VERIFIER_VERDICT_RULE_V1"  # Phase 3e: returns commi
 VERIFIER_RULES_RULE_V1 = "VERIFIER_RULES_RULE_V1"  # Phase 3e (rules checked): earlier returns are exempt.
 LEDGER_RULES_RULE_V1 = "LEDGER_RULES_RULE_V1"  # Phase 3e (rules in the ledger): earlier returns are exempt.
 MIGRATOR_SELF_VERIFY_RULE_V1 = "MIGRATOR_SELF_VERIFY_RULE_V1"
+SPEC_GATE_RULE_V1 = "SPEC_GATE_RULE_V1"  # ADR-0063: Migrator returns committed before the spec gate are exempt.
+ACCEPTANCE_BLOCK_RULE_V1 = "ACCEPTANCE_BLOCK_RULE_V1"  # ADR-0059: earlier orchestrator returns are exempt.
 PLAN_ANCHORS_RULE_V1 = "PLAN_ANCHORS_RULE_V1"  # ADR-0048 (builds: for target anchors): earlier plans are exempt.  # ADR-0045: earlier Migrator returns are exempt.
 
 
@@ -328,6 +330,54 @@ def check_migrator_ledger_rules(folder, path, doc, errors):
                           "why it has none under `no_rules`")
 
 
+SPEC_BUILDERS = {"afs-migrator", "afs-specialist-migrator"}
+
+
+def specced(folder):
+    out = set()
+    for spec in sorted((folder / "spec").glob("*/*.yaml")) if (folder / "spec").is_dir() else []:
+        try:
+            doc = load_yaml(spec) or {}
+        except Exception:  # noqa: BLE001 (a broken spec is check_spec's error to report)
+            continue
+        if isinstance(doc, dict) and doc.get("capability"):
+            out.add(doc["capability"])
+    return out
+
+
+def check_spec_gate(folder, path, doc, profile, errors):
+    """ADR-0063: a finished Migrator ticket that builds a capability with a customer spec reports the spec gate,
+    and the journal backs it: the last run of the profile's `gates.spec` passed, with none of the ticket's
+    capabilities still pending (cases of a capability not yet marked built are skipped, not passed)."""
+    spec_cmds = ((profile or {}).get("gates") or {}).get("spec")
+    if not spec_cmds or doc.get("role") not in SPEC_BUILDERS or doc.get("handoff") not in (None, "", "none"):
+        return
+    mine = sorted(set(ticket_capabilities(folder, doc.get("ticket")) or []) & specced(folder))
+    if not mine:
+        return
+    value = (doc.get("gates") or {}).get("spec")
+    if value != 0 or isinstance(value, bool):
+        errors.append(f"{path}: {', '.join(mine)} has a customer spec, so this return needs `gates.spec: 0`, the "
+                      f"exit of the profile's spec gate (`{spec_cmds[0]}`) run through afs-run after the ledger "
+                      f"marks it migrated (got {value!r}). A case you believe is wrong is a spec dispute handoff")
+        return
+    trusted = {cell(c) for c in spec_cmds} | {cell(shlex.join(["bash", "-c", c])) for c in spec_cmds}
+    journal = folder / "evidence" / "runs" / f"{doc.get('ticket')}.md"
+    runs = [r for r in journal_as_of(path, journal) if r["command"] in trusted and r["result"].get("gate") == "spec"]
+    if not runs:
+        errors.append(f"{path}: gates.spec is 0 but {journal} has no run of the profile's spec gate; run "
+                      f"`{spec_cmds[0]}` through afs-run")
+        return
+    last = runs[-1]
+    pending = set(filter(None, last["result"].get("pending_caps", "").split(",")))
+    if last["exit"] != "0" or last["result"].get("failed") not in ("0", None):
+        errors.append(f"{path}: gates.spec is 0 but the last spec run in {journal} failed "
+                      f"(exit {last['exit']}, failed={last['result'].get('failed')})")
+    elif pending & set(mine):
+        errors.append(f"{path}: the last spec run in {journal} skipped {', '.join(sorted(pending & set(mine)))} as "
+                      "not built yet: mark it `migrated` in the ledger first, then re-run the spec gate")
+
+
 def cell(text, limit=400):
     """Same escaping afs-run uses for the journal's Command cell."""
     return text.replace("|", "\\|").replace("`", "'").strip()[:limit]
@@ -406,6 +456,33 @@ def journal_as_of(ret, journal):
             finally:
                 tmp.unlink()
     return read_journal(journal)[0] if journal.is_file() else []
+
+
+ACCEPTANCE_TOP_LEVEL = ("slice", "tickets", "human_check", "human_check_issues", "human_check_issue",
+                        "human_check_due", "mutation_score", "coverage_gaps", "report", "gates")
+ACCEPTANCE_REQUIRED = ("slice", "tickets", "report", "gates", "human_check")
+
+
+def check_acceptance_block(path, doc, errors):
+    """ADR-0059: an orchestrator's slice-acceptance fields live in its `acceptance` block, because that is all
+    check_signoff.py and check_slice_returns.py read (ADR-0050). Fold eval: 2 of 9 folded acceptances wrote
+    them at the top level, in the retired Slice Coordinator's layout, where the sign-off check can't see
+    `human_check`."""
+    if doc.get("role") != "afs-program-orchestrator":
+        return
+    block = doc.get("acceptance")
+    stray = [k for k in ACCEPTANCE_TOP_LEVEL if k in doc]
+    if stray and (block is not None or "human_check" in doc or "slice" in doc):
+        errors.append(f"{path}: {', '.join(stray)} must be inside the `acceptance` block, which is all the "
+                      "sign-off checks read (ADR-0050, ADR-0059); the retired Slice Coordinator's layout doesn't "
+                      "apply to an orchestrator return")
+    if isinstance(block, dict):
+        missing = [k for k in ACCEPTANCE_REQUIRED if k not in block]
+        if missing:
+            errors.append(f"{path}: the acceptance block needs {', '.join(missing)} (afs-slice-acceptance, "
+                          "\"The acceptance return\")")
+    elif block is not None:
+        errors.append(f"{path}: acceptance must be a mapping of the slice-acceptance fields (ADR-0059)")
 
 
 def check_return_evidence(folder, path, doc, profile, pr_roles, errors):
@@ -606,6 +683,21 @@ def check_layering_gate(path, profile, errors):
                           f"`python .migration/harness/tools/{tool}`")
 
 
+def check_spec(folder, errors):
+    """ADR-0061: the customer spec is valid, every case asserts something and names a rule its capability
+    lists; with the profile's `spec.required`, every rule of a specced capability is proved by a case."""
+    import importlib.machinery
+    import importlib.util
+    tool = HERE / "afs-spec"
+    loader = importlib.machinery.SourceFileLoader("afs_spec", str(tool))
+    module = importlib.util.module_from_spec(importlib.util.spec_from_loader("afs_spec", loader))
+    loader.exec_module(module)
+    profile = load_yaml(folder / "profile.yaml") if (folder / "profile.yaml").exists() else {}
+    require = bool(((profile or {}).get("spec") or {}).get("required"))
+    errors += module.check(folder / "spec", folder / "ledger", require)
+    return len(module.spec_files(folder / "spec"))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("folder")
@@ -651,6 +743,10 @@ def main():
                 check_evidence(folder.resolve().parent, path, doc, errors)
                 check_components(folder.resolve().parent, path, doc, errors)
 
+    spec = folder / "spec"
+    if spec.is_dir():
+        checked += check_spec(folder, errors)
+
     returns = folder / "returns"
     if returns.is_dir():
         validator = load_schema(schemas, "return.schema.json")
@@ -672,6 +768,10 @@ def main():
                     check_verifier_rules(folder, path, doc, errors)
                 if not predates_rule(path, folder, LEDGER_RULES_RULE_V1):
                     check_migrator_ledger_rules(folder, path, doc, errors)
+                if not predates_rule(path, folder, SPEC_GATE_RULE_V1):
+                    check_spec_gate(folder, path, doc, profile, errors)
+                if not predates_rule(path, folder, ACCEPTANCE_BLOCK_RULE_V1):
+                    check_acceptance_block(path, doc, errors)
             if isinstance(doc, dict) and "ticket" in doc and "role" in doc:
                 want = f"{doc['ticket']}.{doc['role']}"
                 if path.stem != want:
