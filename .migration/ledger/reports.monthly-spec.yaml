@@ -5,10 +5,28 @@ title: Produce the specified monthly lending report
 source:
   graph_node: document:legacy/docs/reports-spec.md
   location: legacy/docs/reports-spec.md:1-9
-boundary: "The retired report specification calls for a run on each month's first day over the prior month, one row per member with loans started, late returns, and late fees in cents, sorted by fees descending then member id; omit members with no loans in that month."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+boundary: "The monthly_report command reports the prior local calendar month: one row per member who started a loan in that month, with loans started, late returns, and late fees in cents, sorted by fees descending then member id."
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2360]
+target:
+  components:
+    - src.reports.services.MonthlyReportApplication.generate
+    - src.reports.repository.DjangoReportLoanRepository
+    - src.reports.management.commands.monthly_report.Command
+status: migrated
 verification: spec-derived
 characterization_tier: C
-evidence: [legacy/docs/reports-spec.md, .migration/references/characterization-SY-05.md]
-notes: "Only the document remains; the source explicitly states that the separate reporting module and runtime are unavailable."
+evidence:
+  - legacy/docs/reports-spec.md
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-05.md
+  - tests/reports/test_command.py::test_monthly_report_aggregates_previous_calendar_month
+  - tests/reports/test_command.py::test_monthly_report_handles_january_year_boundary
+  - tests/reports/test_services.py::test_report_application_applies_month_rules_and_fee_ordering
+rules:
+  - id: monthly-membership
+    rule: "Use the prior local calendar month and include only members who started at least one loan in that period."
+    source: ".migration/plan/monthly-report.md; legacy/docs/reports-spec.md:6-9"
+  - id: monthly-metrics-order
+    rule: "Count late returns and total late fees in cents for the period, then sort by fees descending and member id ascending."
+    source: "legacy/docs/reports-spec.md:7-8; .migration/plan/monthly-report.md"
+notes: "Only the document remains; it states no output format, so the command emits a CSV header and rows."

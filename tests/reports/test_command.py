@@ -57,6 +57,7 @@ def test_monthly_report_aggregates_previous_calendar_month():
                 lent_on=date(2026, 2, 1),
                 returned_on=date(2026, 3, 20),
             ),
+            Loan(id='F-new', member='foxtrot', isbn='9', lent_on=date(2026, 3, 10)),
             Loan(id='G', member='golf', isbn='8', lent_on=date(2026, 4, 1)),
         ]
     )
@@ -68,7 +69,7 @@ def test_monthly_report_aggregates_previous_calendar_month():
     assert list(csv.reader(output.getvalue().splitlines())) == [
         ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
         ['alpha', '1', '2', '1075'],
-        ['foxtrot', '0', '1', '825'],
+        ['foxtrot', '1', '1', '825'],
         ['bravo', '1', '1', '75'],
         ['charlie', '1', '0', '0'],
         ['delta', '1', '0', '0'],
@@ -85,8 +86,9 @@ def test_monthly_report_handles_january_year_boundary():
                 member='winter',
                 isbn='1',
                 lent_on=date(2025, 11, 1),
-                returned_on=date(2025, 12, 10),
+                returned_on=date(2025, 12, 2),
             ),
+            Loan(id='winter-start', member='winter', isbn='3', lent_on=date(2025, 12, 31)),
             Loan(id='december', member='new-reader', isbn='2', lent_on=date(2025, 12, 31)),
         ]
     )
@@ -97,6 +99,6 @@ def test_monthly_report_handles_january_year_boundary():
 
     assert list(csv.reader(output.getvalue().splitlines())) == [
         ['member_id', 'loans_started', 'late_returns', 'total_late_fees_cents'],
-        ['winter', '0', '1', '425'],
+        ['winter', '1', '1', '425'],
         ['new-reader', '1', '0', '0'],
     ]
