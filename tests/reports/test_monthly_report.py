@@ -45,6 +45,9 @@ def test_monthly_report_aggregates_the_previous_calendar_month():
             Loan('L2', 'ada', date(2026, 10, 31)),
             Loan('L3', 'bea', date(2026, 10, 2), date(2026, 10, 20)),
             Loan('L4', 'zoe', date(2026, 10, 3), date(2026, 10, 20)),
+            Loan('L7', 'ada', date(2026, 10, 10), date(2026, 10, 27)),
+            Loan('L8', 'amy', date(2026, 10, 4), date(2026, 10, 21)),
+            Loan('L9', 'due-member', date(2026, 10, 5), date(2026, 10, 19)),
             Loan('L5', 'old-member', date(2026, 9, 30), date(2026, 10, 20)),
             Loan('L6', 'new-member', date(2026, 11, 1)),
         ]
@@ -59,7 +62,9 @@ def test_monthly_report_aggregates_the_previous_calendar_month():
     rows = application.generate()
 
     assert rows == [
+        MonthlyReportRow('ada', loans_started=3, late_returns=2, late_fees_cents=150),
         MonthlyReportRow('bea', loans_started=1, late_returns=1, late_fees_cents=100),
-        MonthlyReportRow('ada', loans_started=2, late_returns=1, late_fees_cents=75),
+        MonthlyReportRow('amy', loans_started=1, late_returns=1, late_fees_cents=75),
         MonthlyReportRow('zoe', loans_started=1, late_returns=1, late_fees_cents=75),
+        MonthlyReportRow('due-member', loans_started=1, late_returns=0, late_fees_cents=0),
     ]
