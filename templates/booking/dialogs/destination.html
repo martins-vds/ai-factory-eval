@@ -1,0 +1,39 @@
+<section aria-labelledby="change-destination-title" class="space-y-4">
+  <h2 id="change-destination-title" class="text-xl font-semibold">Change destination</h2>
+  <p>
+    Origin: {{ cargo.route_specification.origin.name }}.
+    Current destination: {{ cargo.route_specification.destination.name }}.
+  </p>
+  <form
+    method="post"
+    action="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-post="/admin/cargo/{{ cargo.tracking_id.value }}/destination/"
+    hx-target="#cargo-edit-dialog-content"
+    hx-swap="innerHTML"
+  >
+    {% csrf_token %}
+    <label class="mb-1 block font-medium" for="new-destination">New destination</label>
+    <select
+      id="new-destination"
+      name="destination"
+      required
+      {% if error %}aria-describedby="destination-error" aria-invalid="true"{% endif %}
+    >
+      <option value="">Select a destination</option>
+      {% for location in destination_choices %}
+        <option value="{{ location.unlocode.value }}">{{ location.name }}</option>
+      {% endfor %}
+    </select>
+    {% if error %}
+      <p class="mt-2 text-red-700" id="destination-error" role="alert">{{ error }}</p>
+    {% endif %}
+    <div class="mt-4 flex justify-end gap-3">
+      {% if is_dialog %}
+        <button type="button" class="btn btn-ghost" onclick="this.closest('dialog').close()">Cancel</button>
+      {% else %}
+        <a href="/admin/dashboard/" class="btn btn-ghost">Cancel</a>
+      {% endif %}
+      <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+  </form>
+</section>

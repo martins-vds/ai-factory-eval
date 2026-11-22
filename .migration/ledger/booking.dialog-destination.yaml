@@ -7,8 +7,13 @@ source:
   risk: {crap: 20, complexity: 4, coverage: 0.0}
 boundary: "Destination dialog receives trackingId, displays origin/current destination, offers destinations excluding both, and provides Cancel and Update with a full-page refresh on completion."
 slice: booking
-tickets: [martins-vds/ai-factory-pilot-target#225]
-status: pending
+tickets: [martins-vds/ai-factory-pilot-target#225, martins-vds/ai-factory-pilot-target#294]
+target:
+  components:
+    - cargotracker.booking.interfaces.dialogs.views.create_destination_dialog_view
+    - templates/booking/dashboard/not_routed_table.html
+    - templates/booking/dialogs/destination.html
+status: migrated
 verification: legacy-test
 characterization_tier: A
 evidence:
@@ -16,5 +21,11 @@ evidence:
   - ".migration/characterization/booking/observations.json"
   - ".migration/characterization/booking/source-tests.json"
   - "tests/characterization/test_booking.py::test_booking_observation_is_recorded"
-notes: "The named test covers service state, not modal options, cancellation or refresh behavior; destination option filtering mutates the bean list (see quirk #235). Successful updates also emit .migration/quirks/booking-dialog-widget-console-warning.md."
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_shows_current_specification_and_filters_choices"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_update_preserves_other_fields_and_refreshes_dashboard"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_choices_are_stable_across_renders_without_mutating_locations"
+  - "tests/booking/interfaces/test_dialogs.py::test_destination_dialog_rejects_a_location_outside_its_choices"
+  - ".migration/evidence/runs/BK-05G.md"
+no_rules: "Choice filtering is dialog presentation under ruling #235; destination changes are delegated to CargoSpecification."
+notes: "The named source test covers service state, not modal options, cancellation or refresh behavior. The source filtered options by mutating its bean list (#235); the ruling requires stable filtering. The unavailable-widget warning is omitted under #251."
 quirks: [martins-vds/ai-factory-pilot-target#235, martins-vds/ai-factory-pilot-target#251]
