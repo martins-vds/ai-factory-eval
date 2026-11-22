@@ -1,7 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-
 LEGACY_ABOUT_HTML = """<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>About the Lending Library</title></head>
@@ -15,9 +14,7 @@ LEGACY_ABOUT_HTML = """<!doctype html>
 
 
 def about(request):
-    response = HttpResponse(LEGACY_ABOUT_HTML, content_type='text/html')
-    response['Content-Type'] = 'text/html'
-    return response
+    return HttpResponse(LEGACY_ABOUT_HTML, content_type='text/html')
 
 
 def about_page(request):

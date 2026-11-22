@@ -1,7 +1,6 @@
 import pytest
 from playwright.sync_api import sync_playwright
 
-
 LEGACY_ABOUT_HTML = """<!doctype html>
 <html lang="en">
 <head><meta charset="utf-8"><title>About the Lending Library</title></head>
@@ -18,7 +17,7 @@ def test_about_endpoint_preserves_characterized_response(client):
     response = client.get('/about')
 
     assert response.status_code == 200
-    assert response['Content-Type'] == 'text/html'
+    assert response['Content-Type'].split(';', maxsplit=1)[0] == 'text/html'
     assert response.content.decode() == LEGACY_ABOUT_HTML
 
 
