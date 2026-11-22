@@ -1,7 +1,11 @@
+import importlib
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
 
 import pytest
+from django.apps import apps
+from django.db import connection
+from playwright.sync_api import sync_playwright
 
 
 @pytest.fixture
@@ -39,6 +43,16 @@ def local_gateway(monkeypatch):
         server.shutdown()
         thread.join()
         server.server_close()
+
+
+@pytest.fixture
+def restore_fee_seed_loans(django_db_blocker):
+    yield
+    with django_db_blocker.unblock():
+        apps.get_model('loans', 'Loan').objects.all().delete()
+        seed_loans = importlib.import_module('src.loans.migrations.0001_initial').seed_loans
+        with connection.schema_editor() as schema_editor:
+            seed_loans(apps, schema_editor)
 
 
 @pytest.mark.django_db
@@ -169,3 +183,21 @@ def test_regular_payment_failure_renders_full_fee_page(client, local_gateway):
     assert response.status_code == 502
     assert b'<!doctype html>' in response.content
     assert b'role="alert">declined\n</p>' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures('restore_fee_seed_loans')
+def test_real_browser_renders_gateway_failure(live_server, local_gateway):
+    local_gateway(status=503, body=b'declined\n')
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            page = browser.new_page()
+            page.goto(f'{live_server.url}/ui/fees/L3/')
+            page.get_by_role('button', name='Pay late fee').click()
+            alert = page.get_by_role('alert')
+            alert.wait_for()
+            assert alert.inner_text() == 'declined'
+        finally:
+            browser.close()

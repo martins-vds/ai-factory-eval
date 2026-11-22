@@ -9,7 +9,35 @@ source:
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+target:
+  components: [src.fees.services.FeeApplication.calculate_fee]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
+  - .migration/characterization/source/goldens/http.json
+  - .migration/characterization/source/goldens/edge-cases.json
+  - .migration/evidence/runs/LL-03.md
+  - tests/fees/test_services.py::test_early_or_on_time_loan_has_no_late_days
+  - tests/fees/test_services.py::test_fee_is_waived_through_two_days_late
+  - tests/fees/test_services.py::test_fee_is_twenty_five_cents_per_day_after_grace_period
+  - tests/fees/test_services.py::test_fee_is_capped_at_ten_dollars
+  - tests/fees/test_services.py::test_return_date_is_used_instead_of_today_for_fee_calculation
+rules:
+  - id: late-days-floor
+    rule: "Late days are clamped at zero when the due date is today or in the future."
+    source: legacy/src/main/java/lib/LateFeeView.java:33
+  - id: grace-period
+    rule: "The first two late days incur no fee."
+    source: legacy/src/main/java/lib/LateFeeView.java:34
+  - id: daily-rate
+    rule: "Each late day after the grace period adds 25 cents."
+    source: legacy/src/main/java/lib/LateFeeView.java:34
+  - id: amount-cap
+    rule: "The calculated late fee never exceeds 1000 cents."
+    source: legacy/src/main/java/lib/LateFeeView.java:34
+  - id: returned-date
+    rule: "A returned loan is calculated through its return date; an unreturned loan is calculated through today."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-32

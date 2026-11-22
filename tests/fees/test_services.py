@@ -97,3 +97,42 @@ def test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure
 
     assert (result.status_code, result.body) == (502, 'payment gateway unavailable\n')
     assert result.interruption is interruption
+
+
+def test_payment_application_returns_success_only_for_gateway_http_200():
+    gateway = PaymentGateway(GatewayResponse(200, 'charged\n'))
+    application = PaymentApplication(
+        LoanRepository(Loan('L1', date(2026, 11, 22))),
+        gateway,
+    )
+
+    result = application.pay('L1')
+
+    assert (result.status_code, result.body) == (200, 'charged\n')
+
+
+def test_payment_application_maps_non_200_response_to_bad_gateway():
+    gateway = PaymentGateway(GatewayResponse(503, 'declined\n'))
+    application = PaymentApplication(
+        LoanRepository(Loan('L1', date(2026, 11, 22))),
+        gateway,
+    )
+
+    result = application.pay('L1')
+
+    assert (result.status_code, result.body) == (502, 'declined\n')
+
+
+def test_payment_application_maps_io_failure_to_gateway_unavailable():
+    gateway = PaymentGateway(error=OSError('connection refused'))
+    application = PaymentApplication(
+        LoanRepository(Loan('L1', date(2026, 11, 22))),
+        gateway,
+    )
+
+    result = application.pay('L1')
+
+    assert (result.status_code, result.body) == (
+        502,
+        'payment gateway unavailable\n',
+    )
