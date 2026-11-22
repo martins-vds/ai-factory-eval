@@ -1,0 +1,16 @@
+id: data.loan-entity
+kind: data
+title: Persist loan records
+source:
+  graph_node: class:legacy/src/main/java/lib/Loan.java:Loan
+  location: legacy/src/main/java/lib/Loan.java:11-50
+boundary: "The LOAN entity stores ID, member, ISBN, lentOn, and nullable returnedOn; dueOn is lentOn plus 14 days."
+status: pending
+verification: pending
+rules:
+  - id: loan-term
+    rule: A loan's due date is 14 days after its lentOn date.
+    source: legacy/src/main/java/lib/Loan.java:14,44-46
+  - id: return-date-nullable
+    rule: returnedOn is nullable until a loan is returned.
+    source: legacy/src/main/java/lib/Loan.java:25-26,48-50

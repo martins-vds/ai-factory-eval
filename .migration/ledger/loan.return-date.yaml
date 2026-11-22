@@ -1,0 +1,16 @@
+id: loan.return-date
+kind: behavioral
+title: Record the loan return date
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanRepository.java:LoanRepository.markReturned
+  flow: Return Book
+  location: legacy/src/main/java/lib/LoanRepository.java:36-44
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "A successful return writes the supplied return date to the persisted Loan.returnedOn field."
+status: pending
+verification: pending
+rules:
+  - id: overwrite-return-date
+    rule: The return operation sets returnedOn to the supplied date even when the loan already has a return date.
+    source: legacy/src/main/java/lib/LoanRepository.java:36-44
+notes: Repeated returns can replace the historical date and change the displayed fee; see .migration/quirks/repeated-loan-return.md.

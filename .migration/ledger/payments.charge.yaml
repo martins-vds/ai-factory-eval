@@ -1,0 +1,25 @@
+id: payments.charge
+kind: integration
+title: Charge a loan through the payment gateway
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/FinePayments.java:POST /payments/{id}"
+  flow: Pay Late Fee
+  location: legacy/src/main/java/lib/FinePayments.java:26-37
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "POST /payments/{id} checks that the loan exists, sends a no-body POST to the configured gateway, and returns the mapped gateway response."
+status: pending
+verification: pending
+rules:
+  - id: existing-loan
+    rule: An unknown loan ID returns HTTP 404 without calling the gateway.
+    source: legacy/src/main/java/lib/FinePayments.java:29-32
+  - id: gateway-url
+    rule: PAYMENT_GATEWAY_URL is used when set; otherwise the gateway base URL is https://payments.lending-library.invalid.
+    source: legacy/src/main/java/lib/FinePayments.java:33
+  - id: gateway-request
+    rule: The gateway receives a POST to `/charge?loan={id}` with no request body.
+    source: legacy/src/main/java/lib/FinePayments.java:34-36
+  - id: gateway-status
+    rule: An upstream HTTP 200 maps to HTTP 200; any other upstream status maps to HTTP 502 and the upstream body is returned.
+    source: legacy/src/main/java/lib/FinePayments.java:37
+notes: No local payment state or deduplication is present; repeated calls invoke the gateway again. See .migration/quirks/payment-repeat-charge.md.

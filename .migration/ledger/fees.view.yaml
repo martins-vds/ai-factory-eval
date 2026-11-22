@@ -1,0 +1,24 @@
+id: fees.view
+kind: ui
+title: View a loan's late fee
+source:
+  graph_node: "endpoint:legacy/src/main/java/lib/LateFeeView.java:GET /fees/{id}"
+  flow: View Late Fee
+  location: legacy/src/main/java/lib/LateFeeView.java:23-38
+  risk: { crap: 20, complexity: 4, coverage: 0 }
+boundary: "GET /fees/{id} returns an HTML fragment with the loan ID, due date, days late, and formatted fee, or a 404 fragment for an unknown loan."
+status: pending
+verification: pending
+rules:
+  - id: late-days
+    rule: Days late are the nonnegative number of days from dueOn to returnedOn, or to the current local date if the loan is unreturned.
+    source: legacy/src/main/java/lib/LateFeeView.java:31-34
+  - id: grace-and-rate
+    rule: Loans at most two days late incur no fee; later days accrue 25 cents per day.
+    source: legacy/src/main/java/lib/LateFeeView.java:33-34
+  - id: fee-cap
+    rule: The fee is capped at 1000 cents.
+    source: legacy/src/main/java/lib/LateFeeView.java:34
+  - id: unknown-loan
+    rule: An unknown loan ID returns HTTP 404 with an HTML `No such loan.` paragraph.
+    source: legacy/src/main/java/lib/LateFeeView.java:27-30

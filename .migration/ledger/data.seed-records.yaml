@@ -1,0 +1,13 @@
+id: data.seed-records
+kind: data
+title: Load the three legacy seed loans
+source:
+  graph_node: table:legacy/src/main/resources/META-INF/seed.sql:LOAN
+  location: legacy/src/main/resources/META-INF/seed.sql:1-3
+boundary: "On persistence-unit initialization, three known sample rows (L1, L2, L3) are inserted into LOAN."
+status: pending
+verification: pending
+rules:
+  - id: seed-rows
+    rule: The seed script inserts L1 for ana, L2 for bo, and L3 for cy with the pinned ISBN and loan/return dates.
+    source: legacy/src/main/resources/META-INF/seed.sql:1-3

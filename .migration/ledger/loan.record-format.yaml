@@ -1,0 +1,18 @@
+id: loan.record-format
+kind: behavioral
+title: Format loan records
+source:
+  graph_node: method:legacy/src/main/java/lib/LoanResource.java:LoanResource.line
+  location: legacy/src/main/java/lib/LoanResource.java:52-55
+  risk: { crap: 6, complexity: 2, coverage: 0 }
+boundary: "Loan records in list, get, create, and return responses have six semicolon-separated fields: ID, member, ISBN, lentOn, dueOn, and returnedOn."
+status: pending
+verification: pending
+rules:
+  - id: field-order
+    rule: Record fields appear in the order ID, member, ISBN, lentOn, dueOn, returnedOn, separated by semicolons.
+    source: legacy/src/main/java/lib/LoanResource.java:52-55
+  - id: empty-return-date
+    rule: returnedOn is an empty field when a loan has not been returned; dates otherwise use LocalDate string formatting.
+    source: legacy/src/main/java/lib/LoanResource.java:52-55
+notes: Documented as a CSV export in legacy/docs/export-csv.md:1-4, but fields are concatenated without CSV quoting or escaping; see .migration/quirks/csv-record-escaping.md.
