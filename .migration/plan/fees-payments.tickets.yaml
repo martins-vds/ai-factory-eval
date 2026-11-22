@@ -1,22 +1,43 @@
 slice: fees-payments
 tickets:
-  - id: LL-03
-    title: View and pay late fees
-    role: afs-migrator
-    specialty: null
-    files:
-      - config/urls.py
-      - src/fees/
-      - tests/fees/
-      - templates/fees/
-      - .migration/ledger/fees.calculation.yaml
-      - .migration/ledger/fees.page.yaml
-      - .migration/ledger/integration.payment-gateway.yaml
-      - .migration/evidence/runs/LL-03.md
-      - .migration/returns/LL-03.afs-migrator.yaml
-    capabilities: [fees.calculation, fees.page, integration.payment-gateway]
-    blocked_by: [LL-02]
+- id: LL-03
+  title: View and pay late fees
+  role: afs-migrator
+  specialty: null
+  files:
+  - config/urls.py
+  - src/fees/
+  - tests/fees/
+  - templates/fees/
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/ledger/integration.payment-gateway.yaml
+  - .migration/evidence/runs/LL-03.md
+  - .migration/returns/LL-03.afs-migrator.yaml
+  capabilities:
+  - fees.calculation
+  - fees.page
+  - integration.payment-gateway
+  blocked_by:
+  - LL-02
+- id: FS-01
+  title: Write the fees customer spec
+  role: afs-characterizer
+  specialty: null
+  files:
+  - .migration/spec/fees-payments/
+  - .migration/ledger/fees.calculation.yaml
+  - .migration/ledger/fees.page.yaml
+  - .migration/evidence/runs/FS-01.md
+  - .migration/returns/FS-01.afs-characterizer.yaml
+  capabilities: []
+  blocked_by: []
 cross_slice:
-  - file: config/urls.py
-    slices: [loan-catalog, loan-circulation, fees-payments, library-info]
-    note: This slice extends root route composition before the library-info route is added.
+- file: config/urls.py
+  slices:
+  - loan-catalog
+  - loan-circulation
+  - fees-payments
+  - library-info
+  note: This slice extends root route composition before the library-info route is
+    added.
