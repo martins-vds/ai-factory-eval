@@ -33,5 +33,11 @@ def test_format_loan_escapes_delimiters_and_keeps_trailing_newline():
     assert format_loan(loan) == 'L4;"a;b";"123;456";2026-01-02;2026-01-16;\n'
 
 
+def test_format_loan_quotes_newlines_inside_fields():
+    loan = Loan('L4', 'a\nb', '123', date(2026, 1, 2), None)
+
+    assert format_loan(loan) == 'L4;"a\nb";123;2026-01-02;2026-01-16;\n'
+
+
 def test_get_loan_returns_none_when_id_is_unknown():
     assert get_loan(LoanReader([]), 'missing') is None

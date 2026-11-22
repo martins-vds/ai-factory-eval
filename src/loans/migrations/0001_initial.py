@@ -26,13 +26,11 @@ def seed_loans(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []  # noqa: RUF012
 
-    operations = [
+    operations = [  # noqa: RUF012
         migrations.CreateModel(
             name='LoanRecord',
             fields=[
@@ -42,9 +40,6 @@ class Migration(migrations.Migration):
                 ('lent_on', models.DateField()),
                 ('returned_on', models.DateField(blank=True, null=True)),
             ],
-            options={
-                'ordering': ['id'],
-            },
         ),
         migrations.RunPython(seed_loans, migrations.RunPython.noop),
     ]

@@ -1,5 +1,3 @@
-from django.db import transaction
-
 from src.loans.domain import Loan
 from src.loans.models import LoanRecord
 
@@ -12,7 +10,6 @@ class DjangoLoanRepository:
         record = LoanRecord.objects.filter(pk=loan_id).first()
         return self._to_domain(record) if record else None
 
-    @transaction.atomic
     def save(self, loan: Loan) -> None:
         LoanRecord.objects.update_or_create(
             id=loan.id,

@@ -7,8 +7,7 @@ from src.loans.services import get_loan, list_loans, loan_due_date
 
 def loan_catalog_page(request: HttpRequest) -> HttpResponse:
     loans = [
-        {'loan': loan, 'due_on': loan_due_date(loan)}
-        for loan in list_loans(DjangoLoanRepository())
+        {'loan': loan, 'due_on': loan_due_date(loan)} for loan in list_loans(DjangoLoanRepository())
     ]
     return render(request, 'loans/list.html', {'loans': loans})
 

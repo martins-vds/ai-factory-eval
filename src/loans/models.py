@@ -7,6 +7,3 @@ class LoanRecord(models.Model):
     isbn = models.TextField()
     lent_on = models.DateField()
     returned_on = models.DateField(blank=True, null=True)
-
-    class Meta:
-        ordering = ['id']

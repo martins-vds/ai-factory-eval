@@ -1,4 +1,9 @@
 import pytest
+from django.apps import apps
+
+
+def test_loan_app_uses_configured_default_primary_key_type():
+    assert apps.get_app_config('loans').default_auto_field == 'django.db.models.BigAutoField'
 
 
 @pytest.mark.django_db

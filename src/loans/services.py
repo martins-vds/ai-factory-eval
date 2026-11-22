@@ -1,6 +1,6 @@
 import csv
-from io import StringIO
 from datetime import timedelta
+from io import StringIO
 
 from src.loans.domain import Loan
 from src.loans.ports import LoanReader
