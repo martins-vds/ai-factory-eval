@@ -8,6 +8,19 @@ source:
   location: legacy/src/main/java/lib/LateFeeView.java:31-37
   risk: {crap: 4, complexity: 4, coverage: 0.9}
 boundary: "Late days are max(0, days from due date to returnedOn or today); up to two days late is waived, otherwise the fee is 25 cents per day capped at $10."
+rules:
+  - id: late-days-use-return-date-or-today
+    rule: "Count calendar days from the due date to the return date, or to today for a loan not yet returned; never count fewer than zero late days."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: fee-waived-through-two-days
+    rule: "A loan that is no more than two days late has no fee."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: fee-is-twenty-five-cents-per-late-day
+    rule: "When a loan is more than two days late, charge twenty-five cents for every late day."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
+  - id: fee-capped-at-ten-dollars
+    rule: "The late fee never exceeds ten dollars."
+    source: legacy/src/main/java/lib/LateFeeView.java:31-37
 tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-synthetic-target#63]
 target:
   components: [src.fees.services.FeeApplication.fee_for, src.fees.views.fee_detail, src.fees.views.fee_page]

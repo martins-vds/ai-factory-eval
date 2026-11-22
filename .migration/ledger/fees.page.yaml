@@ -7,6 +7,13 @@ source:
   flow: View Late Fee
   location: legacy/src/main/java/lib/LateFeeView.java:23-38
 boundary: "GET /fees/{id} renders an HTML heading, due/late-day text, and a two-decimal dollar fee; an unknown loan returns HTTP 404 with `<p>No such loan.</p>`."
+rules:
+  - id: known-loan-page-shows-fee-details
+    rule: "A known loan's fee page shows its identifier, due date, late-day count, and fee as two-decimal dollars."
+    source: legacy/src/main/java/lib/LateFeeView.java:23-38
+  - id: unknown-loan-page-is-not-found
+    rule: "An unknown loan's fee page returns HTTP 404 with `<p>No such loan.</p>`."
+    source: legacy/src/main/java/lib/LateFeeView.java:23-38
 tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-synthetic-target#63]
 target:
   components: [src.fees.views.fee_detail, src.fees.views.fee_page, src.fees.urls, templates/fees/detail.html]
