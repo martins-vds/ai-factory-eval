@@ -6,3 +6,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 |---|---|---|---|---|---|---|---|
 | 2026-11-22T14:40:21+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-22T14:41:09+00:00 | behavior-baseline | 0 | 13.61 | `pytest -q tests/fees` | `bdb3bc6cd47fc5f2` |  |  |
+| 2026-11-22T14:41:54+00:00 | behavior-smoke | 0 | 10.41 | `pytest -q tests/fees` | `3219fe1a504f9bbf` |  |  |
