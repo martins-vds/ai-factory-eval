@@ -74,7 +74,11 @@ def create_dialog_views(
 
     def deadline_dialog(request: HttpRequest, tracking_id: str) -> HttpResponse:
         cargo = _find_cargo(cargo_dashboard, tracking_id)
-        deadline_value = request.POST.get('deadline', '')
+        deadline_value = (
+            request.POST.get('deadline', '')
+            if request.method == 'POST'
+            else cargo.route_specification.arrival_deadline.strftime('%Y-%m-%d')
+        )
         deadline_error = ''
 
         if request.method == 'POST':
@@ -101,8 +105,7 @@ def create_dialog_views(
             'booking/dialogs/deadline.html',
             {
                 'cargo': cargo,
-                'deadline_value': deadline_value
-                or cargo.route_specification.arrival_deadline.strftime('%Y-%m-%d'),
+                'deadline_value': deadline_value,
                 'deadline_error': deadline_error,
             },
         )

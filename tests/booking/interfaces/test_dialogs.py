@@ -64,9 +64,13 @@ def test_not_routed_table_opens_destination_and_deadline_dialogs(client: Client)
     )
 
     assert destination_response.status_code == 200
-    assert '<dialog' in destination_response.content.decode()
+    destination_content = destination_response.content.decode()
+    assert '<dialog' in destination_content
+    assert 'destination-error' not in destination_content
     assert deadline_response.status_code == 200
-    assert '<dialog' in deadline_response.content.decode()
+    deadline_content = deadline_response.content.decode()
+    assert '<dialog' in deadline_content
+    assert 'deadline-error' not in deadline_content
 
 
 @pytest.mark.django_db
@@ -92,8 +96,10 @@ def test_destination_dialog_displays_current_route_and_filters_options_stably():
     assert all(response.status_code == 200 for response in responses)
     assert all('Hong Kong' in content and 'Melbourne' in content for content in contents)
     assert all(option_list is not None for option_list in option_lists)
+    assert all('value="USDAL"' in option_list.group(1) for option_list in option_lists)
     assert all('CNHKG' not in option_list.group(1) for option_list in option_lists)
     assert all('AUMEL' not in option_list.group(1) for option_list in option_lists)
+    assert 'value="" disabled selected' in contents[0]
     assert option_lists[0].group(1) == option_lists[1].group(1)
     assert locations == original_locations
 
@@ -125,6 +131,23 @@ def test_destination_dialog_updates_cargo_and_completes_htmx_dialog():
     assert updated_cargo.route_specification.arrival_deadline == (
         original_cargo.route_specification.arrival_deadline
     )
+
+
+@pytest.mark.django_db
+def test_destination_dialog_redirects_after_non_htmx_update():
+    call_command('seed_sample_data')
+    destination_view, _ = build_dialog_views()
+
+    response = destination_view(
+        RequestFactory().post(
+            '/admin/cargo/DEF789/destination/',
+            {'destination': 'USDAL'},
+        ),
+        'DEF789',
+    )
+
+    assert response.status_code == 302
+    assert response['Location'] == '/admin/dashboard/'
 
 
 @pytest.mark.django_db
@@ -164,6 +187,7 @@ def test_deadline_dialog_displays_current_route_and_deadline():
     assert 'Hong Kong' in content
     assert 'Melbourne' in content
     assert f'value="{cargo.route_specification.arrival_deadline.strftime("%Y-%m-%d")}"' in content
+    assert 'deadline-error' not in content
 
 
 @pytest.mark.parametrize(
@@ -194,6 +218,7 @@ def test_deadline_dialog_shows_parse_errors_without_updating_cargo(deadline, err
 
     assert response.status_code == 200
     assert error in content
+    assert f'value="{deadline}"' in content
     assert 'id="deadline-error"' in content
     assert 'role="alert"' in content
     assert 'aria-invalid="true" aria-describedby="deadline-error"' in content
@@ -238,5 +263,8 @@ def test_dialog_for_unknown_cargo_returns_not_found():
     call_command('seed_sample_data')
     destination_view, _ = build_dialog_views()
 
-    with pytest.raises(Http404):
-        destination_view(RequestFactory().get('/admin/cargo/MISSING1/destination/'), 'MISSING1')
+    with pytest.raises(Http404, match='Cargo with tracking ID MISSING1 not found.'):
+        destination_view(
+            RequestFactory().get('/admin/cargo/MISSING1/destination/'),
+            'MISSING1',
+        )
