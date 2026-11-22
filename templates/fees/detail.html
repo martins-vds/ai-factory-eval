@@ -18,8 +18,8 @@
           {% if fee.loan.returned_on %} · returned {{ fee.loan.returned_on|date:"M j, Y" }}{% endif %}
         </p>
         <p class="mt-2">{{ fee.late_days }} day(s) late · first two days waived</p>
-        <p class="mt-5 text-4xl font-bold text-[#a94e37]">{{ fee.amount }}</p>
-        <p class="mt-2 text-sm text-[#66705b]">25¢ per late day after the grace period, capped at $10.00.</p>
+        <p class="mt-6 text-4xl font-bold text-[#a94e37]">{{ fee.amount }}</p>
+        <p class="mt-2 text-sm text-[#66705b]">25¢ per late day once more than two days late, capped at $10.00.</p>
       </div>
     </article>
     <aside class="card mt-6 border border-[#d8cdbb] bg-[#fffdf7] shadow-sm">
@@ -31,7 +31,7 @@
                 hx-post="/ui/payments/{{ fee.loan.id }}/" hx-target="#payment-status" hx-swap="outerHTML"
                 hx-on::before-swap="if (event.detail.xhr.status >= 400) event.detail.shouldSwap = true">
             {% csrf_token %}
-            <button class="btn bg-[#a94e37] text-white hover:bg-[#873b2a]" type="submit">Pay late fee</button>
+            <button class="btn" style="background-color: #a94e37; color: #fff" type="submit">Pay late fee</button>
           </form>
         </div>
       </div>

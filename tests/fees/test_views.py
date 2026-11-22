@@ -5,8 +5,7 @@ import pytest
 
 HTTP_GOLDENS = json.loads(
     (
-        Path(__file__).resolve().parents[2]
-        / '.migration/characterization/source/goldens/http.json'
+        Path(__file__).resolve().parents[2] / '.migration/characterization/source/goldens/http.json'
     ).read_text(encoding='utf-8')
 )
 EDGE_CASE_GOLDENS = json.loads(
@@ -78,6 +77,24 @@ def test_fee_page_uses_reading_room_layout_and_posts_to_ui_payment_route(client)
     assert b'$4.75' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'hx-on::before-swap=' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_renders_unknown_loan_error(client):
+    response = client.get('/ui/fees/unknown/')
+
+    assert response.status_code == 404
+    assert b'role="alert"' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_ui_payment_success_fragment_renders_gateway_response(client, payment_gateway_server):
+    response = client.post('/ui/payments/L1/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'role="status"' in response.content
+    assert b'Payment complete: charged' in response.content
 
 
 @pytest.mark.django_db
