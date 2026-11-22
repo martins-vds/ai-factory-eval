@@ -236,35 +236,35 @@
       ]
     },
     "event_types": {
-      "assistant.message": 342,
-      "assistant.turn_end": 213,
-      "assistant.turn_start": 214,
+      "assistant.message": 351,
+      "assistant.turn_end": 216,
+      "assistant.turn_start": 216,
       "external_tool.completed": 4,
       "external_tool.requested": 4,
-      "hook.end": 631,
-      "hook.start": 632,
-      "permission.completed": 340,
-      "permission.requested": 340,
+      "hook.end": 637,
+      "hook.start": 638,
+      "permission.completed": 341,
+      "permission.requested": 341,
       "session.compaction_complete": 1,
       "session.compaction_start": 1,
       "session.start": 1,
-      "session.usage_record": 214,
+      "session.usage_record": 216,
       "skill.context_delivered_ref": 14,
       "skill.invoked": 9,
       "skill.invoked_ref": 5,
-      "subagent.completed": 2,
+      "subagent.completed": 3,
       "subagent.configured": 3,
       "subagent.selected": 1,
       "subagent.started": 3,
       "system.message": 4,
-      "tool.execution_complete": 362,
-      "tool.execution_start": 363,
+      "tool.execution_complete": 364,
+      "tool.execution_start": 364,
       "user.message": 4
     },
-    "events": 3707,
+    "events": 3741,
     "usage_fields": []
   },
-  "ended_at": "2026-11-22T17:07:00.165Z",
+  "ended_at": "2026-11-22T17:08:16.786Z",
   "event": "agentStop",
   "harness_tools": [
     {
@@ -352,11 +352,11 @@
   "models": {
     "gpt-6-luna": {
       "output": 0,
-      "requests": 342
+      "requests": 351
     }
   },
   "prompt_head": null,
-  "recorded_at": "2026-11-22T17:07:33+00:00",
+  "recorded_at": "2026-11-22T17:08:49+00:00",
   "schema": "afs-cost/1",
   "session_id": "0c85d75d-b717-447f-ade5-462587e9e81e",
   "shutdown_wait_s": "skipped: the coding agent writes session.shutdown after session hooks",
@@ -400,6 +400,5 @@
   ],
   "started_at": "2026-11-22T16:35:32.388Z",
   "surface": "coding-agent",
-  "trigger_id": "fa6b7a0b-bcdf-43b8-80fc-62b95a7e71ba",
   "usage_source": "assistant.message (output only, partial)"
 }
