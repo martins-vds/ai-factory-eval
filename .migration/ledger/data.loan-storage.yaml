@@ -7,9 +7,23 @@ source:
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_reads_persisted_data_after_a_repeated_migration, tests/loans/test_catalog.py::test_unreturned_loan_passes_model_validation]
+notes: "Approved fix for reset-on-restart behavior: martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#42
+  reason: "Approved persistent PostgreSQL storage without reloading seed records over existing data."
+target:
+  components:
+    - config/settings.py
+    - src/loans/models.py
+    - src/loans/repository.py
+rules:
+  - id: preserve-persisted-loans
+    rule: "Previously stored loan records remain available after repeated startup migrations and are not overwritten by seed values."
+    source: "Approved quirk ruling martins-vds/ai-factory-synthetic-target#42."
+    no_spec: "Found by LL-01; needs a Characterizer case."

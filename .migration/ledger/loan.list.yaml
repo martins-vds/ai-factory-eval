@@ -9,7 +9,17 @@ source:
   risk: {crap: 1, complexity: 1, coverage: 1.0}
 boundary: "GET /loans returns every loan ordered by id as one semicolon-separated text line per record, with a trailing newline."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_use_case_orders_loans_and_calculates_due_dates]
+target:
+  components:
+    - src/loans/services.py
+    - src/loans/repository.py
+    - src/loans/views.py
+rules:
+  - id: loans-ordered-by-id
+    rule: Catalog results are ordered by loan ID.
+    source: "legacy/src/main/java/lib/LoanRepository.java:19-21."
+    no_spec: "Found by LL-01; needs a Characterizer case."
