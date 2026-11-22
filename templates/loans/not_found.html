@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Loan not found · The Lending Library{% endblock %}
+
+{% block content %}
+<main class="mx-auto max-w-4xl px-6 pb-16 pt-12">
+  <p class="text-xs uppercase tracking-[.2em] text-[#6d6c5c]">The collection</p>
+  <h1 class="mt-3 font-serif text-5xl tracking-tight">We couldn't find that loan.</h1>
+  <p class="mt-4 text-[#6d6c5c]">No record exists for {{ loan_id }}.</p>
+  <a class="btn btn-outline mt-8 border-[#a94e37] text-[#a94e37]" href="/ui/loans/">Return to the collection</a>
+</main>
+{% endblock %}
