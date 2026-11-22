@@ -3,6 +3,7 @@ from datetime import date
 
 import pytest
 
+from src.fees.gateway import HttpPaymentGateway
 from src.fees.services import (
     FeeApplication,
     GatewayResponse,
@@ -13,7 +14,7 @@ from src.fees.services import (
 
 
 @dataclass
-class Loan:
+class FeeLoan:
     id: str
     due_on: date
     returned_on: date | None = None
@@ -33,15 +34,12 @@ class FixedClock:
 
 
 class PaymentGateway:
-    def __init__(self, response=None, error=None):
+    def __init__(self, response=None):
         self.response = response
-        self.error = error
         self.calls = []
 
     def charge(self, loan_id):
         self.calls.append(loan_id)
-        if self.error:
-            raise self.error
         return self.response
 
 
@@ -58,7 +56,7 @@ class PaymentGateway:
 def test_fee_application_calculates_late_days_and_capped_cents(
     due_on, returned_on, expected_days, expected_cents
 ):
-    loan = Loan('L1', due_on, returned_on)
+    loan = FeeLoan('L1', due_on, returned_on)
     application = FeeApplication(LoanRepository(loan), FixedClock())
 
     quote = application.calculate('L1')
@@ -87,7 +85,7 @@ def test_payment_application_requires_a_loan_before_calling_gateway():
     [(200, 200), (503, 502)],
 )
 def test_payment_application_maps_gateway_status(gateway_status, expected_status):
-    loan = Loan('L1', date(2026, 11, 22))
+    loan = FeeLoan('L1', date(2026, 11, 22))
     gateway = PaymentGateway(GatewayResponse(gateway_status, b'gateway response\n'))
     application = PaymentApplication(LoanRepository(loan), gateway)
 
@@ -96,12 +94,49 @@ def test_payment_application_maps_gateway_status(gateway_status, expected_status
     assert (result.status, result.body) == (expected_status, b'gateway response\n')
 
 
-def test_payment_application_preserves_interruption_as_gateway_failure_cause():
+def test_payment_application_preserves_interruption_as_gateway_failure_cause(monkeypatch):
     interruption = InterruptedError('gateway call interrupted')
-    gateway = PaymentGateway(error=interruption)
-    application = PaymentApplication(LoanRepository(Loan('L1', date(2026, 11, 22))), gateway)
+
+    def interrupt_request(_request):
+        raise interruption
+
+    monkeypatch.setattr('src.fees.gateway.urlopen', interrupt_request)
+    application = PaymentApplication(
+        LoanRepository(FeeLoan('L1', date(2026, 11, 22))),
+        HttpPaymentGateway(),
+    )
 
     with pytest.raises(GatewayUnavailable) as failure:
         application.pay('L1')
 
+    assert str(failure.value) == 'payment gateway unavailable'
     assert failure.value.__cause__ is interruption
+
+
+def test_http_gateway_uses_the_configured_default(monkeypatch):
+    class Response:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            pass
+
+        def read(self):
+            return b'charged\n'
+
+    requests = []
+
+    def open_request(request):
+        requests.append(request)
+        return Response()
+
+    monkeypatch.delenv('PAYMENT_GATEWAY_URL', raising=False)
+    monkeypatch.setattr('src.fees.gateway.urlopen', open_request)
+
+    response = HttpPaymentGateway().charge('L1')
+
+    assert response.body == b'charged\n'
+    assert requests[0].get_method() == 'POST'
+    assert requests[0].full_url == ('https://payments.lending-library.invalid/charge?loan=L1')

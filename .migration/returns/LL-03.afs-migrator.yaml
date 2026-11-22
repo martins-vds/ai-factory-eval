@@ -1,0 +1,60 @@
+role: afs-migrator
+ticket: LL-03
+issue: martins-vds/ai-factory-eval#2332
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2337
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.966
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/LL-03.md
+ledger_updated:
+  - fees.calculation
+  - fees.page
+  - integration.payment-gateway
+quirk_tickets:
+  - martins-vds/ai-factory-synthetic-target#40
+new_tickets: []
+handoff: none
+rules:
+  - capability: fees.calculation
+    rule: An unknown loan has no late-fee quote.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_application_returns_none_for_an_unknown_loan
+    enforced: true
+    ledger_rule: existing-loan-required
+  - capability: fees.calculation
+    rule: Days late are floored at zero.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_application_calculates_late_days_and_capped_cents
+    enforced: true
+    ledger_rule: nonnegative-late-days
+  - capability: fees.calculation
+    rule: No fee is charged through two days late; otherwise charge 25 cents per late day, capped at $10.
+    use_case: FeeApplication.calculate
+    test: tests/fees/test_fee_services.py::test_fee_application_calculates_late_days_and_capped_cents
+    enforced: true
+    ledger_rule: grace-and-capped-fee
+  - capability: integration.payment-gateway
+    rule: Refuse payment for an unknown loan without calling the gateway.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_requires_a_loan_before_calling_gateway
+    enforced: true
+    ledger_rule: require-existing-loan
+  - capability: integration.payment-gateway
+    rule: Return gateway HTTP 200 as 200 and map every other gateway status to 502.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_maps_gateway_status
+    enforced: true
+    ledger_rule: gateway-status-mapping
+  - capability: integration.payment-gateway
+    rule: Surface interrupted gateway calls as gateway failures while retaining the interruption as the cause.
+    use_case: PaymentApplication.pay
+    test: tests/fees/test_fee_services.py::test_payment_application_preserves_interruption_as_gateway_failure_cause
+    enforced: true
+    ledger_rule: interruption-preserved
+no_rules:
+  fees.page: Presentation-only; quote and loan-existence rules are enforced by fees.calculation.

@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from threading import Thread
+from typing import ClassVar
 
 import pytest
 
@@ -9,14 +10,12 @@ def payment_gateway():
     class Gateway:
         status = 200
         body = b'charged\n'
-        requests = []
+        requests: ClassVar[list] = []
 
         class Handler(BaseHTTPRequestHandler):
             def do_POST(self):
                 length = int(self.headers.get('Content-Length', 0))
-                Gateway.requests.append(
-                    (self.command, self.path, self.rfile.read(length))
-                )
+                Gateway.requests.append((self.command, self.path, self.rfile.read(length)))
                 self.send_response(Gateway.status)
                 self.send_header('Content-Type', 'text/plain')
                 self.end_headers()
