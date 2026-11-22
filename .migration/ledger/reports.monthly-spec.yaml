@@ -20,6 +20,10 @@ evidence:
   - .migration/references/characterization-SY-05.md
   - .migration/evidence/runs/LL-05.md
   - tests/reports/test_monthly_report.py::test_monthly_report_groups_activity_by_member_and_orders_by_late_fees
-  - tests/reports/test_services.py::test_monthly_report_uses_previous_calendar_month_across_year_boundary
-no_rules: "The reporting use case accepts no user input to refuse; the report's period, grouping, fee totals and ordering are verified directly by its tests."
+  - tests/reports/test_monthly_report_application.py::test_monthly_report_uses_previous_calendar_month_across_year_boundary
+  - tests/reports/test_monthly_report_application.py::test_monthly_report_omits_members_without_a_loan_start_in_period
+rules:
+  - id: member-started-in-period
+    rule: Only members with at least one loan started in the report month are included.
+    source: .migration/plan/monthly-report.md
 notes: "The tier-C specification does not define serialization; the command emits a headered CSV table."

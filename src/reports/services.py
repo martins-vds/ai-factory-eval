@@ -60,5 +60,6 @@ class MonthlyReportApplication:
         rows = [
             MonthlyReportRow(member, loans_started, late_returns, late_fees_cents)
             for member, (loans_started, late_returns, late_fees_cents) in members.items()
+            if loans_started > 0
         ]
         return sorted(rows, key=lambda row: (-row.late_fees_cents, row.member_id))
