@@ -1,7 +1,12 @@
 from dataclasses import dataclass
 from datetime import date
 
-from src.fees.services import FeeApplication, GatewayResponse, PaymentApplication
+from src.fees.services import (
+    FeeApplication,
+    GatewayResponse,
+    GatewayUnavailable,
+    PaymentApplication,
+)
 
 
 @dataclass
@@ -99,6 +104,20 @@ def test_interrupted_payment_preserves_interrupt_while_reporting_gateway_failure
     assert result.interruption is interruption
 
 
+def test_wrapped_interruption_is_preserved_when_gateway_reports_unavailable():
+    interruption = InterruptedError('request cancelled')
+    gateway = InMemoryPaymentGateway(error=GatewayUnavailable(interruption))
+    application = PaymentApplication(
+        LoanRepository(Loan('L1', date(2026, 11, 22))),
+        gateway,
+    )
+
+    result = application.pay('L1')
+
+    assert (result.status_code, result.body) == (502, 'payment gateway unavailable\n')
+    assert result.interruption is interruption
+
+
 def test_payment_application_returns_success_only_for_gateway_http_200():
     gateway = InMemoryPaymentGateway(GatewayResponse(200, 'charged\n'))
     application = PaymentApplication(
@@ -109,6 +128,7 @@ def test_payment_application_returns_success_only_for_gateway_http_200():
     result = application.pay('L1')
 
     assert (result.status_code, result.body) == (200, 'charged\n')
+    assert result.interruption is None
 
 
 def test_payment_application_maps_non_200_response_to_bad_gateway():

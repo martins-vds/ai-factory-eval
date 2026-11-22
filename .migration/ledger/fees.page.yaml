@@ -27,6 +27,7 @@ evidence:
   - tests/fees/test_http.py::test_fee_api_returns_characterized_html
   - tests/fees/test_http.py::test_fee_api_returns_characterized_not_found_response
   - tests/fees/test_http.py::test_fee_page_uses_reading_room_layout_and_separate_payment_action
+  - tests/fees/test_http.py::test_fee_page_formats_capped_fee_as_ten_dollars
   - tests/fees/test_http.py::test_fee_page_renders_unknown_loan_as_a_not_found_page
 rules:
   - id: unknown-loan

@@ -68,6 +68,14 @@ def test_fee_api_returns_characterized_html(client):
 
 
 @pytest.mark.django_db
+def test_fee_api_formats_capped_fee_as_ten_dollars(client):
+    response = client.get('/fees/L1')
+
+    assert response.status_code == 200
+    assert b'<p class="fee">Fee: $10.00</p>' in response.content
+
+
+@pytest.mark.django_db
 def test_fee_api_returns_characterized_not_found_response(client):
     response = client.get('/fees/missing')
 
@@ -130,10 +138,18 @@ def test_fee_page_uses_reading_room_layout_and_separate_payment_action(client):
     assert response.status_code == 200
     assert b'<h1 class="card-title mt-2 text-4xl">Late fee for L3</h1>' in response.content
     assert b'Due Dec 15, 2025, 19 day(s) late.' in response.content
-    assert b'Fee: $4.75' in response.content
+    assert b'<p class="fee">Fee: $4.75</p>' in response.content
     assert b'hx-post="/ui/payments/L3/"' in response.content
     assert b'htmx:beforeSwap' in response.content
     assert b'event.detail.shouldSwap = true' in response.content
+
+
+@pytest.mark.django_db
+def test_fee_page_formats_capped_fee_as_ten_dollars(client):
+    response = client.get('/ui/fees/L1/')
+
+    assert response.status_code == 200
+    assert b'<p class="fee">Fee: $10.00</p>' in response.content
 
 
 @pytest.mark.django_db
@@ -153,6 +169,7 @@ def test_htmx_payment_success_returns_a_status_fragment(client, local_gateway):
     assert response.status_code == 200
     assert b'<div id="payment-status"' in response.content
     assert b'role="status">Payment received.</p>' in response.content
+    assert b'<!doctype html>' not in response.content
 
 
 @pytest.mark.django_db
@@ -172,6 +189,17 @@ def test_htmx_payment_not_found_renders_error_fragment(client):
 
     assert response.status_code == 404
     assert b'role="alert">No such loan.</p>' in response.content
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize('path', ['/payments/L3', '/ui/payments/L3/'])
+def test_payment_endpoints_only_accept_post(client, local_gateway, path):
+    requests = local_gateway()
+
+    response = client.get(path)
+
+    assert response.status_code == 405
+    assert requests == []
 
 
 @pytest.mark.django_db
