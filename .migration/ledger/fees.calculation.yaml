@@ -14,7 +14,7 @@ target:
 status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_services.py::test_fee_uses_return_date_instead_of_today, tests/fees/test_services.py::test_fee_applies_grace_period_daily_rate_and_cap]
+evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/http.json, .migration/characterization/source/goldens/edge-cases.json, .migration/evidence/runs/LL-03.md, tests/fees/test_fee_services.py::test_fee_uses_return_date_instead_of_today, tests/fees/test_fee_services.py::test_fee_applies_grace_period_daily_rate_and_cap]
 rules:
   - id: non-negative-late-days
     rule: "Late days are never negative."
