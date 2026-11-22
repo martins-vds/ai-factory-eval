@@ -46,3 +46,11 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-22T18:07:47+00:00 | return-validate-final | 1 | 6.6 | `python .migration/harness/tools/validate.py .migration` | `4bf2175061f90b26` | 195 file(s) checked, 1 error(s) |  |
 | 2026-11-22T18:07:58+00:00 | return-validate-final | 0 | 6.65 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
 | 2026-11-22T18:10:36+00:00 | setup-probe | 0 | 0.0 | `true` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:11:44+00:00 | crap-coverage-correction | 0 | 47.8 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `670f5ce7dbe02b9f` |  |  |
+| 2026-11-22T18:11:47+00:00 | crap-lizard-correction | 0 | 0.12 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-22T18:11:49+00:00 | crap-score-correction | 0 | 0.03 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `7938dca3a718c5db` |  | gate=crap max=26.0 threshold=30 over=0 methods=208 |
+| 2026-11-22T18:11:51+00:00 | lint-correction | 0 | 0.01 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-22T18:11:53+00:00 | format-correction | 0 | 0.01 | `ruff format --check` | `5b710ff7a343c343` |  |  |
+| 2026-11-22T18:11:55+00:00 | layers-correction | 0 | 0.13 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-22T18:11:57+00:00 | ui-correction | 0 | 0.55 | `python .migration/harness/tools/check_ui.py` | `155001eb467e1b84` |  | gate=ui scope="templates changed since a5a2fdf4f0431a1e6fbf29dcbda1a9df126efa17" templates=4 findings=0 |
+| 2026-11-22T18:12:09+00:00 | return-validate-correction | 0 | 6.28 | `python .migration/harness/tools/validate.py .migration` | `7c75cd4a68d80691` |  |  |
