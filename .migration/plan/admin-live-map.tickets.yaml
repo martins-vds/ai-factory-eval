@@ -1,4 +1,3 @@
-# Backfilled from the plan and its published tickets (harness #98).
 slice: admin-live-map
 tickets:
 - id: AM-04A
@@ -32,7 +31,7 @@ tickets:
   - AM-04B
 - id: AM-04D
   title: Marker partial and unmapped cargo
-  role: afs-specialist-migrator
+  role: afs-migrator
   specialty: ui
   files:
   - templates/admin/_live_map_markers.html
