@@ -67,14 +67,20 @@ def test_fee_waiver_daily_rate_and_cap(late_days, amount):
 
 def test_returned_loan_fee_ends_on_return_date():
     application = LateFeeApplication(
-        LoanRepository(Loan('L3', date(2025, 12, 15), date(2026, 1, 3))),
-        FixedClock(date(2026, 11, 22)),
+        LoanRepository(
+            Loan('L3', date(2025, 12, 15), date(2026, 1, 3)),
+            Loan('L4', date(2026, 1, 17)),
+        ),
+        FixedClock(date(2026, 1, 16)),
     )
 
-    quote = application.calculate('L3')
+    returned_loan_quote = application.calculate('L3')
+    not_yet_due_quote = application.calculate('L4')
 
-    assert quote.days_late == 19
-    assert quote.amount == Decimal('4.75')
+    assert returned_loan_quote.days_late == 19
+    assert returned_loan_quote.amount == Decimal('4.75')
+    assert not_yet_due_quote.days_late == 0
+    assert not_yet_due_quote.amount == Decimal('0.00')
 
 
 def test_fee_rejects_an_unknown_loan():

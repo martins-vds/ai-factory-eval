@@ -32,7 +32,10 @@ evidence:
   - tests/fees/test_api.py::test_payment_api_preserves_interruption_when_returning_gateway_failure
   - tests/fees/test_api.py::test_ui_payment_shows_gateway_failure_to_htmx
   - tests/fees/test_api.py::test_ui_payment_returns_success_to_htmx
+  - tests/fees/test_api.py::test_ui_payment_returns_a_full_page_without_an_htmx_request
   - tests/fees/test_api.py::test_ui_payment_returns_unknown_loan_as_htmx_error
+  - tests/fees/test_api.py::test_ui_payment_returns_unknown_loan_as_a_full_page
+  - tests/fees/test_api.py::test_fee_and_payment_routes_reject_unsupported_methods
 notes: "The approved #40 ruling returns a 502 for interruption and preserves the InterruptedError as the chained cause, which is logged."
 quirks: [martins-vds/ai-factory-synthetic-target#40]
 rules:
@@ -40,5 +43,5 @@ rules:
     rule: Payment requires an existing loan; unknown IDs are refused before contacting the gateway.
     source: legacy/src/main/java/lib/FinePayments.java:30-32
   - id: interruption-not-swallowed
-    rule: An interrupted gateway call returns a gateway failure without losing the underlying interruption.
+    rule: The payment use case propagates an interruption raised by the gateway instead of swallowing it.
     source: martins-vds/ai-factory-synthetic-target#40

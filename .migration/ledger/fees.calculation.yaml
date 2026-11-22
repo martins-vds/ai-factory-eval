@@ -35,6 +35,7 @@ evidence:
 - tests/fees/test_fee_services.py::test_fee_rejects_an_unknown_loan
 - tests/fees/test_api.py::test_fee_api_matches_the_characterized_html
 - tests/fees/test_api.py::test_fee_api_returns_the_characterized_not_found_response
+- tests/fees/test_api.py::test_fee_page_returns_the_reading_room_not_found_page
 rules:
 - id: late-days-end-at-return
   rule: Days late run from the due date (14 days after lending) to the return date,
@@ -50,5 +51,5 @@ rules:
   rule: The fee never exceeds $10.00.
   source: legacy/src/main/java/lib/LateFeeView.java:31-37
 - id: unknown-loan-404
-  rule: A fee for a loan that doesn't exist is answered with 404.
+  rule: A fee cannot be calculated for a loan that doesn't exist.
   source: .migration/characterization/source/goldens/http.json
