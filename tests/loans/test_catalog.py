@@ -77,6 +77,20 @@ def test_catalog_use_case_lists_loans_in_id_order():
 
 
 @pytest.mark.django_db
+def test_catalog_use_case_returns_the_characterized_seed_records():
+    catalog = LoanCatalog(DjangoLoanRepository())
+
+    assert [
+        (loan.loan_id, loan.member, loan.isbn, loan.lent_on, loan.returned_on)
+        for loan in catalog.list_loans()
+    ] == [
+        ('L1', 'ana', '9780134685991', date(2026, 1, 2), None),
+        ('L2', 'bo', '9780596007126', date(2026, 1, 10), date(2026, 1, 20)),
+        ('L3', 'cy', '9781617294945', date(2025, 12, 1), date(2026, 1, 3)),
+    ]
+
+
+@pytest.mark.django_db
 def test_catalog_use_case_escapes_export_delimiters():
     LoanRecord.objects.create(
         id='L4',

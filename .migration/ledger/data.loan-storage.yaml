@@ -6,10 +6,16 @@ source:
   graph_node: table:legacy/src/main/java/lib/Loan.java:LOAN
   location: legacy/src/main/java/lib/Loan.java:11-26
 boundary: "The LOAN table stores id, member, ISBN, lentOn, and nullable returnedOn; JPA accesses it through the repository using the in-memory H2 library persistence unit."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2330]
+target:
+  components: [src/loans/models.py, src/loans/repository.py, src/loans/migrations/0001_initial.py]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/edge-cases.json, .migration/characterization/source/goldens/restart.json]
-notes: "persistence.xml uses drop-and-create on startup; the reset-on-restart question is in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_data_survives_reapplying_migrations]
+rules:
+  - id: preserve-persisted-loans
+    rule: "Persisted loans retain their fields when startup migrations are applied again; they are not reset or replaced by seeds."
+    source: "Quirk ruling martins-vds/ai-factory-synthetic-target#42"
+notes: "The source uses drop-and-create on startup; the target follows the approved persistence fix."
 quirks: [martins-vds/ai-factory-synthetic-target#42]

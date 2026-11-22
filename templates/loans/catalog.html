@@ -16,8 +16,8 @@
         <span class="badge badge-outline">Record {{ loan.loan_id }}</span>
         <span class="text-sm text-stone-500">Due {{ loan.due_on|date:"Y-m-d" }}</span>
       </div>
-      <h2 class="mt-4 font-serif text-2xl font-semibold">{{ loan.member }}</h2>
-      <p class="text-sm text-stone-600">ISBN {{ loan.isbn }}</p>
+      <h2 class="mt-4 font-serif text-2xl font-semibold">ISBN {{ loan.isbn }}</h2>
+      <p class="text-sm text-stone-600">Borrowed by {{ loan.member }}</p>
       <a class="btn btn-ghost mt-3 self-start" href="{% url 'loan-page' loan_id=loan.loan_id %}">
         View record {{ loan.loan_id }}
       </a>

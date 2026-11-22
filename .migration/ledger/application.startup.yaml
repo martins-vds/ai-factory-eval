@@ -7,10 +7,13 @@ source:
   location: legacy/src/main/java/lib/App.java:13-25
   risk: {crap: 1, complexity: 1, coverage: 0.85}
 boundary: "PORT selects the listening port (default 8080); startup creates the library persistence unit, wires four HTTP resources, binds Grizzly to 0.0.0.0, and shutdown closes the server and EntityManagerFactory."
-tickets: [martins-vds/ai-factory-synthetic-target#35]
-status: pending
+tickets: [martins-vds/ai-factory-synthetic-target#35, martins-vds/ai-factory-eval#2330]
+target:
+  components: [Makefile, src/loans/migrations/0001_initial.py]
+status: migrated
 verification: differential
 characterization_tier: A
-evidence: [.migration/references/characterization-SY-05.md, .migration/evidence/runs/SY-05.md, .migration/characterization/source/goldens/restart.json]
-notes: "Restart reset behavior is raised in martins-vds/ai-factory-synthetic-target#42."
+evidence: [.migration/evidence/runs/LL-01.md, tests/loans/test_catalog.py::test_catalog_data_survives_reapplying_migrations]
+no_rules: "Port selection and schema migration are operational wiring; loan persistence and seed policy are recorded in their data capabilities."
+notes: "The target applies schema/data migrations before serving and honors the approved persistence fix in martins-vds/ai-factory-synthetic-target#42."
 quirks: [martins-vds/ai-factory-synthetic-target#42]
