@@ -9,6 +9,33 @@ source:
   risk: {crap: 2, complexity: 2, coverage: 0.83}
 boundary: "A successful return assigns the supplied date to returnedOn and persists the changed loan; the source does not reject or preserve an earlier return date."
 tickets: [martins-vds/ai-factory-synthetic-target#35]
+target:
+  components:
+    - src.loans.services.return_loan
+    - src.loans.repository.LoanRepository.mark_returned
+status: migrated
+verification: differential
+characterization_tier: A
+evidence:
+  - .migration/references/characterization-SY-05.md
+  - .migration/evidence/runs/LL-02.md
+  - tests/loans/test_circulation.py::test_return_use_case_records_the_supplied_date
+  - tests/loans/test_circulation.py::test_return_use_case_rejects_a_repeat_and_preserves_the_original_date
+  - tests/loans/test_circulation.py::test_return_api_keeps_the_first_return_date
+  - tests/loans/test_circulation.py::test_reading_room_return_updates_the_loan_row_for_htmx
+  - tests/loans/test_circulation.py::test_reading_room_return_renders_repeat_return_error_for_htmx
+quirks: [martins-vds/ai-factory-synthetic-target#41]
+rules:
+  - id: preserve-first-return-date
+    rule: A returned loan cannot be returned again; reject the repeat and preserve its original return date.
+    source: martins-vds/ai-factory-synthetic-target#41
+  - id: record-return-date
+    rule: A successful return records and persists the date supplied by the use case.
+    source: legacy/src/main/java/lib/LoanRepository.java:36-44
+approval:
+  by: martins-vds
+  ref: martins-vds/ai-factory-synthetic-target#41
+  reason: The approved ruling fixes repeat returns by rejecting them without changing the original date.
 status: pending
 verification: differential
 characterization_tier: A
