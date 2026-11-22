@@ -57,22 +57,24 @@ def test_fee_uses_return_date_instead_of_today():
 
     assert quote.late_days == 3
     assert quote.amount_cents == 75
+    assert quote.amount == '$0.75'
 
 
 @pytest.mark.parametrize(
-    ('today', 'late_days', 'amount_cents'),
+    ('today', 'late_days', 'amount_cents', 'amount'),
     [
-        (date(2026, 9, 30), 0, 0),
-        (date(2026, 10, 3), 2, 0),
-        (date(2026, 10, 4), 3, 75),
-        (date(2027, 1, 1), 92, 1000),
+        (date(2026, 9, 30), 0, 0, '$0.00'),
+        (date(2026, 10, 3), 2, 0, '$0.00'),
+        (date(2026, 10, 4), 3, 75, '$0.75'),
+        (date(2027, 1, 1), 92, 1000, '$10.00'),
     ],
 )
-def test_fee_applies_grace_period_daily_rate_and_cap(today, late_days, amount_cents):
+def test_fee_applies_grace_period_daily_rate_and_cap(today, late_days, amount_cents, amount):
     quote = fee_application(Loan('L1', date(2026, 10, 1)), today=today).quote('L1')
 
     assert quote.late_days == late_days
     assert quote.amount_cents == amount_cents
+    assert quote.amount == amount
 
 
 def test_quote_is_missing_for_unknown_loan():

@@ -1,4 +1,5 @@
 import json
+import logging
 import socket
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -6,6 +7,9 @@ from pathlib import Path
 
 import pytest
 from playwright.sync_api import sync_playwright
+
+from src.fees.composition import fee_application
+from src.fees.services import PaymentGatewayFailure
 
 HTTP_GOLDENS = json.loads(
     (
@@ -177,6 +181,8 @@ def test_ui_payment_renders_not_found_without_calling_gateway(client, gateway_se
     assert response.status_code == 404
     assert b'role="alert"' in response.content
     assert b'no such loan' in response.content
+    assert response.context['success'] is False
+    assert response.context['body'] == 'no such loan\n'
     assert gateway_server.requests == []
 
 
@@ -200,6 +206,23 @@ def test_fee_and_payment_routes_reject_unsupported_methods(
 
     assert response.status_code == 405
     assert gateway_server.requests == []
+
+
+@pytest.mark.django_db
+def test_payment_api_logs_interruption_and_returns_gateway_failure(client, caplog, monkeypatch):
+    def interrupt(_loan_id):
+        raise PaymentGatewayFailure('payment gateway unavailable') from InterruptedError(
+            'request interrupted'
+        )
+
+    monkeypatch.setattr(fee_application.gateway, 'charge', interrupt)
+    with caplog.at_level(logging.WARNING, logger='src.fees.views'):
+        response = client.post('/payments/L1')
+
+    assert response.status_code == 502
+    assert response.content == b'payment gateway unavailable\n'
+    assert 'Payment gateway request was interrupted' in caplog.text
+    assert 'request interrupted' in caplog.text
 
 
 @pytest.mark.django_db
