@@ -41,5 +41,47 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-22T14:40:26Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 17101,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "LL-03",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/03b4b10c-86a4-4a67-ab97-6531d82ddbff.json",
+      ".migration/evidence/runs/LL-03.md",
+      ".migration/handoffs/LL-03.md",
+      ".migration/returns/LL-03.afs-migrator.yaml",
+      "config/urls.py",
+      "src/fees/__init__.py",
+      "src/fees/composition.py",
+      "src/fees/gateway.py",
+      "src/fees/services.py",
+      "src/fees/urls.py",
+      "src/fees/views.py",
+      "templates/fees/fee.html",
+      "templates/fees/not-found.html",
+      "templates/fees/payment-status.html",
+      "tests/fees/conftest.py",
+      "tests/fees/test_gateway.py",
+      "tests/fees/test_services.py",
+      "tests/fees/test_views.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
   }
 ]
