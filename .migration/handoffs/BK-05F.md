@@ -25,3 +25,33 @@
 
 ### Next step for the next session
 Resume BK-05F by reproducing and resolving the mutation-score shortfall first; then commit the pending fix, rerun CodeQL, update the return file, and validate all evidence.
+
+## Handoff — afs-migrator · 2026-11-22T17:41:41Z
+**State:** blocked · **Branch / PR:** `copilot/bk-05f-fix-changed-code-mutation-56efa934-0428-456b-b850-db991918025f` / https://github.com/martins-vds/ai-factory-eval/pull/2396 · **Last commit:** 4bb41e389
+
+### Done
+- Setup passed; source SHA is pinned and read-only, state is valid, db is healthy, and Python 3.13 matches the profile.
+- Removed the redundant empty-string candidate default and added an interface test proving a missing candidate returns 404 without assigning a route.
+- Strengthened no-route UI assertions to match the complete paragraph, so both visible guidance mutants are killed rather than passing as substring matches.
+- Build and idiom gates passed; full behavior and regression suites each passed with 469 tests; CRAP maximum is 26.0.
+- Changed-code mutation passed at 0.869 (53 killed, 8 survived); the eight survivors and all original survivor dispositions are in `.migration/returns/BK-05F.afs-migrator.yaml`.
+- Secret scan found no secrets in changed files.
+
+### Remaining
+- [ ] Resolve the eligibility rule's layer and expand the BK-05F scope before modifying application files.
+- [ ] Update the four BK-05F ledger entries and return with the rule/use-case test or justified `no_rules`, then rerun migration validation.
+
+### Decisions made
+- The candidate-token empty default is redundant: missing input becomes `None`, the signing `TypeError` is caught, and the same 404 is returned.
+- Do not claim the route-specification eligibility rule is enforced by `CargoRouting.assign_route`; the current check exists only at the UI boundary.
+
+### Blockers / questions
+- Migration validation requires every BK-05F capability to list `rules` or `no_rules`. `booking.routing-assign` includes an eligibility check in `views.py`, but `CargoRouting.assign_route` accepts an itinerary without checking the current route specification. The Migrator contract requires a direct use-case test and the rule to be enforced in the use case/domain.
+- The required application and use-case test files are outside BK-05F's planned files: `src/cargotracker/booking/application/routing.py` and `tests/booking/application/test_routing.py`. Per the scope stop rule, do not edit them; the Orchestrator must issue/approve the scope.
+
+### Validation
+- An earlier `python .migration/harness/tools/validate.py .migration` run exited 1 because the return had no handoff path and the rule-completeness check found five errors; see `.migration/runs/BK-05F/20261122T174148545491Z-validation-rules-blocker.log:2-7`.
+- After recording this handoff in the return, `python .migration/harness/tools/validate.py .migration` passed with 195 files checked and 0 errors. Rule completeness remains deferred until the scope blocker is resolved.
+
+### Next step for the next session
+Ask the Program Orchestrator to approve a ticket/scope for moving current-route-specification eligibility into `CargoRouting.assign_route` with a direct use-case rejection test; then resolve BK-05F ledger rules and rerun validation.

@@ -128,11 +128,16 @@ def test_route_screens_explain_when_no_candidates_satisfy_the_deadline(client):
     assert 'No routes found that satisfy the route specification.' in route_content
     assert 'Potential routes:' in route_content
     assert '<dd>0</dd>' in route_content
-    assert 'Try setting an arrival deadline further into the future.' in route_content
+    assert re.search(
+        r'>\s*No routes found that satisfy the route specification\.\s*'
+        r'Try setting an arrival deadline further into the future\.\s*</p>',
+        route_content,
+    )
     assert 'No routes found that satisfy the route specification.' in itinerary_content
-    assert (
-        'Try setting the arrival deadline further into the future (a few weeks at least).'
-        in itinerary_content
+    assert re.search(
+        r'>\s*No routes found that satisfy the route specification\.\s*'
+        r'Try setting the arrival deadline further into the future \(a few weeks at least\)\.\s*</p>',
+        itinerary_content,
     )
     assert 'Route option #' not in route_content
     assert 'Route option #' not in itinerary_content
@@ -174,6 +179,19 @@ def test_assigning_candidate_redirects_to_details_with_the_selected_itinerary(cl
     assert 'Itinerary' in content
     assert 'CM003' in content
     assert 'CM001' not in content
+
+
+@pytest.mark.django_db
+@override_settings(ROOT_URLCONF=__name__)
+def test_route_assignment_rejects_a_missing_candidate(client):
+    tracking_id = _create_cargo(_candidate_paths())
+    route_url = f'/admin/cargo/{tracking_id.value}/route/'
+
+    response = client.post(route_url)
+
+    assert response.status_code == 404
+    details = client.get(f'/admin/cargo/{tracking_id.value}/').content.decode()
+    assert 'Not routed' in details
 
 
 @pytest.mark.django_db
