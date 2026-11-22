@@ -26,7 +26,9 @@ class HttpPaymentGateway:
 
         try:
             with urllib.request.urlopen(request) as response:
-                return GatewayResponse(response.status, response.read().decode('utf-8', errors='replace'))
+                return GatewayResponse(
+                    response.status, response.read().decode('utf-8', errors='replace')
+                )
         except InterruptedError as error:
             raise PaymentGatewayInterrupted('payment request interrupted') from error
         except urllib.error.HTTPError as response:
