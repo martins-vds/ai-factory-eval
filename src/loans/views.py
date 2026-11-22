@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from .models import Loan
-from .services import get_loan_text, list_loans_text
+from .queries import get_loan_text, list_loans_text
 
 
 def loan_catalog(request):
