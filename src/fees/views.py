@@ -3,7 +3,6 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
 from .composition import fee_application
-from .services import PaymentGatewayFailure
 
 
 @require_GET
@@ -45,22 +44,16 @@ def _render_payment(request, loan_id, status, message, success):
 
 
 def _payment_response(request, loan_id, *, page):
-    try:
-        result = fee_application.pay(loan_id)
-    except PaymentGatewayFailure as error:
-        if page:
-            return _render_payment(request, loan_id, 502, str(error), False)
-        return HttpResponse(str(error), status=502, content_type='text/plain')
-
-    if result is None:
+    outcome = fee_application.pay(loan_id)
+    if outcome is None:
         if page:
             return _render_payment(request, loan_id, 404, 'No such loan.', False)
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
 
-    status = 200 if result.status == 200 else 502
+    status = 200 if outcome.succeeded else 502
     if page:
-        return _render_payment(request, loan_id, status, result.body, status == 200)
-    return HttpResponse(result.body, status=status, content_type='text/plain')
+        return _render_payment(request, loan_id, status, outcome.body, outcome.succeeded)
+    return HttpResponse(outcome.body, status=status, content_type='text/plain')
 
 
 @require_POST

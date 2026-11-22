@@ -33,6 +33,13 @@ class PaymentGatewayFailure(Exception):
 
 
 @dataclass(frozen=True)
+class PaymentOutcome:
+    succeeded: bool
+    body: str
+    failure: PaymentGatewayFailure | None = None
+
+
+@dataclass(frozen=True)
 class FeeQuote:
     loan: LoanRecord
     days_late: int
@@ -59,7 +66,11 @@ class FeeApplication:
         amount_cents = 0 if days_late <= 2 else min(1000, days_late * 25)
         return FeeQuote(loan, days_late, amount_cents)
 
-    def pay(self, loan_id: str) -> PaymentResult | None:
+    def pay(self, loan_id: str) -> PaymentOutcome | None:
         if self.repository.find(loan_id) is None:
             return None
-        return self.gateway.charge(loan_id)
+        try:
+            response = self.gateway.charge(loan_id)
+        except PaymentGatewayFailure as error:
+            return PaymentOutcome(False, str(error), error)
+        return PaymentOutcome(response.status == 200, response.body)

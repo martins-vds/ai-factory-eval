@@ -3,7 +3,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from src.fees.services import FeeApplication
+from src.fees.services import FeeApplication, PaymentGatewayFailure, PaymentResult
 
 
 @dataclass
@@ -30,11 +30,16 @@ class Clock:
 
 
 class PaymentGateway:
-    def __init__(self):
+    def __init__(self, result=None, failure=None):
         self.charges = []
+        self.result = result or PaymentResult(200, 'charged\n')
+        self.failure = failure
 
     def charge(self, loan_id):
         self.charges.append(loan_id)
+        if self.failure is not None:
+            raise self.failure
+        return self.result
 
 
 @pytest.mark.parametrize(
@@ -83,3 +88,42 @@ def test_payment_for_unknown_loan_does_not_call_gateway():
 
     assert application.pay('missing') is None
     assert gateway.charges == []
+
+
+@pytest.mark.parametrize(
+    ('gateway_status', 'succeeded'),
+    [(200, True), (503, False)],
+)
+def test_payment_only_succeeds_for_gateway_http_200(gateway_status, succeeded):
+    loan = Loan('L1', date(2026, 10, 12))
+    gateway = PaymentGateway(PaymentResult(gateway_status, 'gateway response'))
+    application = FeeApplication(
+        LoanRepository([loan]),
+        Clock(date(2026, 10, 12)),
+        gateway,
+    )
+
+    outcome = application.pay('L1')
+
+    assert outcome.succeeded is succeeded
+    assert outcome.body == 'gateway response'
+    assert gateway.charges == ['L1']
+
+
+def test_payment_outcome_keeps_interrupted_failure_cause():
+    loan = Loan('L1', date(2026, 10, 12))
+    interrupted = InterruptedError('request interrupted')
+    failure = PaymentGatewayFailure()
+    failure.__cause__ = interrupted
+    gateway = PaymentGateway(failure=failure)
+    application = FeeApplication(
+        LoanRepository([loan]),
+        Clock(date(2026, 10, 12)),
+        gateway,
+    )
+
+    outcome = application.pay('L1')
+
+    assert outcome.succeeded is False
+    assert outcome.failure is failure
+    assert outcome.failure.__cause__ is interrupted
