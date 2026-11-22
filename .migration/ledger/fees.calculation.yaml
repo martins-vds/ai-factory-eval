@@ -25,8 +25,11 @@ evidence:
   - .migration/evidence/runs/LL-03.md
 rules:
   - id: late-days
-    rule: Late days are clamped at zero and use returnedOn when present, otherwise today's date.
+    rule: Late days are clamped at zero between the due date and the effective date.
     source: legacy/src/main/java/lib/LateFeeView.java:31-35
+  - id: effective-date
+    rule: Use returnedOn when present; otherwise use today's date.
+    source: legacy/src/main/java/lib/LateFeeView.java:32-33
   - id: waiver-rate-cap
     rule: Fees are waived through two days late, then accrue at 25 cents per day up to 1000 cents.
     source: legacy/src/main/java/lib/LateFeeView.java:36-37
