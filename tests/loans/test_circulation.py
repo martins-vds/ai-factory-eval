@@ -42,7 +42,14 @@ def test_api_lends_a_book_and_returns_the_formatted_loan(client):
 
 @pytest.mark.parametrize(
     ('member', 'isbn', 'field'),
-    [('', '123', 'member'), ('  ', '123', 'member'), ('reader', '', 'isbn'), ('reader', '  ', 'isbn')],
+    [
+        (None, '123', 'member'),
+        ('', '123', 'member'),
+        ('  ', '123', 'member'),
+        ('reader', None, 'isbn'),
+        ('reader', '', 'isbn'),
+        ('reader', '  ', 'isbn'),
+    ],
 )
 def test_lending_use_case_rejects_blank_required_fields(member, isbn, field):
     application = LoanApplication(InMemoryLoanStore())
@@ -57,6 +64,9 @@ def test_lending_use_case_rejects_blank_required_fields(member, isbn, field):
 @pytest.mark.parametrize(
     'form',
     [
+        {'isbn': '123'},
+        {'member': 'reader'},
+        {},
         {'member': '', 'isbn': '123'},
         {'member': 'reader', 'isbn': ''},
         {'member': '  ', 'isbn': '123'},
@@ -182,10 +192,21 @@ def test_reading_room_return_renders_success_and_preserves_a_repeated_date(clien
 
 @pytest.mark.django_db
 def test_reading_room_unknown_htmx_return_renders_an_error(client):
-    response = client.post('/ui/loans/missing/return/', HTTP_HX_REQUEST='true')
+    fragment = client.post('/ui/loans/missing/return/', HTTP_HX_REQUEST='true')
+    page = client.post('/ui/loans/missing/return/')
 
-    assert response.status_code == 404
-    assert b'No such loan' in response.content
+    assert fragment.status_code == 404
+    assert b'No such loan' in fragment.content
+    assert page.status_code == 404
+    assert b'No such loan' in page.content
+
+
+@pytest.mark.django_db
+def test_reading_room_htmx_repeat_return_keeps_the_original_date(client):
+    response = client.post('/ui/loans/L2/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 409
+    assert b'Jan 20, 2026' in response.content
 
 
 @pytest.mark.django_db
@@ -217,8 +238,10 @@ def test_browser_can_lend_a_book(live_server):
             page.get_by_label('ISBN').fill('123')
             if htmx_loaded:
                 with page.expect_response(
-                    lambda response: response.url.endswith('/ui/loans/new/')
-                    and response.request.method == 'POST'
+                    lambda response: (
+                        response.url.endswith('/ui/loans/new/')
+                        and response.request.method == 'POST'
+                    )
                 ) as post:
                     page.get_by_role('button', name='Lend book').click()
                 response = post.value

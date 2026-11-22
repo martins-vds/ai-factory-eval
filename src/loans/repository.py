@@ -1,6 +1,7 @@
 from django.db import transaction
 
-from .domain import Loan as LoanRecord, LoanAlreadyReturned
+from .domain import Loan as LoanRecord
+from .domain import LoanAlreadyReturned
 from .models import Loan as LoanModel
 
 

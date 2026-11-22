@@ -54,3 +54,12 @@ class LoanApplication:
             raise LoanNotFound
         loan.mark_returned(returned_on)
         return self.loans.save_returned(loan)
+
+
+def list_loans_text(application):
+    return ''.join(loan_line(loan) for loan in application.all_loans())
+
+
+def get_loan_text(loan_id, application):
+    loan = application.find_loan(loan_id)
+    return loan_line(loan) if loan else None

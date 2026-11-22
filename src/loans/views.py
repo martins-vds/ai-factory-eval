@@ -5,7 +5,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from .composition import loan_application
 from .domain import LoanAlreadyReturned, LoanInputError, LoanNotFound
-from .services import loan_line
+from .services import get_loan_text, list_loans_text, loan_line
 
 
 def loan_catalog(request):
@@ -21,10 +21,7 @@ def loan_catalog_detail(request, loan_id):
 
 @require_GET
 def loan_list(request):
-    return HttpResponse(
-        ''.join(loan_line(loan) for loan in loan_application().all_loans()),
-        content_type='text/plain',
-    )
+    return HttpResponse(list_loans_text(loan_application()), content_type='text/plain')
 
 
 @require_http_methods(['GET', 'POST'])
@@ -36,10 +33,10 @@ def loans(request):
 
 @require_GET
 def loan_detail(request, loan_id):
-    loan = loan_application().find_loan(loan_id)
-    if loan is None:
+    body = get_loan_text(loan_id, loan_application())
+    if body is None:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
-    return HttpResponse(loan_line(loan), content_type='text/plain')
+    return HttpResponse(body, content_type='text/plain')
 
 
 @require_POST
@@ -62,12 +59,10 @@ def loan_return(request, loan_id):
     except LoanNotFound:
         return HttpResponse('no such loan\n', status=404, content_type='text/plain')
     except LoanAlreadyReturned:
-        return HttpResponse('loan has already been returned\n', status=409, content_type='text/plain')
+        return HttpResponse(
+            'loan has already been returned\n', status=409, content_type='text/plain'
+        )
     return HttpResponse(loan_line(loan), content_type='text/plain')
-
-
-def loan_lend_page(request):
-    return render(request, 'loans/new.html')
 
 
 @require_POST
