@@ -43,7 +43,6 @@ def loan_detail(request, loan_id):
     return HttpResponse(body, content_type='text/plain')
 
 
-@require_POST
 def loan_lend(request):
     try:
         loan = lend_book(

@@ -24,7 +24,6 @@ class LoanRepository:
             lent_on=lent_on,
         )
 
-    @transaction.atomic
     def mark_returned(self, loan_id, returned_on):
         updated = Loan.objects.filter(pk=loan_id, returned_on__isnull=True).update(
             returned_on=returned_on

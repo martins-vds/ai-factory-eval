@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 import pytest
+from django.db import IntegrityError
 from django.test import Client
 
 from src.loans.clock import SystemClock
@@ -167,6 +168,16 @@ def test_browser_lending_form_creates_loan_and_redirects_to_detail(client):
 
 
 @pytest.mark.django_db
+def test_browser_lending_form_preserves_nonblank_whitespace(client):
+    response = client.post('/ui/loans/', {'member': ' dee ', 'isbn': ' 123 '})
+
+    assert response.status_code == 302
+    loan = Loan.objects.get(pk='L4')
+    assert loan.member == ' dee '
+    assert loan.isbn == ' 123 '
+
+
+@pytest.mark.django_db
 def test_browser_lending_and_return_actions_use_reading_room_pages(client):
     new_loan_page = client.get('/ui/loans/new/')
 
@@ -174,12 +185,31 @@ def test_browser_lending_and_return_actions_use_reading_room_pages(client):
     assert b'Lend a book.' in new_loan_page.content
     assert b'name="member"' in new_loan_page.content
     assert b'name="isbn"' in new_loan_page.content
+    assert new_loan_page.content.count(b'class="input input-bordered"') == 2
+
+    list_page = client.get('/ui/loans/')
+
+    assert list_page.status_code == 200
+    assert b'Lend a book' in list_page.content
+    assert b'Loan L1' in list_page.content
 
     detail_page = client.get('/ui/loans/L1/')
 
     assert detail_page.status_code == 200
     assert b'hx-post="/ui/loans/L1/return/"' in detail_page.content
     assert b'hx-on::response-error=' in detail_page.content
+
+
+@pytest.mark.django_db
+def test_return_routes_only_allow_post_requests(client):
+    api_response = client.get('/loans/L1/return')
+    form_response = client.put('/ui/loans/new/')
+    return_response = client.get('/ui/loans/L1/return/')
+
+    assert api_response.status_code == 405
+    assert form_response.status_code == 405
+    assert return_response.status_code == 405
+    assert Loan.objects.get(pk='L1').returned_on is None
 
 
 @pytest.mark.django_db
@@ -193,6 +223,17 @@ def test_browser_return_rejection_renders_error_and_original_date(client):
     assert b'This loan has already been returned.' in response.content
     assert b'Jan 20, 2026' in response.content
     assert Loan.objects.get(pk='L2').returned_on == date(2026, 1, 20)
+
+
+@pytest.mark.django_db
+def test_browser_return_unknown_loan_renders_error_fragment(client):
+    response = client.post(
+        '/ui/loans/unknown/return/',
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 404
+    assert b'No such loan.' in response.content
 
 
 @pytest.mark.django_db
@@ -210,3 +251,29 @@ def test_browser_return_records_date_and_updates_return_status(client):
         in (response.content)
     )
     assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_browser_return_form_redirects_after_return(client):
+    returned_on = date.today()
+
+    response = client.post('/ui/loans/L1/return/')
+
+    assert response.status_code == 302
+    assert response['Location'] == '/ui/loans/L1/'
+    assert Loan.objects.get(pk='L1').returned_on == returned_on
+
+
+@pytest.mark.django_db
+def test_lending_repository_rolls_back_a_failed_insert():
+    Loan.objects.create(
+        id='L5',
+        member='existing',
+        isbn='456',
+        lent_on=date(2026, 3, 1),
+    )
+
+    with pytest.raises(IntegrityError):
+        LoanRepository().lend('duplicate', '123', date(2026, 3, 2))
+
+    assert Loan.objects.get(pk='L5').member == 'existing'
