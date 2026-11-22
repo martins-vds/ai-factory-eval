@@ -5,7 +5,7 @@ If the payment gateway call is interrupted, the source catches `InterruptedExcep
 
 ## Evidence
 - Source: `function:legacy/src/main/java/lib/FinePayments.java:pay`, `legacy/src/main/java/lib/FinePayments.java:34-40`
-- Characterization: tier-A characterization observed the unavailable-gateway path as HTTP 502 with `payment gateway unavailable`; interruption itself was not separately exercised.
+- Characterization: a controlled gateway connection close produced HTTP 502 `payment gateway unavailable` through the I/O-exception path; `InterruptedException` itself was not induced.
 - Why it looks wrong: clearing the interrupt can prevent the server from promptly stopping or cancelling interrupted request work.
 
 ## Impact

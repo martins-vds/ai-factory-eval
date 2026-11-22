@@ -5,7 +5,7 @@ Every `POST /payments/{id}` for an existing loan sends a new gateway request, wi
 
 ## Evidence
 - Source: `function:legacy/src/main/java/lib/FinePayments.java:pay`, `legacy/src/main/java/lib/FinePayments.java:29-37`
-- Characterization: the tier-A probe observed a single unavailable-gateway request; retries or repeated successful charges were not separately exercised.
+- Characterization: two successful `POST /payments/L1` requests each returned HTTP 200 `charged`; the controlled gateway observed two bodyless `POST /charge?loan=L1` requests.
 - Why it looks wrong: retrying a request may charge again; whether the external gateway deduplicates the loan ID is unspecified by the source.
 
 ## Impact

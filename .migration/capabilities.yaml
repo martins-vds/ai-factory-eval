@@ -6,6 +6,7 @@ characterization:
   source_builds: 'yes'
   tier: A
   reason: The pinned legacy source builds and runs; HTTP endpoint probes returned the expected responses (see references/characterization.md).
+  tier_b_attempt: 'no code: legacy/docs/reports-spec.md is the only monthly-report artifact; no implementation or runtime exists.'
 capabilities:
 - id: build-run
   applies_to: source

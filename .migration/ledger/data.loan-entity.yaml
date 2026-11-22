@@ -6,7 +6,11 @@ source:
   location: legacy/src/main/java/lib/Loan.java:11-50
 boundary: "The LOAN entity stores ID, member, ISBN, lentOn, and nullable returnedOn; dueOn is lentOn plus 14 days."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: loan-term
     rule: A loan's due date is 14 days after its lentOn date.

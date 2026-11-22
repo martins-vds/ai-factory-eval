@@ -8,5 +8,9 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "GET /about serves the packaged static HTML page with the library name, Monday-to-Saturday hours, 14-day loan period, and contact address."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: This static public information page has no business rule beyond serving its packaged content.

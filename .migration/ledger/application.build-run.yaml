@@ -6,5 +6,9 @@ source:
   location: legacy/pom.xml:10-52; legacy/run.sh:1-6
 boundary: "Running legacy/run.sh builds the Java 17 Maven package without tests, copies dependencies, and starts lib.App."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: Build and launch mechanics have no standalone business rule.

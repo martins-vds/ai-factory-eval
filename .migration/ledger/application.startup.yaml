@@ -7,5 +7,9 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "Process startup: PORT defaults to 8080, Jersey registers the loan, fee, payment, and about resources, Grizzly binds on 0.0.0.0, and shutdown closes the server and EntityManagerFactory."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 no_rules: Runtime composition and resource lifecycle contain no standalone business rule.

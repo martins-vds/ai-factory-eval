@@ -7,7 +7,11 @@ source:
   risk: { crap: 2, complexity: 1, coverage: 0 }
 boundary: "GET /loans/{id} returns the formatted loan with HTTP 200, or HTTP 404 with `no such loan` when the ID is unknown."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: unknown-loan
     rule: An unknown loan ID returns HTTP 404 and the plain-text body `no such loan` followed by a newline.

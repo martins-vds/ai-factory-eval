@@ -7,7 +7,11 @@ source:
   risk: { crap: 6, complexity: 2, coverage: 0 }
 boundary: "Loan records in list, get, create, and return responses have six semicolon-separated fields: ID, member, ISBN, lentOn, dueOn, and returnedOn."
 status: pending
-verification: pending
+verification: characterized
+characterization_tier: A
+evidence:
+  - .migration/evidence/source-characterization-SY-05.md
+  - .migration/evidence/runs/SY-05.md
 rules:
   - id: field-order
     rule: Record fields appear in the order ID, member, ISBN, lentOn, dueOn, returnedOn, separated by semicolons.
