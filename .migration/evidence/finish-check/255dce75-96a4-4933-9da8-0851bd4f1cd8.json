@@ -30,5 +30,35 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-22T04:40:36Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 28937,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "REF-02",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/255dce75-96a4-4933-9da8-0851bd4f1cd8.json",
+      ".migration/evidence/mutants/REF-02.md",
+      ".migration/evidence/runs/REF-02.md",
+      ".migration/returns/REF-02.afs-migrator.yaml",
+      "src/fees/presentation.py",
+      "src/fees/views.py"
+    ],
+    "findings": [],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "clean"
   }
 ]
