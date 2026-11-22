@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Loan catalog | The Lending Library{% endblock %}
+{% block content %}
+<main class="mx-auto grid max-w-6xl gap-12 px-6 py-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
+  <section aria-labelledby="catalog-heading">
+    <p class="text-xs uppercase tracking-[.2em] text-[#626658]">The collection · {{ loans|length }} loans in view</p>
+    <h1 id="catalog-heading" class="mb-4 mt-3 text-5xl md:text-6xl">Books in good company.</h1>
+    <p class="mb-8 text-[#626658]">A quiet ledger of what is out, who has it, and when it comes home.</p>
+    {% for loan in loans %}
+      <article class="grid gap-4 border-b border-[#d8cdbb] py-5 sm:grid-cols-[minmax(0,1fr)_auto]">
+        <div>
+          <a class="text-xl font-semibold text-[#2f3428] underline decoration-[#a94e37] underline-offset-4" href="{% url 'ui_loan_detail' loan.id %}">Loan {{ loan.id }}</a>
+          <p class="mt-1 text-[#626658]">{{ loan.member }} · ISBN {{ loan.isbn }}</p>
+        </div>
+        <p class="sm:text-right">Due {{ loan.due_on|date:"M j, Y" }}</p>
+      </article>
+    {% empty %}
+      <p class="rounded-box border border-[#d8cdbb] bg-[#fffdf7] p-6">No loans are in the catalog.</p>
+    {% endfor %}
+  </section>
+  <aside class="card h-fit border border-[#d8cdbb] bg-[#fffdf7] shadow-none">
+    <div class="card-body">
+      <p class="text-xs uppercase tracking-widest text-[#626658]">Lending policy</p>
+      <h2 class="card-title text-2xl">A little time to read</h2>
+      <p>Every loan is due 14 days after it begins.</p>
+      <a class="btn mt-3 bg-[#a94e37] text-white hover:bg-[#893d2b]" href="{% url 'loan_list' %}">Export the catalog</a>
+    </div>
+  </aside>
+</main>
+{% endblock %}

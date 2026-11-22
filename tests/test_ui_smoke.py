@@ -12,7 +12,14 @@ def test_loan_catalog_renders_in_browser(live_server):
             assert response is not None
             assert response.status == 200
             assert page.get_by_role('heading', name='Books in good company.').is_visible()
-            assert page.get_by_text('ana', exact=True).is_visible()
-            assert page.get_by_text('9780134685991', exact=True).is_visible()
+            assert page.get_by_text('ana · ISBN 9780134685991', exact=True).is_visible()
+            assert page.locator('link[href*="tailwind.css"]').count() == 1
+            assert page.locator('script[src*="htmx.org@2.0.11"]').count() == 1
+            assert (
+                page.locator('body').evaluate(
+                    '(element) => getComputedStyle(element).backgroundColor'
+                )
+                == 'rgb(245, 240, 229)'
+            )
         finally:
             browser.close()
