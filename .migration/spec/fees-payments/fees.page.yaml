@@ -1,0 +1,45 @@
+capability: fees.page
+title: Show a loan's late-fee page
+cases:
+  - title: A known loan shows its late-fee details
+    rule: known-loan-shows-fee-details
+    oracle: .migration/characterization/source/goldens/http.json
+    given:
+      clock: "2026-11-08"
+    when:
+      http:
+        method: GET
+        path: /fees/L3
+    then:
+      status: 200
+      text:
+        - "Late fee for L3"
+        - "Due 2025-12-15, 19 day(s) late."
+        - "Fee: $4.75"
+  - title: The browser page shows the late-fee details
+    rule: known-loan-shows-fee-details
+    oracle: .migration/characterization/source/goldens/http.json
+    given:
+      clock: "2026-11-08"
+    when:
+      http:
+        method: GET
+        path: /ui/fees/L3/
+    then:
+      status: 200
+      text:
+        - "Late fee for L3"
+        - "2025-12-15"
+        - "19 day(s) late"
+        - "Fee: $4.75"
+  - title: An unknown loan is not found
+    rule: unknown-loan-is-not-found
+    oracle: .migration/characterization/source/goldens/edge-cases.json
+    when:
+      http:
+        method: GET
+        path: /fees/unknown
+    then:
+      status: 404
+      text:
+        - "<p>No such loan.</p>"

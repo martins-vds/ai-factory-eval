@@ -1,0 +1,24 @@
+role: afs-characterizer
+ticket: FS-01
+issue: martins-vds/ai-factory-eval#2298
+pr: martins-vds/ai-factory-eval#2303
+tier_used: {A: 2, B: 0, C: 0}
+suite:
+  path: .migration/spec/fees-payments/
+  cases: 12
+  passing: 12
+  run_log: .migration/evidence/runs/FS-01.md
+predicted_vs_observed: {match: 2, differs: 0}
+ledger_updated: [fees.calculation, fees.page]
+quirk_tickets: []
+review_only_requests: []
+spec:
+  files:
+    - .migration/spec/fees-payments/fees.calculation.yaml
+    - .migration/spec/fees-payments/fees.page.yaml
+  cases: 12
+  rules_proved: 6
+notes: >-
+  SY-05 records the exact 1–3-day and cap boundaries as source-predicted rather than HTTP-observed;
+  the boundary table uses that characterization reference. The initial browser-page assertion was
+  corrected to check the recorded details separately; the final spec run passed all 12 cases.
