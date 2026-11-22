@@ -42,6 +42,18 @@ def test_lend_endpoint_returns_the_characterized_record(client, monkeypatch):
     assert response.content.decode() == 'L4;reader;123;2026-03-01;2026-03-15;\n'
 
 
+@pytest.mark.parametrize(
+    ('member', 'isbn', 'field'),
+    [('', '123', 'member'), ('reader', '', 'isbn')],
+)
+@pytest.mark.django_db
+def test_lend_endpoint_rejects_blank_fields(client, member, isbn, field):
+    response = client.post('/loans', {'member': member, 'isbn': isbn})
+
+    assert response.status_code == 400
+    assert response.content.decode() == f'{field}: This field cannot be blank.\n'
+
+
 @pytest.mark.django_db
 def test_return_endpoint_persists_date_and_rejects_repeated_returns(client, monkeypatch):
     monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 3, 1))
@@ -66,6 +78,80 @@ def test_return_endpoint_preserves_not_found_response(client):
     assert response.status_code == 404
     assert response['Content-Type'] == 'text/plain'
     assert response.content.decode() == 'no such loan\n'
+
+
+@pytest.mark.django_db
+def test_reading_room_catalog_offers_lending_and_return_actions(client):
+    response = client.get('/ui/loans/')
+
+    assert response.status_code == 200
+    assert b'hx-post="/ui/loans/new/"' in response.content
+    assert b'name="member"' in response.content
+    assert b'name="isbn"' in response.content
+    assert b'hx-post="/ui/loans/L1/return/"' in response.content
+
+
+@pytest.mark.django_db
+def test_full_page_lend_form_renders_field_specific_errors(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': '', 'isbn': '123'},
+    )
+
+    assert response.status_code == 400
+    assert b'member' in response.content
+    assert b'This field cannot be blank.' in response.content
+    assert b'value="123"' in response.content
+
+
+@pytest.mark.django_db
+def test_unknown_ui_return_renders_a_readable_not_found_page(client):
+    response = client.post('/ui/loans/unknown/return/')
+
+    assert response.status_code == 404
+    assert b'Return unavailable' in response.content
+    assert b'No such loan.' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_lend_validation_returns_a_field_error_fragment(client):
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': '', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 400
+    assert b'Member: This field cannot be blank.' in response.content
+    assert b'<html' not in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_lend_updates_catalog_and_feedback(client, monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 3, 1))
+
+    response = client.post(
+        '/ui/loans/new/',
+        {'member': 'reader', 'isbn': '123'},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 201
+    assert b'Loan L4 recorded.' in response.content
+    assert b'id="loan-entries" hx-swap-oob="innerHTML"' in response.content
+    assert b'Loan L4' in response.content
+
+
+@pytest.mark.django_db
+def test_htmx_return_updates_catalog_and_feedback(client, monkeypatch):
+    monkeypatch.setattr('src.loans.clock.timezone.localdate', lambda: date(2026, 3, 1))
+
+    response = client.post('/ui/loans/L1/return/', HTTP_HX_REQUEST='true')
+
+    assert response.status_code == 200
+    assert b'Loan L1 returned.' in response.content
+    assert b'id="loan-entries" hx-swap-oob="innerHTML"' in response.content
+    assert b'Returned Mar 1, 2026' in response.content
 
 
 @pytest.mark.parametrize(
