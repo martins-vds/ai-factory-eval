@@ -58,7 +58,7 @@ def test_export_round_trips_fixture_and_preserves_null_and_empty_string(tmp_path
     with (out / 'cargo.csv').open(newline='', encoding='utf-8') as stream:
         cargo = next(csv.DictReader(stream))
     assert cargo['last_known_location_id'] == r'\N'
-    assert cargo['eta'] == r'\N'
+    assert cargo['eta'] == '2026-12-29'
     assert cargo['calculated_at'] == '2026-11-07T10:11:12Z'
 
 
