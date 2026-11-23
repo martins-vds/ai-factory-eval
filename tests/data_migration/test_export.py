@@ -1,8 +1,10 @@
 import csv
+from io import StringIO
 from pathlib import Path
 
 import pytest
 from django.core.management import call_command
+from django.core.management.base import CommandError
 
 from cargotracker.location.infrastructure.models import LocationRecord
 
@@ -17,9 +19,20 @@ def test_export_data_snapshot_round_trips_mapped_fixture(tmp_path):
         snapshot=str(FIXTURE_SNAPSHOT),
         mapping=str(MAPPING),
     )
-    output = tmp_path / 'target'
+    output = tmp_path / 'nested' / 'target'
+    command_output = StringIO()
 
+    call_command(
+        'export_data_snapshot',
+        mapping=str(MAPPING),
+        out=str(output),
+        stdout=command_output,
+    )
+    assert command_output.getvalue() == 'Exported 7 rows across 6 mapped tables.\n'
+
+    before = {path.name: path.read_bytes() for path in output.glob('*.csv')}
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+    assert {path.name: path.read_bytes() for path in output.glob('*.csv')} == before
 
     assert {path.name for path in output.glob('*.csv')} == {
         'location.csv',
@@ -160,3 +173,9 @@ def test_export_orders_rows_by_primary_key(tmp_path):
     with (output / 'location.csv').open(newline='', encoding='utf-8') as stream:
         rows = list(csv.reader(stream))
     assert [row[0] for row in rows[1:]] == ['100', '101', '102']
+
+
+@pytest.mark.parametrize('provided', [{'out': 'unused'}, {'mapping': 'unused'}])
+def test_export_requires_mapping_and_output_directory(provided):
+    with pytest.raises(CommandError):
+        call_command('export_data_snapshot', **provided)

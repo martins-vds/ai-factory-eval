@@ -25,3 +25,17 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-23T00:47:56+00:00 | database-migrate | 0 | 0.51 | `python manage.py migrate --noinput` | `56d728c244009843` |  |  |
 | 2026-11-23T00:48:00+00:00 | snapshot-load | 0 | 0.43 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot/ --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
 | 2026-11-23T00:48:03+00:00 | snapshot-export | 0 | 0.42 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export/` | `ba754ea10ff616fb` |  |  |
+| 2026-11-23T00:48:25+00:00 | build-compile | 0 | 0.06 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-23T00:48:27+00:00 | build-check | 0 | 0.39 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-23T00:48:30+00:00 | idiom-ruff | 0 | 0.02 | `ruff check` | `82b3e6a6c090a576` |  |  |
+| 2026-11-23T00:48:32+00:00 | idiom-format | 0 | 0.02 | `ruff format --check` | `2c0a2eb94d0401d1` |  |  |
+| 2026-11-23T00:48:34+00:00 | idiom-layers | 0 | 0.16 | `python .migration/harness/tools/check_layers.py` | `6d772d1f98375ff4` | src/cargotracker/booking/application/routing.py:1: known, not failing: use cases don't depend on web adapters or persist | gate=layering contracts=3 violations=0 known=3 |
+| 2026-11-23T00:48:38+00:00 | idiom-ui | 0 | 0.73 | `python .migration/harness/tools/check_ui.py` | `f12fd2d3086e0571` |  | gate=ui scope="templates changed since af7b0f50a4466466d767a8b3fe238a5cb3c2ef8f" templates=0 findings=0 |
+| 2026-11-23T00:49:39+00:00 | behavior | 0 | 58.8 | `pytest -q` | `126fa1e53d74a221` |  |  |
+| 2026-11-23T00:50:33+00:00 | crap-coverage | 0 | 50.33 | `pytest -q --cov=src --cov-report=lcov:.migration/runs/crap.lcov` | `798b3a2814fdacec` |  |  |
+| 2026-11-23T00:50:36+00:00 | crap-lizard | 0 | 0.15 | `bash -c 'lizard --csv src > .migration/runs/lizard.csv'` | `e3b0c44298fc1c14` |  |  |
+| 2026-11-23T00:50:38+00:00 | crap-score | 0 | 0.04 | `python .migration/harness/tools/crap.py .migration/runs/lizard.csv --lcov .migration/runs/crap.lcov --max 30` | `f2b725d165841675` |  | gate=crap max=26.0 threshold=30 over=0 methods=181 |
+| 2026-11-23T00:51:31+00:00 | mutation-changed | 1 | 50.35 | `python .migration/harness/tools/afs-mutation` | `5e2f94a2e232974a` | afs-mutation: FAILED score=0.679 threshold=0.8 killed=36 survived=17 skipped=0 files=2 jobs=2 base=af7b0f50a4466466d767a | gate=mutation score=0.679 threshold=0.8 killed=36 survived=17 files=2 base=af7b0f50a4466466d767a8b3fe238a5cb3c2ef8f |
+| 2026-11-23T00:52:06+00:00 | export-mutation-tests | 0 | 2.04 | `pytest -q tests/data_migration/test_export.py` | `97a9c113392c5109` |  |  |
+| 2026-11-23T00:52:10+00:00 | focused-style-after-mutation-tests | 0 | 0.01 | `ruff check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `82b3e6a6c090a576` |  |  |
+| 2026-11-23T00:52:10+00:00 | focused-format-after-mutation-tests | 0 | 0.01 | `ruff format --check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `eee76f865de5a9f2` |  |  |
