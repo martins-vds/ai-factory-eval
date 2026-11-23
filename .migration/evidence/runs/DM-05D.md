@@ -19,3 +19,9 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-23T00:46:56+00:00 | focused-ruff-final | 0 | 0.01 | `ruff check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `82b3e6a6c090a576` |  |  |
 | 2026-11-23T00:46:57+00:00 | focused-format-final | 0 | 0.01 | `ruff format --check src/cargotracker/data_migration/exporter.py src/cargotracker/data_migration/management/commands/export_data_snapshot.py tests/data_migration/test_export.py` | `eee76f865de5a9f2` |  |  |
 | 2026-11-23T00:46:58+00:00 | export-focused-tests-final | 0 | 2.07 | `pytest -q tests/data_migration/test_export.py` | `7dae9c85117603cd` |  |  |
+| 2026-11-23T00:47:31+00:00 | snapshot-check | 0 | 0.06 | `python .migration/harness/tools/data_reconcile.py snapshot .migration/data/snapshot/` | `bee2f0acd5234102` |  | gate=data-snapshot tables=7 problems=0 |
+| 2026-11-23T00:47:40+00:00 | snapshot-load | 1 | 0.44 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot/ --mapping .migration/data/mapping.yaml` | `39d84694036a43bc` | Traceback (most recent call last): |  |
+| 2026-11-23T00:47:52+00:00 | database-migration-plan | 0 | 0.42 | `python manage.py migrate --plan` | `841635093d753223` |  |  |
+| 2026-11-23T00:47:56+00:00 | database-migrate | 0 | 0.51 | `python manage.py migrate --noinput` | `56d728c244009843` |  |  |
+| 2026-11-23T00:48:00+00:00 | snapshot-load | 0 | 0.43 | `python manage.py load_data_snapshot --snapshot .migration/data/snapshot/ --mapping .migration/data/mapping.yaml` | `102e06696c233e34` |  |  |
+| 2026-11-23T00:48:03+00:00 | snapshot-export | 0 | 0.42 | `python manage.py export_data_snapshot --mapping .migration/data/mapping.yaml --out .migration/data/target-export/` | `ba754ea10ff616fb` |  |  |
