@@ -1,0 +1,509 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/martins-vds/ai-factory-swarm/schemas/spec.schema.json",
+  "title": "AI Factory Swarm customer spec (tests as data)",
+  "description": "One file under `.migration/spec/<slice>/`, ADR-0061. A capability's behaviour as data: cases that act through a public entry point (an HTTP request or a management command) and say what must come back, in the domain's words. `afs-spec` runs them; no case names a module, class or function of the code.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "capability",
+    "cases"
+  ],
+  "properties": {
+    "capability": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+      "description": "The ledger entry (`.migration/ledger/<capability>.yaml`) whose rules these cases prove."
+    },
+    "title": {
+      "type": "string"
+    },
+    "background": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "given": {
+          "$ref": "#/$defs/given"
+        }
+      },
+      "description": "Setup every case starts from, before its own `given`."
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    }
+  },
+  "$defs": {
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "rule",
+        "when",
+        "then"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3,
+          "description": "What the case shows, in the domain's words."
+        },
+        "rule": {
+          "description": "The ledger rule id (or ids) this case proves.",
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*$"
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9-]*$"
+              }
+            }
+          ]
+        },
+        "oracle": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Where the expected values come from: a recorded legacy output or characterization test, as a path from the repo root (ADR-0062). The legacy app is the independent oracle; a value from anywhere else needs a `ruling`. With the profile's `spec.required`, every case names an oracle or a ruling, and the path must exist."
+        },
+        "ruling": {
+          "type": "string",
+          "description": "The quirk ruling an expected value comes from, when it differs from what the legacy app did (ADR-0061: a spec never silently keeps a legacy bug)."
+        },
+        "given": {
+          "$ref": "#/$defs/given"
+        },
+        "when": {
+          "$ref": "#/$defs/when"
+        },
+        "then": {
+          "$ref": "#/$defs/then"
+        },
+        "examples": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "columns",
+            "rows"
+          ],
+          "description": "Table form: one case per row; `{column}` in given, when and then is replaced by the row's value.",
+          "properties": {
+            "columns": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-z_][a-z0-9_]*$"
+              }
+            },
+            "rows": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        },
+        "forall": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/generator"
+          },
+          "propertyNames": {
+            "pattern": "^[a-z_][a-z0-9_]*$"
+          },
+          "description": "Property form (ADR-0069): `{name}` in given, when and then takes values from these ranges; the case must hold for every one. Not with `examples`."
+        }
+      }
+    },
+    "given": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fixtures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Data fixtures the stack loads first (Django: `loaddata` names or paths)."
+        },
+        "commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          },
+          "description": "Side-channel setup commands, run before the action."
+        },
+        "clock": {
+          "type": "string",
+          "pattern": "^(\\d{4}-\\d{2}-\\d{2}([T ]\\d{2}:\\d{2}(:\\d{2})?)?|\\{[a-z_][a-z0-9_]*\\})$",
+          "description": "Today's date (and time) as the code sees it: a boundary, so it may be set. Or `{column}`, taken from the case's examples."
+        },
+        "gateways": {
+          "type": "object",
+          "description": "ADR-0068: a real local HTTP stub per named gateway (the profile's spec.gateways says how the target finds it), answering in order; the last answer repeats.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "respond": {
+                "description": "An answer, or a list of answers in order.",
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/answer"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/answer"
+                    }
+                  }
+                ]
+              },
+              "unreachable": {
+                "const": true,
+                "description": "Point the target at a port nothing listens on."
+              }
+            }
+          }
+        }
+      }
+    },
+    "when": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "description": "Exactly one action, through a public entry point.",
+      "properties": {
+        "http": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "method",
+            "path"
+          ],
+          "properties": {
+            "method": {
+              "enum": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE"
+              ]
+            },
+            "path": {
+              "type": "string",
+              "pattern": "^/"
+            },
+            "form": {
+              "type": "object",
+              "description": "Form fields, sent form-encoded."
+            },
+            "json": {
+              "description": "A JSON body."
+            },
+            "headers": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "htmx": {
+              "type": "boolean",
+              "description": "Send it as an htmx request (`HX-Request: true`)."
+            }
+          }
+        },
+        "command": {
+          "$ref": "#/$defs/command"
+        },
+        "replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "recording",
+            "exchange"
+          ],
+          "description": "Replay one recorded legacy exchange (ADR-0067): its request is sent to the target, and `then.replay` compares the response with the recorded one. The recording is the oracle.",
+          "properties": {
+            "recording": {
+              "type": "string",
+              "minLength": 1,
+              "description": "A JSON file of exchanges, from the repo root: {name: {request: {method, path, form?, json?, headers?}, response: {status, body, content_type?}}}."
+            },
+            "exchange": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The exchange's name in that file; may be `{column}` from the examples."
+            },
+            "under": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The key the exchanges sit under, when the recording nests them (e.g. `responses`)."
+            }
+          }
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": [
+              "string",
+              "number"
+            ]
+          }
+        }
+      }
+    },
+    "then": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "description": "What must come back. At least one assertion: a case can't be empty.",
+      "properties": {
+        "status": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\{[a-z_][a-z0-9_]*\\}$",
+              "description": "`{column}`: the row's value, with its own type"
+            }
+          ],
+          "description": "HTTP status, or a command's exit status (0 ok, 1 it raised)."
+        },
+        "json": {
+          "description": "The JSON body must contain this (objects match on the keys given; lists and values match exactly)."
+        },
+        "text": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Each must appear in the body or output."
+        },
+        "not_text": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "None may appear."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "body"
+          ],
+          "description": "With `when.replay`: the status must be the recorded one, and the body must match it after normalizing.",
+          "properties": {
+            "body": {
+              "enum": [
+                "exact",
+                "text",
+                "json",
+                "ignore"
+              ],
+              "description": "exact: the body, line endings and trailing spaces normalized; text: the visible text (tags dropped, entities decoded, whitespace collapsed); json: equal as JSON; ignore: only the status."
+            },
+            "mask": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Regular expressions replaced by <masked> on both sides: values that differ by design (dates, ids, tokens)."
+            }
+          }
+        },
+        "sent": {
+          "type": "object",
+          "description": "ADR-0068: exactly the requests each stubbed gateway received, in order (method and path equal, body containing the text given). [] means none.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "method",
+                "path"
+              ],
+              "properties": {
+                "method": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "schema": {
+          "description": "ADR-0068: the JSON body must satisfy this JSON Schema: inline, or a file from the repo root. The contract of an API whose values can't be fixed.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "number": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "pattern"
+          ],
+          "description": "A number taken from the body (the pattern's first group, or the whole match) must be within bounds: how a property states an invariant.",
+          "properties": {
+            "pattern": {
+              "type": "string",
+              "minLength": 1
+            },
+            "min": {
+              "type": "number"
+            },
+            "max": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "oneOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "string",
+              "pattern": "^\\{[a-z_][a-z0-9_]*\\}$",
+              "description": "`{column}`: the row's value, with its own type"
+            }
+          ]
+        },
+        "body": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "generator": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "additionalProperties": false,
+      "description": "A range or a list a property case draws from (ADR-0069).",
+      "properties": {
+        "int": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to"
+          ],
+          "properties": {
+            "from": {
+              "type": "integer"
+            },
+            "to": {
+              "type": "integer"
+            }
+          }
+        },
+        "number": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to"
+          ],
+          "properties": {
+            "from": {
+              "type": "number"
+            },
+            "to": {
+              "type": "number"
+            },
+            "places": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6
+            }
+          }
+        },
+        "date": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "from",
+            "to"
+          ],
+          "properties": {
+            "from": {
+              "type": "string",
+              "format": "date"
+            },
+            "to": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        },
+        "one_of": {
+          "type": "array",
+          "minItems": 1
+        }
+      }
+    }
+  }
+}
