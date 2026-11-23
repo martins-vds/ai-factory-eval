@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 from django.core.management import call_command
 
+from cargotracker.location.infrastructure.models import LocationRecord
 
 FIXTURE_SNAPSHOT = Path(__file__).parent / 'fixtures' / 'DM-05C'
 MAPPING = Path(__file__).parents[2] / '.migration' / 'data' / 'mapping.yaml'
@@ -142,3 +143,20 @@ def test_export_data_snapshot_round_trips_mapped_fixture(tmp_path):
             '900',
         ],
     ]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_export_orders_rows_by_primary_key(tmp_path):
+    call_command(
+        'load_data_snapshot',
+        snapshot=str(FIXTURE_SNAPSHOT),
+        mapping=str(MAPPING),
+    )
+    LocationRecord.objects.create(id=100, unlocode='TST00', name='Test location')
+    output = tmp_path / 'target'
+
+    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+
+    with (output / 'location.csv').open(newline='', encoding='utf-8') as stream:
+        rows = list(csv.reader(stream))
+    assert [row[0] for row in rows[1:]] == ['100', '101', '102']
