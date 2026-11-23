@@ -1,0 +1,42 @@
+[
+  {
+    "at": "2026-11-23T01:04:31Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 20728,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05D",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/95681b45-9075-45ee-997d-5e07ec09aacf.json",
+      ".migration/evidence/flaky/DM-05D.md",
+      ".migration/evidence/mutants/DM-05D.md",
+      ".migration/evidence/runs/DM-05D.md",
+      ".migration/returns/DM-05D.afs-migrator.yaml",
+      "src/cargotracker/data_migration/exporter.py",
+      "src/cargotracker/data_migration/management/commands/export_data_snapshot.py",
+      "tests/data_migration/test_export.py"
+    ],
+    "test_health": {
+      "block": false,
+      "findings": []
+    },
+    "findings": [
+      "[mechanical] `.migration/returns/DM-05D.afs-migrator.yaml` reports failing gates and no handoff: `crap: 26.0` (an exit gate takes the gate command's exit code, 0 when it passed, not a score). CI will fail the same way. Fix the code or tests and re-run the gate through afs-run; if you can't, write a handoff (afs-handoff), set `handoff:` in your return, and stop.",
+      "[mechanical] You changed `tests/data_migration/test_export.py` after your last run of `build`, `behavior`, `idiom`, `crap`, `regression`, `mutation_changed`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return.",
+      "[scope] These files are outside ticket DM-05D's planned files: `.migration/evidence/flaky/DM-05D.md`. Don't widen your own scope: revert them, or, if the work truly needs them, write a handoff (afs-handoff) that names each file and why, set `handoff:` in your return, and stop. The operator decides."
+    ],
+    "blocks_before": 0,
+    "decision": "block",
+    "why": "block 1 of 2"
+  }
+]
