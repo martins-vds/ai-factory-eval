@@ -1,6 +1,6 @@
 # Surviving mutants: DM-05D
 
-Written by `afs-mutation` on its last run (base `af7b0f50a4466466d767a8b3fe238a5cb3c2ef8f`): score 0.868, threshold 0.8, killed 46, survived 7. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
+Written by `afs-mutation` on its last run (base `af7b0f50a4466466d767a8b3fe238a5cb3c2ef8f`): score 0.865, threshold 0.8, killed 45, survived 7. Each line is a mutant no test killed: add a test that fails on it, or simplify the code if it is equivalent. The diff under each line is the change mutmut made.
 
 - `src/cargotracker/data_migration/exporter.py:22 Mutant #3`
 
@@ -56,7 +56,7 @@ Written by `afs-mutation` on its last run (base `af7b0f50a4466466d767a8b3fe238a5
            tables = _prepare_tables(mapping, _model_index())
   ```
 
-- `src/cargotracker/data_migration/exporter.py:67 Mutant #42`
+- `src/cargotracker/data_migration/exporter.py:67 Mutant #41`
 
   ```diff
   @@ -64,6 +64,6 @@
