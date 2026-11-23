@@ -89,4 +89,3 @@ Written by `afs-mutation` on its last run (base `af7b0f50a4466466d767a8b3fe238a5
        def add_arguments(self, parser):
            parser.add_argument('--mapping', required=True)
   ```
-
