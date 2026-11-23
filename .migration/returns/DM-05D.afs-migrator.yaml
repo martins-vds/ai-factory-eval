@@ -10,7 +10,7 @@ gates:
   build: 0
   behavior: 0
   idiom: 0
-  crap: 26.0
+  crap: 0
   mutation_changed: 0.865
   regression: 0
 evidence_logs:
@@ -21,7 +21,3 @@ new_tickets: []
 handoff: none
 rules: []
 no_rules: {}
-notes: >-
-  The first snapshot load was attempted before target migrations were applied and failed because the
-  cargo table did not exist. After applying the existing migrations, the load and export succeeded;
-  afs-run preserved the initial failure and subsequent pass in .migration/evidence/flaky/DM-05D.md.
