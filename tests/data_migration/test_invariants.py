@@ -200,9 +200,9 @@ def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
     assert cargo.delivery.last_known_location == derived.last_known_location
     assert cargo.delivery.current_voyage == derived.current_voyage
     assert cargo.delivery.misdirected == derived.misdirected
-    assert (
-        cargo.delivery.eta.date() if cargo.delivery.eta else None
-    ) == (derived.eta.date() if derived.eta else None)
+    assert (cargo.delivery.eta.date() if cargo.delivery.eta else None) == (
+        derived.eta.date() if derived.eta else None
+    )
     assert cargo.delivery.next_expected_activity == derived.next_expected_activity
     assert cargo.delivery.unloaded_at_destination == derived.unloaded_at_destination
     assert cargo.delivery.routing_status == derived.routing_status
