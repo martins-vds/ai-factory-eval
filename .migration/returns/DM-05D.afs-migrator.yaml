@@ -1,0 +1,32 @@
+role: afs-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#2425
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2429
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 0
+  mutation_changed: 0.965
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05D.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+specialty: data
+specialty_evidence:
+  - .migration/evidence/runs/DM-05D.md
+  - tests/data_migration/test_export.py
+rules: []
+no_rules:
+  export_data_snapshot: Serialization-only pipeline behavior; no domain business rules changed.
+equivalent_mutants:
+  - >-
+    exporter.py:34 #17: no proxy models or mapped auto-created models are registered in this target, so
+    changing the model-index filter does not change the export model set.
+  - >-
+    exporter.py:78 #53 and :79 #54: the configured Django target uses USE_TZ=True and UTC, so PostgreSQL
+    model queries return timezone-aware UTC values; these mutations affect only an unreachable naive
+    timestamp path or replace the UTC offset with the same UTC value.
