@@ -151,9 +151,8 @@ def test_export_data_snapshot_preserves_null_empty_string_and_utc_order(tmp_path
     assert empty_value['completionTime'] == '2026-11-07T08:12:13Z'
 
 
-@pytest.mark.parametrize(
-    ('mapping', 'expected_error'),
-    [
+def test_export_data_snapshot_rejects_invalid_mappings(tmp_path):
+    cases = [
         ({'tables': 'not-a-list'}, 'mapping has no tables'),
         ({'tables': []}, 'mapping has no tables'),
         ({'tables': [None]}, 'each mapped table must be an object'),
@@ -202,20 +201,19 @@ def test_export_data_snapshot_preserves_null_empty_string_and_utc_order(tmp_path
             },
             'mapping targets must be unique table names: location',
         ),
-    ],
-)
-def test_export_data_snapshot_rejects_invalid_mappings(tmp_path, mapping, expected_error):
-    mapping_path = tmp_path / 'mapping.yaml'
-    mapping_path.write_text(yaml.safe_dump(mapping), encoding='utf-8')
+    ]
+    for index, (mapping, expected_error) in enumerate(cases):
+        mapping_path = tmp_path / f'mapping-{index}.yaml'
+        mapping_path.write_text(yaml.safe_dump(mapping), encoding='utf-8')
 
-    with pytest.raises(CommandError) as error:
-        call_command(
-            'export_data_snapshot',
-            mapping=str(mapping_path),
-            out=str(tmp_path / 'export'),
-        )
+        with pytest.raises(CommandError) as error:
+            call_command(
+                'export_data_snapshot',
+                mapping=str(mapping_path),
+                out=str(tmp_path / 'export'),
+            )
 
-    assert str(error.value) == expected_error
+        assert str(error.value) == expected_error
 
 
 def test_export_data_snapshot_reports_mapping_file_errors(tmp_path):
