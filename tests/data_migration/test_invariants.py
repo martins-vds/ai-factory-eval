@@ -3,6 +3,7 @@ import hashlib
 import json
 import shutil
 from dataclasses import replace
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -126,8 +127,7 @@ def test_loaded_cargo_delivery_matches_its_handling_history(tmp_path):
         )
 
         assert (
-            replace(derived_delivery, last_event_id=history.most_recent_event_id)
-            == cargo.delivery
+            replace(derived_delivery, last_event_id=history.most_recent_event_id) == cargo.delivery
         )
 
 
@@ -138,7 +138,7 @@ def test_loaded_itinerary_legs_connect(tmp_path):
 
     for cargo in CargoRecord.objects.prefetch_related('legs'):
         legs = list(cargo.legs.all())
-        for current, following in zip(legs, legs[1:]):
+        for current, following in pairwise(legs):
             assert current.unload_location_id == following.load_location_id
             connected_pairs += 1
 
@@ -169,7 +169,7 @@ def test_loaded_carrier_movement_schedules_are_in_order(tmp_path):
         for movement in movements:
             assert movement.departure_time <= movement.arrival_time
             checked_movements += 1
-        for previous, following in zip(movements, movements[1:]):
+        for previous, following in pairwise(movements):
             assert previous.arrival_time <= following.departure_time
             assert previous.arrival_location_id == following.departure_location_id
 
