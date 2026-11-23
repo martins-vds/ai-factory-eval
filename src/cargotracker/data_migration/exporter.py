@@ -56,7 +56,7 @@ def export_snapshot(mapping_path, output_path):
             )
             path = output / f'{target}.csv'
             with path.open('w', encoding='utf-8', newline='') as stream:
-                writer = csv.writer(stream, lineterminator='\n')
+                writer = csv.writer(stream)
                 writer.writerow(columns)
                 row_count = 0
                 for row in rows:

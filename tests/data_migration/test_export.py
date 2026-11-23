@@ -42,6 +42,7 @@ def test_export_data_snapshot_round_trips_mapped_fixture(tmp_path):
         'leg.csv',
         'carrier_movement.csv',
     }
+    assert (output / 'location.csv').read_bytes().startswith(b'id,unlocode,name\r\n')
 
     def rows(table):
         with (output / f'{table}.csv').open(newline='', encoding='utf-8') as stream:
