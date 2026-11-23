@@ -30,5 +30,3 @@ equivalent_mutants:
     exporter.py:78 #53 and :79 #54: the configured Django target uses USE_TZ=True and UTC, so PostgreSQL
     model queries return timezone-aware UTC values; these mutations affect only an unreachable naive
     timestamp path or replace the UTC offset with the same UTC value.
-flaky_runs:
-  - .migration/evidence/flaky/DM-05D.md
