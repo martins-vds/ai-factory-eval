@@ -26,3 +26,5 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-23T00:53:14+00:00 | export-tests-final | 0 | 2.22 | `pytest -q tests/data_migration/test_export.py` | `9c28f57c4fad4b6d` |  |  |
 | 2026-11-23T00:53:39+00:00 | mutation-changed | 2 | 7.73 | `python .migration/harness/tools/afs-mutation` | `4bf8c5f3dc0d3854` | afs-mutation: mutmut failed on src/cargotracker/data_migration/exporter.py; its mutants were not tested: | gate=mutation score=n/a error=mutmut-failed failed_files=2 files=2 base=f415794e3aff44382d65a23c7841c416c0678532 |
 | 2026-11-23T00:53:54+00:00 | export-tests-mutation-discovery | 0 | 2.22 | `pytest -q tests/data_migration/test_export.py` | `8b095f83baeb8b1c` |  |  |
+| 2026-11-23T00:55:40+00:00 | mutation-changed | 0 | 88.04 | `python .migration/harness/tools/afs-mutation` | `b794aaf09c88c7f0` |  | gate=mutation score=0.930 threshold=0.8 killed=80 survived=6 files=2 base=f415794e3aff44382d65a23c7841c416c0678532 |
+| 2026-11-23T00:56:18+00:00 | export-tests-survivor-cases | 0 | 2.23 | `pytest -q tests/data_migration/test_export.py` | `2b8f17307e76a363` |  |  |

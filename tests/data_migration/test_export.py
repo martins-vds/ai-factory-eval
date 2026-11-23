@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime, timedelta, timezone
-from io import StringIO
 from pathlib import Path
 
 import pytest
@@ -161,6 +160,10 @@ def test_export_data_snapshot_rejects_invalid_mappings(tmp_path):
             'invalid target table name None',
         ),
         (
+            {'tables': [{'target': 1, 'columns': {'id': 'id'}}]},
+            'invalid target table name 1',
+        ),
+        (
             {'tables': [{'target': '../location', 'columns': {'id': 'id'}}]},
             "invalid target table name '../location'",
         ),
@@ -222,6 +225,11 @@ def test_export_data_snapshot_reports_mapping_file_errors(tmp_path):
         call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
     assert str(missing_error.value).startswith(f'{mapping_path}: unable to read mapping: ')
 
+    mapping_path.write_text('', encoding='utf-8')
+    with pytest.raises(CommandError) as empty_error:
+        call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
+    assert str(empty_error.value) == 'mapping has no tables'
+
     mapping_path.write_text('[]', encoding='utf-8')
     with pytest.raises(CommandError) as shape_error:
         call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
@@ -237,11 +245,13 @@ def test_export_data_snapshot_requires_arguments_and_describes_command(tmp_path,
             call_command('export_data_snapshot', **options)
         assert missing in str(error.value)
 
-    output = StringIO()
     with pytest.raises(SystemExit) as help_exit:
-        call_command('export_data_snapshot', '--help', stdout=output)
+        call_command('export_data_snapshot', '--help')
     assert help_exit.value.code == 0
-    assert 'Export mapped target tables as a relational snapshot.' in capsys.readouterr().out
+    assert any(
+        line == 'Export mapped target tables as a relational snapshot.'
+        for line in capsys.readouterr().out.splitlines()
+    )
 
 
 @pytest.mark.django_db(transaction=True)
