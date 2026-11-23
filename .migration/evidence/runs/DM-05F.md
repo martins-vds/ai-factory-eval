@@ -23,3 +23,4 @@ Written by `afs-run`, one row per gate run. Raw logs are not committed; the SHA-
 | 2026-11-23T01:41:41+00:00 | behavior | 0 | 47.9 | `pytest -q` | `1cc8e8532584ac36` |  |  |
 | 2026-11-23T01:41:55+00:00 | build-compile | 0 | 0.04 | `python -m compileall -q src` | `e3b0c44298fc1c14` |  |  |
 | 2026-11-23T01:41:57+00:00 | build-check | 0 | 0.37 | `python manage.py check` | `1e3e63f221bde888` |  |  |
+| 2026-11-23T01:44:18+00:00 | regression | 0 | 57.51 | `pytest -q` | `36c2119e7f6d31fe` |  |  |
