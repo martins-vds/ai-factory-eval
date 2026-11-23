@@ -1,0 +1,27 @@
+role: afs-migrator
+ticket: DM-05D
+issue: martins-vds/ai-factory-eval#2419
+pr: https://github.com/martins-vds/ai-factory-eval/pull/2423
+specialty: data
+specialty_evidence:
+  - .migration/evidence/runs/DM-05D.md
+  - .migration/evidence/mutants/DM-05D.md
+gates:
+  build: 0
+  behavior: 0
+  idiom: 0
+  crap: 26.0
+  mutation_changed: 0.865
+  regression: 0
+evidence_logs:
+  - .migration/evidence/runs/DM-05D.md
+ledger_updated: []
+quirk_tickets: []
+new_tickets: []
+handoff: none
+rules: []
+no_rules: {}
+notes: >-
+  The first snapshot load was attempted before target migrations were applied and failed because the
+  cargo table did not exist. After applying the existing migrations, the load and export succeeded;
+  afs-run preserved the initial failure and subsequent pass in .migration/evidence/flaky/DM-05D.md.
