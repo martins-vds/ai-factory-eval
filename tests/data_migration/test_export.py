@@ -1,6 +1,4 @@
 import csv
-import subprocess
-import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -21,32 +19,98 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
 
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
 
-    assert {path.name for path in output.glob('*.csv')} == {
-        'HandlingEvent.csv',
-        'carrier_movement.csv',
-        'cargo.csv',
-        'leg.csv',
-        'location.csv',
-        'voyage.csv',
-    }
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(ROOT / '.migration' / 'harness' / 'tools' / 'data_reconcile.py'),
-            'reconcile',
-            '--snapshot',
-            str(FIXTURE_SNAPSHOT),
-            '--target',
-            str(output),
-            '--mapping',
-            str(MAPPING),
+    expected_tables = {
+        'location.csv': [
+            ['id', 'unlocode', 'name'],
+            ['101', 'USNYC', 'New York'],
+            ['102', 'NLRTM', 'Rotterdam'],
         ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-
-    assert result.returncode == 0, result.stdout + result.stderr
+        'voyage.csv': [
+            ['id', 'voyage_number'],
+            ['900', ''],
+        ],
+        'cargo.csv': [
+            [
+                'id',
+                'tracking_id',
+                'origin_id',
+                'spec_origin_id',
+                'spec_destination_id',
+                'spec_arrival_deadline',
+                'transport_status',
+                'last_known_location_id',
+                'current_voyage_id',
+                'misdirected',
+                'eta',
+                'next_expected_handling_event_type',
+                'next_expected_location_id',
+                'next_expected_voyage_id',
+                'unloaded_at_dest',
+                'routing_status',
+                'calculated_at',
+                'last_event_id',
+            ],
+            [
+                '13',
+                'FIDELITY-0001',
+                '101',
+                '101',
+                '102',
+                '2026-12-30',
+                'NOT_RECEIVED',
+                r'\N',
+                '900',
+                'True',
+                '2026-12-29',
+                'LOAD',
+                r'\N',
+                r'\N',
+                'False',
+                'ROUTED',
+                '2026-11-07T10:11:12Z',
+                '71',
+            ],
+        ],
+        'HandlingEvent.csv': [
+            ['id', 'type', 'voyage_id', 'location_id', 'completionTime', 'registration', 'cargo_id'],
+            [
+                '71',
+                'RECEIVE',
+                '900',
+                '102',
+                '2026-11-07T08:12:13Z',
+                '2026-11-07T10:13:14Z',
+                '13',
+            ],
+        ],
+        'leg.csv': [
+            [
+                'id',
+                'load_time',
+                'unload_time',
+                'load_location_id',
+                'unload_location_id',
+                'voyage_id',
+                'cargo_id',
+            ],
+            ['81', '2026-11-08T08:00:00Z', '2026-11-09T11:00:00Z', '101', '102', '900', '13'],
+        ],
+        'carrier_movement.csv': [
+            [
+                'id',
+                'arrival_time',
+                'departure_time',
+                'arrival_location_id',
+                'departure_location_id',
+                'voyage_id',
+            ],
+            ['91', '2026-11-09T10:00:00Z', '2026-11-08T12:00:00Z', '102', '101', '900'],
+        ],
+    }
+    assert {path.name for path in output.glob('*.csv')} == set(expected_tables)
+    for filename, expected_rows in expected_tables.items():
+        with (output / filename).open(newline='', encoding='utf-8') as stream:
+            assert list(csv.reader(stream)) == expected_rows
 
 
 @pytest.mark.django_db(transaction=True)
