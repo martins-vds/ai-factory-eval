@@ -13,9 +13,11 @@ class DataExportError(Exception):
 def _read_mapping(mapping_path):
     path = Path(mapping_path)
     try:
-        mapping = yaml.safe_load(path.read_text(encoding='utf-8')) or {}
+        mapping = yaml.safe_load(path.read_text(encoding='utf-8'))
     except (OSError, yaml.YAMLError) as error:
         raise DataExportError(f'{path}: unable to read mapping: {error}') from error
+    if mapping is None:
+        mapping = {}
     if not isinstance(mapping, dict):
         raise DataExportError(f'{path}: mapping must be an object')
 
@@ -96,7 +98,7 @@ def export_snapshot(mapping_path, output_path):
                 rows = model._base_manager.order_by(model._meta.pk.name).values_list(
                     *(field.attname for field in fields)
                 )
-                for row in rows.iterator(chunk_size=1000):
+                for row in rows.iterator():
                     writer.writerow([_format_value(value) for value in row])
                     count += 1
             exported.append((target, count))

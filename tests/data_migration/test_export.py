@@ -1,9 +1,12 @@
 import csv
 from datetime import datetime, timedelta, timezone
+from io import StringIO
 from pathlib import Path
 
 import pytest
 from django.core.management import call_command
+from django.core.management.base import CommandError
+import yaml
 
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 
@@ -13,10 +16,12 @@ MAPPING = ROOT / '.migration' / 'data' / 'mapping.yaml'
 
 
 @pytest.mark.django_db(transaction=True)
-def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
+def test_export_data_snapshot_round_trips_fixture_rows(tmp_path, capsys):
     call_command('load_data_snapshot', snapshot=str(FIXTURE_SNAPSHOT), mapping=str(MAPPING))
-    output = tmp_path / 'export'
+    capsys.readouterr()
+    output = tmp_path / 'nested' / 'export'
 
+    call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
     call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
 
     expected_tables = {
@@ -111,6 +116,10 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path):
     for filename, expected_rows in expected_tables.items():
         with (output / filename).open(newline='', encoding='utf-8') as stream:
             assert list(csv.reader(stream)) == expected_rows
+    assert capsys.readouterr().out.splitlines() == [
+        'Exported 7 rows across 6 mapped tables.',
+        'Exported 7 rows across 6 mapped tables.',
+    ]
 
 
 @pytest.mark.django_db(transaction=True)
@@ -140,3 +149,109 @@ def test_export_data_snapshot_preserves_null_empty_string_and_utc_order(tmp_path
     assert empty_value['type'] == ''
     assert empty_value['voyage_id'] == r'\N'
     assert empty_value['completionTime'] == '2026-11-07T08:12:13Z'
+
+
+@pytest.mark.parametrize(
+    ('mapping', 'expected_error'),
+    [
+        ({'tables': 'not-a-list'}, 'mapping has no tables'),
+        ({'tables': []}, 'mapping has no tables'),
+        ({'tables': [None]}, 'each mapped table must be an object'),
+        (
+            {'tables': [{'target': None, 'columns': {'id': 'id'}}]},
+            'invalid target table name None',
+        ),
+        (
+            {'tables': [{'target': '../location', 'columns': {'id': 'id'}}]},
+            "invalid target table name '../location'",
+        ),
+        (
+            {'tables': [{'target': '..\\location', 'columns': {'id': 'id'}}]},
+            r"invalid target table name '..\\location'",
+        ),
+        (
+            {'tables': [{'target': 'missing_model', 'columns': {'id': 'id'}}]},
+            'missing_model: no registered Django model for target table',
+        ),
+        (
+            {'tables': [{'target': 'location', 'columns': 'not-a-mapping'}]},
+            'location: mapping has no columns',
+        ),
+        (
+            {'tables': [{'target': 'location', 'columns': {}}]},
+            'location: mapping has no columns',
+        ),
+        (
+            {'tables': [{'target': 'location', 'columns': {1: 'id'}}]},
+            'location: mapped target columns must be strings',
+        ),
+        (
+            {'tables': [{'target': 'location', 'columns': {'unknown': 'unknown'}}]},
+            "location: no target column 'unknown'",
+        ),
+        (
+            {'tables': [{'target': 'location', 'columns': {'unlocode': 'unlocode'}}]},
+            'location: mapping must include its primary key',
+        ),
+        (
+            {
+                'tables': [
+                    {'target': 'location', 'columns': {'id': 'id'}},
+                    {'target': 'location', 'columns': {'id': 'id'}},
+                ]
+            },
+            'mapping targets must be unique table names: location',
+        ),
+    ],
+)
+def test_export_data_snapshot_rejects_invalid_mappings(tmp_path, mapping, expected_error):
+    mapping_path = tmp_path / 'mapping.yaml'
+    mapping_path.write_text(yaml.safe_dump(mapping), encoding='utf-8')
+
+    with pytest.raises(CommandError) as error:
+        call_command(
+            'export_data_snapshot',
+            mapping=str(mapping_path),
+            out=str(tmp_path / 'export'),
+        )
+
+    assert str(error.value) == expected_error
+
+
+def test_export_data_snapshot_reports_mapping_file_errors(tmp_path):
+    mapping_path = tmp_path / 'missing.yaml'
+    with pytest.raises(CommandError) as missing_error:
+        call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
+    assert str(missing_error.value).startswith(f'{mapping_path}: unable to read mapping: ')
+
+    mapping_path.write_text('[]', encoding='utf-8')
+    with pytest.raises(CommandError) as shape_error:
+        call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
+    assert str(shape_error.value) == f'{mapping_path}: mapping must be an object'
+
+
+def test_export_data_snapshot_requires_arguments_and_describes_command(tmp_path, capsys):
+    for options, missing in (
+        ({'mapping': str(MAPPING)}, '--out'),
+        ({'out': str(tmp_path / 'export')}, '--mapping'),
+    ):
+        with pytest.raises(CommandError) as error:
+            call_command('export_data_snapshot', **options)
+        assert missing in str(error.value)
+
+    output = StringIO()
+    with pytest.raises(SystemExit) as help_exit:
+        call_command('export_data_snapshot', '--help', stdout=output)
+    assert help_exit.value.code == 0
+    assert 'Export mapped target tables as a relational snapshot.' in capsys.readouterr().out
+
+
+@pytest.mark.django_db(transaction=True)
+def test_export_data_snapshot_reports_output_errors(tmp_path):
+    output = tmp_path / 'file'
+    output.write_text('not a directory', encoding='utf-8')
+
+    with pytest.raises(CommandError) as error:
+        call_command('export_data_snapshot', mapping=str(MAPPING), out=str(output))
+
+    assert str(error.value).startswith(f'{output}: unable to write export: ')
