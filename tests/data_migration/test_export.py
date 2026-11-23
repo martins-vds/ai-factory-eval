@@ -3,9 +3,9 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
+import yaml
 from django.core.management import call_command
 from django.core.management.base import CommandError
-import yaml
 
 from cargotracker.handling.infrastructure.models import HandlingEventRecord
 
@@ -76,7 +76,15 @@ def test_export_data_snapshot_round_trips_fixture_rows(tmp_path, capsys):
             ],
         ],
         'HandlingEvent.csv': [
-            ['id', 'type', 'voyage_id', 'location_id', 'completionTime', 'registration', 'cargo_id'],
+            [
+                'id',
+                'type',
+                'voyage_id',
+                'location_id',
+                'completionTime',
+                'registration',
+                'cargo_id',
+            ],
             [
                 '71',
                 'RECEIVE',
@@ -222,17 +230,23 @@ def test_export_data_snapshot_rejects_invalid_mappings(tmp_path):
 def test_export_data_snapshot_reports_mapping_file_errors(tmp_path):
     mapping_path = tmp_path / 'missing.yaml'
     with pytest.raises(CommandError) as missing_error:
-        call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
+        call_command(
+            'export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export')
+        )
     assert str(missing_error.value).startswith(f'{mapping_path}: unable to read mapping: ')
 
     mapping_path.write_text('', encoding='utf-8')
     with pytest.raises(CommandError) as empty_error:
-        call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
+        call_command(
+            'export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export')
+        )
     assert str(empty_error.value) == 'mapping has no tables'
 
     mapping_path.write_text('[]', encoding='utf-8')
     with pytest.raises(CommandError) as shape_error:
-        call_command('export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export'))
+        call_command(
+            'export_data_snapshot', mapping=str(mapping_path), out=str(tmp_path / 'export')
+        )
     assert str(shape_error.value) == f'{mapping_path}: mapping must be an object'
 
 
