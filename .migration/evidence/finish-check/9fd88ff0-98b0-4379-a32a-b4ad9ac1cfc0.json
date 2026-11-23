@@ -32,5 +32,40 @@
     "blocks_before": 0,
     "decision": "block",
     "why": "block 1 of 2"
+  },
+  {
+    "at": "2026-11-23T01:45:37Z",
+    "python": "/opt/hostedtoolcache/Python/3.13.18/x64/bin/python3",
+    "payload_keys": [
+      "cwd",
+      "sessionId",
+      "stopReason",
+      "stop_hook_active",
+      "timestamp",
+      "transcriptPath"
+    ],
+    "prompt_chars": 16930,
+    "prompt_from": "transcript",
+    "scope_lines": [],
+    "enabled": true,
+    "ticket": "DM-05F",
+    "role": "afs-migrator",
+    "changed": [
+      ".migration/costs/9fd88ff0-98b0-4379-a32a-b4ad9ac1cfc0.json",
+      ".migration/evidence/runs/DM-05F.md",
+      ".migration/returns/DM-05F.afs-migrator.yaml",
+      "tests/data_migration/test_invariants.py"
+    ],
+    "snapshot_tests": "ok",
+    "test_health": {
+      "block": false,
+      "findings": []
+    },
+    "findings": [
+      "[mechanical] You changed `tests/data_migration/test_invariants.py` after your last run of `build`, so those results don't describe the code CI will check. Re-run each through afs-run and copy the new results into your return."
+    ],
+    "blocks_before": 1,
+    "decision": "allow",
+    "why": "same failure twice; wrote .migration/handoffs/DM-05F.md"
   }
 ]
